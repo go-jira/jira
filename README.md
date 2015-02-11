@@ -7,6 +7,7 @@ simple jira command line client in Go
 git clone git@github.com:Netflix-Skunkworks/go-jira.git
 cd go-jira
 export GOPATH=$(pwd)
+export GOBIN=$GOPATH/bin
 cd src/github.com/Netflix-Skunkworks/go-jira/jira
 go get -v
 go install -v
