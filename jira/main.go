@@ -22,7 +22,7 @@ func parseYaml(file string, opts map[string]string) {
 }
 
 func loadConfigs(opts map[string]string) {
-	paths := cli.FindParentPaths(".jira")
+	paths := cli.FindParentPaths(".jira.d/config.yml")
 	// prepend
 	paths = append([]string{"/etc/jira-cli.yml"}, paths...)
 
@@ -50,7 +50,7 @@ General Options:
   -t --template=FILE  Template file to use for output
 
 List options:
-  -q --query=FILE  Template to use for output
+  -q --query=JQL      Jira Query Language expression for the search
 `, user)
 	
 	args, _ := docopt.Parse(usage, nil, true, "0.0.1", false, false)
