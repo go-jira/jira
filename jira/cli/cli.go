@@ -10,7 +10,7 @@ import (
 	"os"
 	"net/url"
 	"time"
-	"io"
+	"bytes"
 	"runtime"
 )
 
@@ -87,38 +87,99 @@ func (c *Cli) loadCookies() []*http.Cookie {
 	return cookies
 }
 
-func (c *Cli) post(uri string, content io.Reader) *http.Response {
-	req, _ := http.NewRequest("POST", uri, content)
-	return c.makeRequest(req)
+func (c *Cli) post(uri string, content string) (*http.Response, error) {
+	return c.makeRequestWithContent("POST", uri, content)
 }
 
-func (c *Cli) get(uri string) *http.Response {
+func (c *Cli) put(uri string, content string) (*http.Response, error) {
+	return c.makeRequestWithContent("PUT", uri, content)
+}
+
+func (c *Cli) makeRequestWithContent(method string, uri string, content string) (*http.Response, error) {
+	buffer := bytes.NewBufferString(content)
+	req, _ := http.NewRequest(method, uri, buffer)
+
+	log.Info("%s %s", req.Method, req.URL.String())
+	if log.IsEnabledFor(logging.DEBUG) {
+		logBuffer := bytes.NewBuffer(make([]byte,0,len(content)))
+		req.Write(logBuffer)
+		log.Debug("%s", logBuffer)
+		// need to recreate the buffer since the offset is now at the end
+		// need to be able to rewind the buffer offset, dont know how yet
+		req, _ = http.NewRequest(method, uri, bytes.NewBufferString(content))
+	}
+
+	if resp, err := c.makeRequest(req); err != nil {
+		return nil, err
+	} else {
+		if resp.StatusCode == 401 {
+			if err := c.CmdLogin(); err != nil {
+				return nil, err
+			}
+			req, _ = http.NewRequest(method, uri, bytes.NewBufferString(content))
+			return c.makeRequest(req)
+		}
+		return resp, err
+	}
+}
+
+func (c *Cli) get(uri string) (*http.Response, error) {
 	req, _ := http.NewRequest("GET", uri, nil)
-	return c.makeRequest(req)
+	log.Info("%s %s", req.Method, req.URL.String())
+	if log.IsEnabledFor(logging.DEBUG) {
+		logBuffer := bytes.NewBuffer(make([]byte,0))
+		req.Write(logBuffer)
+		log.Debug("%s", logBuffer)
+	}
+
+	if resp, err := c.makeRequest(req); err != nil {
+		return nil, err
+	} else {
+		if resp.StatusCode == 401 {
+			if err := c.CmdLogin(); err != nil {
+				return nil, err
+			}
+			return c.makeRequest(req)
+		}
+		return resp, err
+	}
 }
 
-func (c *Cli) makeRequest(req *http.Request) *http.Response {
-	
+func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.ua.Do(req)
-	
-	if err != nil {
-		fmt.Printf("Error: %s", err)
+	if resp, err = c.ua.Do(req); err != nil { 
+		log.Error("Failed to %s %s: %s", req.Method, req.URL.String(), err)
+		return nil, err
+	} else {
+		if resp.StatusCode < 200 || resp.StatusCode >= 300 && resp.StatusCode != 401 {
+			log.Error("response status: %s", resp.Status)
+			resp.Write(os.Stderr)
+		}
+		
+		runtime.SetFinalizer(resp, func(r *http.Response) {
+			r.Body.Close()
+		})
+		
+		if _, ok := resp.Header["Set-Cookie"]; ok {
+			c.saveCookies(resp.Cookies())
+		}
 	}
+	return resp, nil
+}
 
-	if resp.StatusCode != 200 {
-		log.Error("response status: %s", resp.Status)
-		resp.Write(os.Stderr)
+func (c *Cli) getTemplate(path string, dflt string) string {
+	if override, ok := c.opts["template"]; ok {
+		if _, err := os.Stat(override); err == nil {
+			return readFile(override)
+		} else {
+			if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", override)); err == nil {
+				return readFile(file)
+			}
+		}
 	}
-
-	runtime.SetFinalizer(resp, func(r *http.Response) {
-		r.Body.Close()
-	})
-
-	if _, ok := resp.Header["Set-Cookie"]; ok {
-		c.saveCookies(resp.Cookies())
+	if file, err := FindClosestParentPath(path); err != nil {
+		return dflt
+	} else {
+		return readFile(file)
 	}
-
-	return resp
 }
