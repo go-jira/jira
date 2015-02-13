@@ -71,3 +71,7 @@ const default_create_template = `fields:
   customfield_10110:
     - name:
 `
+
+const default_comment_template = `body: |
+  
+`
