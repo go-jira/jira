@@ -46,23 +46,22 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] (assign|give) ISSUE ASSIGNEE
 
 General Options:
-  -h --help           Show this usage
-  --version           Show this version
-  -v --verbose        Increase output logging
-  -u --user=USER      Username to use for authenticaion (default: %s)
   -e --endpoint=URI   URI to use for jira (default: https://jira)
+  -h --help           Show this usage
   -t --template=FILE  Template file to use for output/editing
+  -u --user=USER      Username to use for authenticaion (default: %s)
+  -v --verbose        Increase output logging
+  --version           Show this version
 
 Command Options:
   -a --assignee=USER        Username assigned the issue
-  -q --query=JQL            Jira Query Language expression for the search
   -c --component=COMPONENT  Component to Search for
-  -p --project=PROJECT      Project to Search for
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
-  -o --override=KEY:VAL     Set custom key/value pairs
-  -w --watcher=USER         Watcher to add to issue (default: %s)
   -m --comment=COMMENT      Comment message for transition
-
+  -o --override=KEY:VAL     Set custom key/value pairs
+  -p --project=PROJECT      Project to Search for
+  -q --query=JQL            Jira Query Language expression for the search
+  -w --watcher=USER         Watcher to add to issue (default: %s)
 `, user, user)
 	
 	args, err := docopt.Parse(usage, nil, true, "0.0.1", false, false); if err != nil {
