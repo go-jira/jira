@@ -226,7 +226,7 @@ func (c *Cli) CmdCreate(project string, issuetype string) error {
 			} else {
 				logBuffer := bytes.NewBuffer(make([]byte,0))
 				resp.Write(logBuffer)
-				err := fmt.Errorf("Unexpected Response From PUT")
+				err := fmt.Errorf("Unexpected Response From POST")
 				log.Error("%s:\n%s", err, logBuffer)
 				return err
 			}
@@ -270,7 +270,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte,0))
 		resp.Write(logBuffer)
-		err := fmt.Errorf("Unexpected Response From PUT")
+		err := fmt.Errorf("Unexpected Response From POST")
 		log.Error("%s:\n%s", err, logBuffer)
 		return err
 	}
@@ -303,7 +303,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte,0))
 		resp.Write(logBuffer)
-		err := fmt.Errorf("Unexpected Response From PUT")
+		err := fmt.Errorf("Unexpected Response From POST")
 		log.Error("%s:\n%s", err, logBuffer)
 		return err
 	}
@@ -327,7 +327,7 @@ func (c *Cli) CmdWatch(issue string, watcher string) error {
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte,0))
 		resp.Write(logBuffer)
-		err := fmt.Errorf("Unexpected Response From PUT")
+		err := fmt.Errorf("Unexpected Response From POST")
 		log.Error("%s:\n%s", err, logBuffer)
 		return err
 	}
@@ -413,7 +413,7 @@ func (c *Cli) CmdComment(issue string) error {
 		} else {
 			logBuffer := bytes.NewBuffer(make([]byte,0))
 			resp.Write(logBuffer)
-			err := fmt.Errorf("Unexpected Response From PUT")
+			err := fmt.Errorf("Unexpected Response From POST")
 			log.Error("%s:\n%s", err, logBuffer)
 			return err
 		}
@@ -433,6 +433,31 @@ func (c *Cli) CmdComment(issue string) error {
 			map[string]interface{}{},
 			handlePost,
 		)
+	}
+	return nil
+}
+
+func (c *Cli) CmdAssign(issue string, user string) error {
+	log.Debug("assign called")
+	
+	json, err := jsonEncode(map[string]interface{}{
+		"name": user,
+	}); if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", c.endpoint, issue)
+	resp, err := c.put(uri, json); if err != nil {
+		return err
+	}
+	if resp.StatusCode == 204 {
+		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte,0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From PUT")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
 	}
 	return nil
 }

@@ -42,9 +42,8 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] start ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] stop ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] [-t FILE] comment ISSUE [-m COMMENT]
-
-  jira TODO [-v ...] [-u USER] [-e URI] take ISSUE
-  jira TODO [-v ...] [-u USER] [-e URI] assign ISSUE ASSIGNEE
+  jira [-v ...] [-u USER] [-e URI] take ISSUE
+  jira [-v ...] [-u USER] [-e URI] (assign|give) ISSUE ASSIGNEE
 
 General Options:
   -h --help           Show this usage
@@ -52,7 +51,7 @@ General Options:
   -v --verbose        Increase output logging
   -u --user=USER      Username to use for authenticaion (default: %s)
   -e --endpoint=URI   URI to use for jira (default: https://jira)
-  -t --template=FILE  Template file to use for output
+  -t --template=FILE  Template file to use for output/editing
 
 List Options:
   -q --query=JQL      Jira Query Language expression for the search
@@ -216,6 +215,13 @@ Transition Options:
 		err = c.CmdTransition(args["ISSUE"].(string), "stop")
 	} else if validCommand("comment") {
 		err = c.CmdComment(args["ISSUE"].(string))
+	} else if validCommand("take") {
+		err = c.CmdAssign(args["ISSUE"].(string), user)
+	} else if validCommand("assign") || validCommand("give") {
+		err = c.CmdAssign(
+			args["ISSUE"].(string),
+			args["ASSIGNEE"].(string),
+		)
 	} else if val, ok := args["ISSUE"]; ok {
 		err = c.CmdView(val.(string))
 	}
