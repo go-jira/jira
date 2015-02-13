@@ -57,25 +57,47 @@ func (c *Cli) CmdFields() error {
 func (c *Cli) CmdList() error {
 	log.Debug("list called")
 
-	if query, ok := c.opts["query"]; !ok {
-		log.Error("No query argument found, either use --query or set query attribute in .jira file")
-		return fmt.Errorf("Missing query")
-	} else {
-		json, err := jsonEncode(map[string]string{
-			"jql": query,
-			"startAt": "0",
-			"maxResults": "500",
-		}); if err != nil {
+	var query string
+	var ok bool
+	// project = BAKERY and status not in (Resolved, Closed)
+	if query, ok = c.opts["query"]; !ok {
+		qbuff := bytes.NewBufferString("status not in (Resolved, Closed)")
+		if project, ok := c.opts["project"]; !ok {
+			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
+			log.Error("%s", err)
 			return err
+		} else {
+			qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", project))
+		}
+		
+		if component, ok := c.opts["component"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND component = '%s'", component))
 		}
 
-		uri := fmt.Sprintf("%s/rest/api/2/search", c.endpoint)
-		data, err := responseToJson(c.post(uri, json)); if err != nil {
-			return err
+		if assignee, ok := c.opts["assignee"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND assignee = '%s'", assignee))
 		}
 
-		return runTemplate(c.getTemplate(".jira.d/templates/list", default_list_template), data, nil)
+		if issuetype, ok := c.opts["issuetype"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND issuetype = '%s'", issuetype))
+		}
+		query = qbuff.String()
 	}
+
+	json, err := jsonEncode(map[string]string{
+		"jql": query,
+		"startAt": "0",
+		"maxResults": "500",
+	}); if err != nil {
+		return err
+	}
+	
+	uri := fmt.Sprintf("%s/rest/api/2/search", c.endpoint)
+	data, err := responseToJson(c.post(uri, json)); if err != nil {
+		return err
+	}
+	
+	return runTemplate(c.getTemplate(".jira.d/templates/list", default_list_template), data, nil)
 }
 
 func (c *Cli) CmdView(issue string) error {
