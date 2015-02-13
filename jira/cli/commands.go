@@ -4,11 +4,8 @@ import (
 	"net/http"
 	"fmt"
 	"code.google.com/p/gopass"
-	"os"
 	"bytes"
-	"os/exec"
-	"io/ioutil"
-	"gopkg.in/yaml.v1"
+	"strings"
 	// "github.com/kr/pretty"
 )
 
@@ -107,102 +104,30 @@ func (c *Cli) CmdEdit(issue string) error {
 		issueData = data.(map[string]interface{})
 	}
 
-	issueData["meta"] = editmeta.(map[string]interface{})["fields"]
+	issueData["meta"] = editmeta.(map[string]interface{})
+	issueData["overrides"] = c.opts
 	
-	tmpdir := fmt.Sprintf("%s/.jira.d/tmp", os.Getenv("HOME"))
-	fh, err := ioutil.TempFile(tmpdir, fmt.Sprintf("%s-edit-", issue)); if err != nil {
-		log.Error("Failed to make temp file in %s: %s", tmpdir, err)
-		return err
-	}
-	defer fh.Close()
-	
-	tmpFileName := fmt.Sprintf("%s.yml", fh.Name())
-	if err := os.Rename(fh.Name(), tmpFileName); err != nil {
-		log.Error("Failed to rename %s to %s: %s", fh.Name(), fmt.Sprintf("%s.yml", fh.Name()), err)
-		return err
-	}
-	
-	err = runTemplate(c.getTemplate(".jira.d/templates/edit", default_edit_template), issueData, fh); if err != nil {
-		return err
-	}
-	
-	fh.Close()
-	
-	editor, ok := c.opts["editor"]; if !ok {
-		editor = os.Getenv("JIRA_EDITOR"); if editor == "" {
-			editor = os.Getenv("EDITOR"); if editor == "" {
-				editor = "vim"
-			}
-		}
-	}
-	for ; true ; {
-		log.Debug("Running: %s %s", editor, tmpFileName)
-		cmd := exec.Command(editor, tmpFileName)
-		cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
-		if err := cmd.Run(); err != nil {
-			log.Error("Failed to edit template with %s: %s", editor, err)
-			if promptYN("edit again?", true) {
-				continue
-			}
-			return err
-		}
-		
-		edited := make(map[string]interface{})
-		if fh, err := ioutil.ReadFile(tmpFileName); err != nil {
-			log.Error("Failed to read tmpfile %s: %s", tmpFileName, err)
-			if promptYN("edit again?", true) {
-				continue
-			}
-			return err
-		} else {
-			if err := yaml.Unmarshal(fh, &edited); err != nil {
-				log.Error("Failed to parse YAML: %s", err)
-				if promptYN("edit again?", true) {
-					continue
-				}
+	return c.editTemplate(
+		c.getTemplate(".jira.d/templates/edit", default_edit_template),
+		fmt.Sprintf("%s-edit-", issue),
+		issueData,
+		func(json string) error {
+			resp, err := c.put(uri, json); if err != nil {
 				return err
 			}
-		}
-		
-		if fixed, err := yamlFixup(edited); err != nil {
-			return err
-		} else {
-			edited = fixed.(map[string]interface{})
-		}
-		
-		mf := editmeta.(map[string]interface{})["fields"]
-		f  := edited["fields"].(map[string]interface{})
-		for k, _ := range f {
-			if _, ok := mf.(map[string]interface{})[k]; !ok {
-				err := fmt.Errorf("Field %s is not editable", k)
-				log.Error("%s", err)
-				if promptYN("edit again?", true) {
-					continue
-				}
+			
+			if resp.StatusCode == 204 {
+				fmt.Printf("OK %s %s/browse/%s\n", issueData["key"], c.endpoint, issueData["key"])
+				return nil
+			} else {
+				logBuffer := bytes.NewBuffer(make([]byte,0))
+				resp.Write(logBuffer)
+				err := fmt.Errorf("Unexpected Response From PUT")
+				log.Error("%s:\n%s", err, logBuffer)
 				return err
 			}
-		}
-
-		json, err := jsonEncode(edited); if err != nil {
-			return err
-		}
-		
-		resp, err := c.put(uri, json); if err != nil {
-			return err
-		}
-
-		if resp.StatusCode == 204 {
-			fmt.Printf("OK %s %s", issueData["key"], issueData["self"])
-			return nil
-		} else {
-			logBuffer := bytes.NewBuffer(make([]byte,0))
-			resp.Write(logBuffer)
-			err := fmt.Errorf("Unexpected Response From PUT")
-			log.Error("%s:\n%s", err, logBuffer)
-			return err
-		}
-	}
-	return nil
+		},
+	)
 }
 
 func (c *Cli) CmdEditMeta(issue string) error {
@@ -232,6 +157,12 @@ func (c *Cli) CmdCreateMeta(project string, issuetype string) error {
 		return err
 	}
 
+	if val, ok := data.(map[string]interface{})["projects"]; ok {
+		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
+			data = val.([]interface{})[0]
+		}
+	}
+
 	return runTemplate(c.getTemplate(".jira.d/templates/createmeta", default_fields_template), data, nil)
 }
 
@@ -243,3 +174,153 @@ func (c *Cli) CmdTransitions(issue string) error {
 	}
 	return runTemplate(c.getTemplate(".jira.d/templates/transitions", default_transitions_template), data, nil)
 }
+
+func (c *Cli) CmdCreate(project string, issuetype string) error {
+	log.Debug("create called")
+
+	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, issuetype)
+	data, err := responseToJson(c.get(uri)); if err != nil {
+		return err
+	}
+
+	issueData := make(map[string]interface{})
+	issueData["overrides"] = c.opts
+
+	if val, ok := data.(map[string]interface{})["projects"]; ok {
+		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
+			issueData["meta"] = val.([]interface{})[0]
+		}
+	}
+	
+	sanitizedType := strings.ToLower(strings.Replace(issuetype, " ", "", -1))
+	return c.editTemplate(
+		c.getTemplate(fmt.Sprintf(".jira.d/templates/create-%s", sanitizedType), default_create_template),
+		fmt.Sprintf("create-%s-", sanitizedType),
+		issueData,
+		func(json string) error {
+			log.Debug("JSON: %s", json)
+			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
+			resp, err := c.post(uri, json); if err != nil {
+				return err
+			}
+			
+			if resp.StatusCode == 201 {
+				// response: {"id":"410836","key":"PROJ-238","self":"https://jira/rest/api/2/issue/410836"}
+				if json, err := responseToJson(resp, nil); err != nil {
+					return err
+				} else {
+					key := json.(map[string]interface{})["key"]
+					fmt.Printf("OK %s %s/browse/%s\n", key, c.endpoint, key)
+				}
+				return nil
+			} else {
+				logBuffer := bytes.NewBuffer(make([]byte,0))
+				resp.Write(logBuffer)
+				err := fmt.Errorf("Unexpected Response From PUT")
+				log.Error("%s:\n%s", err, logBuffer)
+				return err
+			}
+		},
+	)
+	return nil
+}
+
+func (c *Cli) CmdIssueLinkTypes() error {
+	log.Debug("Transitions called")
+	uri := fmt.Sprintf("%s/rest/api/2/issueLinkType", c.endpoint)
+	data, err := responseToJson(c.get(uri)); if err != nil {
+		return err
+	}
+	return runTemplate(c.getTemplate(".jira.d/templates/issuelinktypes", default_fields_template), data, nil)
+}
+
+func (c *Cli) CmdBlocks(blocker string, issue string) error {
+	log.Debug("blocks called")
+
+	json, err := jsonEncode(map[string]interface{}{
+		"type": map[string]string{
+			"name": "Depends",
+		},
+		"inwardIssue": map[string]string{
+			"key": issue,
+		},
+		"outwardIssue": map[string]string{
+			"key": blocker,
+		},
+	}); if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
+	resp, err := c.post(uri, json); if err != nil {
+		return err
+	}
+	if resp.StatusCode == 201 {
+		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte,0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From PUT")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
+
+func (c *Cli) CmdDups(duplicate string, issue string) error {
+	log.Debug("dups called")
+
+	json, err := jsonEncode(map[string]interface{}{
+		"type": map[string]string{
+			"name": "Duplicate",
+		},
+		"inwardIssue": map[string]string{
+			"key": duplicate,
+		},
+		"outwardIssue": map[string]string{
+			"key": issue,
+		},
+	}); if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
+	resp, err := c.post(uri, json); if err != nil {
+		return err
+	}
+	if resp.StatusCode == 201 {
+		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte,0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From PUT")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
+
+
+func (c *Cli) CmdWatch(issue string, watcher string) error {
+	log.Debug("dups called")
+
+	json, err := jsonEncode(watcher); if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", c.endpoint, issue)
+	resp, err := c.post(uri, json); if err != nil {
+		return err
+	}
+	if resp.StatusCode == 204 {
+		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte,0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From PUT")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
+
