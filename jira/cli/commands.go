@@ -140,6 +140,16 @@ func (c *Cli) CmdEditMeta(issue string) error {
 	return runTemplate(c.getTemplate(".jira.d/templates/editmeta", default_fields_template), data, nil)
 }
 
+func (c *Cli) CmdTransitionMeta(issue string) error {
+	log.Debug("tranisionMeta called")
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
+	data, err := responseToJson(c.get(uri)); if err != nil {
+		return err
+	}
+	
+	return runTemplate(c.getTemplate(".jira.d/templates/transmeta", default_fields_template), data, nil)
+}
+
 func (c *Cli) CmdIssueTypes(project string) error {
 	log.Debug("issueTypes called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
@@ -239,7 +249,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 
 	json, err := jsonEncode(map[string]interface{}{
 		"type": map[string]string{
-			"name": "Depends",
+			"name": "Depends",  // TODO This is probably not constant across Jira installs
 		},
 		"inwardIssue": map[string]string{
 			"key": issue,
@@ -272,7 +282,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 
 	json, err := jsonEncode(map[string]interface{}{
 		"type": map[string]string{
-			"name": "Duplicate",
+			"name": "Duplicate",  // TODO This is probably not constant across Jira installs
 		},
 		"inwardIssue": map[string]string{
 			"key": duplicate,
@@ -324,3 +334,64 @@ func (c *Cli) CmdWatch(issue string, watcher string) error {
 	return nil
 }
 
+func (c *Cli) CmdTransition(issue string, trans string) error {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
+	data, err := responseToJson(c.get(uri)); if err != nil {
+		return err
+	}
+
+	transitions := data.(map[string]interface{})["transitions"].([]interface{})
+	var	transId string
+	found := make([]string, len(transitions))
+	for _, transition := range transitions {
+		name := transition.(map[string]interface{})["name"].(string)
+		id  :=  transition.(map[string]interface{})["id"].(string)
+		found = append(found, name)
+		if strings.Contains(strings.ToLower(name), trans) {
+			transId = id
+		}
+	}
+	if transId == "" {
+		err := fmt.Errorf("Invalid Transition '%s', Available: %s", trans, strings.Join(found, ", "))
+		log.Error("%s", err)
+		return err
+	}
+	
+
+	payload := map[string]interface{}{
+		"transition": map[string]interface{}{
+			"id": transId,
+		},
+	}
+
+	if comment, ok := c.opts["comment"]; ok {
+		payload["update"] = map[string]interface{}{
+			"comment": []interface{}{
+				map[string]interface{}{
+					"add": map[string]interface{}{
+						"body": comment,
+					},
+				},
+			},
+		}
+	}
+
+	json, err := jsonEncode(payload); if err != nil {
+		return err
+	}
+	
+	uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
+	resp, err := c.post(uri, json); if err != nil {
+		return err
+	}
+	if resp.StatusCode == 204 {
+		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte,0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From POST")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
