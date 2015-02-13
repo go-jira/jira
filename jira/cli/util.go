@@ -1,28 +1,28 @@
 package cli
 
 import (
-	"os"
-	"fmt"
-	"errors"
-	"strings"
-	"net/http"
-	"encoding/json"
-	"io/ioutil"
-	"text/template"
-	"io"
 	"bufio"
 	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/mgutz/ansi"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+	"text/template"
 )
 
 func FindParentPaths(fileName string) []string {
 	cwd, _ := os.Getwd()
 
-	paths := make([]string,0)
+	paths := make([]string, 0)
 
 	// special case if homedir is not in current path then check there anyway
 	homedir := os.Getenv("HOME")
-	if ! strings.HasPrefix(cwd, homedir) {
+	if !strings.HasPrefix(cwd, homedir) {
 		file := fmt.Sprintf("%s/%s", homedir, fileName)
 		if _, err := os.Stat(file); err == nil {
 			paths = append(paths, file)
@@ -44,9 +44,9 @@ func FindParentPaths(fileName string) []string {
 	return paths
 }
 
-func FindClosestParentPath(fileName string) (string,error) {
+func FindClosestParentPath(fileName string) (string, error) {
 	paths := FindParentPaths(fileName)
-	if len(paths) > 0 { 
+	if len(paths) > 0 {
 		return paths[len(paths)-1], nil
 	}
 	return "", errors.New(fmt.Sprintf("%s not found in parent directory hierarchy", fileName))
@@ -78,15 +78,18 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 		},
 		"append": func(more string, content interface{}) (string, error) {
 			switch value := content.(type) {
-			case string: return string(append([]byte(content.(string)), []byte(more)...)), nil
-			case []byte: return string(append(content.([]byte), []byte(more)...)), nil
-			default: return "", errors.New(fmt.Sprintf("Unknown type: %s", value))
+			case string:
+				return string(append([]byte(content.(string)), []byte(more)...)), nil
+			case []byte:
+				return string(append(content.([]byte), []byte(more)...)), nil
+			default:
+				return "", errors.New(fmt.Sprintf("Unknown type: %s", value))
 			}
 		},
 		"indent": func(spaces int, content string) string {
-			indent  := make([]byte, spaces + 1, spaces +1)
+			indent := make([]byte, spaces+1, spaces+1)
 			indent[0] = '\n'
-			for i := 1; i < spaces + 1; i += 1 {
+			for i := 1; i < spaces+1; i += 1 {
 				indent[i] = ' '
 			}
 			return strings.Replace(content, "\n", string(indent), -1)
@@ -131,8 +134,9 @@ func jsonDecode(io io.Reader) interface{} {
 func jsonEncode(data interface{}) (string, error) {
 	buffer := bytes.NewBuffer(make([]byte, 0))
 	enc := json.NewEncoder(buffer)
-	
-	err := enc.Encode(data); if err != nil {
+
+	err := enc.Encode(data)
+	if err != nil {
 		log.Error("Failed to encode data %s: %s", data, err)
 		return "", err
 	}
@@ -140,7 +144,7 @@ func jsonEncode(data interface{}) (string, error) {
 }
 
 func jsonWrite(file string, data interface{}) {
-	fh, err := os.OpenFile(file, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0600)
+	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	defer fh.Close()
 	if err != nil {
 		log.Error("Failed to open %s: %s", file, err)
@@ -157,20 +161,20 @@ func promptYN(prompt string, yes bool) bool {
 	} else {
 		prompt = fmt.Sprintf("%s [Y/n]: ", prompt)
 	}
-	
+
 	fmt.Printf("%s", prompt)
 	text, _ := reader.ReadString('\n')
 	ans := strings.ToLower(strings.TrimRight(text, "\n"))
 	if ans == "" {
 		return yes
 	}
-	if( strings.HasPrefix(ans, "y") ) {
+	if strings.HasPrefix(ans, "y") {
 		return true
 	}
 	return false
 }
 
-func yamlFixup( data interface{} ) (interface{}, error) {
+func yamlFixup(data interface{}) (interface{}, error) {
 	switch d := data.(type) {
 	case map[interface{}]interface{}:
 		// need to copy this map into a string map so json can encode it
@@ -190,7 +194,7 @@ func yamlFixup( data interface{} ) (interface{}, error) {
 			}
 		}
 		return copy, nil
-	case map[string]interface{}: 
+	case map[string]interface{}:
 		for k, v := range d {
 			if fixed, err := yamlFixup(v); err != nil {
 				return nil, err
@@ -208,7 +212,7 @@ func yamlFixup( data interface{} ) (interface{}, error) {
 			}
 		}
 		return data, nil
-	default: return d, nil
+	default:
+		return d, nil
 	}
 }
-
