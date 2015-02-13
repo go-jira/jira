@@ -41,9 +41,8 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] reopen ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] start ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] stop ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] comment ISSUE [-m COMMENT]
 
-
-  jira TODO [-v ...] [-u USER] [-e URI] comment ISSUE [-m COMMENT]
   jira TODO [-v ...] [-u USER] [-e URI] take ISSUE
   jira TODO [-v ...] [-u USER] [-e URI] assign ISSUE ASSIGNEE
 
@@ -215,6 +214,8 @@ Transition Options:
 		err = c.CmdTransition(args["ISSUE"].(string), "start")
 	} else if validCommand("stop") {
 		err = c.CmdTransition(args["ISSUE"].(string), "stop")
+	} else if validCommand("comment") {
+		err = c.CmdComment(args["ISSUE"].(string))
 	} else if val, ok := args["ISSUE"]; ok {
 		err = c.CmdView(val.(string))
 	}

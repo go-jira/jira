@@ -312,7 +312,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 
 
 func (c *Cli) CmdWatch(issue string, watcher string) error {
-	log.Debug("dups called")
+	log.Debug("watch called")
 
 	json, err := jsonEncode(watcher); if err != nil {
 		return err
@@ -335,6 +335,7 @@ func (c *Cli) CmdWatch(issue string, watcher string) error {
 }
 
 func (c *Cli) CmdTransition(issue string, trans string) error {
+	log.Debug("transition called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri)); if err != nil {
 		return err
@@ -342,7 +343,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 
 	transitions := data.(map[string]interface{})["transitions"].([]interface{})
 	var	transId string
-	found := make([]string, len(transitions))
+	found := make([]string, 0, len(transitions))
 	for _, transition := range transitions {
 		name := transition.(map[string]interface{})["name"].(string)
 		id  :=  transition.(map[string]interface{})["id"].(string)
@@ -392,6 +393,46 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		err := fmt.Errorf("Unexpected Response From POST")
 		log.Error("%s:\n%s", err, logBuffer)
 		return err
+	}
+	return nil
+}
+
+func (c *Cli) CmdComment(issue string) error {
+	log.Debug("comment called")
+	
+	handlePost := func(json string) error {
+		log.Debug("JSON: %s", json)
+		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", c.endpoint, issue)
+		resp, err := c.post(uri, json); if err != nil {
+			return err
+		}
+		
+		if resp.StatusCode == 201 {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+			return nil
+		} else {
+			logBuffer := bytes.NewBuffer(make([]byte,0))
+			resp.Write(logBuffer)
+			err := fmt.Errorf("Unexpected Response From PUT")
+			log.Error("%s:\n%s", err, logBuffer)
+			return err
+		}
+	}
+
+	if comment, ok := c.opts["comment"]; ok {
+		json, err := jsonEncode(map[string]interface{}{
+			"body": comment,
+		}); if err != nil {
+			return err
+		}
+		return handlePost(json)
+	} else {
+		return c.editTemplate(
+			c.getTemplate(".jira.d/templates/comment", default_comment_template),
+			fmt.Sprintf("%s-create-", issue),
+			map[string]interface{}{},
+			handlePost,
+		)
 	}
 	return nil
 }
