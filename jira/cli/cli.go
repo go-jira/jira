@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"gopkg.in/yaml.v2"
 	"net/url"
 	"time"
 	"bytes"
@@ -182,4 +184,95 @@ func (c *Cli) getTemplate(path string, dflt string) string {
 	} else {
 		return readFile(file)
 	}
+}
+
+func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData map[string]interface{}, templateProcessor func(string) error) error {
+
+	tmpdir := fmt.Sprintf("%s/.jira.d/tmp", os.Getenv("HOME"))
+	fh, err := ioutil.TempFile(tmpdir, tmpFilePrefix); if err != nil {
+		log.Error("Failed to make temp file in %s: %s", tmpdir, err)
+		return err
+	}
+	defer fh.Close()
+	
+	tmpFileName := fmt.Sprintf("%s.yml", fh.Name())
+	if err := os.Rename(fh.Name(), tmpFileName); err != nil {
+		log.Error("Failed to rename %s to %s: %s", fh.Name(), fmt.Sprintf("%s.yml", fh.Name()), err)
+		return err
+	}
+	
+	err = runTemplate(template, templateData, fh); if err != nil {
+		return err
+	}
+	
+	fh.Close()
+	
+	editor, ok := c.opts["editor"]; if !ok {
+		editor = os.Getenv("JIRA_EDITOR"); if editor == "" {
+			editor = os.Getenv("EDITOR"); if editor == "" {
+				editor = "vim"
+			}
+		}
+	}
+	for ; true ; {
+		log.Debug("Running: %s %s", editor, tmpFileName)
+		cmd := exec.Command(editor, tmpFileName)
+		cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
+		if err := cmd.Run(); err != nil {
+			log.Error("Failed to edit template with %s: %s", editor, err)
+			if promptYN("edit again?", true) {
+				continue
+			}
+			return err
+		}
+		
+		edited := make(map[string]interface{})
+		if fh, err := ioutil.ReadFile(tmpFileName); err != nil {
+			log.Error("Failed to read tmpfile %s: %s", tmpFileName, err)
+			if promptYN("edit again?", true) {
+				continue
+			}
+			return err
+		} else {
+			if err := yaml.Unmarshal(fh, &edited); err != nil {
+				log.Error("Failed to parse YAML: %s", err)
+				if promptYN("edit again?", true) {
+					continue
+				}
+				return err
+			}
+		}
+		
+		if fixed, err := yamlFixup(edited); err != nil {
+			return err
+		} else {
+			edited = fixed.(map[string]interface{})
+		}
+		
+		mf := templateData["meta"].(map[string]interface{})["fields"]
+		f  := edited["fields"].(map[string]interface{})
+		for k, _ := range f {
+			if _, ok := mf.(map[string]interface{})[k]; !ok {
+				err := fmt.Errorf("Field %s is not editable", k)
+				log.Error("%s", err)
+				if promptYN("edit again?", true) {
+					continue
+				}
+				return err
+			}
+		}
+
+		json, err := jsonEncode(edited); if err != nil {
+			return err
+		}
+
+		if err := templateProcessor(json); err != nil {
+			log.Error("%s", err)
+			if promptYN("edit again?", true) {
+				continue
+			}
+		}
+		return nil
+	}
+	return nil
 }

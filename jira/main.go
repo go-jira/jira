@@ -22,16 +22,18 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] login
   jira [-v ...] [-u USER] [-e URI] [-t FILE] ls [-q JQL]
   jira [-v ...] [-u USER] [-e URI] [-t FILE] view ISSUE
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
   jira [-v ...] [-u USER] [-e URI] [-t FILE] ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] editmeta ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] transitions ISSUE
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] create [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
+  jira [-v ...] [-u USER] [-e URI] DUPLICATE dups ISSUE
+  jira [-v ...] [-u USER] [-e URI] BLOCKER blocks ISSUE
+  jira [-v ...] [-u USER] [-e URI] watch ISSUE [WATCHER]
 
-  jira TODO [-v ...] [-u USER] [-e URI] [-t FILE] create [-p PROJECT] [-i ISSUETYPE]
-  jira TODO [-v ...] [-u USER] [-e URI] DUPLICATE dups ISSUE
-  jira TODO [-v ...] [-u USER] [-e URI] BLOCKER blocks ISSUE
   jira TODO [-v ...] [-u USER] [-e URI] close ISSUE [-m COMMENT]
   jira TODO [-v ...] [-u USER] [-e URI] resolve ISSUE [-m COMMENT]
   jira TODO [-v ...] [-u USER] [-e URI] comment ISSUE [-m COMMENT]
@@ -52,6 +54,7 @@ List Options:
 Create Options:
   -p --project=PROJECT      Jira Project Name
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
+  -o --override=KEY:VAL     Set custom key/value pairs
 `, user)
 	
 	args, _ := docopt.Parse(usage, nil, true, "0.0.1", false, false)
@@ -73,7 +76,6 @@ Create Options:
 
 	log.Info("Args: %v", args)
 
-
 	opts := make(map[string]string)
 	loadConfigs(opts)
 
@@ -82,12 +84,23 @@ Create Options:
 	for key,val := range args {
 		if val != nil && strings.HasPrefix(key, "--") {
 			opt := key[2:]
-			switch v := val.(type) {
-				// only deal with string opts, ignore
-				// other types, like int (for now) since
-				// they are only used for --verbose
-			case string:
-				opts[opt] = v
+			if opt == "override" {
+				for _, v := range val.([]string) {
+					if strings.Contains(v, "=") {
+						kv := strings.SplitN(v, "=", 2)
+						opts[kv[0]] = kv[1]
+					} else {
+						log.Error("Malformed override, expected KEY=VALUE, got %s", v)
+						os.Exit(1)
+					}
+				}
+			} else {
+				switch v := val.(type) {
+				case string:
+					opts[opt] = v
+				case int:
+					opts[opt] = fmt.Sprintf("%d", v)
+				}
 			}
 		}
 	}
@@ -122,6 +135,8 @@ Create Options:
 	} else if val, ok := args["editmeta"]; ok && val.(bool) {
 		issue, _ := args["ISSUE"]
 		err = c.CmdEditMeta(issue.(string))
+	} else if val, ok := args["issuelinktypes"]; ok && val.(bool) {
+		err = c.CmdIssueLinkTypes()
 	} else if val, ok := args["issuetypes"]; ok && val.(bool) {
 		var project interface{}
 		if project, ok = opts["project"]; !ok {
@@ -140,9 +155,55 @@ Create Options:
 			issuetype = "Bug"
 		}
 		err = c.CmdCreateMeta(project.(string), issuetype.(string))
+	} else if val, ok := args["create"]; ok && val.(bool) {
+		var project interface{}
+		if project, ok = opts["project"]; !ok {
+			log.Error("missing PROJECT argument or \"project\" property in the config file")
+			os.Exit(1)
+		}
+		var issuetype interface{}
+		if issuetype, ok = opts["issuetype"]; !ok {
+			issuetype = "Bug"
+		}
+		err = c.CmdCreate(project.(string), issuetype.(string))
 	} else if val, ok := args["transitions"]; ok && val.(bool) {
 		issue, _ := args["ISSUE"]
 		err = c.CmdTransitions(issue.(string))
+	} else if val, ok := args["blocks"]; ok && val.(bool) {
+		if blocker, ok := args["BLOCKER"].(string); ok {
+			if issue, ok := args["ISSUE"].(string); ok {
+				err = c.CmdBlocks(blocker, issue)
+			} else {
+				log.Error("missing ISSUE")
+				os.Exit(1)
+			}
+		} else {
+			log.Error("missing BLOCKER")
+			os.Exit(1)
+		}
+	} else if val, ok := args["dups"]; ok && val.(bool) {
+		if duplicate, ok := args["DUPLICATE"].(string); ok {
+			if issue, ok := args["ISSUE"].(string); ok {
+				err = c.CmdDups(duplicate, issue)
+			} else {
+				log.Error("missing ISSUE")
+				os.Exit(1)
+			}
+		} else {
+			log.Error("missing BLOCKER")
+			os.Exit(1)
+		}
+	} else if val, ok := args["watch"]; ok && val.(bool) {
+		if issue, ok := args["ISSUE"].(string); ok {
+			var watcher string
+			if watcher, ok = args["WATCHER"].(string); !ok {
+				watcher = user
+			}
+			err = c.CmdWatch(issue, watcher)
+		} else {
+			log.Error("missing ISSUE")
+			os.Exit(1)
+		}
 	} else if val, ok := args["ISSUE"]; ok {
 		err = c.CmdView(val.(string))
 	}

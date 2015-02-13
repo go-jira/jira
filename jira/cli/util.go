@@ -94,6 +94,9 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 		"color": func(color string) string {
 			return ansi.ColorCode(color)
 		},
+		"split": func(sep string, content string) []string {
+			return strings.Split(content, sep)
+		},
 	}
 	if tmpl, err := template.New("template").Funcs(funcs).Parse(templateContent); err != nil {
 		log.Error("Failed to parse template: %s", err)
@@ -157,7 +160,10 @@ func promptYN(prompt string, yes bool) bool {
 	
 	fmt.Printf("%s", prompt)
 	text, _ := reader.ReadString('\n')
-	ans := strings.ToLower(text)
+	ans := strings.ToLower(strings.TrimRight(text, "\n"))
+	if ans == "" {
+		return yes
+	}
 	if( strings.HasPrefix(ans, "y") ) {
 		return true
 	}
@@ -205,3 +211,4 @@ func yamlFixup( data interface{} ) (interface{}, error) {
 	default: return d, nil
 	}
 }
+

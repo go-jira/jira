@@ -31,22 +31,43 @@ const default_edit_template = `update:
           
 fields:
   summary: {{ .fields.summary }}
-  components: # {{ range .meta.components.allowedValues }}{{.name}}, {{end}}{{ range .fields.components }}
+  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range .fields.components }}
     - name: {{ .name }}{{end}}
   assignee:
-    name: {{ .fields.assignee.name }}
+    name: {{ if .fields.assignee }}{{ .fields.assignee.name }}{{end}}
   reporter:
     name: {{ .fields.reporter.name }}
   # watchers
   customfield_10110: {{ range .fields.customfield_10110 }}
     - name: {{ .name }}{{end}}
-  priority: # {{ range .meta.priority.allowedValues }}{{.name}}, {{end}}
+  priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ .fields.priority.name }}
   description: |
-    {{ .fields.description | indent 4 }}
+    {{ or .fields.description "" | indent 4 }}
 `
 const default_transitions_template = `{{ range .transitions }}{{color "+bh"}}{{.name | printf "%-13s" }}{{color "reset"}} -> {{.to.name}}
 {{end}}`
 
 const default_issuetypes_template = `{{ range .projects }}{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
 {{end}}{{end}}`
+
+const default_create_template = `fields:
+  project:
+    key: {{ .overrides.project }}
+  issuetype:
+    name: {{ .overrides.issuetype }}
+  summary: {{ or .overrides.summary "" }}
+  priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
+    name: {{ or .overrides.priority "" }}
+  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
+    - name: {{ . }}{{end}}
+  description: |
+    {{ or .overrides.description "" | indent 4 }}
+  assignee:
+    name: {{ or .overrides.assignee .overrides.user}}
+  reporter:
+    name: {{ or .overrides.reporter .overrides.user }}
+  # watchers
+  customfield_10110:
+    - name:
+`
