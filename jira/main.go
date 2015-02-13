@@ -20,7 +20,7 @@ func main() {
 Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] fields
   jira [-v ...] [-u USER] [-e URI] [-t FILE] login
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) [-q JQL]
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE]) 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
   jira [-v ...] [-u USER] [-e URI] [-t FILE] transmeta ISSUE
@@ -53,23 +53,22 @@ General Options:
   -e --endpoint=URI   URI to use for jira (default: https://jira)
   -t --template=FILE  Template file to use for output/editing
 
-List Options:
-  -q --query=JQL      Jira Query Language expression for the search
-
-Create Options:
-  -p --project=PROJECT      Jira Project Name
+Command Options:
+  -a --assignee=USER        Username assigned the issue
+  -q --query=JQL            Jira Query Language expression for the search
+  -c --component=COMPONENT  Component to Search for
+  -p --project=PROJECT      Project to Search for
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -o --override=KEY:VAL     Set custom key/value pairs
-
-Watch Options:
   -w --watcher=USER         Watcher to add to issue (default: %s)
-
-Transition Options:
   -m --comment=COMMENT      Comment message for transition
 
 `, user, user)
 	
-	args, _ := docopt.Parse(usage, nil, true, "0.0.1", false, false)
+	args, err := docopt.Parse(usage, nil, true, "0.0.1", false, false); if err != nil {
+		log.Error("Failed to parse options: %s", err)
+		os.Exit(1)
+	}
 	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
 	logging.SetBackend(
 		logging.NewBackendFormatter(
@@ -152,7 +151,6 @@ Transition Options:
 		return dflt
 	}
 
-	var err error
 	if validCommand("login") {
 		err = c.CmdLogin()
 	} else if validCommand("fields") {
