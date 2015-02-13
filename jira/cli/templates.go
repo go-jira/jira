@@ -1,14 +1,14 @@
 package cli
 
 var all_templates = map[string]string{
-	"fields": default_fields_template,
-	"list": default_list_template,
-	"view": default_view_template,
-	"edit": default_edit_template,
+	"fields":      default_fields_template,
+	"list":        default_list_template,
+	"view":        default_view_template,
+	"edit":        default_edit_template,
 	"transitions": default_transitions_template,
-	"issuetypes": default_issuetypes_template,
-	"create": default_create_template,
-	"comment": default_comment_template,
+	"issuetypes":  default_issuetypes_template,
+	"create":      default_create_template,
+	"comment":     default_comment_template,
 }
 
 const default_fields_template = "{{ . | toJson}}\n"

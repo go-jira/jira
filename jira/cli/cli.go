@@ -1,28 +1,28 @@
 package cli
 
 import (
-	"github.com/op/go-logging"
-	"net/http"
-	"net/http/cookiejar"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/op/go-logging"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"net/http"
+	"net/http/cookiejar"
+	"net/url"
 	"os"
 	"os/exec"
-	"gopkg.in/yaml.v2"
-	"net/url"
-	"time"
-	"bytes"
 	"runtime"
+	"time"
 )
 
 var log = logging.MustGetLogger("jira.cli")
 
 type Cli struct {
-	endpoint *url.URL
-	opts map[string]string
+	endpoint   *url.URL
+	opts       map[string]string
 	cookieFile string
-	ua *http.Client
+	ua         *http.Client
 }
 
 func New(opts map[string]string) *Cli {
@@ -32,12 +32,12 @@ func New(opts map[string]string) *Cli {
 	url, _ := url.Parse(endpoint)
 
 	cli := &Cli{
-		endpoint: url,
-		opts: opts,
+		endpoint:   url,
+		opts:       opts,
 		cookieFile: fmt.Sprintf("%s/.jira.d/cookies.js", homedir),
-		ua: &http.Client{Jar: cookieJar},
+		ua:         &http.Client{Jar: cookieJar},
 	}
-	
+
 	cli.ua.Jar.SetCookies(url, cli.loadCookies())
 
 	return cli
@@ -49,17 +49,17 @@ func (c *Cli) saveCookies(cookies []*http.Cookie) {
 	for _, cookie := range cookies {
 		cookie.Expires = expiry
 	}
-	
+
 	if currentCookies := c.loadCookies(); currentCookies != nil {
 		currentCookiesByName := make(map[string]*http.Cookie)
 		for _, cookie := range currentCookies {
 			currentCookiesByName[cookie.Name] = cookie
 		}
-		
+
 		for _, cookie := range cookies {
 			currentCookiesByName[cookie.Name] = cookie
 		}
-		
+
 		mergedCookies := make([]*http.Cookie, 0, len(currentCookiesByName))
 		for _, v := range currentCookiesByName {
 			mergedCookies = append(mergedCookies, v)
@@ -80,7 +80,7 @@ func (c *Cli) loadCookies() []*http.Cookie {
 		log.Error("Failed to open %s: %s", c.cookieFile, err)
 		os.Exit(1)
 	}
-	cookies := make([]*http.Cookie,0)
+	cookies := make([]*http.Cookie, 0)
 	err = json.Unmarshal(bytes, &cookies)
 	if err != nil {
 		log.Error("Failed to parse json from file %s: %s", c.cookieFile, err)
@@ -103,7 +103,7 @@ func (c *Cli) makeRequestWithContent(method string, uri string, content string) 
 
 	log.Info("%s %s", req.Method, req.URL.String())
 	if log.IsEnabledFor(logging.DEBUG) {
-		logBuffer := bytes.NewBuffer(make([]byte,0,len(content)))
+		logBuffer := bytes.NewBuffer(make([]byte, 0, len(content)))
 		req.Write(logBuffer)
 		log.Debug("%s", logBuffer)
 		// need to recreate the buffer since the offset is now at the end
@@ -129,7 +129,7 @@ func (c *Cli) get(uri string) (*http.Response, error) {
 	req, _ := http.NewRequest("GET", uri, nil)
 	log.Info("%s %s", req.Method, req.URL.String())
 	if log.IsEnabledFor(logging.DEBUG) {
-		logBuffer := bytes.NewBuffer(make([]byte,0))
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		req.Write(logBuffer)
 		log.Debug("%s", logBuffer)
 	}
@@ -149,7 +149,7 @@ func (c *Cli) get(uri string) (*http.Response, error) {
 
 func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	req.Header.Set("Content-Type", "application/json")
-	if resp, err = c.ua.Do(req); err != nil { 
+	if resp, err = c.ua.Do(req); err != nil {
 		log.Error("Failed to %s %s: %s", req.Method, req.URL.String(), err)
 		return nil, err
 	} else {
@@ -157,11 +157,11 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 			log.Error("response status: %s", resp.Status)
 			resp.Write(os.Stderr)
 		}
-		
+
 		runtime.SetFinalizer(resp, func(r *http.Response) {
 			r.Body.Close()
 		})
-		
+
 		if _, ok := resp.Header["Set-Cookie"]; ok {
 			c.saveCookies(resp.Cookies())
 		}
@@ -189,32 +189,37 @@ func (c *Cli) getTemplate(path string, dflt string) string {
 func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData map[string]interface{}, templateProcessor func(string) error) error {
 
 	tmpdir := fmt.Sprintf("%s/.jira.d/tmp", os.Getenv("HOME"))
-	fh, err := ioutil.TempFile(tmpdir, tmpFilePrefix); if err != nil {
+	fh, err := ioutil.TempFile(tmpdir, tmpFilePrefix)
+	if err != nil {
 		log.Error("Failed to make temp file in %s: %s", tmpdir, err)
 		return err
 	}
 	defer fh.Close()
-	
+
 	tmpFileName := fmt.Sprintf("%s.yml", fh.Name())
 	if err := os.Rename(fh.Name(), tmpFileName); err != nil {
 		log.Error("Failed to rename %s to %s: %s", fh.Name(), fmt.Sprintf("%s.yml", fh.Name()), err)
 		return err
 	}
-	
-	err = runTemplate(template, templateData, fh); if err != nil {
+
+	err = runTemplate(template, templateData, fh)
+	if err != nil {
 		return err
 	}
-	
+
 	fh.Close()
-	
-	editor, ok := c.opts["editor"]; if !ok {
-		editor = os.Getenv("JIRA_EDITOR"); if editor == "" {
-			editor = os.Getenv("EDITOR"); if editor == "" {
+
+	editor, ok := c.opts["editor"]
+	if !ok {
+		editor = os.Getenv("JIRA_EDITOR")
+		if editor == "" {
+			editor = os.Getenv("EDITOR")
+			if editor == "" {
 				editor = "vim"
 			}
 		}
 	}
-	for ; true ; {
+	for true {
 		log.Debug("Running: %s %s", editor, tmpFileName)
 		cmd := exec.Command(editor, tmpFileName)
 		cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
@@ -225,7 +230,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 			}
 			return err
 		}
-		
+
 		edited := make(map[string]interface{})
 		if fh, err := ioutil.ReadFile(tmpFileName); err != nil {
 			log.Error("Failed to read tmpfile %s: %s", tmpFileName, err)
@@ -242,7 +247,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 				return err
 			}
 		}
-		
+
 		if fixed, err := yamlFixup(edited); err != nil {
 			return err
 		} else {
@@ -251,7 +256,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 
 		if _, ok := templateData["meta"]; ok {
 			mf := templateData["meta"].(map[string]interface{})["fields"]
-			f  := edited["fields"].(map[string]interface{})
+			f := edited["fields"].(map[string]interface{})
 			for k, _ := range f {
 				if _, ok := mf.(map[string]interface{})[k]; !ok {
 					err := fmt.Errorf("Field %s is not editable", k)
@@ -264,7 +269,8 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 			}
 		}
 
-		json, err := jsonEncode(edited); if err != nil {
+		json, err := jsonEncode(edited)
+		if err != nil {
 			return err
 		}
 

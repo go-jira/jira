@@ -1,14 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"github.com/Netflix-Skunkworks/go-jira/jira/cli"
 	"github.com/docopt/docopt-go"
 	"github.com/op/go-logging"
-	"fmt"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"os"
 	"strings"
-	"io/ioutil"
-	"gopkg.in/yaml.v2"
-	"github.com/Netflix-Skunkworks/go-jira/jira/cli"
 )
 
 var log = logging.MustGetLogger("jira")
@@ -66,15 +66,16 @@ Command Options:
   -q --query=JQL            Jira Query Language expression for the search
   -w --watcher=USER         Watcher to add to issue (default: %s)
 `, user, fmt.Sprintf("%s/.jira.d/templates", home), user)
-	
-	args, err := docopt.Parse(usage, nil, true, "0.0.1", false, false); if err != nil {
+
+	args, err := docopt.Parse(usage, nil, true, "0.0.1", false, false)
+	if err != nil {
 		log.Error("Failed to parse options: %s", err)
 		os.Exit(1)
 	}
 	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
 	logging.SetBackend(
 		logging.NewBackendFormatter(
-			logBackend, 
+			logBackend,
 			logging.MustStringFormatter(format),
 		),
 	)
@@ -82,7 +83,7 @@ Command Options:
 	if verbose, ok := args["--verbose"]; ok {
 		if verbose.(int) > 1 {
 			logging.SetLevel(logging.DEBUG, "")
-		} else if verbose.(int) > 0 { 
+		} else if verbose.(int) > 0 {
 			logging.SetLevel(logging.INFO, "")
 		}
 	}
@@ -94,7 +95,7 @@ Command Options:
 
 	// strip the "--" off the command line options
 	// and populate the opts that we pass to the cli ctor
-	for key,val := range args {
+	for key, val := range args {
 		if val != nil && strings.HasPrefix(key, "--") {
 			opt := key[2:]
 			if opt == "override" {
@@ -117,7 +118,7 @@ Command Options:
 			}
 		}
 	}
-	
+
 	// cant use proper [default:x] syntax in docopt
 	// because only want to default if the option is not
 	// already specified in some .jira.d/config.yml file
@@ -133,10 +134,10 @@ Command Options:
 	if _, ok := opts["directory"]; !ok {
 		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
 	}
-	
+
 	c := cli.New(opts)
 
-	log.Debug("opts: %s", opts);
+	log.Debug("opts: %s", opts)
 
 	validCommand := func(cmd string) bool {
 		if val, ok := args[cmd]; ok && val.(bool) {
@@ -231,7 +232,7 @@ Command Options:
 		err = c.CmdView(val.(string))
 	}
 
-	if err != nil { 
+	if err != nil {
 		os.Exit(1)
 	}
 	os.Exit(0)
@@ -249,8 +250,7 @@ func loadConfigs(opts map[string]string) {
 	// prepend
 	paths = append([]string{"/etc/jira-cli.yml"}, paths...)
 
-	for _, file := range(paths) {
+	for _, file := range paths {
 		parseYaml(file, opts)
 	}
 }
-
