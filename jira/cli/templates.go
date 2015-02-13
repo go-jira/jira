@@ -1,5 +1,16 @@
 package cli
 
+var all_templates = map[string]string{
+	"fields": default_fields_template,
+	"list": default_list_template,
+	"view": default_view_template,
+	"edit": default_edit_template,
+	"transitions": default_transitions_template,
+	"issuetypes": default_issuetypes_template,
+	"create": default_create_template,
+	"comment": default_comment_template,
+}
+
 const default_fields_template = "{{ . | toJson}}\n"
 
 const default_list_template = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
@@ -28,22 +39,24 @@ const default_edit_template = `update:
   comment:
     - add: 
         body: |
-          
+          {{ or .overrides.comment ""}}
 fields:
-  summary: {{ .fields.summary }}
-  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range .fields.components }}
-    - name: {{ .name }}{{end}}
+  summary: {{ or .overrides.summary .fields.summary }}
+  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
+    - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
+    - name: {{ .name }}{{end}}{{end}}
   assignee:
-    name: {{ if .fields.assignee }}{{ .fields.assignee.name }}{{end}}
+    name: {{ if .overrides.assignee }}{{.overrides.assignee}}{{else}}{{if .fields.assignee }}{{ .fields.assignee.name }}{{end}}{{end}}
   reporter:
-    name: {{ .fields.reporter.name }}
+    name: {{ or .overrides.reporter .fields.reporter.name }}
   # watchers
   customfield_10110: {{ range .fields.customfield_10110 }}
-    - name: {{ .name }}{{end}}
+    - name: {{ .name }}{{end}}{{if .overrides.watcher}}
+    - name: {{ .overrides.watcher}}{{end}}
   priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ .fields.priority.name }}
+    name: {{ or .overrides.priority .fields.priority.name }}
   description: |
-    {{ or .fields.description "" | indent 4 }}
+    {{ or .overrides.description (or .fields.description "") | indent 4 }}
 `
 const default_transitions_template = `{{ range .transitions }}{{.id }}: {{.name}}
 {{end}}`

@@ -34,8 +34,9 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
   jira [-v ...] [-u USER] [-e URI] [-t FILE] transmeta ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] editmeta ISSUE
+  jira [-v ...] export-templates [-d DIR]
   jira [-v ...] [-u USER] [-e URI] [-t FILE] ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE [-o KEY=VAL]...
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE [-m COMMENT] [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] transitions ISSUE
@@ -65,6 +66,7 @@ General Options:
 Command Options:
   -a --assignee=USER        Username assigned the issue
   -c --component=COMPONENT  Component to Search for
+  -d --directory=DIR        Directory to export templates to (default: /Users/cbennett/.jira.d/templates)
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -m --comment=COMMENT      Comment message for transition
   -o --override=KEY:VAL     Set custom key/value pairs

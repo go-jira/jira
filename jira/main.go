@@ -16,6 +16,7 @@ var format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shor
 
 func main() {
 	user := os.Getenv("USER")
+	home := os.Getenv("HOME")
 	usage := fmt.Sprintf(`
 Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] fields
@@ -25,8 +26,9 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
   jira [-v ...] [-u USER] [-e URI] [-t FILE] transmeta ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] editmeta ISSUE
+  jira [-v ...] export-templates [-d DIR]
   jira [-v ...] [-u USER] [-e URI] [-t FILE] ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE [-o KEY=VAL]...
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE [-m COMMENT] [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] transitions ISSUE
@@ -56,13 +58,14 @@ General Options:
 Command Options:
   -a --assignee=USER        Username assigned the issue
   -c --component=COMPONENT  Component to Search for
+  -d --directory=DIR        Directory to export templates to (default: %s)
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -m --comment=COMMENT      Comment message for transition
   -o --override=KEY:VAL     Set custom key/value pairs
   -p --project=PROJECT      Project to Search for
   -q --query=JQL            Jira Query Language expression for the search
   -w --watcher=USER         Watcher to add to issue (default: %s)
-`, user, user)
+`, user, fmt.Sprintf("%s/.jira.d/templates", home), user)
 	
 	args, err := docopt.Parse(usage, nil, true, "0.0.1", false, false); if err != nil {
 		log.Error("Failed to parse options: %s", err)
@@ -126,6 +129,9 @@ Command Options:
 	}
 	if _, ok := opts["issuetype"]; !ok {
 		opts["issuetype"] = "Bug"
+	}
+	if _, ok := opts["directory"]; !ok {
+		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
 	}
 	
 	c := cli.New(opts)
@@ -214,6 +220,8 @@ Command Options:
 		err = c.CmdComment(args["ISSUE"].(string))
 	} else if validCommand("take") {
 		err = c.CmdAssign(args["ISSUE"].(string), user)
+	} else if validCommand("export-templates") {
+		err = c.CmdExportTemplates()
 	} else if validCommand("assign") || validCommand("give") {
 		err = c.CmdAssign(
 			args["ISSUE"].(string),
