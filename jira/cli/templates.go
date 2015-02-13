@@ -45,7 +45,7 @@ fields:
   description: |
     {{ or .fields.description "" | indent 4 }}
 `
-const default_transitions_template = `{{ range .transitions }}{{color "+bh"}}{{.name | printf "%-13s" }}{{color "reset"}} -> {{.to.name}}
+const default_transitions_template = `{{ range .transitions }}{{.id }}: {{.name}}
 {{end}}`
 
 const default_issuetypes_template = `{{ range .projects }}{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}

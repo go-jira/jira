@@ -20,11 +20,12 @@ func main() {
 Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] fields
   jira [-v ...] [-u USER] [-e URI] [-t FILE] login
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] ls [-q JQL]
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) [-q JQL]
   jira [-v ...] [-u USER] [-e URI] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] ISSUE
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] transmeta ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] editmeta ISSUE
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
@@ -32,10 +33,16 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] create [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] DUPLICATE dups ISSUE
   jira [-v ...] [-u USER] [-e URI] BLOCKER blocks ISSUE
-  jira [-v ...] [-u USER] [-e URI] watch ISSUE [WATCHER]
+  jira [-v ...] [-u USER] [-e URI] watch ISSUE [-w WATCHER]
+  jira [-v ...] [-u USER] [-e URI] (trans|transition) TRANSITION ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] ack ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] close ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] resolve ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] reopen ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] start ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] stop ISSUE [-m COMMENT]
 
-  jira TODO [-v ...] [-u USER] [-e URI] close ISSUE [-m COMMENT]
-  jira TODO [-v ...] [-u USER] [-e URI] resolve ISSUE [-m COMMENT]
+
   jira TODO [-v ...] [-u USER] [-e URI] comment ISSUE [-m COMMENT]
   jira TODO [-v ...] [-u USER] [-e URI] take ISSUE
   jira TODO [-v ...] [-u USER] [-e URI] assign ISSUE ASSIGNEE
@@ -55,7 +62,14 @@ Create Options:
   -p --project=PROJECT      Jira Project Name
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -o --override=KEY:VAL     Set custom key/value pairs
-`, user)
+
+Watch Options:
+  -w --watcher=USER         Watcher to add to issue (default: %s)
+
+Transition Options:
+  -m --comment=COMMENT      Comment message for transition
+
+`, user, user)
 	
 	args, _ := docopt.Parse(usage, nil, true, "0.0.1", false, false)
 	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
@@ -121,89 +135,86 @@ Create Options:
 	c := cli.New(opts)
 
 	log.Debug("opts: %s", opts);
-	
+
+	validCommand := func(cmd string) bool {
+		if val, ok := args[cmd]; ok && val.(bool) {
+			return true
+		}
+		return false
+	}
+
+	validOpt := func(opt string, dflt interface{}) interface{} {
+		if val, ok := opts[opt]; ok {
+			return val
+		}
+		if dflt == nil {
+			log.Error("Missing required option --%s or \"%s\" property override in the config file", opt, opt)
+			os.Exit(1)
+		}
+		return dflt
+	}
+
 	var err error
-	if val, ok := args["login"]; ok && val.(bool) {
+	if validCommand("login") {
 		err = c.CmdLogin()
-	} else if val, ok := args["fields"]; ok && val.(bool) {
+	} else if validCommand("fields") {
 		err = c.CmdFields()
-	} else if val, ok := args["ls"]; ok && val.(bool) {
+	} else if validCommand("ls") || validCommand("list") {
 		err = c.CmdList()
-	} else if val, ok := args["edit"]; ok && val.(bool) {
-		issue, _ := args["ISSUE"]
-		err = c.CmdEdit(issue.(string))
-	} else if val, ok := args["editmeta"]; ok && val.(bool) {
-		issue, _ := args["ISSUE"]
-		err = c.CmdEditMeta(issue.(string))
-	} else if val, ok := args["issuelinktypes"]; ok && val.(bool) {
+	} else if validCommand("edit") {
+		err = c.CmdEdit(args["ISSUE"].(string))
+	} else if validCommand("editmeta") {
+		err = c.CmdEditMeta(args["ISSUE"].(string))
+	} else if validCommand("transmeta") {
+		err = c.CmdTransitionMeta(args["ISSUE"].(string))
+	} else if validCommand("issuelinktypes") {
 		err = c.CmdIssueLinkTypes()
-	} else if val, ok := args["issuetypes"]; ok && val.(bool) {
-		var project interface{}
-		if project, ok = opts["project"]; !ok {
-			log.Error("missing PROJECT argument or \"project\" property in the config file")
-			os.Exit(1)
-		}
-		err = c.CmdIssueTypes(project.(string))
-	} else if val, ok := args["createmeta"]; ok && val.(bool) {
-		var project interface{}
-		if project, ok = opts["project"]; !ok {
-			log.Error("missing PROJECT argument or \"project\" property in the config file")
-			os.Exit(1)
-		}
-		var issuetype interface{}
-		if issuetype, ok = opts["issuetype"]; !ok {
-			issuetype = "Bug"
-		}
-		err = c.CmdCreateMeta(project.(string), issuetype.(string))
-	} else if val, ok := args["create"]; ok && val.(bool) {
-		var project interface{}
-		if project, ok = opts["project"]; !ok {
-			log.Error("missing PROJECT argument or \"project\" property in the config file")
-			os.Exit(1)
-		}
-		var issuetype interface{}
-		if issuetype, ok = opts["issuetype"]; !ok {
-			issuetype = "Bug"
-		}
-		err = c.CmdCreate(project.(string), issuetype.(string))
-	} else if val, ok := args["transitions"]; ok && val.(bool) {
-		issue, _ := args["ISSUE"]
-		err = c.CmdTransitions(issue.(string))
-	} else if val, ok := args["blocks"]; ok && val.(bool) {
-		if blocker, ok := args["BLOCKER"].(string); ok {
-			if issue, ok := args["ISSUE"].(string); ok {
-				err = c.CmdBlocks(blocker, issue)
-			} else {
-				log.Error("missing ISSUE")
-				os.Exit(1)
-			}
-		} else {
-			log.Error("missing BLOCKER")
-			os.Exit(1)
-		}
-	} else if val, ok := args["dups"]; ok && val.(bool) {
-		if duplicate, ok := args["DUPLICATE"].(string); ok {
-			if issue, ok := args["ISSUE"].(string); ok {
-				err = c.CmdDups(duplicate, issue)
-			} else {
-				log.Error("missing ISSUE")
-				os.Exit(1)
-			}
-		} else {
-			log.Error("missing BLOCKER")
-			os.Exit(1)
-		}
-	} else if val, ok := args["watch"]; ok && val.(bool) {
-		if issue, ok := args["ISSUE"].(string); ok {
-			var watcher string
-			if watcher, ok = args["WATCHER"].(string); !ok {
-				watcher = user
-			}
-			err = c.CmdWatch(issue, watcher)
-		} else {
-			log.Error("missing ISSUE")
-			os.Exit(1)
-		}
+	} else if validCommand("issuetypes") {
+		err = c.CmdIssueTypes(validOpt("project", nil).(string))
+	} else if validCommand("createmeta") {
+		err = c.CmdCreateMeta(
+			validOpt("project", nil).(string),
+			validOpt("issuetype", "Bug").(string),
+		)
+	} else if validCommand("create") {
+		err = c.CmdCreate(
+			validOpt("project", nil).(string),
+			validOpt("issuetype", "Bug").(string),
+		)
+	} else if validCommand("transitions") {
+		err = c.CmdTransitions(args["ISSUE"].(string))
+	} else if validCommand("blocks") {
+		err = c.CmdBlocks(
+			args["BLOCKER"].(string),
+			args["ISSUE"].(string),
+		)
+	} else if validCommand("dups") {
+		err = c.CmdDups(
+			args["DUPLICATE"].(string),
+			args["ISSUE"].(string),
+		)
+	} else if validCommand("watch") {
+		err = c.CmdWatch(
+			args["ISSUE"].(string),
+			validOpt("watcher", user).(string),
+		)
+	} else if validCommand("trans") || validCommand("transition") {
+		err = c.CmdTransition(
+			args["ISSUE"].(string),
+			args["TRANSITION"].(string),
+		)
+	} else if validCommand("close") {
+		err = c.CmdTransition(args["ISSUE"].(string), "close")
+	} else if validCommand("ack") {
+		err = c.CmdTransition(args["ISSUE"].(string), "acknowledge")
+	} else if validCommand("reopen") {
+		err = c.CmdTransition(args["ISSUE"].(string), "reopen")
+	} else if validCommand("resolve") {
+		err = c.CmdTransition(args["ISSUE"].(string), "resolve")
+	} else if validCommand("start") {
+		err = c.CmdTransition(args["ISSUE"].(string), "start")
+	} else if validCommand("stop") {
+		err = c.CmdTransition(args["ISSUE"].(string), "stop")
 	} else if val, ok := args["ISSUE"]; ok {
 		err = c.CmdView(val.(string))
 	}
