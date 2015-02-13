@@ -6,6 +6,7 @@ import (
 	"code.google.com/p/gopass"
 	"bytes"
 	"strings"
+	"os"
 	// "github.com/kr/pretty"
 )
 
@@ -480,6 +481,41 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 		err := fmt.Errorf("Unexpected Response From PUT")
 		log.Error("%s:\n%s", err, logBuffer)
 		return err
+	}
+	return nil
+}
+
+func (c *Cli) CmdExportTemplates() error {
+	dir := c.opts["directory"]
+	if stat, err := os.Stat(dir); err != nil && !os.IsNotExist(err) {
+		log.Error("Failed to stat %s: %s", dir, err)
+		return err
+	} else if err == nil && !stat.IsDir() {
+		err := fmt.Errorf("%s exists and is not a directory!", dir)
+		log.Error("%s", err)
+		return err
+	} else {
+		// dir does not exist, so try to create it
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			log.Error("Failed to mkdir -p %s: %s", dir, err)
+			return err
+		}
+	}
+
+	for name, template := range all_templates {
+		templateFile := fmt.Sprintf("%s/%s", dir, name)
+		if _, err := os.Stat(templateFile); err == nil {
+			log.Warning("Skipping %s, already exists", templateFile)
+			continue
+		}
+		if fh, err := os.OpenFile(templateFile, os.O_WRONLY | os.O_CREATE, 0644); err != nil {
+			log.Error("Failed to open %s for writing: %s", templateFile, err)
+			return err
+		} else {
+			defer fh.Close()
+			log.Notice("Creating %s", templateFile)
+			fh.Write([]byte(template))
+		}
 	}
 	return nil
 }
