@@ -3,17 +3,46 @@ simple jira command line client in Go
 
 ## Build
 
+
+*  If you do not have a **GOPATH** setup, these are simple build steps:
+
 ```bash
 git clone git@github.com:Netflix-Skunkworks/go-jira.git
 cd go-jira
 export GOPATH=$(pwd)
 export GOBIN=$GOPATH/bin
+export PATH=$GOBIN:$PATH
 cd src/github.com/Netflix-Skunkworks/go-jira/jira
 go get -v
-go install -v
 ```
 
-## Simple Config file
+* If you do have a **GOPATH** setup, these are the standard steps to build:
+
+```
+cd $GOPATH
+git clone git@github.com:Netflix-Skunkworks/go-jira.git src/github.com/Netflix-Skunkworks/go-jira
+cd src/github.com/Netflix-Skunkworks/go-jira/jira
+go get -v
+```
+
+## Configuration
+
+**go-jira** uses a configuration heirarchy.  When loading the configuration from disk it will recursively look through
+all parent directories in your current  path looking for a **.jira.d** directory anywhere in your.  (If your current directory is not
+a child directory of your homedir, then your homedir will also be inspected for a **.jira.d** directory.  From all of **.jira.d** directories
+discovered **go-jira** will load a **config.yml** found.  The configuration properties found in a file closests to your current working directory
+will have precedence.  Properties overriden with command line options will have final precedence.
+
+The complicated configuration heirarchy is used because **go-jira** attempts to be context aware.  For example if you are working on a "foo" project and 
+you `cd` into your project workspace, wouldn't it be nice if `jira ls` automatically knew to list only issues related to the "foo" project?  Likewise when you
+`cd` to the "bar" project then `jira ls` should only list issues related to "bar" project.  You can do this with by creating a configuration under your project
+workspace at **./.jira.d/config.yml** that looks like:
+
+```
+project: foo
+```
+
+You will need to specify your local jira endpoint first, typically in your homedir like:
 
 ```bash
 mkdir ~/.jira.d
@@ -22,6 +51,16 @@ cat <<EOM >~/.jira.d/config.yml
 endpoint: https://jira.mycompany.com
 EOM
 ```
+
+### Templates
+
+**go-jira** has the ability to customize most output (and editor input) via templates  There are default templates available for all operations,
+which may or may not work for your actual jira implementation.  Jira is endlessly customizable, so it is hard to provide default templates
+that will work for all issue types.
+
+When running a command like `jira edit` it will look through the current directory hierachy trying to find a file that matches **.jira.d/templates/edit**,
+if found it will use that file as the template, otherwise it will use the default **edit** template hard-coded into **go-jira**.  You can export the default
+hard-coded templates with `jira export-templates` which will write then to **~/.jira.d/templtes/.**.
 
 ## Usage
 
