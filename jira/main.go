@@ -48,7 +48,7 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] (assign|give) ISSUE ASSIGNEE
 
 General Options:
-  -e --endpoint=URI   URI to use for jira (default: https://jira)
+  -e --endpoint=URI   URI to use for jira
   -h --help           Show this usage
   -t --template=FILE  Template file to use for output/editing
   -u --user=USER      Username to use for authenticaion (default: %s)
@@ -122,9 +122,6 @@ Command Options:
 	// cant use proper [default:x] syntax in docopt
 	// because only want to default if the option is not
 	// already specified in some .jira.d/config.yml file
-	if _, ok := opts["endpoint"]; !ok {
-		opts["endpoint"] = "https://jira"
-	}
 	if _, ok := opts["user"]; !ok {
 		opts["user"] = user
 	}
@@ -133,6 +130,11 @@ Command Options:
 	}
 	if _, ok := opts["directory"]; !ok {
 		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
+	}
+
+	if _, ok := opts["endpoint"]; !ok {
+		log.Error("endpoint option required.  Either use --endpoint or set a enpoint option in your ~/.jira.d/config.yml file")
+		os.Exit(1)
 	}
 
 	c := cli.New(opts)
