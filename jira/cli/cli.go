@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -169,7 +170,7 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	return resp, nil
 }
 
-func (c *Cli) getTemplate(path string, dflt string) string {
+func (c *Cli) getTemplate(name string) string {
 	if override, ok := c.opts["template"]; ok {
 		if _, err := os.Stat(override); err == nil {
 			return readFile(override)
@@ -177,10 +178,18 @@ func (c *Cli) getTemplate(path string, dflt string) string {
 			if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", override)); err == nil {
 				return readFile(file)
 			}
+			if dflt, ok := all_templates[override]; ok {
+				return dflt
+			}
 		}
 	}
-	if file, err := FindClosestParentPath(path); err != nil {
-		return dflt
+	if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", name)); err != nil {
+		// create-bug etc are special, if we dont find it in the path
+		// then just return a generic create template
+		if strings.HasPrefix(name, "create-") {
+			return all_templates["create"]
+		}
+		return all_templates[name]
 	} else {
 		return readFile(file)
 	}
