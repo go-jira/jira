@@ -52,6 +52,17 @@ endpoint: https://jira.mycompany.com
 EOM
 ```
 
+### Editing
+
+when you run command like `jira edit` it will open up your favorite editor with the templatized output, so you can quickly edit.  When then editor
+closes then **go-jira** will submit the complted form.  To specify your editor, and this is the order which **go-jira** attempts to determine your p
+prefered editor:
+
+* **editor** property in any config.yml file
+* **JIRA_EDITOR** envionment variable
+* **EDITOR** environment variable
+* vim
+
 ### Templates
 
 **go-jira** has the ability to customize most output (and editor input) via templates  There are default templates available for all operations,
