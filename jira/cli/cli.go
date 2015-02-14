@@ -187,7 +187,11 @@ func (c *Cli) getTemplate(name string) string {
 		// create-bug etc are special, if we dont find it in the path
 		// then just return a generic create template
 		if strings.HasPrefix(name, "create-") {
-			return all_templates["create"]
+			if file, err := FindClosestParentPath(".jira.d/templates/create"); err != nil {
+				return all_templates["create"]
+			} else {
+				return readFile(file)
+			}
 		}
 		return all_templates[name]
 	} else {
