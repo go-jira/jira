@@ -3,6 +3,7 @@ simple jira command line client in Go
 
 ## Build
 
+* **NOTE** You will need `**go-1.4.1**` minimum
 
 *  If you do not have a **GOPATH** setup, these are simple build steps:
 
