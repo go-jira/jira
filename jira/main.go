@@ -19,19 +19,9 @@ func main() {
 	home := os.Getenv("HOME")
 	usage := fmt.Sprintf(`
 Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] fields
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] login
   jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE]) 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] view ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] transmeta ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] editmeta ISSUE
-  jira [-v ...] export-templates [-d DIR]
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] edit ISSUE [-m COMMENT] [-o KEY=VAL]...
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] transitions ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] create [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] DUPLICATE dups ISSUE
   jira [-v ...] [-u USER] [-e URI] BLOCKER blocks ISSUE
@@ -46,7 +36,17 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] comment ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] take ISSUE
   jira [-v ...] [-u USER] [-e URI] (assign|give) ISSUE ASSIGNEE
-
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] fields
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] transmeta ISSUE
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] editmeta ISSUE
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] transitions ISSUE
+  jira [-v ...] export-templates [-d DIR]
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] login
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] ISSUE
+ 
 General Options:
   -e --endpoint=URI   URI to use for jira
   -h --help           Show this usage
