@@ -52,7 +52,7 @@ func (c *Cli) CmdFields() error {
 		return err
 	}
 
-	return runTemplate(c.getTemplate(".jira.d/templates/fields", default_fields_template), data, nil)
+	return runTemplate(c.getTemplate("fields"), data, nil)
 }
 
 func (c *Cli) CmdList() error {
@@ -100,7 +100,7 @@ func (c *Cli) CmdList() error {
 		return err
 	}
 
-	return runTemplate(c.getTemplate(".jira.d/templates/list", default_list_template), data, nil)
+	return runTemplate(c.getTemplate("list"), data, nil)
 }
 
 func (c *Cli) CmdView(issue string) error {
@@ -111,7 +111,7 @@ func (c *Cli) CmdView(issue string) error {
 		return err
 	}
 
-	return runTemplate(c.getTemplate(".jira.d/templates/view", default_view_template), data, nil)
+	return runTemplate(c.getTemplate("view"), data, nil)
 }
 
 func (c *Cli) CmdEdit(issue string) error {
@@ -135,7 +135,7 @@ func (c *Cli) CmdEdit(issue string) error {
 	issueData["overrides"] = c.opts
 
 	return c.editTemplate(
-		c.getTemplate(".jira.d/templates/edit", default_edit_template),
+		c.getTemplate("edit"),
 		fmt.Sprintf("%s-edit-", issue),
 		issueData,
 		func(json string) error {
@@ -166,7 +166,7 @@ func (c *Cli) CmdEditMeta(issue string) error {
 		return err
 	}
 
-	return runTemplate(c.getTemplate(".jira.d/templates/editmeta", default_fields_template), data, nil)
+	return runTemplate(c.getTemplate("editmeta"), data, nil)
 }
 
 func (c *Cli) CmdTransitionMeta(issue string) error {
@@ -177,7 +177,7 @@ func (c *Cli) CmdTransitionMeta(issue string) error {
 		return err
 	}
 
-	return runTemplate(c.getTemplate(".jira.d/templates/transmeta", default_fields_template), data, nil)
+	return runTemplate(c.getTemplate("transmeta"), data, nil)
 }
 
 func (c *Cli) CmdIssueTypes(project string) error {
@@ -188,7 +188,7 @@ func (c *Cli) CmdIssueTypes(project string) error {
 		return err
 	}
 
-	return runTemplate(c.getTemplate(".jira.d/templates/issuetypes", default_issuetypes_template), data, nil)
+	return runTemplate(c.getTemplate("issuetypes"), data, nil)
 }
 
 func (c *Cli) CmdCreateMeta(project string, issuetype string) error {
@@ -205,7 +205,7 @@ func (c *Cli) CmdCreateMeta(project string, issuetype string) error {
 		}
 	}
 
-	return runTemplate(c.getTemplate(".jira.d/templates/createmeta", default_fields_template), data, nil)
+	return runTemplate(c.getTemplate("createmeta"), data, nil)
 }
 
 func (c *Cli) CmdTransitions(issue string) error {
@@ -215,7 +215,7 @@ func (c *Cli) CmdTransitions(issue string) error {
 	if err != nil {
 		return err
 	}
-	return runTemplate(c.getTemplate(".jira.d/templates/transitions", default_transitions_template), data, nil)
+	return runTemplate(c.getTemplate("transitions"), data, nil)
 }
 
 func (c *Cli) CmdCreate(project string, issuetype string) error {
@@ -238,7 +238,7 @@ func (c *Cli) CmdCreate(project string, issuetype string) error {
 
 	sanitizedType := strings.ToLower(strings.Replace(issuetype, " ", "", -1))
 	return c.editTemplate(
-		c.getTemplate(fmt.Sprintf(".jira.d/templates/create-%s", sanitizedType), default_create_template),
+		c.getTemplate(fmt.Sprintf("create-%s", sanitizedType)),
 		fmt.Sprintf("create-%s-", sanitizedType),
 		issueData,
 		func(json string) error {
@@ -277,7 +277,7 @@ func (c *Cli) CmdIssueLinkTypes() error {
 	if err != nil {
 		return err
 	}
-	return runTemplate(c.getTemplate(".jira.d/templates/issuelinktypes", default_fields_template), data, nil)
+	return runTemplate(c.getTemplate("issuelinktypes"), data, nil)
 }
 
 func (c *Cli) CmdBlocks(blocker string, issue string) error {
@@ -473,7 +473,7 @@ func (c *Cli) CmdComment(issue string) error {
 		return handlePost(json)
 	} else {
 		return c.editTemplate(
-			c.getTemplate(".jira.d/templates/comment", default_comment_template),
+			c.getTemplate("comment"),
 			fmt.Sprintf("%s-create-", issue),
 			map[string]interface{}{},
 			handlePost,
