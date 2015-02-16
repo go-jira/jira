@@ -128,9 +128,6 @@ Command Options:
 	if _, ok := opts["user"]; !ok {
 		opts["user"] = user
 	}
-	if _, ok := opts["issuetype"]; !ok {
-		opts["issuetype"] = "Bug"
-	}
 	if _, ok := opts["directory"]; !ok {
 		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
 	}
