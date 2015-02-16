@@ -62,7 +62,7 @@ func (c *Cli) CmdList() error {
 	var ok bool
 	// project = BAKERY and status not in (Resolved, Closed)
 	if query, ok = c.opts["query"]; !ok {
-		qbuff := bytes.NewBufferString("status not in (Resolved, Closed)")
+		qbuff := bytes.NewBufferString("resolution = unresolved")
 		if project, ok := c.opts["project"]; !ok {
 			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
 			log.Error("%s", err)
@@ -81,6 +81,14 @@ func (c *Cli) CmdList() error {
 
 		if issuetype, ok := c.opts["issuetype"]; ok {
 			qbuff.WriteString(fmt.Sprintf(" AND issuetype = '%s'", issuetype))
+		}
+
+		if watcher, ok := c.opts["watcher"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND watcher = '%s'", watcher))
+		}
+
+		if reporter, ok := c.opts["reporter"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", reporter))
 		}
 		query = qbuff.String()
 	}
