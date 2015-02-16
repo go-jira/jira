@@ -532,19 +532,8 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 
 func (c *Cli) CmdExportTemplates() error {
 	dir := c.opts["directory"]
-	if stat, err := os.Stat(dir); err != nil && !os.IsNotExist(err) {
-		log.Error("Failed to stat %s: %s", dir, err)
+	if err := mkdir(dir); err != nil {
 		return err
-	} else if err == nil && !stat.IsDir() {
-		err := fmt.Errorf("%s exists and is not a directory!", dir)
-		log.Error("%s", err)
-		return err
-	} else {
-		// dir does not exist, so try to create it
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			log.Error("Failed to mkdir -p %s: %s", dir, err)
-			return err
-		}
 	}
 
 	for name, template := range all_templates {

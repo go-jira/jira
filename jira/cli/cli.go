@@ -202,6 +202,10 @@ func (c *Cli) getTemplate(name string) string {
 func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData map[string]interface{}, templateProcessor func(string) error) error {
 
 	tmpdir := fmt.Sprintf("%s/.jira.d/tmp", os.Getenv("HOME"))
+	if err := mkdir(tmpdir); err != nil {
+		return err
+	}
+
 	fh, err := ioutil.TempFile(tmpdir, tmpFilePrefix)
 	if err != nil {
 		log.Error("Failed to make temp file in %s: %s", tmpdir, err)
