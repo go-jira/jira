@@ -216,3 +216,21 @@ func yamlFixup(data interface{}) (interface{}, error) {
 		return d, nil
 	}
 }
+
+func mkdir(dir string) error {
+	if stat, err := os.Stat(dir); err != nil && !os.IsNotExist(err) {
+		log.Error("Failed to stat %s: %s", dir, err)
+		return err
+	} else if err == nil && !stat.IsDir() {
+		err := fmt.Errorf("%s exists and is not a directory!", dir)
+		log.Error("%s", err)
+		return err
+	} else {
+		// dir does not exist, so try to create it
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			log.Error("Failed to mkdir -p %s: %s", dir, err)
+			return err
+		}
+	}
+	return nil
+}
