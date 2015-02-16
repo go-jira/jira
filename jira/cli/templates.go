@@ -26,7 +26,7 @@ summary: {{ .fields.summary }}
 project: {{ .fields.project.key }}
 components: {{ range .fields.components }}{{ .name }} {{end}}
 issuetype: {{ .fields.issuetype.name }}
-assignee: {{ .fields.assignee.name }}
+assignee: {{ if .fields.assignee }}{{ .fields.assignee }}{{end}}
 reporter: {{ .fields.reporter.name }}
 watchers: {{ range .fields.customfield_10110 }}{{ .name }} {{end}}
 blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key }}[{{.outwardIssue.fields.status.name}}]{{end}}{{end}}
