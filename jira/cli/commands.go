@@ -85,10 +85,18 @@ func (c *Cli) CmdList() error {
 		query = qbuff.String()
 	}
 
-	json, err := jsonEncode(map[string]string{
+	fields := make([]string,0)
+	if qf, ok := c.opts["queryfields"]; ok {
+		fields = strings.Split(qf,",")
+	} else {
+		fields = append(fields, "summary")
+	}
+
+	json, err := jsonEncode(map[string]interface{}{
 		"jql":        query,
 		"startAt":    "0",
 		"maxResults": "500",
+		"fields": fields,
 	})
 	if err != nil {
 		return err
