@@ -19,7 +19,7 @@ func main() {
 	home := os.Getenv("HOME")
 	usage := fmt.Sprintf(`
 Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE]) 
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [-m COMMENT] [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
@@ -66,7 +66,9 @@ Command Options:
   -o --override=KEY:VAL     Set custom key/value pairs
   -p --project=PROJECT      Project to Search for
   -q --query=JQL            Jira Query Language expression for the search
+  -r --reporter=USER        Reporter to search for
   -w --watcher=USER         Watcher to add to issue (default: %s)
+                            or Watcher to search for
 `, user, fmt.Sprintf("%s/.jira.d/templates", home), user)
 
 	args, err := docopt.Parse(usage, nil, true, "0.0.1", false, false)
