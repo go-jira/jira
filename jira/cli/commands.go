@@ -105,6 +105,7 @@ func (c *Cli) CmdList() error {
 
 func (c *Cli) CmdView(issue string) error {
 	log.Debug("view called")
+	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -145,6 +146,7 @@ func (c *Cli) CmdEdit(issue string) error {
 			}
 
 			if resp.StatusCode == 204 {
+				c.Browse(issueData["key"].(string))
 				fmt.Printf("OK %s %s/browse/%s\n", issueData["key"], c.endpoint, issueData["key"])
 				return nil
 			} else {
@@ -160,6 +162,7 @@ func (c *Cli) CmdEdit(issue string) error {
 
 func (c *Cli) CmdEditMeta(issue string) error {
 	log.Debug("editMeta called")
+	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/editmeta", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -171,6 +174,7 @@ func (c *Cli) CmdEditMeta(issue string) error {
 
 func (c *Cli) CmdTransitionMeta(issue string) error {
 	log.Debug("tranisionMeta called")
+	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -210,6 +214,7 @@ func (c *Cli) CmdCreateMeta(project string, issuetype string) error {
 
 func (c *Cli) CmdTransitions(issue string) error {
 	log.Debug("Transitions called")
+	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -255,7 +260,9 @@ func (c *Cli) CmdCreate(project string, issuetype string) error {
 					return err
 				} else {
 					key := json.(map[string]interface{})["key"]
+					c.Browse(key.(string))
 					fmt.Printf("OK %s %s/browse/%s\n", key, c.endpoint, key)
+					
 				}
 				return nil
 			} else {
@@ -304,6 +311,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 		return err
 	}
 	if resp.StatusCode == 201 {
+		c.Browse(issue)
 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
@@ -339,6 +347,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 		return err
 	}
 	if resp.StatusCode == 201 {
+		c.Browse(issue)
 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
@@ -364,6 +373,7 @@ func (c *Cli) CmdWatch(issue string, watcher string) error {
 		return err
 	}
 	if resp.StatusCode == 204 {
+		c.Browse(issue)
 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
@@ -429,6 +439,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		return err
 	}
 	if resp.StatusCode == 204 {
+		c.Browse(issue)
 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
@@ -452,6 +463,7 @@ func (c *Cli) CmdComment(issue string) error {
 		}
 
 		if resp.StatusCode == 201 {
+			c.Browse(issue)
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			return nil
 		} else {
@@ -498,6 +510,7 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 		return err
 	}
 	if resp.StatusCode == 204 {
+		c.Browse(issue)
 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))

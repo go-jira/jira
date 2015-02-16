@@ -297,3 +297,13 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 	}
 	return nil
 }
+
+func (c *Cli) Browse(issue string) {
+	if val, ok := c.opts["browse"]; ok && val == "true" {
+		if runtime.GOOS == "darwin" {
+			exec.Command("open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
+		} else if runtime.GOOS == "linux" {
+			exec.Command("xdg-open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
+		}
+	}
+}
