@@ -30,7 +30,7 @@ func New(opts map[string]string) *Cli {
 	homedir := os.Getenv("HOME")
 	cookieJar, _ := cookiejar.New(nil)
 	endpoint, _ := opts["endpoint"]
-	url, _ := url.Parse(endpoint)
+	url, _ := url.Parse(strings.TrimRight(endpoint, "/"))
 
 	cli := &Cli{
 		endpoint:   url,
