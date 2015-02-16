@@ -44,7 +44,7 @@ const default_edit_template = `update:
   comment:
     - add: 
         body: |
-          {{ or .overrides.comment ""}}
+          {{ or .overrides.comment "" | indent 10 }}
 fields:
   summary: {{ or .overrides.summary .fields.summary }}
   components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
@@ -91,5 +91,5 @@ const default_create_template = `fields:
 `
 
 const default_comment_template = `body: |
-  
+  {{ or .overrides.comment | indent 2 }}
 `
