@@ -60,6 +60,7 @@ Command Options:
   -b --browse               Open your browser to the Jira issue
   -c --component=COMPONENT  Component to Search for
   -d --directory=DIR        Directory to export templates to (default: %s)
+  -f --queryfields          Fields that are used in "list" template: (default: summary)
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -m --comment=COMMENT      Comment message for transition
   -o --override=KEY:VAL     Set custom key/value pairs
@@ -127,6 +128,9 @@ Command Options:
 	// already specified in some .jira.d/config.yml file
 	if _, ok := opts["user"]; !ok {
 		opts["user"] = user
+	}
+	if _, ok := opts["queryfields"]; !ok {
+		opts["queryfields"] = "summary"
 	}
 	if _, ok := opts["directory"]; !ok {
 		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
