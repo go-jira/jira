@@ -403,21 +403,24 @@ func (c *Cli) CmdWatch(issue string, watcher string) error {
 
 func (c *Cli) CmdTransition(issue string, trans string) error {
 	log.Debug("transition called")
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
 		return err
 	}
 
 	transitions := data.(map[string]interface{})["transitions"].([]interface{})
-	var transId string
+	var transId, transName string
+	var transMeta map[string]interface{}
 	found := make([]string, 0, len(transitions))
 	for _, transition := range transitions {
 		name := transition.(map[string]interface{})["name"].(string)
 		id := transition.(map[string]interface{})["id"].(string)
 		found = append(found, name)
 		if strings.Contains(strings.ToLower(name), trans) {
+			transName = name
 			transId = id
+			transMeta = transition.(map[string]interface{})
 		}
 	}
 	if transId == "" {
@@ -426,45 +429,47 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		return err
 	}
 
-	payload := map[string]interface{}{
-		"transition": map[string]interface{}{
-			"id": transId,
-		},
-	}
-
-	if comment, ok := c.opts["comment"]; ok {
-		payload["update"] = map[string]interface{}{
-			"comment": []interface{}{
-				map[string]interface{}{
-					"add": map[string]interface{}{
-						"body": comment,
-					},
-				},
-			},
+	handlePost := func(json string) error {
+		log.Debug("POST: %s", json)
+		// os.Exit(0)
+		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
+		resp, err := c.post(uri, json)
+		if err != nil {
+			return err
 		}
+		if resp.StatusCode == 204 {
+			c.Browse(issue)
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		} else {
+			logBuffer := bytes.NewBuffer(make([]byte, 0))
+			resp.Write(logBuffer)
+			err := fmt.Errorf("Unexpected Response From POST")
+			log.Error("%s:\n%s", err, logBuffer)
+			return err
+		}
+		return nil
 	}
-
-	json, err := jsonEncode(payload)
-	if err != nil {
+	
+	uri = fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
+	var issueData map[string]interface{}
+	if data, err := responseToJson(c.get(uri)); err != nil {
 		return err
-	}
-
-	uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
-	resp, err := c.post(uri, json)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode == 204 {
-		c.Browse(issue)
-		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	} else {
-		logBuffer := bytes.NewBuffer(make([]byte, 0))
-		resp.Write(logBuffer)
-		err := fmt.Errorf("Unexpected Response From POST")
-		log.Error("%s:\n%s", err, logBuffer)
-		return err
+		issueData = data.(map[string]interface{})
 	}
-	return nil
+	issueData["meta"] = transMeta
+	issueData["overrides"] = c.opts
+	issueData["transition"] = map[string]interface{}{
+		"name": transName,
+		"id": transId,
+	};
+	
+	return c.editTemplate(
+		c.getTemplate("transition"),
+		fmt.Sprintf("%s-trans-%s-", issue, trans),
+		issueData,
+		handlePost,
+	)
 }
 
 func (c *Cli) CmdComment(issue string) error {

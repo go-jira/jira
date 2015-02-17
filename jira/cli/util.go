@@ -184,7 +184,7 @@ func yamlFixup(data interface{}) (interface{}, error) {
 			case string:
 				if fixed, err := yamlFixup(val); err != nil {
 					return nil, err
-				} else {
+				} else if fixed != nil {
 					copy[k] = fixed
 				}
 			default:
@@ -198,7 +198,7 @@ func yamlFixup(data interface{}) (interface{}, error) {
 		for k, v := range d {
 			if fixed, err := yamlFixup(v); err != nil {
 				return nil, err
-			} else {
+			} else if fixed != nil {
 				d[k] = fixed
 			}
 		}
@@ -207,11 +207,16 @@ func yamlFixup(data interface{}) (interface{}, error) {
 		for i, val := range d {
 			if fixed, err := yamlFixup(val); err != nil {
 				return nil, err
-			} else {
+			} else if fixed != nil {
 				d[i] = fixed
 			}
 		}
 		return data, nil
+	case string:
+		if d == "" {
+			return nil, nil
+		}
+		return d, nil
 	default:
 		return d, nil
 	}

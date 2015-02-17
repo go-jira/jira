@@ -21,18 +21,18 @@ func main() {
 Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [-m COMMENT] [-o KEY=VAL]...
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
+  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
+  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] [-b] DUPLICATE dups ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] BLOCKER blocks ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] watch ISSUE [-w WATCHER]
-  jira [-v ...] [-u USER] [-e URI] [-b] (trans|transition) TRANSITION ISSUE [-m COMMENT]
-  jira [-v ...] [-u USER] [-e URI] [-b] ack ISSUE [-m COMMENT]
-  jira [-v ...] [-u USER] [-e URI] [-b] close ISSUE [-m COMMENT]
-  jira [-v ...] [-u USER] [-e URI] [-b] resolve ISSUE [-m COMMENT]
-  jira [-v ...] [-u USER] [-e URI] [-b] reopen ISSUE [-m COMMENT]
-  jira [-v ...] [-u USER] [-e URI] [-b] start ISSUE [-m COMMENT]
-  jira [-v ...] [-u USER] [-e URI] [-b] stop ISSUE [-m COMMENT]
+  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] (trans|transition) TRANSITION ISSUE [-m COMMENT] [--noedit]
+  jira [-v ...] [-u USER] [-e URI] [-b] ack ISSUE [-m COMMENT] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] close ISSUE [-m COMMENT] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] resolve ISSUE [-m COMMENT] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] reopen ISSUE [-m COMMENT] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] start ISSUE [-m COMMENT] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] stop ISSUE [-m COMMENT] [--edit]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] comment ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] [-b] take ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] (assign|give) ISSUE ASSIGNEE
@@ -142,7 +142,7 @@ Command Options:
 		log.Error("endpoint option required.  Either use --endpoint or set a enpoint option in your ~/.jira.d/config.yml file")
 		os.Exit(1)
 	}
-
+	
 	c := cli.New(opts)
 
 	log.Debug("opts: %s", opts)
@@ -165,6 +165,22 @@ Command Options:
 		return dflt
 	}
 
+	setEditing := func(dflt bool) {
+		if dflt {
+			if val, ok := opts["noedit"]; ok && val == "true" {
+				opts["edit"] = "false"
+			} else {
+				opts["edit"] = "true"
+			}
+		} else {
+			if val, ok := opts["edit"]; ok && val == "true" {
+				opts["edit"] = "true"
+			} else {
+				opts["edit"] = "false"
+			}
+		}
+	}
+
 	if validCommand("login") {
 		err = c.CmdLogin()
 	} else if validCommand("fields") {
@@ -172,6 +188,7 @@ Command Options:
 	} else if validCommand("ls") || validCommand("list") {
 		err = c.CmdList()
 	} else if validCommand("edit") {
+		setEditing(true)
 		err = c.CmdEdit(args["ISSUE"].(string))
 	} else if validCommand("editmeta") {
 		err = c.CmdEditMeta(args["ISSUE"].(string))
@@ -187,6 +204,7 @@ Command Options:
 			validOpt("issuetype", "Bug").(string),
 		)
 	} else if validCommand("create") {
+		setEditing(true)
 		err = c.CmdCreate(
 			validOpt("project", nil).(string),
 			validOpt("issuetype", "Bug").(string),
@@ -209,21 +227,28 @@ Command Options:
 			validOpt("watcher", user).(string),
 		)
 	} else if validCommand("trans") || validCommand("transition") {
+		setEditing(true)
 		err = c.CmdTransition(
 			args["ISSUE"].(string),
 			args["TRANSITION"].(string),
 		)
 	} else if validCommand("close") {
+		setEditing(false)
 		err = c.CmdTransition(args["ISSUE"].(string), "close")
 	} else if validCommand("ack") {
+		setEditing(false)
 		err = c.CmdTransition(args["ISSUE"].(string), "acknowledge")
 	} else if validCommand("reopen") {
+		setEditing(false)
 		err = c.CmdTransition(args["ISSUE"].(string), "reopen")
 	} else if validCommand("resolve") {
+		setEditing(false)
 		err = c.CmdTransition(args["ISSUE"].(string), "resolve")
 	} else if validCommand("start") {
+		setEditing(false)
 		err = c.CmdTransition(args["ISSUE"].(string), "start")
 	} else if validCommand("stop") {
+		setEditing(false)
 		err = c.CmdTransition(args["ISSUE"].(string), "stop")
 	} else if validCommand("comment") {
 		err = c.CmdComment(args["ISSUE"].(string))

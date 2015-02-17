@@ -235,29 +235,37 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 			}
 		}
 	}
+
+	editing := true
+	if val, ok := c.opts["edit"]; ok && val == "false" {
+		editing = false
+	}
+	
 	for true {
-		log.Debug("Running: %s %s", editor, tmpFileName)
-		cmd := exec.Command(editor, tmpFileName)
-		cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
-		if err := cmd.Run(); err != nil {
-			log.Error("Failed to edit template with %s: %s", editor, err)
-			if promptYN("edit again?", true) {
-				continue
+		if editing {
+			log.Debug("Running: %s %s", editor, tmpFileName)
+			cmd := exec.Command(editor, tmpFileName)
+			cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
+			if err := cmd.Run(); err != nil {
+				log.Error("Failed to edit template with %s: %s", editor, err)
+				if promptYN("edit again?", true) {
+					continue
+				}
+				return err
 			}
-			return err
 		}
 
 		edited := make(map[string]interface{})
 		if fh, err := ioutil.ReadFile(tmpFileName); err != nil {
 			log.Error("Failed to read tmpfile %s: %s", tmpFileName, err)
-			if promptYN("edit again?", true) {
+			if editing && promptYN("edit again?", true) {
 				continue
 			}
 			return err
 		} else {
 			if err := yaml.Unmarshal(fh, &edited); err != nil {
 				log.Error("Failed to parse YAML: %s", err)
-				if promptYN("edit again?", true) {
+				if editing && promptYN("edit again?", true) {
 					continue
 				}
 				return err
@@ -272,15 +280,16 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 
 		if _, ok := templateData["meta"]; ok {
 			mf := templateData["meta"].(map[string]interface{})["fields"]
-			f := edited["fields"].(map[string]interface{})
-			for k, _ := range f {
-				if _, ok := mf.(map[string]interface{})[k]; !ok {
-					err := fmt.Errorf("Field %s is not editable", k)
-					log.Error("%s", err)
-					if promptYN("edit again?", true) {
-						continue
+			if f, ok := edited["fields"].(map[string]interface{}); ok {
+				for k, _ := range f {
+					if _, ok := mf.(map[string]interface{})[k]; !ok {
+						err := fmt.Errorf("Field %s is not editable", k)
+						log.Error("%s", err)
+						if editing && promptYN("edit again?", true) {
+							continue
+						}
+						return err
 					}
-					return err
 				}
 			}
 		}
@@ -292,7 +301,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 
 		if err := templateProcessor(json); err != nil {
 			log.Error("%s", err)
-			if promptYN("edit again?", true) {
+			if editing && promptYN("edit again?", true) {
 				continue
 			}
 		}
