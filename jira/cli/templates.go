@@ -22,6 +22,7 @@ const default_debug_template = "{{ . | toJson}}\n"
 const default_list_template = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
 
 const default_view_template = `issue: {{ .key }}
+created: {{ .fields.created }}
 status: {{ .fields.status.name }}
 summary: {{ .fields.summary }}
 project: {{ .fields.project.key }}
