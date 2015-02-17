@@ -14,6 +14,7 @@ var all_templates = map[string]string{
 	"issuetypes":     default_issuetypes_template,
 	"create":         default_create_template,
 	"comment":        default_comment_template,
+	"transition":     default_transition_template,
 }
 
 const default_debug_template = "{{ . | toJson}}\n"
@@ -76,7 +77,7 @@ const default_create_template = `fields:
     name: {{ .overrides.issuetype }}
   summary: {{ or .overrides.summary "" }}
   priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority "" }}
+    name: {{ or .overrides.priority "unassigned" }}
   components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
     - name: {{ . }}{{end}}
   description: |
@@ -92,4 +93,39 @@ const default_create_template = `fields:
 
 const default_comment_template = `body: |
   {{ or .overrides.comment | indent 2 }}
+`
+
+const default_transition_template = `update:
+  comment:
+    - add: 
+        body: |
+          {{ or .overrides.comment "" | indent 10 }}
+fields:{{if .meta.fields.assignee}}
+  assignee:
+    name: {{if .overrides.assignee}}{{.overrides.assignee}}{{else}}{{if .fields.assignee}}{{.fields.assignee.name}}{{end}}{{end}}{{end}}{{if .meta.fields.components}}
+  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
+    - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
+    - name: {{ .name }}{{end}}{{end}}{{end}}{{if .meta.fields.description}}
+  description: {{or .overrides.description .fields.description }}{{end}}{{if .meta.fields.fixVersions}}{{if .meta.fields.fixVersions.allowedValues}}
+  fixVersions: # {{ range .meta.fields.fixVersions.allowedValues }}{{.name}}, {{end}}{{if .overrides.fixVersions}}{{ range (split "," .overrides.fixVersions)}}
+    - name: {{.}}{{end}}{{else}}{{range .fields.fixVersions}}
+    - name: {{.}}{{end}}{{end}}{{end}}{{end}}{{if .meta.fields.issuetype}}
+  issuetype: # {{ range .meta.fields.issuetype.allowedValues }}{{.name}}, {{end}}
+    name: {{if .overrides.issuetype}}{{.overrides.issuetype}}{{else}}{{if .fields.issuetype}}{{.fields.issuetype.name}}{{end}}{{end}}{{end}}{{if .meta.fields.labels}}
+  labels: {{range .fields.labels}}
+    - {{.}}{{end}}{{if .overrides.labels}}{{range (split "," .overrides.labels)}}
+    - {{.}}{{end}}{{end}}{{end}}{{if .meta.fields.priority}}
+  priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
+    name: {{ or .overrides.priority "unassigned" }}{{end}}{{if .meta.fields.reporter}}
+  reporter:
+    name: {{if .overrides.reporter}}{{.overrides.reporter}}{{else}}{{if .fields.reporter}}{{.fields.reporter.name}}{{end}}{{end}}{{end}}{{if .meta.fields.resolution}}
+  resolution: # {{ range .meta.fields.resolution.allowedValues }}{{.name}}, {{end}}
+    name: {{if .overrides.resolution}}{{.overrides.resolution}}{{else if .fields.resolution}}{{.fields.resolution.name}}{{else}}Fixed{{end}}{{end}}{{if .meta.fields.summary}}
+  summary: {{or .overrides.summary .fields.summary}}{{end}}{{if .meta.fields.versions.allowedValues}}
+  versions: # {{ range .meta.fields.versions.allowedValues }}{{.name}}, {{end}}{{if .overrides.versions}}{{ range (split "," .overrides.versions)}}
+    - name: {{.}}{{end}}{{else}}{{range .fields.versions}}
+    - name: {{.}}{{end}}{{end}}{{end}}
+transition:
+  id: {{ .transition.id }}
+  name: {{ .transition.name }}
 `
