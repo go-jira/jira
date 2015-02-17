@@ -34,7 +34,7 @@ blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key
 depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}
 priority: {{ .fields.priority.name }}
 description: |
-  {{ .fields.description | indent 2 }}
+  {{ if .fields.description }}{{.fields.description | indent 2 }}{{end}}
 
 comments:
 {{ range .fields.comment.comments }}  - | # {{.author.name}} at {{.created}}
