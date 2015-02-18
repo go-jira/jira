@@ -4,10 +4,10 @@ simple jira command line client in Go
 ## Synopsis
 
 ```bash
-jira ls -p GOJIRA                       # list all issues for project GOJRIA
+jira ls -p GOJIRA                       # list all unresolved issues for project GOJRIA
 jira ls -p GOJIRA -a mothra             # as above also assigned to user mothra
-jira ls -p GOJIRA -w mothra             # lists GOJIRA issues watched by user mothra
-jira ls -p GOJIRA -r mothra             # list GOJIRA issues reported by user mothra
+jira ls -p GOJIRA -w mothra             # lists GOJIRA unresolved issues watched by user mothra
+jira ls -p GOJIRA -r mothra             # list GOJIRA unresolved issues reported by user mothra
 
 jira view GOJIRA-321                    # print Issue using "view" template
 jira GOJIRA-321                         # same as above
@@ -43,10 +43,10 @@ jira give GOJIRA-321 mothra             # assign issue to user mothra
 mkdir .jira.d
 echo "project: GOJIRA" > .jira.d/config.yml
 
-jira ls                                 # list all issues for project GOJRIA
+jira ls                                 # list all unresolved issues for project GOJRIA
 jira ls -a mothra                       # as above also assigned to user mothra
-jira ls -w mothra                       # lists GOJIRA issues watched by user mothra
-jira ls -r mothra                       # list GOJIRA issues reported by user mothra
+jira ls -w mothra                       # lists GOJIRA unresolved issues watched by user mothra
+jira ls -r mothra                       # list GOJIRA unresolved issues reported by user mothra
 
 jira create                             # create new "Bug" type issue for project GOJIRA
 jira create -i Task                     # create new Task type issue
