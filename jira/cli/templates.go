@@ -49,7 +49,7 @@ const default_edit_template = `update:
           {{ or .overrides.comment "" | indent 10 }}
 fields:
   summary: {{ or .overrides.summary .fields.summary }}
-  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
     - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
     - name: {{ .name }}{{end}}{{end}}
   assignee:
@@ -60,7 +60,7 @@ fields:
   customfield_10110: {{ range .fields.customfield_10110 }}
     - name: {{ .name }}{{end}}{{if .overrides.watcher}}
     - name: {{ .overrides.watcher}}{{end}}
-  priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
+  priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority .fields.priority.name }}
   description: |
     {{ or .overrides.description (or .fields.description "") | indent 4 }}
@@ -77,14 +77,14 @@ const default_create_template = `fields:
   issuetype:
     name: {{ .overrides.issuetype }}
   summary: {{ or .overrides.summary "" }}
-  priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
+  priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority "unassigned" }}
-  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
     - name: {{ . }}{{end}}
   description: |
     {{ or .overrides.description "" | indent 4 }}
   assignee:
-    name: {{ or .overrides.assignee .overrides.user}}
+    name: {{ or .overrides.assignee "" }}
   reporter:
     name: {{ or .overrides.reporter .overrides.user }}
   # watchers
@@ -104,26 +104,26 @@ const default_transition_template = `update:
 fields:{{if .meta.fields.assignee}}
   assignee:
     name: {{if .overrides.assignee}}{{.overrides.assignee}}{{else}}{{if .fields.assignee}}{{.fields.assignee.name}}{{end}}{{end}}{{end}}{{if .meta.fields.components}}
-  components: # {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
     - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
     - name: {{ .name }}{{end}}{{end}}{{end}}{{if .meta.fields.description}}
   description: {{or .overrides.description .fields.description }}{{end}}{{if .meta.fields.fixVersions}}{{if .meta.fields.fixVersions.allowedValues}}
-  fixVersions: # {{ range .meta.fields.fixVersions.allowedValues }}{{.name}}, {{end}}{{if .overrides.fixVersions}}{{ range (split "," .overrides.fixVersions)}}
+  fixVersions: # Values: {{ range .meta.fields.fixVersions.allowedValues }}{{.name}}, {{end}}{{if .overrides.fixVersions}}{{ range (split "," .overrides.fixVersions)}}
     - name: {{.}}{{end}}{{else}}{{range .fields.fixVersions}}
     - name: {{.}}{{end}}{{end}}{{end}}{{end}}{{if .meta.fields.issuetype}}
-  issuetype: # {{ range .meta.fields.issuetype.allowedValues }}{{.name}}, {{end}}
+  issuetype: # Values: {{ range .meta.fields.issuetype.allowedValues }}{{.name}}, {{end}}
     name: {{if .overrides.issuetype}}{{.overrides.issuetype}}{{else}}{{if .fields.issuetype}}{{.fields.issuetype.name}}{{end}}{{end}}{{end}}{{if .meta.fields.labels}}
   labels: {{range .fields.labels}}
     - {{.}}{{end}}{{if .overrides.labels}}{{range (split "," .overrides.labels)}}
     - {{.}}{{end}}{{end}}{{end}}{{if .meta.fields.priority}}
-  priority: # {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
+  priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority "unassigned" }}{{end}}{{if .meta.fields.reporter}}
   reporter:
     name: {{if .overrides.reporter}}{{.overrides.reporter}}{{else}}{{if .fields.reporter}}{{.fields.reporter.name}}{{end}}{{end}}{{end}}{{if .meta.fields.resolution}}
-  resolution: # {{ range .meta.fields.resolution.allowedValues }}{{.name}}, {{end}}
+  resolution: # Values: {{ range .meta.fields.resolution.allowedValues }}{{.name}}, {{end}}
     name: {{if .overrides.resolution}}{{.overrides.resolution}}{{else if .fields.resolution}}{{.fields.resolution.name}}{{else}}Fixed{{end}}{{end}}{{if .meta.fields.summary}}
   summary: {{or .overrides.summary .fields.summary}}{{end}}{{if .meta.fields.versions.allowedValues}}
-  versions: # {{ range .meta.fields.versions.allowedValues }}{{.name}}, {{end}}{{if .overrides.versions}}{{ range (split "," .overrides.versions)}}
+  versions: # Values: {{ range .meta.fields.versions.allowedValues }}{{.name}}, {{end}}{{if .overrides.versions}}{{ range (split "," .overrides.versions)}}
     - name: {{.}}{{end}}{{else}}{{range .fields.versions}}
     - name: {{.}}{{end}}{{end}}{{end}}
 transition:
