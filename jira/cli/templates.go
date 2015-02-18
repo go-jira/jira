@@ -35,11 +35,11 @@ blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key
 depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}
 priority: {{ .fields.priority.name }}
 description: |
-  {{ if .fields.description }}{{.fields.description | indent 2 }}{{end}}
+  {{ or .fields.description "" | indent 2 }}
 
 comments:
 {{ range .fields.comment.comments }}  - | # {{.author.name}} at {{.created}}
-    {{ .body | indent 4}}
+    {{ or .body "" | indent 4}}
 {{end}}
 `
 const default_edit_template = `update:
@@ -93,7 +93,7 @@ const default_create_template = `fields:
 `
 
 const default_comment_template = `body: |
-  {{ or .overrides.comment | indent 2 }}
+  {{ or .overrides.comment "" | indent 2 }}
 `
 
 const default_transition_template = `update:
