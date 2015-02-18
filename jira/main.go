@@ -26,13 +26,13 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-b] DUPLICATE dups ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] BLOCKER blocks ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] watch ISSUE [-w WATCHER]
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] (trans|transition) TRANSITION ISSUE [-m COMMENT] [--noedit]
-  jira [-v ...] [-u USER] [-e URI] [-b] ack ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] close ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] resolve ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] reopen ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] start ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] stop ISSUE [-m COMMENT] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] (trans|transition) TRANSITION ISSUE [-m COMMENT] [-o KEY=VAL] [--noedit]
+  jira [-v ...] [-u USER] [-e URI] [-b] ack ISSUE [-m COMMENT] [-o KEY=VAL] [--edit] 
+  jira [-v ...] [-u USER] [-e URI] [-b] close ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] resolve ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] reopen ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] start ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] stop ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] comment ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] [-b] take ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] (assign|give) ISSUE ASSIGNEE
@@ -44,6 +44,7 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] transitions ISSUE
   jira [-v ...] export-templates [-d DIR]
+  jira [-v ...] [-u USER] [-e URI] (b|browse) ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] login
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] ISSUE
  
@@ -255,6 +256,9 @@ Command Options:
 		err = c.CmdComment(args["ISSUE"].(string))
 	} else if validCommand("take") {
 		err = c.CmdAssign(args["ISSUE"].(string), user)
+	} else if validCommand("browse") || validCommand("b") {
+		opts["browse"] = "true"
+		err = c.Browse(args["ISSUE"].(string))
 	} else if validCommand("export-templates") {
 		err = c.CmdExportTemplates()
 	} else if validCommand("assign") || validCommand("give") {
