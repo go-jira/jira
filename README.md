@@ -1,6 +1,57 @@
 # go-jira
 simple jira command line client in Go
 
+## Synopsis
+
+```bash
+jira ls -p GOJIRA                       # list all issues for project GOJRIA
+jira ls -p GOJIRA -a mothra             # as above also assigned to user mothra
+jira ls -p GOJIRA -w mothra             # lists GOJIRA issues watched by user mothra
+jira ls -p GOJIRA -r mothra             # list GOJIRA issues reported by user mothra
+
+jira view GOJIRA-321                    # print Issue using "view" template
+jira GOJIRA-321                         # same as above
+
+jira edit GOJIRA-321                    # open up the issue in an editor, when you exit the editor
+                                        # the issue will post the updates to the server
+
+# edit the issue, using the overirdes on the command line, skip the interactive editor:
+jira edit GOJIRA-321 --noedit -o assignee=mothra -o comment="mothra, please take care of this." -o priority=Major
+
+jira create -p GOJIRA                   # create new "Bug" type issue for project GOJIRA
+jira create -p GOJIRA -i Task           # create new Task type issue
+
+jira trans close GOJIRA-321             # close issue, with interactive editor to be able to set other fields
+jira close GOJIRA-321 --edit            # same as above
+
+# close the issue, set the resolution, and skip interactive editor:
+jira trans close GOJIRA-321 -o resolution="Won't Fix" --noedit
+# same as above
+jira close GOJIRA-321 -o resolution="Won't Fix"
+
+jira repopen GOJIRA-321 -m "reopening"  # reopen issue
+
+jira watch GOJIRA-321                   # add self as watcher to the issue
+
+jira comment GOJIRA-321 -m "done yet?"  # add comment to the issue
+
+jira take GOJIRA-321                    # assign issue to self
+
+jira give GOJIRA-321 mothra             # assign issue to user mothra
+
+# create local project config to set defaults
+mkdir .jira.d
+echo "project: GOJIRA" > .jira.d/config.yml
+
+jira ls                                 # list all issues for project GOJRIA
+jira ls -a mothra                       # as above also assigned to user mothra
+jira ls -w mothra                       # lists GOJIRA issues watched by user mothra
+jira ls -r mothra                       # list GOJIRA issues reported by user mothra
+
+jira create                             # create new "Bug" type issue for project GOJIRA
+jira create -i Task                     # create new Task type issue
+```
+
 ## Download
 
 You can download one of the pre-built binaries for **go-jira** [here](https://github.com/Netflix-Skunkworks/go-jira/releases).
