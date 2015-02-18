@@ -496,7 +496,7 @@ func (c *Cli) CmdComment(issue string) error {
 		}
 	}
 
-	if comment, ok := c.opts["comment"]; ok {
+	if comment, ok := c.opts["comment"]; ok && comment != "" {
 		json, err := jsonEncode(map[string]interface{}{
 			"body": comment,
 		})

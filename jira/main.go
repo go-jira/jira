@@ -251,6 +251,7 @@ Command Options:
 		setEditing(false)
 		err = c.CmdTransition(args["ISSUE"].(string), "stop")
 	} else if validCommand("comment") {
+		setEditing(true)
 		err = c.CmdComment(args["ISSUE"].(string))
 	} else if validCommand("take") {
 		err = c.CmdAssign(args["ISSUE"].(string), user)
