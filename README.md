@@ -3,7 +3,7 @@ simple jira command line client in Go
 
 ## Download
 
-You can download one of the pre-build binaries for **go-jira** [here](|https://github.com/Netflix-Skunkworks/go-jira/releases).
+You can download one of the pre-build binaries for **go-jira** [here](https://github.com/Netflix-Skunkworks/go-jira/releases).
 
 ## Build
 
