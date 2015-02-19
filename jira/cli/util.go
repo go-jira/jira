@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 )
 
 func FindParentPaths(fileName string) []string {
@@ -62,6 +63,28 @@ func readFile(file string) string {
 	return string(bytes)
 }
 
+func fuzzyAge(start string) (string, error) {
+	if t, err := time.Parse("2006-01-02T15:04:05.000-0700", start); err != nil {
+		return "", err
+	} else {
+		delta := time.Now().Sub(t)
+		if delta.Minutes() < 2 {
+			return "a minute", nil
+		} else if dm := delta.Minutes(); dm < 45 {
+			return fmt.Sprintf("%d minutes", int(dm)), nil
+		} else if dm := delta.Minutes(); dm < 90 {
+			return "an hour", nil
+		} else if dh := delta.Hours(); dh < 24 {
+			return fmt.Sprintf("%d hours", int(dh)), nil
+		} else if dh := delta.Hours(); dh < 48 {
+			return "a day", nil
+		} else {
+			return fmt.Sprintf("%d days", int(delta.Hours() / 24)), nil
+		}
+	}
+	return "unknown", nil
+}
+
 func runTemplate(templateContent string, data interface{}, out io.Writer) error {
 
 	if out == nil {
@@ -99,6 +122,25 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 		},
 		"split": func(sep string, content string) []string {
 			return strings.Split(content, sep)
+		},
+		"abbrev": func(max int, content string) string {
+			if len(content) > max {
+				var buffer bytes.Buffer
+				buffer.WriteString(content[:max-3])
+				buffer.WriteString("...")
+				return buffer.String()
+			}
+			return content
+		},
+		"rep": func(count int, content string) string {
+			var buffer bytes.Buffer
+			for i := 0; i < count; i += 1 {
+				buffer.WriteString(content)
+			}
+			return buffer.String()
+		},
+		"age": func(content string) (string, error) {
+			return fuzzyAge(content)
 		},
 	}
 	if tmpl, err := template.New("template").Funcs(funcs).Parse(templateContent); err != nil {

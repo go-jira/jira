@@ -19,7 +19,7 @@ func main() {
 	home := os.Getenv("HOME")
 	usage := fmt.Sprintf(`
 Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) 
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
@@ -61,7 +61,7 @@ Command Options:
   -b --browse               Open your browser to the Jira issue
   -c --component=COMPONENT  Component to Search for
   -d --directory=DIR        Directory to export templates to (default: %s)
-  -f --queryfields          Fields that are used in "list" template: (default: summary)
+  -f --queryfields=FIELDS   Fields that are used in "list" template: (default: summary,created,priority,status,reporter,assignee)
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -m --comment=COMMENT      Comment message for transition
   -o --override=KEY:VAL     Set custom key/value pairs
@@ -133,7 +133,7 @@ Command Options:
 		opts["user"] = user
 	}
 	if _, ok := opts["queryfields"]; !ok {
-		opts["queryfields"] = "summary"
+		opts["queryfields"] = "summary,created,priority,status,reporter,assignee"
 	}
 	if _, ok := opts["directory"]; !ok {
 		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
