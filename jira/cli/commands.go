@@ -27,14 +27,22 @@ func (c *Cli) CmdLogin() error {
 				// probably got this, need to redirect the user to login manually
 				// X-Authentication-Denied-Reason: CAPTCHA_CHALLENGE; login-url=https://jira/login.jsp
 				if reason := resp.Header.Get("X-Authentication-Denied-Reason"); reason != "" {
-					log.Error("Authentication Failed: %s", reason)
-					return fmt.Errorf("Authenticaion Failed: %s", reason)
+					err := fmt.Errorf("Authenticaion Failed: %s", reason)
+					log.Error("%s", err)
+					return err
 				}
-				log.Error("Authentication Failead: Unknown")
-				return fmt.Errorf("Authentication Failead")
+				err := fmt.Errorf("Authentication Failed: Unknown Reason")
+				log.Error("%s", err)
+				return err
 
-			}
-			if resp.StatusCode != 200 {
+			} else if resp.StatusCode == 200 {
+				// https://confluence.atlassian.com/display/JIRA043/JIRA+REST+API+%28Alpha%29+Tutorial#JIRARESTAPI%28Alpha%29Tutorial-CAPTCHAs
+				// probably bad password, try again
+				if reason := resp.Header.Get("X-Seraph-Loginreason"); reason == "AUTHENTICATION_DENIED" {
+					log.Warning("Authentication Failed: %s", reason)
+					continue
+				}
+			} else {
 				log.Warning("Login failed")
 				continue
 			}
