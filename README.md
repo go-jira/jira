@@ -12,16 +12,19 @@ jira ls -p GOJIRA -r mothra             # list GOJIRA unresolved issues reported
 jira view GOJIRA-321                    # print Issue using "view" template
 jira GOJIRA-321                         # same as above
 
-jira edit GOJIRA-321                    # open up the issue in an editor, when you exit the editor
-                                        # the issue will post the updates to the server
+jira edit GOJIRA-321                    # open up the issue in an editor, when you exit the
+                                        # editor the issue will post the updates to the server
 
 # edit the issue, using the overirdes on the command line, skip the interactive editor:
-jira edit GOJIRA-321 --noedit -o assignee=mothra -o comment="mothra, please take care of this." -o priority=Major
+jira edit GOJIRA-321 --noedit \
+     -o assignee=mothra \
+     -o comment="mothra, please take care of this." \
+     -o priority=Major
 
 jira create -p GOJIRA                   # create new "Bug" type issue for project GOJIRA
 jira create -p GOJIRA -i Task           # create new Task type issue
 
-jira trans close GOJIRA-321             # close issue, with interactive editor to be able to set other fields
+jira trans close GOJIRA-321             # close issue, with interactive editor to set fields
 jira close GOJIRA-321 --edit            # same as above
 
 # close the issue, set the resolution, and skip interactive editor:
