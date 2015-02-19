@@ -116,9 +116,19 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 func responseToJson(resp *http.Response, err error) (interface{}, error) {
 	if err != nil {
 		return nil, err
-	} else {
-		return jsonDecode(resp.Body), nil
 	}
+
+	data := jsonDecode(resp.Body)
+	if resp.StatusCode == 400 {
+		if val, ok := data.(map[string]interface{})["errorMessages"]; ok {
+			for _,errMsg := range val.([]interface{}) {
+				log.Error("%s", errMsg)
+			}
+		}
+	}
+
+
+	return data, nil
 }
 
 func jsonDecode(io io.Reader) interface{} {
