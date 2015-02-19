@@ -8,6 +8,7 @@ jira ls -p GOJIRA                       # list all unresolved issues for project
 jira ls -p GOJIRA -a mothra             # as above also assigned to user mothra
 jira ls -p GOJIRA -w mothra             # lists GOJIRA unresolved issues watched by user mothra
 jira ls -p GOJIRA -r mothra             # list GOJIRA unresolved issues reported by user mothra
+jira ls -t table -p GOJIRA              # list all unresolved issues in pretty table output
 
 jira view GOJIRA-321                    # print Issue using "view" template
 jira GOJIRA-321                         # same as above
@@ -50,6 +51,7 @@ jira ls                                 # list all unresolved issues for project
 jira ls -a mothra                       # as above also assigned to user mothra
 jira ls -w mothra                       # lists GOJIRA unresolved issues watched by user mothra
 jira ls -r mothra                       # list GOJIRA unresolved issues reported by user mothra
+jira ls -t table                        # list all unresolved issues in pretty table output
 
 jira create                             # create new "Bug" type issue for project GOJIRA
 jira create -i Task                     # create new Task type issue
