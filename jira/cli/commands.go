@@ -569,6 +569,9 @@ func (c *Cli) CmdExportTemplates() error {
 	}
 
 	for name, template := range all_templates {
+		if wanted, ok := c.opts["template"]; ok && wanted != name {
+			continue
+		}
 		templateFile := fmt.Sprintf("%s/%s", dir, name)
 		if _, err := os.Stat(templateFile); err == nil {
 			log.Warning("Skipping %s, already exists", templateFile)

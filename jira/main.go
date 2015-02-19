@@ -43,7 +43,7 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] transitions ISSUE
-  jira [-v ...] export-templates [-d DIR]
+  jira [-v ...] export-templates [-d DIR] [-t template]
   jira [-v ...] [-u USER] [-e URI] (b|browse) ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] login
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] ISSUE
