@@ -32,6 +32,10 @@ func New(opts map[string]string) *Cli {
 	endpoint, _ := opts["endpoint"]
 	url, _ := url.Parse(strings.TrimRight(endpoint, "/"))
 
+	if project, ok := opts["project"]; ok {
+		opts["project"] = strings.ToUpper(project)
+	}
+
 	cli := &Cli{
 		endpoint:   url,
 		opts:       opts,
