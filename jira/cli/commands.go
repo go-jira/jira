@@ -220,6 +220,11 @@ func (c *Cli) CmdCreateMeta(project string, issuetype string) error {
 	}
 
 	if val, ok := data.(map[string]interface{})["projects"]; ok {
+		if len(val.([]interface{})) == 0 {
+			err = fmt.Errorf("Project '%s' or issuetype '%s' unknown.  Unable to createmeta.", project, issuetype)
+			log.Error("%s", err)
+			return err
+		}
 		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
 			data = val.([]interface{})[0]
 		}
@@ -253,6 +258,11 @@ func (c *Cli) CmdCreate(project string, issuetype string) error {
 	issueData["overrides"].(map[string]string)["issuetype"] = issuetype
 
 	if val, ok := data.(map[string]interface{})["projects"]; ok {
+		if len(val.([]interface{})) == 0 {
+			err = fmt.Errorf("Project '%s' or issuetype '%s' unknown.  Unable to create issue.", project, issuetype)
+			log.Error("%s", err)
+			return err
+		}
 		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
 			issueData["meta"] = val.([]interface{})[0]
 		}
