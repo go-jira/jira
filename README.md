@@ -55,6 +55,10 @@ jira ls -t table                        # list all unresolved issues in pretty t
 
 jira create                             # create new "Bug" type issue for project GOJIRA
 jira create -i Task                     # create new Task type issue
+
+# make the table template your default "list" template:
+jira export-templates -t table
+mv $HOME/.jira.d/templates/table $HOME/.jira.d/templates/list
 ```
 
 ## Download
