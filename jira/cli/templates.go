@@ -96,7 +96,8 @@ const default_create_template = `fields:
   reporter:
     name: {{ or .overrides.reporter .overrides.user }}
   # watchers
-  customfield_10110:
+  customfield_10110: {{ range split "," (or .overrides.watchers "")}}
+    - name: {{.}}{{end}}
     - name:
 `
 
