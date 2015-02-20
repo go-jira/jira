@@ -141,21 +141,20 @@ hard-coded templates with `jira export-templates` which will write them to **~/.
 
 ```
 Usage:
-Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) 
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
   jira [-v ...] [-u USER] [-e URI] [-b] DUPLICATE dups ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] BLOCKER blocks ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] watch ISSUE [-w WATCHER]
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] (trans|transition) TRANSITION ISSUE [-m COMMENT] [--noedit]
-  jira [-v ...] [-u USER] [-e URI] [-b] ack ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] close ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] resolve ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] reopen ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] start ISSUE [-m COMMENT] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] stop ISSUE [-m COMMENT] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] (trans|transition) TRANSITION ISSUE [-m COMMENT] [-o KEY=VAL] [--noedit]
+  jira [-v ...] [-u USER] [-e URI] [-b] ack ISSUE [-m COMMENT] [-o KEY=VAL] [--edit] 
+  jira [-v ...] [-u USER] [-e URI] [-b] close ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] resolve ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] reopen ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] start ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira [-v ...] [-u USER] [-e URI] [-b] stop ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] comment ISSUE [-m COMMENT]
   jira [-v ...] [-u USER] [-e URI] [-b] take ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] (assign|give) ISSUE ASSIGNEE
@@ -166,7 +165,8 @@ Usage:
   jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
   jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] transitions ISSUE
-  jira [-v ...] export-templates [-d DIR]
+  jira [-v ...] export-templates [-d DIR] [-t template]
+  jira [-v ...] [-u USER] [-e URI] (b|browse) ISSUE
   jira [-v ...] [-u USER] [-e URI] [-t FILE] login
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] ISSUE
  
@@ -183,7 +183,7 @@ Command Options:
   -b --browse               Open your browser to the Jira issue
   -c --component=COMPONENT  Component to Search for
   -d --directory=DIR        Directory to export templates to (default: /Users/cbennett/.jira.d/templates)
-  -f --queryfields          Fields that are used in "list" template: (default: summary)
+  -f --queryfields=FIELDS   Fields that are used in "list" template: (default: summary,created,priority,status,reporter,assignee)
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -m --comment=COMMENT      Comment message for transition
   -o --override=KEY:VAL     Set custom key/value pairs
