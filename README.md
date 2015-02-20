@@ -1,5 +1,5 @@
 # go-jira
-simple jira command line client in Go
+simple command line client for Atlassian's Jira service written in Go
 
 ## Synopsis
 
