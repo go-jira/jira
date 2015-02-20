@@ -244,7 +244,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 	if val, ok := c.opts["edit"]; ok && val == "false" {
 		editing = false
 	}
-	
+
 	for true {
 		if editing {
 			log.Debug("Running: %s %s", editor, tmpFileName)

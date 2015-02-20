@@ -147,7 +147,7 @@ Command Options:
 		log.Error("endpoint option required.  Either use --endpoint or set a enpoint option in your ~/.jira.d/config.yml file")
 		os.Exit(1)
 	}
-	
+
 	c := cli.New(opts)
 
 	log.Debug("opts: %s", opts)
@@ -309,7 +309,7 @@ func populateEnv(args map[string]interface{}) {
 				case string:
 					os.Setenv(envName, v)
 				case bool:
-					if v { 
+					if v {
 						os.Setenv(envName, "1")
 					} else {
 						os.Setenv(envName, "0")
@@ -345,7 +345,7 @@ func loadConfigs(opts map[string]string) {
 	for _, file := range paths {
 		if stat, err := os.Stat(file); err == nil {
 			// check to see if config file is exectuable
-			if stat.Mode() & 0111 == 0 {
+			if stat.Mode()&0111 == 0 {
 				parseYaml(file, opts)
 			} else {
 				log.Debug("Found Executable Config file: %s", file)

@@ -101,9 +101,9 @@ func (c *Cli) CmdList() error {
 		query = qbuff.String()
 	}
 
-	fields := make([]string,0)
+	fields := make([]string, 0)
 	if qf, ok := c.opts["queryfields"]; ok {
-		fields = strings.Split(qf,",")
+		fields = strings.Split(qf, ",")
 	} else {
 		fields = append(fields, "summary")
 	}
@@ -112,7 +112,7 @@ func (c *Cli) CmdList() error {
 		"jql":        query,
 		"startAt":    "0",
 		"maxResults": "500",
-		"fields": fields,
+		"fields":     fields,
 	})
 	if err != nil {
 		return err
@@ -297,7 +297,7 @@ func (c *Cli) CmdCreate(project string, issuetype string) error {
 					key := json.(map[string]interface{})["key"]
 					c.Browse(key.(string))
 					fmt.Printf("OK %s %s/browse/%s\n", key, c.endpoint, key)
-					
+
 				}
 				return nil
 			} else {
@@ -468,7 +468,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		}
 		return nil
 	}
-	
+
 	uri = fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
 	var issueData map[string]interface{}
 	if data, err := responseToJson(c.get(uri)); err != nil {
@@ -480,9 +480,9 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 	issueData["overrides"] = c.opts
 	issueData["transition"] = map[string]interface{}{
 		"name": transName,
-		"id": transId,
-	};
-	
+		"id":   transId,
+	}
+
 	return c.editTemplate(
 		c.getTemplate("transition"),
 		fmt.Sprintf("%s-trans-%s-", issue, trans),
