@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/Netflix-Skunkworks/go-jira/jira/cli"
 	"github.com/docopt/docopt-go"
@@ -8,6 +9,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -94,6 +96,8 @@ Command Options:
 	}
 
 	log.Info("Args: %v", args)
+
+	populateEnv(args)
 
 	opts := make(map[string]string)
 	loadConfigs(opts)
@@ -283,12 +287,79 @@ func parseYaml(file string, opts map[string]string) {
 	}
 }
 
+func populateEnv(args map[string]interface{}) {
+	for key, val := range args {
+		if val != nil && strings.HasPrefix(key, "--") {
+			if key == "--override" {
+				for _, v := range val.([]string) {
+					if strings.Contains(v, "=") {
+						kv := strings.SplitN(v, "=", 2)
+						envName := fmt.Sprintf("JIRA_%s", strings.ToUpper(kv[0]))
+						os.Setenv(envName, kv[1])
+					} else {
+						log.Error("Malformed override, expected KEY=VALUE, got %s", v)
+						os.Exit(1)
+					}
+				}
+			} else {
+				envName := fmt.Sprintf("JIRA_%s", strings.ToUpper(key[2:]))
+				switch v := val.(type) {
+				case []string:
+					os.Setenv(envName, strings.Join(v, ","))
+				case string:
+					os.Setenv(envName, v)
+				case bool:
+					if v { 
+						os.Setenv(envName, "1")
+					} else {
+						os.Setenv(envName, "0")
+					}
+				}
+			}
+		} else if val != nil {
+			// lower case strings are operations
+			if strings.ToLower(key) == key {
+				if key == "ls" && val.(bool) {
+					os.Setenv("JIRA_OPERATION", "list")
+				} else if key == "b" && val.(bool) {
+					os.Setenv("JIRA_OPERATION", "browse")
+				} else if key == "trans" && val.(bool) {
+					os.Setenv("JIRA_OPERATION", "transition")
+				} else if key == "give" && val.(bool) {
+					os.Setenv("JIRA_OPERATION", "assign")
+				} else if val.(bool) {
+					os.Setenv("JIRA_OPERATION", key)
+				}
+			} else {
+				os.Setenv(fmt.Sprintf("JIRA_%s", key), val.(string))
+			}
+		}
+	}
+}
+
 func loadConfigs(opts map[string]string) {
 	paths := cli.FindParentPaths(".jira.d/config.yml")
 	// prepend
 	paths = append([]string{"/etc/jira-cli.yml"}, paths...)
 
 	for _, file := range paths {
-		parseYaml(file, opts)
+		if stat, err := os.Stat(file); err == nil {
+			// check to see if config file is exectuable
+			if stat.Mode() & 0111 == 0 {
+				parseYaml(file, opts)
+			} else {
+				log.Debug("Found Executable Config file: %s", file)
+				// it is executable, so run it and try to parse the output
+				cmd := exec.Command(file)
+				stdout := bytes.NewBufferString("")
+				cmd.Stdout = stdout
+				cmd.Stderr = bytes.NewBufferString("")
+				if err := cmd.Run(); err != nil {
+					log.Error("%s is exectuable, but it failed to execute: %s\n%s", file, err, cmd.Stderr)
+					os.Exit(1)
+				}
+				yaml.Unmarshal(stdout.Bytes(), &opts)
+			}
+		}
 	}
 }
