@@ -79,7 +79,7 @@ func fuzzyAge(start string) (string, error) {
 		} else if dh := delta.Hours(); dh < 48 {
 			return "a day", nil
 		} else {
-			return fmt.Sprintf("%d days", int(delta.Hours() / 24)), nil
+			return fmt.Sprintf("%d days", int(delta.Hours()/24)), nil
 		}
 	}
 	return "unknown", nil
@@ -163,12 +163,11 @@ func responseToJson(resp *http.Response, err error) (interface{}, error) {
 	data := jsonDecode(resp.Body)
 	if resp.StatusCode == 400 {
 		if val, ok := data.(map[string]interface{})["errorMessages"]; ok {
-			for _,errMsg := range val.([]interface{}) {
+			for _, errMsg := range val.([]interface{}) {
 				log.Error("%s", errMsg)
 			}
 		}
 	}
-
 
 	return data, nil
 }
