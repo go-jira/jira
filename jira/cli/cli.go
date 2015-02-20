@@ -285,7 +285,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		if _, ok := templateData["meta"]; ok {
 			mf := templateData["meta"].(map[string]interface{})["fields"]
 			if f, ok := edited["fields"].(map[string]interface{}); ok {
-				for k, _ := range f {
+				for k := range f {
 					if _, ok := mf.(map[string]interface{})[k]; !ok {
 						err := fmt.Errorf("Field %s is not editable", k)
 						log.Error("%s", err)
