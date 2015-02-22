@@ -18,7 +18,7 @@ export GOPATH=$(shell pwd)
 
 build:
 	cd src/github.com/Netflix-Skunkworks/go-jira/jira; \
-	go install -v
+	go get -v
 
 all:
 	mkdir -p $(DIST); \
@@ -28,3 +28,6 @@ all:
         echo "Building for $$p"; \
         GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -o $(DIST)/jira-$$p; \
    done
+
+fmt:
+	gofmt -s -w jira

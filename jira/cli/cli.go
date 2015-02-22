@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/kballard/go-shellquote"
 	"github.com/op/go-logging"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -247,8 +248,10 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 
 	for true {
 		if editing {
-			log.Debug("Running: %s %s", editor, tmpFileName)
-			cmd := exec.Command(editor, tmpFileName)
+			shell, _ := shellquote.Split(editor)
+			shell = append(shell, tmpFileName)
+			log.Debug("Running: %#v", shell)
+			cmd := exec.Command(shell[0], shell[1:]...)
 			cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, os.Stdin
 			if err := cmd.Run(); err != nil {
 				log.Error("Failed to edit template with %s: %s", editor, err)
