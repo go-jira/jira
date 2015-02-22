@@ -117,7 +117,7 @@ endpoint: https://jira.mycompany.com
 EOM
 ```
 
-### Dynamics Configuration
+### Dynamic Configuration
 
 If the **.jira.d/config.yml** file is executable, then **go-jira** will attempt to execute the file and use the stdout for configuration.  You can use this to customize templates or other overrides depending on what type of operation you are running.  For example if you would like to use the "table" template when ever you run `jira ls`, then you can create a template like this:
 
