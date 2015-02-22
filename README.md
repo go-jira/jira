@@ -117,6 +117,36 @@ endpoint: https://jira.mycompany.com
 EOM
 ```
 
+### Dynamics Configuration
+
+If the **.jira.d/config.yml** file is executable, then **go-jira** will attempt to execute the file and use the stdout for configuration.  You can use this to customize templates or other overrides depending on what type of operation you are running.  For example if you would like to use the "table" template when ever you run `jira ls`, then you can create a template like this:
+
+```sh
+#!/bin/sh
+
+echo "endpoint: https://jira.mycompany.com"
+echo "editor: emacs -nw"
+
+case $JIRA_OPERATION in 
+    list)
+      echo "template: table";;
+esac
+```
+
+Or if you always set the same overrides when you create an issue for your project you can do something like this:
+
+```sh
+#!/bin/sh
+echo "project: GOJIRA"
+
+case $JIRA_OPERATION in
+    create)
+        echo "assignee: $USER"
+        echo "watchers: mothra"
+        ;;
+esac
+```
+
 ### Editing
 
 When you run command like `jira edit` it will open up your favorite editor with the templatized output so you can quickly edit.  When the editor
