@@ -182,9 +182,7 @@ Command Options:
 				opts["edit"] = "true"
 			}
 		} else {
-			if val, ok := opts["edit"]; ok && val == "true" {
-				opts["edit"] = "true"
-			} else {
+			if val, ok := opts["edit"]; ok && val != "true" {
 				opts["edit"] = "false"
 			}
 		}
@@ -333,6 +331,8 @@ func populateEnv(args map[string]interface{}) {
 					os.Setenv("JIRA_OPERATION", "assign")
 				} else if val.(bool) {
 					os.Setenv("JIRA_OPERATION", key)
+				} else {
+					os.Setenv("JIRA_OPERATION", "view")
 				}
 			} else {
 				os.Setenv(fmt.Sprintf("JIRA_%s", key), val.(string))
