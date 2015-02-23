@@ -224,10 +224,16 @@ Command Options:
 			args["ISSUE"].(string),
 		)
 	} else if validCommand("dups") {
-		err = c.CmdDups(
+		if err = c.CmdDups(
 			args["DUPLICATE"].(string),
 			args["ISSUE"].(string),
-		)
+		); err == nil {
+			opts["resolution"] = "Duplicate"
+			err = c.CmdTransition(
+				args["DUPLICATE"].(string),
+				"close",
+			)
+		}
 	} else if validCommand("watch") {
 		err = c.CmdWatch(
 			args["ISSUE"].(string),
