@@ -21,7 +21,7 @@ func main() {
 	home := os.Getenv("HOME")
 	usage := fmt.Sprintf(`
 Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS]
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS] [-s ORDER]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
@@ -70,6 +70,7 @@ Command Options:
   -p --project=PROJECT      Project to Search for
   -q --query=JQL            Jira Query Language expression for the search
   -r --reporter=USER        Reporter to search for
+  -s --sort=ORDER           For list operations, sort issues (default: priority asc, created)
   -w --watcher=USER         Watcher to add to issue (default: %s)
                             or Watcher to search for
 `, user, fmt.Sprintf("%s/.jira.d/templates", home), user)
@@ -141,6 +142,9 @@ Command Options:
 	}
 	if _, ok := opts["directory"]; !ok {
 		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
+	}
+	if _, ok := opts["sort"]; !ok {
+		opts["sort"] = "priority asc, created"
 	}
 
 	if _, ok := opts["endpoint"]; !ok {
