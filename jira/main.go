@@ -296,6 +296,7 @@ func parseYaml(file string, opts map[string]string) {
 }
 
 func populateEnv(args map[string]interface{}) {
+	foundOp := false
 	for key, val := range args {
 		if val != nil && strings.HasPrefix(key, "--") {
 			if key == "--override" {
@@ -328,22 +329,28 @@ func populateEnv(args map[string]interface{}) {
 			// lower case strings are operations
 			if strings.ToLower(key) == key {
 				if key == "ls" && val.(bool) {
+					foundOp = true
 					os.Setenv("JIRA_OPERATION", "list")
 				} else if key == "b" && val.(bool) {
+					foundOp = true
 					os.Setenv("JIRA_OPERATION", "browse")
 				} else if key == "trans" && val.(bool) {
+					foundOp = true
 					os.Setenv("JIRA_OPERATION", "transition")
 				} else if key == "give" && val.(bool) {
+					foundOp = true
 					os.Setenv("JIRA_OPERATION", "assign")
 				} else if val.(bool) {
+					foundOp = true
 					os.Setenv("JIRA_OPERATION", key)
-				} else {
-					os.Setenv("JIRA_OPERATION", "view")
 				}
 			} else {
 				os.Setenv(fmt.Sprintf("JIRA_%s", key), val.(string))
 			}
 		}
+	}
+	if !foundOp {
+		os.Setenv("JIRA_OPERATION", "view")
 	}
 }
 
