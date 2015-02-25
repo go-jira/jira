@@ -99,7 +99,7 @@ func (c *Cli) CmdList() error {
 			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", reporter))
 		}
 
-		if sort, ok := c.opts["sort"]; ok {
+		if sort, ok := c.opts["sort"]; ok && sort != "" {
 			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", sort ))
 		}
 
