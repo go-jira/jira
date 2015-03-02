@@ -26,7 +26,7 @@ all:
 	go get -d; \
 	for p in $(PLATFORMS); do \
         echo "Building for $$p"; \
-        GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -o $(DIST)/jira-$$p; \
+        GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -ldflags -s -o $(DIST)/jira-$$p; \
    done
 
 fmt:
@@ -49,6 +49,3 @@ update-changelog:
 	perl -pe 's{\#(\d+)}{[#$$1](https://github.com/Netflix-Skunkworks/go-jira/issues/$$1)}g' >> CHANGELOG.md.new; \
 	tail +2 CHANGELOG.md >> CHANGELOG.md.new; \
 	mv CHANGELOG.md.new CHANGELOG.md
-
-# https://github.com/Netflix-Skunkworks/go-jira/commit/d5330fd
-# [#1349](https://github.com/bower/bower/issues/1349)
