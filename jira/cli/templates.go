@@ -40,7 +40,7 @@ assignee: {{ if .fields.assignee }}{{ .fields.assignee.name }}{{end}}
 reporter: {{ if .fields.reporter }}{{ .fields.reporter.name }}{{end}}
 watchers: {{ range .fields.customfield_10110 }}{{ .name }} {{end}}
 blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key }}[{{.outwardIssue.fields.status.name}}]{{end}}{{end}}
-epends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}
+depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}
 priority: {{ .fields.priority.name }}
 description: |
   {{ or .fields.description "" | indent 2 }}
