@@ -20,13 +20,20 @@ build:
 	cd src/github.com/Netflix-Skunkworks/go-jira/jira; \
 	go get -v
 
+
+cross-setup:
+	for p in $(PLATFORMS); do \
+        echo "Building for $$p"; \
+		cd $(GOROOT)/src && sudo GOOS=$${p/-*/} GOARCH=$${p/*-/} bash ./make.bash --no-clean; \
+   done
+
 all:
 	mkdir -p $(DIST); \
 	cd src/github.com/Netflix-Skunkworks/go-jira/jira; \
 	go get -d; \
 	for p in $(PLATFORMS); do \
         echo "Building for $$p"; \
-        GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -ldflags -s -o $(DIST)/jira-$$p; \
+		cd $(GOPATH)/src/github.com/Netflix-Skunkworks/go-jira/jira GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -ldflags -s -o $(DIST)/jira-$$p; \
    done
 
 fmt:
