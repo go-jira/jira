@@ -28,12 +28,13 @@ cross-setup:
    done
 
 all:
+	rm -rf $(DIST); \
 	mkdir -p $(DIST); \
 	cd src/github.com/Netflix-Skunkworks/go-jira/jira; \
 	go get -d; \
 	for p in $(PLATFORMS); do \
         echo "Building for $$p"; \
-		cd $(GOPATH)/src/github.com/Netflix-Skunkworks/go-jira/jira GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -ldflags -s -o $(DIST)/jira-$$p; \
+		GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -ldflags -s -o $(DIST)/jira-$$p; \
    done
 
 fmt:
