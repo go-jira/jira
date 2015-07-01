@@ -267,7 +267,7 @@ Command Options:
 		setEditing(true)
 		err = c.CmdComment(args["ISSUE"].(string))
 	} else if validCommand("take") {
-		err = c.CmdAssign(args["ISSUE"].(string), user)
+		err = c.CmdAssign(args["ISSUE"].(string), opts["user"])
 	} else if validCommand("browse") || validCommand("b") {
 		opts["browse"] = "true"
 		err = c.Browse(args["ISSUE"].(string))
