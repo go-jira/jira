@@ -19,9 +19,10 @@ var format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shor
 func main() {
 	user := os.Getenv("USER")
 	home := os.Getenv("HOME")
+	defaultMaxResults := "500"
 	usage := fmt.Sprintf(`
 Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS] [-s ORDER]
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS] [-s ORDER] [--max_results MAX_RESULTS]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
@@ -73,7 +74,8 @@ Command Options:
   -s --sort=ORDER           For list operations, sort issues (default: priority asc, created)
   -w --watcher=USER         Watcher to add to issue (default: %s)
                             or Watcher to search for
-`, user, fmt.Sprintf("%s/.jira.d/templates", home), user)
+  --max_results=VAL         Maximum number of results to return in query (default: %s)
+`, user, fmt.Sprintf("%s/.jira.d/templates", home), user, defaultMaxResults)
 
 	args, err := docopt.Parse(usage, nil, true, "0.0.7", false, false)
 	if err != nil {
@@ -145,6 +147,9 @@ Command Options:
 	}
 	if _, ok := opts["sort"]; !ok {
 		opts["sort"] = "priority asc, created"
+	}
+	if _, ok := opts["max_results"]; !ok {
+		opts["max_results"] = defaultMaxResults
 	}
 
 	if _, ok := opts["endpoint"]; !ok {
