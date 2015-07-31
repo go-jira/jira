@@ -171,7 +171,7 @@ hard-coded templates with `jira export-templates` which will write them to **~/.
 
 ```
 Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS]
+  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS] [--max_results MAX_RESULTS]
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
   jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
@@ -222,4 +222,5 @@ Command Options:
   -r --reporter=USER        Reporter to search for
   -w --watcher=USER         Watcher to add to issue (default: cbennett)
                             or Watcher to search for
+  --max_results=VAL         Maximum number of results to return in query (default: 500)
 ```
