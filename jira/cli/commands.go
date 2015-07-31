@@ -116,7 +116,7 @@ func (c *Cli) CmdList() error {
 	json, err := jsonEncode(map[string]interface{}{
 		"jql":        query,
 		"startAt":    "0",
-		"maxResults": "500",
+		"maxResults": c.opts["max_results"],
 		"fields":     fields,
 	})
 	if err != nil {
