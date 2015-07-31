@@ -77,7 +77,7 @@ Command Options:
   --max_results=VAL         Maximum number of results to return in query (default: %s)
 `, user, fmt.Sprintf("%s/.jira.d/templates", home), user, defaultMaxResults)
 
-	args, err := docopt.Parse(usage, nil, true, "0.0.7", false, false)
+	args, err := docopt.Parse(usage, nil, true, "0.0.8", false, false)
 	if err != nil {
 		log.Error("Failed to parse options: %s", err)
 		os.Exit(1)
