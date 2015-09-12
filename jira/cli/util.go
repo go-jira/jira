@@ -63,6 +63,22 @@ func readFile(file string) string {
 	return string(bytes)
 }
 
+func copyFile(src, dst string) (err error){
+	var s, d *os.File;
+	if s, err = os.Open(src); err == nil {
+		defer s.Close()
+		if d, err = os.Create(dst); err == nil {
+			if _, err = io.Copy(d, s); err != nil {
+				d.Close()
+				return
+			}
+			return d.Close()
+		}
+	}
+	return
+}
+
+
 func fuzzyAge(start string) (string, error) {
 	if t, err := time.Parse("2006-01-02T15:04:05.000-0700", start); err != nil {
 		return "", err
@@ -246,23 +262,25 @@ func yamlFixup(data interface{}) (interface{}, error) {
 		}
 		return copy, nil
 	case map[string]interface{}:
+		copy := make(map[string]interface{})
 		for k, v := range d {
 			if fixed, err := yamlFixup(v); err != nil {
 				return nil, err
 			} else if fixed != nil {
-				d[k] = fixed
+				copy[k] = fixed
 			}
 		}
-		return d, nil
+		return copy, nil
 	case []interface{}:
-		for i, val := range d {
+		copy := make([]interface{}, 0, len(d))
+		for _, val := range d {
 			if fixed, err := yamlFixup(val); err != nil {
 				return nil, err
 			} else if fixed != nil {
-				d[i] = fixed
+				copy = append(copy, fixed)
 			}
 		}
-		return data, nil
+		return copy, nil
 	case string:
 		if d == "" {
 			return nil, nil

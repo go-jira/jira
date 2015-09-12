@@ -196,7 +196,7 @@ func (c *Cli) getTemplate(name string) string {
 			} else {
 				return readFile(file)
 			}
-		}
+	}
 		return all_templates[name]
 	} else {
 		return readFile(file)
@@ -222,6 +222,9 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		log.Error("Failed to rename %s to %s: %s", fh.Name(), fmt.Sprintf("%s.yml", fh.Name()), err)
 		return err
 	}
+	defer func() {
+		os.Remove(tmpFileName)
+	}()
 
 	err = runTemplate(template, templateData, fh)
 	if err != nil {
@@ -246,6 +249,12 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		editing = false
 	}
 
+	tmpFileNameOrig := fmt.Sprintf("%s-orig")
+	copyFile(tmpFileName,tmpFileNameOrig)
+	defer func() {
+		os.Remove(tmpFileNameOrig)
+	}()
+
 	for true {
 		if editing {
 			shell, _ := shellquote.Split(editor)
@@ -259,6 +268,11 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 					continue
 				}
 				return err
+			}
+			diff := exec.Command("diff", "-q", tmpFileNameOrig, tmpFileName)
+			if err := diff.Run(); err == nil {
+				log.Info("No changes found, aborting")
+				return fmt.Errorf("No changes found, aborting")
 			}
 		}
 
