@@ -63,8 +63,8 @@ func readFile(file string) string {
 	return string(bytes)
 }
 
-func copyFile(src, dst string) (err error){
-	var s, d *os.File;
+func copyFile(src, dst string) (err error) {
+	var s, d *os.File
 	if s, err = os.Open(src); err == nil {
 		defer s.Close()
 		if d, err = os.Create(dst); err == nil {
@@ -77,7 +77,6 @@ func copyFile(src, dst string) (err error){
 	}
 	return
 }
-
 
 func fuzzyAge(start string) (string, error) {
 	if t, err := time.Parse("2006-01-02T15:04:05.000-0700", start); err != nil {
