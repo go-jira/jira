@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.8 - 2015-07-31
+
+* Add --max_results option for 'ls' [Mike Pountney] [[e06ff0c](https://github.com/Netflix-Skunkworks/go-jira/commit/e06ff0c)]
+
 ## 0.0.7 - 2015-07-01
 
 * fix "take" command not honouring user option [Andrew Haigh] [[8f1d2b9](https://github.com/Netflix-Skunkworks/go-jira/commit/8f1d2b9)]
