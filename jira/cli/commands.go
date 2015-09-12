@@ -100,7 +100,7 @@ func (c *Cli) CmdList() error {
 		}
 
 		if sort, ok := c.opts["sort"]; ok && sort != "" {
-			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", sort ))
+			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", sort))
 		}
 
 		query = qbuff.String()
