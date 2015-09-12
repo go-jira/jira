@@ -299,6 +299,14 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 			edited = fixed.(map[string]interface{})
 		}
 
+		// if you want to abort editing a jira issue then
+		// you can add the "abort: true" flag to the document
+		// and we will abort now
+		if val, ok := edited["abort"].(bool); ok && val {
+			log.Info("abort flag found in template, quiting")
+			return fmt.Errorf("abort flag found in template, quiting")
+		}
+
 		if _, ok := templateData["meta"]; ok {
 			mf := templateData["meta"].(map[string]interface{})["fields"]
 			if f, ok := edited["fields"].(map[string]interface{}); ok {
