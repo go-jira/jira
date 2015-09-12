@@ -249,7 +249,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		editing = false
 	}
 
-	tmpFileNameOrig := fmt.Sprintf("%s-orig")
+	tmpFileNameOrig := fmt.Sprintf("%s.orig",tmpFileName)
 	copyFile(tmpFileName,tmpFileNameOrig)
 	defer func() {
 		os.Remove(tmpFileNameOrig)
