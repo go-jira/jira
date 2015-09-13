@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/Netflix-Skunkworks/go-jira/jira/cli"
-	"github.com/docopt/docopt-go"
+	"github.com/coryb/optigo"
 	"github.com/op/go-logging"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -17,39 +17,63 @@ var log = logging.MustGetLogger("jira")
 var format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
 
 func main() {
+	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
+	logging.SetBackend(
+		logging.NewBackendFormatter(
+			logBackend,
+			logging.MustStringFormatter(format),
+		),
+	)
+	logging.SetLevel(logging.NOTICE, "")
+
 	user := os.Getenv("USER")
 	home := os.Getenv("HOME")
-	defaultMaxResults := "500"
-	usage := fmt.Sprintf(`
+	defaultMaxResults := 500
+
+	usage := func(ok bool) {
+		printer := fmt.Printf
+		if !ok {
+			printer = func(format string, args ...interface{}) (int, error) {
+				return fmt.Fprintf(os.Stderr, format, args...)
+			}
+			defer func() {
+				os.Exit(1)
+			}()
+		} else {
+			defer func() {
+				os.Exit(0)
+			}()
+		}
+		output := fmt.Sprintf(`
 Usage:
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS] [-s ORDER] [--max_results MAX_RESULTS]
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] view ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
-  jira [-v ...] [-u USER] [-e URI] [-b] DUPLICATE dups ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-b] BLOCKER blocks ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-b] watch ISSUE [-w WATCHER]
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] (trans|transition) TRANSITION ISSUE [-m COMMENT] [-o KEY=VAL] [--noedit]
-  jira [-v ...] [-u USER] [-e URI] [-b] ack ISSUE [-m COMMENT] [-o KEY=VAL] [--edit] 
-  jira [-v ...] [-u USER] [-e URI] [-b] close ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] resolve ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] reopen ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] start ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] stop ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] comment ISSUE [-m COMMENT]
-  jira [-v ...] [-u USER] [-e URI] [-b] take ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-b] (assign|give) ISSUE ASSIGNEE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] fields
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] issuelinktypes
-  jira [-v ...] [-u USER] [-e URI] [-b][-t FILE] transmeta ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] editmeta ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] issuetypes [-p PROJECT] 
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] createmeta [-p PROJECT] [-i ISSUETYPE] 
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] transitions ISSUE
-  jira [-v ...] export-templates [-d DIR] [-t template]
-  jira [-v ...] [-u USER] [-e URI] (b|browse) ISSUE
-  jira [-v ...] [-u USER] [-e URI] [-t FILE] login
-  jira [-v ...] [-u USER] [-e URI] [-b] [-t FILE] ISSUE
+  jira (ls|list) ( [-q JQL] | [-p PROJECT] [-c COMPONENT] [-a ASSIGNEE] [-i ISSUETYPE] [-w WATCHER] [-r REPORTER]) [-f FIELDS] [-s ORDER] [--max_results MAX_RESULTS]
+  jira view ISSUE
+  jira edit ISSUE [--noedit] [-m COMMENT] [-o KEY=VAL]... 
+  jira create [--noedit] [-p PROJECT] [-i ISSUETYPE] [-o KEY=VAL]...
+  jira DUPLICATE dups ISSUE
+  jira BLOCKER blocks ISSUE
+  jira watch ISSUE [-w WATCHER]
+  jira (trans|transition) TRANSITION ISSUE [-m COMMENT] [-o KEY=VAL] [--noedit]
+  jira ack ISSUE [-m COMMENT] [-o KEY=VAL] [--edit] 
+  jira close ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira resolve ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira reopen ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira start ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira stop ISSUE [-m COMMENT] [-o KEY=VAL] [--edit]
+  jira comment ISSUE [-m COMMENT]
+  jira take ISSUE
+  jira (assign|give) ISSUE ASSIGNEE
+  jira fields
+  jira issuelinktypes
+  jira transmeta ISSUE
+  jira editmeta ISSUE
+  jira issuetypes [-p PROJECT] 
+  jira createmeta [-p PROJECT] [-i ISSUETYPE] 
+  jira transitions ISSUE
+  jira export-templates [-d DIR] [-t template]
+  jira (b|browse) ISSUE
+  jira login
+  jira ISSUE
  
 General Options:
   -e --endpoint=URI   URI to use for jira
@@ -57,7 +81,6 @@ General Options:
   -t --template=FILE  Template file to use for output/editing
   -u --user=USER      Username to use for authenticaion (default: %s)
   -v --verbose        Increase output logging
-  --version           Show this version
 
 Command Options:
   -a --assignee=USER        Username assigned the issue
@@ -67,90 +90,118 @@ Command Options:
   -f --queryfields=FIELDS   Fields that are used in "list" template: (default: summary,created,priority,status,reporter,assignee)
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -m --comment=COMMENT      Comment message for transition
-  -o --override=KEY:VAL     Set custom key/value pairs
+  -o --override=KEY=VAL     Set custom key/value pairs
   -p --project=PROJECT      Project to Search for
   -q --query=JQL            Jira Query Language expression for the search
   -r --reporter=USER        Reporter to search for
   -s --sort=ORDER           For list operations, sort issues (default: priority asc, created)
   -w --watcher=USER         Watcher to add to issue (default: %s)
                             or Watcher to search for
-  --max_results=VAL         Maximum number of results to return in query (default: %s)
+  --max_results=VAL         Maximum number of results to return in query (default: %d)
 `, user, fmt.Sprintf("%s/.jira.d/templates", home), user, defaultMaxResults)
-
-	args, err := docopt.Parse(usage, nil, true, "0.0.8", false, false)
-	if err != nil {
-		log.Error("Failed to parse options: %s", err)
-		os.Exit(1)
-	}
-	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
-	logging.SetBackend(
-		logging.NewBackendFormatter(
-			logBackend,
-			logging.MustStringFormatter(format),
-		),
-	)
-	logging.SetLevel(logging.NOTICE, "")
-	if verbose, ok := args["--verbose"]; ok {
-		if verbose.(int) > 1 {
-			logging.SetLevel(logging.DEBUG, "")
-		} else if verbose.(int) > 0 {
-			logging.SetLevel(logging.INFO, "")
-		}
+		printer(output)
 	}
 
-	log.Info("Args: %v", args)
+	jiraCommands := map[string]string{
+		"list":             "list",
+		"ls":               "list",
+		"view":             "view",
+		"edit":             "edit",
+		"create":           "create",
+		"dups":             "dups",
+		"blocks":           "blocks",
+		"watch":            "watch",
+		"trans":            "transition",
+		"transition":       "transition",
+		"ack":              "acknowledge",
+		"acknowledge":      "acknowledge",
+		"close":            "close",
+		"resolve":          "resolve",
+		"reopen":           "reopen",
+		"start":            "start",
+		"stop":             "stop",
+		"comment":          "comment",
+		"take":             "take",
+		"assign":           "assign",
+		"give":             "assign",
+		"fields":           "fields",
+		"issuelinktypes":   "issuelinktypes",
+		"transmeta":        "transmeta",
+		"editmeta":         "editmeta",
+		"issuetypes":       "issuetypes",
+		"createmeta":       "createmeta",
+		"transitions":      "transitions",
+		"export-templates": "export-templates",
+		"browse":           "browse",
+		"login":            "login",
+	}
 
-	populateEnv(args)
+	opts := map[string]interface{}{
+		"user":        user,
+		"issuetype":   "Bug",
+		"watcher":     user,
+		"queryfields": "summary,created,priority,status,reporter,assignee",
+		"directory":   fmt.Sprintf("%s/.jira.d/templates", home),
+		"sort":        "priority asc, created",
+		"max_results": defaultMaxResults,
+	}
+	overrides := make(map[string]string)
 
-	opts := make(map[string]string)
-	loadConfigs(opts)
+	setopt := func(name string, value interface{}) {
+		opts[name] = value
+	}
 
-	// strip the "--" off the command line options
-	// and populate the opts that we pass to the cli ctor
-	for key, val := range args {
-		if val != nil && strings.HasPrefix(key, "--") {
-			opt := key[2:]
-			if opt == "override" {
-				for _, v := range val.([]string) {
-					if strings.Contains(v, "=") {
-						kv := strings.SplitN(v, "=", 2)
-						opts[kv[0]] = kv[1]
-					} else {
-						log.Error("Malformed override, expected KEY=VALUE, got %s", v)
-						os.Exit(1)
-					}
-				}
-			} else {
-				switch v := val.(type) {
-				case string:
-					opts[opt] = v
-				case int:
-					opts[opt] = fmt.Sprintf("%d", v)
-				case bool:
-					opts[opt] = fmt.Sprintf("%t", v)
-				}
+	op := optigo.NewDirectAssignParser(map[string]interface{}{
+		"h|help": usage,
+		"v|verbose+": func() {
+			logging.SetLevel(logging.GetLevel("")+1, "")
+		},
+		"dryrun":                setopt,
+		"b|browse":              setopt,
+		"editor=s":              setopt,
+		"u|user=s":              setopt,
+		"endpoint=s":            setopt,
+		"t|template=s":          setopt,
+		"q|query=s":             setopt,
+		"p|project=s":           setopt,
+		"c|component=s":         setopt,
+		"a|assignee=s":          setopt,
+		"i|issuetype=s":         setopt,
+		"w|watcher=s":           setopt,
+		"r|reporter=s":          setopt,
+		"f|queryfields=s":       setopt,
+		"s|sort=s":              setopt,
+		"l|limit|max_results=i": setopt,
+		"o|override=s%":         &overrides,
+		"noedit":                setopt,
+		"edit":                  setopt,
+		"m|comment=s":           setopt,
+		"d|dir|directory=s":     setopt,
+	})
+
+	if err := op.ProcessAll(os.Args[1:]); err != nil {
+		log.Error("%s", err)
+		usage(false)
+	}
+	args := op.Args
+	opts["overrides"] = overrides
+
+	command := "view"
+	if len(args) > 0 {
+		if alias, ok := jiraCommands[args[0]]; ok {
+			command = alias
+			args = args[1:]
+		} else if len(args) > 1 {
+			// look at second arg for "dups" and "blocks" commands
+			if alias, ok := jiraCommands[args[1]]; ok {
+				command = alias
+				args = append(args[:1], args[2:]...)
 			}
 		}
 	}
 
-	// cant use proper [default:x] syntax in docopt
-	// because only want to default if the option is not
-	// already specified in some .jira.d/config.yml file
-	if _, ok := opts["user"]; !ok {
-		opts["user"] = user
-	}
-	if _, ok := opts["queryfields"]; !ok {
-		opts["queryfields"] = "summary,created,priority,status,reporter,assignee"
-	}
-	if _, ok := opts["directory"]; !ok {
-		opts["directory"] = fmt.Sprintf("%s/.jira.d/templates", home)
-	}
-	if _, ok := opts["sort"]; !ok {
-		opts["sort"] = "priority asc, created"
-	}
-	if _, ok := opts["max_results"]; !ok {
-		opts["max_results"] = defaultMaxResults
-	}
+	os.Setenv("JIRA_OPERATION", command)
+	loadConfigs(opts)
 
 	if _, ok := opts["endpoint"]; !ok {
 		log.Error("endpoint option required.  Either use --endpoint or set a enpoint option in your ~/.jira.d/config.yml file")
@@ -161,130 +212,90 @@ Command Options:
 
 	log.Debug("opts: %s", opts)
 
-	validCommand := func(cmd string) bool {
-		if val, ok := args[cmd]; ok && val.(bool) {
-			return true
-		}
-		return false
-	}
-
-	validOpt := func(opt string, dflt interface{}) interface{} {
-		if val, ok := opts[opt]; ok {
-			return val
-		}
-		if dflt == nil {
-			log.Error("Missing required option --%s or \"%s\" property override in the config file", opt, opt)
-			os.Exit(1)
-		}
-		return dflt
-	}
-
 	setEditing := func(dflt bool) {
 		if dflt {
-			if val, ok := opts["noedit"]; ok && val == "true" {
-				opts["edit"] = "false"
+			if val, ok := opts["noedit"].(bool); ok && val {
+				opts["edit"] = false
 			} else {
-				opts["edit"] = "true"
+				opts["edit"] = true
 			}
 		} else {
-			if val, ok := opts["edit"]; ok && val != "true" {
-				opts["edit"] = "false"
+			if val, ok := opts["edit"].(bool); ok && !val {
+				opts["edit"] = false
 			}
 		}
 	}
 
-	if validCommand("login") {
+	var err error
+	switch command {
+	case "login":
 		err = c.CmdLogin()
-	} else if validCommand("fields") {
+	case "fields":
 		err = c.CmdFields()
-	} else if validCommand("ls") || validCommand("list") {
+	case "list":
 		err = c.CmdList()
-	} else if validCommand("edit") {
+	case "edit":
 		setEditing(true)
-		err = c.CmdEdit(args["ISSUE"].(string))
-	} else if validCommand("editmeta") {
-		err = c.CmdEditMeta(args["ISSUE"].(string))
-	} else if validCommand("transmeta") {
-		err = c.CmdTransitionMeta(args["ISSUE"].(string))
-	} else if validCommand("issuelinktypes") {
+		err = c.CmdEdit(args[0])
+	case "editmeta":
+		err = c.CmdEditMeta(args[0])
+	case "transmeta":
+		err = c.CmdTransitionMeta(args[0])
+	case "issuelinktypes":
 		err = c.CmdIssueLinkTypes()
-	} else if validCommand("issuetypes") {
-		err = c.CmdIssueTypes(validOpt("project", nil).(string))
-	} else if validCommand("createmeta") {
-		err = c.CmdCreateMeta(
-			validOpt("project", nil).(string),
-			validOpt("issuetype", "Bug").(string),
-		)
-	} else if validCommand("create") {
+	case "issuetypes":
+		err = c.CmdIssueTypes()
+	case "createmeta":
+		err = c.CmdCreateMeta()
+	case "create":
 		setEditing(true)
-		err = c.CmdCreate(
-			validOpt("project", nil).(string),
-			validOpt("issuetype", "Bug").(string),
-		)
-	} else if validCommand("transitions") {
-		err = c.CmdTransitions(args["ISSUE"].(string))
-	} else if validCommand("blocks") {
-		err = c.CmdBlocks(
-			args["BLOCKER"].(string),
-			args["ISSUE"].(string),
-		)
-	} else if validCommand("dups") {
-		if err = c.CmdDups(
-			args["DUPLICATE"].(string),
-			args["ISSUE"].(string),
-		); err == nil {
+		err = c.CmdCreate()
+	case "transitions":
+		err = c.CmdTransitions(args[0])
+	case "blocks":
+		err = c.CmdBlocks(args[0], args[1])
+	case "dups":
+		if err = c.CmdDups(args[0], args[1]); err == nil {
 			opts["resolution"] = "Duplicate"
-			err = c.CmdTransition(
-				args["DUPLICATE"].(string),
-				"close",
-			)
+			err = c.CmdTransition(args[0], "close")
 		}
-	} else if validCommand("watch") {
-		err = c.CmdWatch(
-			args["ISSUE"].(string),
-			validOpt("watcher", user).(string),
-		)
-	} else if validCommand("trans") || validCommand("transition") {
+	case "watch":
+		err = c.CmdWatch(args[0])
+	case "transition":
 		setEditing(true)
-		err = c.CmdTransition(
-			args["ISSUE"].(string),
-			args["TRANSITION"].(string),
-		)
-	} else if validCommand("close") {
+		err = c.CmdTransition(args[0], args[1])
+	case "close":
 		setEditing(false)
-		err = c.CmdTransition(args["ISSUE"].(string), "close")
-	} else if validCommand("ack") {
+		err = c.CmdTransition(args[0], "close")
+	case "acknowledge":
 		setEditing(false)
-		err = c.CmdTransition(args["ISSUE"].(string), "acknowledge")
-	} else if validCommand("reopen") {
+		err = c.CmdTransition(args[0], "acknowledge")
+	case "reopen":
 		setEditing(false)
-		err = c.CmdTransition(args["ISSUE"].(string), "reopen")
-	} else if validCommand("resolve") {
+		err = c.CmdTransition(args[0], "reopen")
+	case "resolve":
 		setEditing(false)
-		err = c.CmdTransition(args["ISSUE"].(string), "resolve")
-	} else if validCommand("start") {
+		err = c.CmdTransition(args[0], "resolve")
+	case "start":
 		setEditing(false)
-		err = c.CmdTransition(args["ISSUE"].(string), "start")
-	} else if validCommand("stop") {
+		err = c.CmdTransition(args[0], "start")
+	case "stop":
 		setEditing(false)
-		err = c.CmdTransition(args["ISSUE"].(string), "stop")
-	} else if validCommand("comment") {
+		err = c.CmdTransition(args[0], "stop")
+	case "comment":
 		setEditing(true)
-		err = c.CmdComment(args["ISSUE"].(string))
-	} else if validCommand("take") {
-		err = c.CmdAssign(args["ISSUE"].(string), opts["user"])
-	} else if validCommand("browse") || validCommand("b") {
-		opts["browse"] = "true"
-		err = c.Browse(args["ISSUE"].(string))
-	} else if validCommand("export-templates") {
+		err = c.CmdComment(args[0])
+	case "take":
+		err = c.CmdAssign(args[0], opts["user"].(string))
+	case "browse":
+		opts["browse"] = true
+		err = c.Browse(args[0])
+	case "export-tempaltes":
 		err = c.CmdExportTemplates()
-	} else if validCommand("assign") || validCommand("give") {
-		err = c.CmdAssign(
-			args["ISSUE"].(string),
-			args["ASSIGNEE"].(string),
-		)
-	} else if val, ok := args["ISSUE"]; ok {
-		err = c.CmdView(val.(string))
+	case "assign":
+		err = c.CmdAssign(args[0], args[1])
+	default:
+		err = c.CmdView(args[0])
 	}
 
 	if err != nil {
@@ -293,73 +304,35 @@ Command Options:
 	os.Exit(0)
 }
 
-func parseYaml(file string, opts map[string]string) {
+func parseYaml(file string, opts map[string]interface{}) {
 	if fh, err := ioutil.ReadFile(file); err == nil {
 		log.Debug("Found Config file: %s", file)
 		yaml.Unmarshal(fh, &opts)
 	}
 }
 
-func populateEnv(args map[string]interface{}) {
-	foundOp := false
-	for key, val := range args {
-		if val != nil && strings.HasPrefix(key, "--") {
-			if key == "--override" {
-				for _, v := range val.([]string) {
-					if strings.Contains(v, "=") {
-						kv := strings.SplitN(v, "=", 2)
-						envName := fmt.Sprintf("JIRA_%s", strings.ToUpper(kv[0]))
-						os.Setenv(envName, kv[1])
-					} else {
-						log.Error("Malformed override, expected KEY=VALUE, got %s", v)
-						os.Exit(1)
-					}
-				}
-			} else {
-				envName := fmt.Sprintf("JIRA_%s", strings.ToUpper(key[2:]))
-				switch v := val.(type) {
-				case []string:
-					os.Setenv(envName, strings.Join(v, ","))
-				case string:
-					os.Setenv(envName, v)
-				case bool:
-					if v {
-						os.Setenv(envName, "1")
-					} else {
-						os.Setenv(envName, "0")
-					}
-				}
-			}
-		} else if val != nil {
-			// lower case strings are operations
-			if strings.ToLower(key) == key {
-				if key == "ls" && val.(bool) {
-					foundOp = true
-					os.Setenv("JIRA_OPERATION", "list")
-				} else if key == "b" && val.(bool) {
-					foundOp = true
-					os.Setenv("JIRA_OPERATION", "browse")
-				} else if key == "trans" && val.(bool) {
-					foundOp = true
-					os.Setenv("JIRA_OPERATION", "transition")
-				} else if key == "give" && val.(bool) {
-					foundOp = true
-					os.Setenv("JIRA_OPERATION", "assign")
-				} else if val.(bool) {
-					foundOp = true
-					os.Setenv("JIRA_OPERATION", key)
-				}
-			} else {
-				os.Setenv(fmt.Sprintf("JIRA_%s", key), val.(string))
-			}
+func populateEnv(opts map[string]interface{}) {
+	for k, v := range opts {
+		envName := fmt.Sprintf("JIRA_%s", strings.ToUpper(k))
+		var val string
+		switch t := v.(type) {
+		case string:
+			val = t
+		case int, int8, int16, int32, int64:
+			val = fmt.Sprintf("%d", t)
+		case float32, float64:
+			val = fmt.Sprintf("%f", t)
+		case bool:
+			val = fmt.Sprintf("%t", t)
+		default:
+			val = fmt.Sprintf("%v", t)
 		}
-	}
-	if !foundOp {
-		os.Setenv("JIRA_OPERATION", "view")
+		os.Setenv(envName, val)
 	}
 }
 
-func loadConfigs(opts map[string]string) {
+func loadConfigs(opts map[string]interface{}) {
+	populateEnv(opts)
 	paths := cli.FindParentPaths(".jira.d/config.yml")
 	// prepend
 	paths = append([]string{"/etc/jira-cli.yml"}, paths...)
@@ -381,6 +354,7 @@ func loadConfigs(opts map[string]string) {
 					os.Exit(1)
 				}
 				yaml.Unmarshal(stdout.Bytes(), &opts)
+				populateEnv(opts)
 			}
 		}
 	}

@@ -22,18 +22,18 @@ var log = logging.MustGetLogger("jira.cli")
 
 type Cli struct {
 	endpoint   *url.URL
-	opts       map[string]string
+	opts       map[string]interface{}
 	cookieFile string
 	ua         *http.Client
 }
 
-func New(opts map[string]string) *Cli {
+func New(opts map[string]interface{}) *Cli {
 	homedir := os.Getenv("HOME")
 	cookieJar, _ := cookiejar.New(nil)
-	endpoint, _ := opts["endpoint"]
+	endpoint, _ := opts["endpoint"].(string)
 	url, _ := url.Parse(strings.TrimRight(endpoint, "/"))
 
-	if project, ok := opts["project"]; ok {
+	if project, ok := opts["project"].(string); ok {
 		opts["project"] = strings.ToUpper(project)
 	}
 
@@ -175,7 +175,7 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 }
 
 func (c *Cli) getTemplate(name string) string {
-	if override, ok := c.opts["template"]; ok {
+	if override, ok := c.opts["template"].(string); ok {
 		if _, err := os.Stat(override); err == nil {
 			return readFile(override)
 		} else {
@@ -233,7 +233,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 
 	fh.Close()
 
-	editor, ok := c.opts["editor"]
+	editor, ok := c.opts["editor"].(string)
 	if !ok {
 		editor = os.Getenv("JIRA_EDITOR")
 		if editor == "" {
@@ -245,7 +245,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 	}
 
 	editing := true
-	if val, ok := c.opts["edit"]; ok && val == "false" {
+	if val, ok := c.opts["edit"].(bool); ok && !val {
 		editing = false
 	}
 
@@ -340,7 +340,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 }
 
 func (c *Cli) Browse(issue string) error {
-	if val, ok := c.opts["browse"]; ok && val == "true" {
+	if val, ok := c.opts["browse"].(bool); ok && val {
 		if runtime.GOOS == "darwin" {
 			return exec.Command("open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
 		} else if runtime.GOOS == "linux" {
