@@ -14,7 +14,7 @@ func (c *Cli) CmdLogin() error {
 	uri := fmt.Sprintf("%s/rest/auth/1/session", c.endpoint)
 	for true {
 		req, _ := http.NewRequest("GET", uri, nil)
-		user, _ := c.opts["user"]
+		user, _ := c.opts["user"].(string)
 
 		prompt := fmt.Sprintf("Enter Password for %s: ", user)
 		passwd, _ := gopass.GetPass(prompt)
@@ -69,7 +69,7 @@ func (c *Cli) CmdList() error {
 	var query string
 	var ok bool
 	// project = BAKERY and status not in (Resolved, Closed)
-	if query, ok = c.opts["query"]; !ok {
+	if query, ok = c.opts["query"].(string); !ok {
 		qbuff := bytes.NewBufferString("resolution = unresolved")
 		if project, ok := c.opts["project"]; !ok {
 			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
@@ -107,7 +107,7 @@ func (c *Cli) CmdList() error {
 	}
 
 	fields := make([]string, 0)
-	if qf, ok := c.opts["queryfields"]; ok {
+	if qf, ok := c.opts["queryfields"].(string); ok {
 		fields = strings.Split(qf, ",")
 	} else {
 		fields = append(fields, "summary")
@@ -213,7 +213,8 @@ func (c *Cli) CmdTransitionMeta(issue string) error {
 	return runTemplate(c.getTemplate("transmeta"), data, nil)
 }
 
-func (c *Cli) CmdIssueTypes(project string) error {
+func (c *Cli) CmdIssueTypes() error {
+	project := c.opts["project"].(string)
 	log.Debug("issueTypes called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
 	data, err := responseToJson(c.get(uri))
@@ -224,7 +225,9 @@ func (c *Cli) CmdIssueTypes(project string) error {
 	return runTemplate(c.getTemplate("issuetypes"), data, nil)
 }
 
-func (c *Cli) CmdCreateMeta(project string, issuetype string) error {
+func (c *Cli) CmdCreateMeta() error {
+	project := c.opts["project"].(string)
+	issuetype := c.opts["issuetype"].(string)
 	log.Debug("createMeta called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, issuetype)
 	data, err := responseToJson(c.get(uri))
@@ -257,7 +260,9 @@ func (c *Cli) CmdTransitions(issue string) error {
 	return runTemplate(c.getTemplate("transitions"), data, nil)
 }
 
-func (c *Cli) CmdCreate(project string, issuetype string) error {
+func (c *Cli) CmdCreate() error {
+	project := c.opts["project"].(string)
+	issuetype := c.opts["issuetype"].(string)
 	log.Debug("create called")
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, issuetype)
@@ -399,7 +404,8 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	return nil
 }
 
-func (c *Cli) CmdWatch(issue string, watcher string) error {
+func (c *Cli) CmdWatch(issue string) error {
+	watcher := c.opts["watcher"].(string)
 	log.Debug("watch called")
 
 	json, err := jsonEncode(watcher)
@@ -568,7 +574,7 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 }
 
 func (c *Cli) CmdExportTemplates() error {
-	dir := c.opts["directory"]
+	dir := c.opts["directory"].(string)
 	if err := mkdir(dir); err != nil {
 		return err
 	}
