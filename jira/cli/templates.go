@@ -50,7 +50,8 @@ comments:
     {{ or .body "" | indent 4}}
 {{end}}
 `
-const default_edit_template = `update:
+const default_edit_template = `# issue: {{ .key }}
+update:
   comment:
     - add: 
         body: |
@@ -72,6 +73,10 @@ fields:
     name: {{ or .overrides.priority .fields.priority.name }}
   description: |
     {{ or .overrides.description (or .fields.description "") | indent 4 }}
+# comments:
+# {{ range .fields.comment.comments }}  - | # {{.author.name}} at {{.created}}
+#     {{ or .body "" | indent 4 | comment}}
+# {{end}}
 `
 const default_transitions_template = `{{ range .transitions }}{{.id }}: {{.name}}
 {{end}}`
