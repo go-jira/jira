@@ -28,6 +28,8 @@ func main() {
 
 	user := os.Getenv("USER")
 	home := os.Getenv("HOME")
+	defaultQueryFields := "summary,created,priority,status,reporter,assignee"
+	defaultSort := "priority asc, created"
 	defaultMaxResults := 500
 
 	usage := func(ok bool) {
@@ -87,18 +89,18 @@ Command Options:
   -b --browse               Open your browser to the Jira issue
   -c --component=COMPONENT  Component to Search for
   -d --directory=DIR        Directory to export templates to (default: %s)
-  -f --queryfields=FIELDS   Fields that are used in "list" template: (default: summary,created,priority,status,reporter,assignee)
+  -f --queryfields=FIELDS   Fields that are used in "list" template: (default: %s)
   -i --issuetype=ISSUETYPE  Jira Issue Type (default: Bug)
   -m --comment=COMMENT      Comment message for transition
   -o --override=KEY=VAL     Set custom key/value pairs
   -p --project=PROJECT      Project to Search for
   -q --query=JQL            Jira Query Language expression for the search
   -r --reporter=USER        Reporter to search for
-  -s --sort=ORDER           For list operations, sort issues (default: priority asc, created)
+  -s --sort=ORDER           For list operations, sort issues (default: %s)
   -w --watcher=USER         Watcher to add to issue (default: %s)
                             or Watcher to search for
   --max_results=VAL         Maximum number of results to return in query (default: %d)
-`, user, fmt.Sprintf("%s/.jira.d/templates", home), user, defaultMaxResults)
+`, user, fmt.Sprintf("%s/.jira.d/templates", home), defaultQueryFields, defaultSort, user, defaultMaxResults)
 		printer(output)
 	}
 
@@ -140,9 +142,9 @@ Command Options:
 		"user":        user,
 		"issuetype":   "Bug",
 		"watcher":     user,
-		"queryfields": "summary,created,priority,status,reporter,assignee",
+		"queryfields": defaultQueryFields,
 		"directory":   fmt.Sprintf("%s/.jira.d/templates", home),
-		"sort":        "priority asc, created",
+		"sort":        defaultSort,
 		"max_results": defaultMaxResults,
 	}
 	overrides := make(map[string]string)
