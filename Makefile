@@ -62,3 +62,6 @@ update-changelog:
 	mv CHANGELOG.md.new CHANGELOG.md; \
 	git commit -m "Updated Changelog" CHANGELOG.md; \
 	git tag $(NEWVER)
+
+clean:
+	rm -rf pkg dist bin && find src \! -path \*/go-jira\* -delete
