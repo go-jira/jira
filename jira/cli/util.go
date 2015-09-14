@@ -132,6 +132,9 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 			}
 			return strings.Replace(content, "\n", string(indent), -1)
 		},
+		"comment": func(content string) string {
+			return strings.Replace(content, "\n", "\n# ", -1)
+		},
 		"color": func(color string) string {
 			return ansi.ColorCode(color)
 		},
