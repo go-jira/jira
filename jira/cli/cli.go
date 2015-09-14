@@ -203,6 +203,12 @@ func (c *Cli) getTemplate(name string) string {
 	}
 }
 
+type NoChangesFound struct{}
+
+func (f NoChangesFound) Error() string {
+	return "No changes found, aborting"
+}
+
 func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData map[string]interface{}, templateProcessor func(string) error) error {
 
 	tmpdir := fmt.Sprintf("%s/.jira.d/tmp", os.Getenv("HOME"))
@@ -270,9 +276,9 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 				return err
 			}
 			diff := exec.Command("diff", "-q", tmpFileNameOrig, tmpFileName)
+			log.Notice("Running diff -q %s %s", tmpFileNameOrig, tmpFileName)
 			if err := diff.Run(); err == nil {
-				log.Info("No changes found, aborting")
-				return fmt.Errorf("No changes found, aborting")
+				return NoChangesFound{}
 			}
 		}
 
@@ -348,4 +354,70 @@ func (c *Cli) Browse(issue string) error {
 		}
 	}
 	return nil
+}
+
+func (c *Cli) FindIssues() (interface{}, error) {
+	var query string
+	var ok bool
+	// project = BAKERY and status not in (Resolved, Closed)
+	if query, ok = c.opts["query"].(string); !ok {
+		qbuff := bytes.NewBufferString("resolution = unresolved")
+		if project, ok := c.opts["project"]; !ok {
+			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
+			log.Error("%s", err)
+			return nil, err
+		} else {
+			qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", project))
+		}
+
+		if component, ok := c.opts["component"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND component = '%s'", component))
+		}
+
+		if assignee, ok := c.opts["assignee"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND assignee = '%s'", assignee))
+		}
+
+		if issuetype, ok := c.opts["issuetype"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND issuetype = '%s'", issuetype))
+		}
+
+		if watcher, ok := c.opts["watcher"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND watcher = '%s'", watcher))
+		}
+
+		if reporter, ok := c.opts["reporter"]; ok {
+			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", reporter))
+		}
+
+		if sort, ok := c.opts["sort"]; ok && sort != "" {
+			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", sort))
+		}
+
+		query = qbuff.String()
+	}
+
+	fields := make([]string, 0)
+	if qf, ok := c.opts["queryfields"].(string); ok {
+		fields = strings.Split(qf, ",")
+	} else {
+		fields = append(fields, "summary")
+	}
+
+	json, err := jsonEncode(map[string]interface{}{
+		"jql":        query,
+		"startAt":    "0",
+		"maxResults": c.opts["max_results"],
+		"fields":     fields,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	uri := fmt.Sprintf("%s/rest/api/2/search", c.endpoint)
+	if data, err := responseToJson(c.post(uri, json)); err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
 }
