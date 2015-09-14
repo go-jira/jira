@@ -38,7 +38,7 @@ all:
    done
 
 fmt:
-	gofmt -s -w jira && git commit -a -m "gofmt"
+	gofmt -s -w jira
 
 install:
 	export GOBIN=~/bin && ${MAKE} build
