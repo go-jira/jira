@@ -109,7 +109,7 @@ func (c *Cli) CmdEdit(issue string) error {
 		fmt.Sprintf("%s-edit-", issue),
 		issueData,
 		func(json string) error {
-			if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+			if c.getOptBool("dryrun", false) {
 				log.Debug("Dryrun mode, skipping PUT")
 				return nil
 			}
@@ -171,7 +171,8 @@ func (c *Cli) CmdIssueTypes() error {
 
 func (c *Cli) CmdCreateMeta() error {
 	project := c.opts["project"].(string)
-	issuetype := c.opts["issuetype"].(string)
+	issuetype := c.getOptString("issuetype", "Bug")
+
 	log.Debug("createMeta called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, issuetype)
 	data, err := responseToJson(c.get(uri))
@@ -206,7 +207,7 @@ func (c *Cli) CmdTransitions(issue string) error {
 
 func (c *Cli) CmdCreate() error {
 	project := c.opts["project"].(string)
-	issuetype := c.opts["issuetype"].(string)
+	issuetype := c.getOptString("issuetype", "Bug")
 	log.Debug("create called")
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, issuetype)
@@ -238,7 +239,7 @@ func (c *Cli) CmdCreate() error {
 		func(json string) error {
 			log.Debug("JSON: %s", json)
 			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
-			if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+			if c.getOptBool("dryrun", false) {
 				log.Debug("Dryrun mode, skipping POST")
 				return nil
 			}
@@ -299,7 +300,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
-	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+	if c.getOptBool("dryrun", false) {
 		log.Debug("Dryrun mode, skipping POST")
 		return nil
 	}
@@ -339,7 +340,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
-	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+	if c.getOptBool("dryrun", false) {
 		log.Debug("Dryrun mode, skipping POST")
 		return nil
 	}
@@ -361,7 +362,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 }
 
 func (c *Cli) CmdWatch(issue string) error {
-	watcher := c.opts["watcher"].(string)
+	watcher := c.getOptString("watcher", c.opts["user"].(string))
 	log.Debug("watch called")
 
 	json, err := jsonEncode(watcher)
@@ -370,7 +371,7 @@ func (c *Cli) CmdWatch(issue string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", c.endpoint, issue)
-	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+	if c.getOptBool("dryrun", false) {
 		log.Debug("Dryrun mode, skipping POST")
 		return nil
 	}
@@ -423,7 +424,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		log.Debug("POST: %s", json)
 		// os.Exit(0)
 		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
-		if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+		if c.getOptBool("dryrun", false) {
 			log.Debug("Dryrun mode, skipping POST")
 			return nil
 		}
@@ -472,7 +473,7 @@ func (c *Cli) CmdComment(issue string) error {
 	handlePost := func(json string) error {
 		log.Debug("JSON: %s", json)
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", c.endpoint, issue)
-		if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+		if c.getOptBool("dryrun", false) {
 			log.Debug("Dryrun mode, skipping POST")
 			return nil
 		}
@@ -524,7 +525,7 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", c.endpoint, issue)
-	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+	if c.getOptBool("dryrun", false) {
 		log.Debug("Dryrun mode, skipping PUT")
 		return nil
 	}

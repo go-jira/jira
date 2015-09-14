@@ -276,7 +276,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 				return err
 			}
 			diff := exec.Command("diff", "-q", tmpFileNameOrig, tmpFileName)
-			log.Notice("Running diff -q %s %s", tmpFileNameOrig, tmpFileName)
+			// if err == nil then diff found no changes
 			if err := diff.Run(); err == nil {
 				return NoChangesFound{}
 			}
@@ -419,5 +419,21 @@ func (c *Cli) FindIssues() (interface{}, error) {
 		return nil, err
 	} else {
 		return data, nil
+	}
+}
+
+func (c *Cli) getOptString(optName string, dflt string) string {
+	if val, ok := c.opts[optName].(string); ok {
+		return val
+	} else {
+		return dflt
+	}
+}
+
+func (c *Cli) getOptBool(optName string, dflt bool) bool {
+	if val, ok := c.opts[optName].(bool); ok {
+		return val
+	} else {
+		return dflt
 	}
 }
