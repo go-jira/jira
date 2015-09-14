@@ -65,71 +65,11 @@ func (c *Cli) CmdFields() error {
 
 func (c *Cli) CmdList() error {
 	log.Debug("list called")
-
-	var query string
-	var ok bool
-	// project = BAKERY and status not in (Resolved, Closed)
-	if query, ok = c.opts["query"].(string); !ok {
-		qbuff := bytes.NewBufferString("resolution = unresolved")
-		if project, ok := c.opts["project"]; !ok {
-			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
-			log.Error("%s", err)
-			return err
-		} else {
-			qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", project))
-		}
-
-		if component, ok := c.opts["component"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND component = '%s'", component))
-		}
-
-		if assignee, ok := c.opts["assignee"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND assignee = '%s'", assignee))
-		}
-
-		if issuetype, ok := c.opts["issuetype"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND issuetype = '%s'", issuetype))
-		}
-
-		if watcher, ok := c.opts["watcher"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND watcher = '%s'", watcher))
-		}
-
-		if reporter, ok := c.opts["reporter"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", reporter))
-		}
-
-		if sort, ok := c.opts["sort"]; ok && sort != "" {
-			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", sort))
-		}
-
-		query = qbuff.String()
-	}
-
-	fields := make([]string, 0)
-	if qf, ok := c.opts["queryfields"].(string); ok {
-		fields = strings.Split(qf, ",")
+	if data, err := c.FindIssues(); err != nil {
+		return err
 	} else {
-		fields = append(fields, "summary")
+		return runTemplate(c.getTemplate("list"), data, nil)
 	}
-
-	json, err := jsonEncode(map[string]interface{}{
-		"jql":        query,
-		"startAt":    "0",
-		"maxResults": c.opts["max_results"],
-		"fields":     fields,
-	})
-	if err != nil {
-		return err
-	}
-
-	uri := fmt.Sprintf("%s/rest/api/2/search", c.endpoint)
-	data, err := responseToJson(c.post(uri, json))
-	if err != nil {
-		return err
-	}
-
-	return runTemplate(c.getTemplate("list"), data, nil)
 }
 
 func (c *Cli) CmdView(issue string) error {
@@ -169,6 +109,10 @@ func (c *Cli) CmdEdit(issue string) error {
 		fmt.Sprintf("%s-edit-", issue),
 		issueData,
 		func(json string) error {
+			if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+				log.Debug("Dryrun mode, skipping PUT")
+				return nil
+			}
 			resp, err := c.put(uri, json)
 			if err != nil {
 				return err
@@ -294,6 +238,10 @@ func (c *Cli) CmdCreate() error {
 		func(json string) error {
 			log.Debug("JSON: %s", json)
 			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
+			if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+				log.Debug("Dryrun mode, skipping POST")
+				return nil
+			}
 			resp, err := c.post(uri, json)
 			if err != nil {
 				return err
@@ -351,6 +299,10 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
+	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+		log.Debug("Dryrun mode, skipping POST")
+		return nil
+	}
 	resp, err := c.post(uri, json)
 	if err != nil {
 		return err
@@ -387,6 +339,10 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
+	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+		log.Debug("Dryrun mode, skipping POST")
+		return nil
+	}
 	resp, err := c.post(uri, json)
 	if err != nil {
 		return err
@@ -414,6 +370,10 @@ func (c *Cli) CmdWatch(issue string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", c.endpoint, issue)
+	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+		log.Debug("Dryrun mode, skipping POST")
+		return nil
+	}
 	resp, err := c.post(uri, json)
 	if err != nil {
 		return err
@@ -463,6 +423,10 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		log.Debug("POST: %s", json)
 		// os.Exit(0)
 		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
+		if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+			log.Debug("Dryrun mode, skipping POST")
+			return nil
+		}
 		resp, err := c.post(uri, json)
 		if err != nil {
 			return err
@@ -508,6 +472,10 @@ func (c *Cli) CmdComment(issue string) error {
 	handlePost := func(json string) error {
 		log.Debug("JSON: %s", json)
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", c.endpoint, issue)
+		if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+			log.Debug("Dryrun mode, skipping POST")
+			return nil
+		}
 		resp, err := c.post(uri, json)
 		if err != nil {
 			return err
@@ -556,6 +524,10 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", c.endpoint, issue)
+	if dryrun, ok := c.opts["dryrun"].(bool); ok && dryrun {
+		log.Debug("Dryrun mode, skipping PUT")
+		return nil
+	}
 	resp, err := c.put(uri, json)
 	if err != nil {
 		return err

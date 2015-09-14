@@ -138,7 +138,7 @@ Command Options:
 		"login":            "login",
 	}
 
-	opts := map[string]interface{}{
+	defaults := map[string]interface{}{
 		"user":        user,
 		"issuetype":   "Bug",
 		"watcher":     user,
@@ -147,6 +147,8 @@ Command Options:
 		"sort":        defaultSort,
 		"max_results": defaultMaxResults,
 	}
+	opts := make(map[string]interface{})
+
 	overrides := make(map[string]string)
 
 	setopt := func(name string, value interface{}) {
@@ -205,6 +207,17 @@ Command Options:
 	os.Setenv("JIRA_OPERATION", command)
 	loadConfigs(opts)
 
+	// apply defaults
+	for k, v := range defaults {
+		if _, ok := opts[k]; !ok {
+			log.Debug("Setting %q to %#v from defaults", k, v)
+			opts[k] = v
+		}
+	}
+
+	log.Debug("opts: %v", opts)
+	log.Debug("args: %v", args)
+
 	if _, ok := opts["endpoint"]; !ok {
 		log.Error("endpoint option required.  Either use --endpoint or set a enpoint option in your ~/.jira.d/config.yml file")
 		os.Exit(1)
@@ -238,7 +251,27 @@ Command Options:
 		err = c.CmdList()
 	case "edit":
 		setEditing(true)
-		err = c.CmdEdit(args[0])
+		if len(args) > 0 {
+			err = c.CmdEdit(args[0])
+		} else {
+			var data interface{}
+			if data, err = c.FindIssues(); err == nil {
+				issues := data.(map[string]interface{})["issues"].([]interface{})
+				log.Notice("Found Issues: %d", len(issues))
+				for _, issue := range issues {
+					log.Notice("Issue: %s", issue.(map[string]interface{})["key"])
+					if err = c.CmdEdit(issue.(map[string]interface{})["key"].(string)); err != nil {
+						switch err.(type) {
+						case cli.NoChangesFound:
+							log.Warning("No Changes found: %s", err)
+							err = nil
+							continue
+						}
+						break
+					}
+				}
+			}
+		}
 	case "editmeta":
 		err = c.CmdEditMeta(args[0])
 	case "transmeta":
@@ -301,6 +334,7 @@ Command Options:
 	}
 
 	if err != nil {
+		log.Error("%s", err)
 		os.Exit(1)
 	}
 	os.Exit(0)
@@ -339,11 +373,14 @@ func loadConfigs(opts map[string]interface{}) {
 	// prepend
 	paths = append([]string{"/etc/jira-cli.yml"}, paths...)
 
-	for _, file := range paths {
+	// iterate paths in reverse
+	for i := len(paths) - 1; i >= 0; i-- {
+		file := paths[i]
 		if stat, err := os.Stat(file); err == nil {
+			tmp := make(map[string]interface{})
 			// check to see if config file is exectuable
 			if stat.Mode()&0111 == 0 {
-				parseYaml(file, opts)
+				parseYaml(file, tmp)
 			} else {
 				log.Debug("Found Executable Config file: %s", file)
 				// it is executable, so run it and try to parse the output
@@ -355,9 +392,15 @@ func loadConfigs(opts map[string]interface{}) {
 					log.Error("%s is exectuable, but it failed to execute: %s\n%s", file, err, cmd.Stderr)
 					os.Exit(1)
 				}
-				yaml.Unmarshal(stdout.Bytes(), &opts)
-				populateEnv(opts)
+				yaml.Unmarshal(stdout.Bytes(), &tmp)
 			}
+			for k, v := range tmp {
+				if _, ok := opts[k]; !ok {
+					log.Debug("Setting %q to %#v from %s", k, v, file)
+					opts[k] = v
+				}
+			}
+			populateEnv(opts)
 		}
 	}
 }
