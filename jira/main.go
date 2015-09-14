@@ -140,8 +140,6 @@ Command Options:
 
 	defaults := map[string]interface{}{
 		"user":        user,
-		"issuetype":   "Bug",
-		"watcher":     user,
 		"queryfields": defaultQueryFields,
 		"directory":   fmt.Sprintf("%s/.jira.d/templates", home),
 		"sort":        defaultSort,
@@ -228,15 +226,19 @@ Command Options:
 	log.Debug("opts: %s", opts)
 
 	setEditing := func(dflt bool) {
+		log.Debug("Default Editing: %t", dflt)
 		if dflt {
 			if val, ok := opts["noedit"].(bool); ok && val {
+				log.Debug("Setting edit = false")
 				opts["edit"] = false
 			} else {
+				log.Debug("Setting edit = true")
 				opts["edit"] = true
 			}
 		} else {
-			if val, ok := opts["edit"].(bool); ok && !val {
-				opts["edit"] = false
+			if _, ok := opts["edit"].(bool); !ok {
+				log.Debug("Setting edit = %t", dflt)
+				opts["edit"] = dflt
 			}
 		}
 	}
@@ -257,9 +259,7 @@ Command Options:
 			var data interface{}
 			if data, err = c.FindIssues(); err == nil {
 				issues := data.(map[string]interface{})["issues"].([]interface{})
-				log.Notice("Found Issues: %d", len(issues))
 				for _, issue := range issues {
-					log.Notice("Issue: %s", issue.(map[string]interface{})["key"])
 					if err = c.CmdEdit(issue.(map[string]interface{})["key"].(string)); err != nil {
 						switch err.(type) {
 						case cli.NoChangesFound:
