@@ -210,7 +210,7 @@ Command Options:
 			}
 		}
 	}
-	
+
 	if command == "" {
 		command = args[0]
 		args = args[1:]
@@ -218,7 +218,7 @@ Command Options:
 
 	os.Setenv("JIRA_OPERATION", command)
 	loadConfigs(opts)
-	
+
 	// check to see if it was set in the configs:
 	if value, ok := opts["command"].(string); ok {
 		command = value
