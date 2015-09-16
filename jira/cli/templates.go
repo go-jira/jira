@@ -54,7 +54,7 @@ const default_edit_template = `# issue: {{ .key }}
 update:
   comment:
     - add: 
-        body: |
+        body: |~
           {{ or .overrides.comment "" | indent 10 }}
 fields:
   summary: {{ or .overrides.summary .fields.summary }}
@@ -71,7 +71,7 @@ fields:
     - name: {{ .overrides.watcher}}{{end}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority .fields.priority.name }}
-  description: |
+  description: |~
     {{ or .overrides.description (or .fields.description "") | indent 4 }}
 # comments:
 # {{ range .fields.comment.comments }}  - | # {{.author.name}} at {{.created}}
@@ -94,7 +94,7 @@ const default_create_template = `fields:
     name: {{ or .overrides.priority "unassigned" }}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
     - name: {{ . }}{{end}}
-  description: |
+  description: |~
     {{ or .overrides.description "" | indent 4 }}
   assignee:
     name: {{ or .overrides.assignee "" }}
@@ -106,14 +106,14 @@ const default_create_template = `fields:
     - name:
 `
 
-const default_comment_template = `body: |
+const default_comment_template = `body: |~
   {{ or .overrides.comment "" | indent 2 }}
 `
 
 const default_transition_template = `update:
   comment:
     - add: 
-        body: |
+        body: |~
           {{ or .overrides.comment "" | indent 10 }}
 fields:{{if .meta.fields.assignee}}
   assignee:
