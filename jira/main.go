@@ -6,7 +6,7 @@ import (
 	"github.com/Netflix-Skunkworks/go-jira/jira/cli"
 	"github.com/coryb/optigo"
 	"github.com/op/go-logging"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/coryb/yaml.v2"
 	"io/ioutil"
 	"os"
 	"os/exec"

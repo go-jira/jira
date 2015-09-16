@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/kballard/go-shellquote"
 	"github.com/op/go-logging"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/coryb/yaml.v2"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -250,10 +250,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		}
 	}
 
-	editing := true
-	if val, ok := c.opts["edit"].(bool); ok && !val {
-		editing = false
-	}
+	editing := c.getOptBool("edit", true)
 
 	tmpFileNameOrig := fmt.Sprintf("%s.orig", tmpFileName)
 	copyFile(tmpFileName, tmpFileNameOrig)
@@ -275,6 +272,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 				}
 				return err
 			}
+
 			diff := exec.Command("diff", "-q", tmpFileNameOrig, tmpFileName)
 			// if err == nil then diff found no changes
 			if err := diff.Run(); err == nil {

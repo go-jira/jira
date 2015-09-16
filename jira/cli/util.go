@@ -125,15 +125,26 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 			}
 		},
 		"indent": func(spaces int, content string) string {
-			indent := make([]byte, spaces+1, spaces+1)
+			indent := make([]rune, spaces+1, spaces+1)
 			indent[0] = '\n'
 			for i := 1; i < spaces+1; i += 1 {
 				indent[i] = ' '
 			}
-			return strings.Replace(content, "\n", string(indent), -1)
+
+			lineSeps := []rune{'\n', '\u0085', '\u2028', '\u2029'}
+			for _, sep := range lineSeps {
+				indent[0] = sep
+				content = strings.Replace(content, string(sep), string(indent), -1)
+			}
+			return content
+
 		},
 		"comment": func(content string) string {
-			return strings.Replace(content, "\n", "\n# ", -1)
+			lineSeps := []rune{'\n', '\u0085', '\u2028', '\u2029'}
+			for _, sep := range lineSeps {
+				content = strings.Replace(content, string(sep), string([]rune{sep, '#', ' '}), -1)
+			}
+			return content
 		},
 		"color": func(color string) string {
 			return ansi.ColorCode(color)
