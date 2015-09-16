@@ -197,7 +197,7 @@ Command Options:
 	args := op.Args
 	opts["overrides"] = overrides
 
-	command := "view"
+	var command string
 	if len(args) > 0 {
 		if alias, ok := jiraCommands[args[0]]; ok {
 			command = alias
@@ -210,9 +210,22 @@ Command Options:
 			}
 		}
 	}
+	
+	if command == "" {
+		command = args[0]
+		args = args[1:]
+	}
 
 	os.Setenv("JIRA_OPERATION", command)
 	loadConfigs(opts)
+	
+	// check to see if it was set in the configs:
+	if value, ok := opts["command"].(string); ok {
+		command = value
+	} else {
+		args = append([]string{command}, args...)
+		command = "view"
+	}
 
 	// apply defaults
 	for k, v := range defaults {
@@ -338,8 +351,11 @@ Command Options:
 		err = c.CmdExportTemplates()
 	case "assign":
 		err = c.CmdAssign(args[0], args[1])
-	default:
+	case "view":
 		err = c.CmdView(args[0])
+	default:
+		log.Error("Unknown command %s", command)
+		os.Exit(1)
 	}
 
 	if err != nil {
