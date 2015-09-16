@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.10 - 2015-09-15
+
+* allow for command aliasing in conjunction with executable config files [Cory Bennett] [[23590d4](https://github.com/Netflix-Skunkworks/go-jira/commit/23590d4)]
+* update usage [Cory Bennett] [[ef7a57e](https://github.com/Netflix-Skunkworks/go-jira/commit/ef7a57e)]
+
 ## 0.0.9 - 2015-09-15
 
 * use forked yaml.v2 so as to not lose line terminations present in jira fields [Cory Bennett] [[f84e77f](https://github.com/Netflix-Skunkworks/go-jira/commit/f84e77f)]
