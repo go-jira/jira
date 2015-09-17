@@ -222,7 +222,7 @@ Command Options:
 	// check to see if it was set in the configs:
 	if value, ok := opts["command"].(string); ok {
 		command = value
-	} else {
+	} else if _, ok := jiraCommands[command]; !ok || command == "" {
 		args = append([]string{command}, args...)
 		command = "view"
 	}
