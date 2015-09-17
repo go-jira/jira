@@ -166,7 +166,7 @@ Command Options:
 	op := optigo.NewDirectAssignParser(map[string]interface{}{
 		"h|help": usage,
 		"version": func() {
-			fmt.Println("version: 0.0.10")
+			fmt.Println("version: 0.0.11")
 			os.Exit(0)
 		},
 		"v|verbose+": func() {
