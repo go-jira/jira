@@ -43,7 +43,11 @@ fmt:
 install:
 	export GOBIN=~/bin && ${MAKE} build
 
-CURVER ?= $(shell git fetch --tags && git tag | tail -1)
+# need gsort on OSX (brew install coreutils) or newer sort on linux
+# that supports the -V option for version sorting
+SORT=gsort
+
+CURVER ?= $(shell git fetch --tags && git tag | $(SORT) -V | tail -1)
 NEWVER ?= $(shell echo $(CURVER) | awk -F. '{print $$1"."$$2"."$$3+1}')
 TODAY  := $(shell date +%Y-%m-%d)
 
@@ -61,6 +65,8 @@ update-changelog:
 	tail +2 CHANGELOG.md >> CHANGELOG.md.new; \
 	mv CHANGELOG.md.new CHANGELOG.md; \
 	git commit -m "Updated Changelog" CHANGELOG.md; \
+	perl -pi -e "s/version: $(CURVER)/version: $(NEWVER)/" jira/main.go; \
+	git commit -m "bump version" jira/main.go; \
 	git tag $(NEWVER)
 
 clean:
