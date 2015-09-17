@@ -84,6 +84,7 @@ General Options:
   -t --template=FILE  Template file to use for output/editing
   -u --user=USER      Username to use for authenticaion (default: %s)
   -v --verbose        Increase output logging
+  --version           Print version
 
 Query Options:
   -a --assignee=USER        Username assigned the issue
@@ -164,6 +165,10 @@ Command Options:
 
 	op := optigo.NewDirectAssignParser(map[string]interface{}{
 		"h|help": usage,
+		"version": func() {
+			fmt.Println("version: 0.0.10")
+			os.Exit(0)
+		},
 		"v|verbose+": func() {
 			logging.SetLevel(logging.GetLevel("")+1, "")
 		},
