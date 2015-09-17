@@ -1,10 +1,9 @@
 # Changelog
 
-## 0.0.10 - 2015-09-16
+## 0.0.11 - 2015-09-16
 
+* add --version [Cory Bennett] [[8385ee2](https://github.com/Netflix-Skunkworks/go-jira/commit/8385ee2)]
 * fix command line parser broken in 0.0.10 [Cory Bennett] [[15ae929](https://github.com/Netflix-Skunkworks/go-jira/commit/15ae929)]
-* allow for command aliasing in conjunction with executable config files [Cory Bennett] [[23590d4](https://github.com/Netflix-Skunkworks/go-jira/commit/23590d4)]
-* update usage [Cory Bennett] [[ef7a57e](https://github.com/Netflix-Skunkworks/go-jira/commit/ef7a57e)]
 
 ## 0.0.10 - 2015-09-15
 
