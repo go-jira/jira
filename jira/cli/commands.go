@@ -222,7 +222,7 @@ func (c *Cli) CmdCreate() error {
 
 	issueData := make(map[string]interface{})
 	issueData["overrides"] = c.opts
-	issueData["overrides"].(map[string]string)["issuetype"] = issuetype
+	issueData["overrides"].(map[string]interface{})["issuetype"] = issuetype
 
 	if val, ok := data.(map[string]interface{})["projects"]; ok {
 		if len(val.([]interface{})) == 0 {
