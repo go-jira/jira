@@ -5,6 +5,7 @@ import (
 	"code.google.com/p/gopass"
 	"fmt"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"strings"
 	// "github.com/kr/pretty"
@@ -20,9 +21,12 @@ func (c *Cli) CmdLogin() error {
 		passwd, _ := gopass.GetPass(prompt)
 
 		req.SetBasicAuth(user, passwd)
+		log.Info("%s %s", req.Method, req.URL.String())
 		if resp, err := c.makeRequest(req); err != nil {
 			return err
 		} else {
+			out, _ := httputil.DumpResponse(resp, true)
+			log.Debug("%s", out)
 			if resp.StatusCode == 403 {
 				// probably got this, need to redirect the user to login manually
 				// X-Authentication-Denied-Reason: CAPTCHA_CHALLENGE; login-url=https://jira/login.jsp
