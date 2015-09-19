@@ -2,8 +2,8 @@ package cli
 
 import (
 	"bytes"
-	"code.google.com/p/gopass"
 	"fmt"
+	"golang.org/x/crypto/ssh/terminal"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -17,8 +17,9 @@ func (c *Cli) CmdLogin() error {
 		req, _ := http.NewRequest("GET", uri, nil)
 		user, _ := c.opts["user"].(string)
 
-		prompt := fmt.Sprintf("Enter Password for %s: ", user)
-		passwd, _ := gopass.GetPass(prompt)
+		fmt.Printf("Enter Password for %s: ", user)
+		pwbytes, _ := terminal.ReadPassword(int(os.Stdin.Fd()))
+		passwd := string(pwbytes)
 
 		req.SetBasicAuth(user, passwd)
 		log.Info("%s %s", req.Method, req.URL.String())
