@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.13 - 2015-09-19
+
+* replace dead/deprecated code.google.com/p/gopass with golang.org/x/crypto/ssh/terminal for reading password from stdin [Cory Bennett] [[909eb06](https://github.com/Netflix-Skunkworks/go-jira/commit/909eb06)]
+
 ## 0.0.12 - 2015-09-18
 
 * fix exception from "jira create" [Cory Bennett] [[9348a4b](https://github.com/Netflix-Skunkworks/go-jira/commit/9348a4b)]
