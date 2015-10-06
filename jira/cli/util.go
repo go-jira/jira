@@ -295,7 +295,7 @@ func yamlFixup(data interface{}) (interface{}, error) {
 		}
 		return copy, nil
 	case string:
-		if d == "" {
+		if d == "" || d == "\n" {
 			return nil, nil
 		}
 		return d, nil
