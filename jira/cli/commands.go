@@ -115,6 +115,7 @@ func (c *Cli) CmdEdit(issue string) error {
 		issueData,
 		func(json string) error {
 			if c.getOptBool("dryrun", false) {
+				log.Debug("PUT: %s", json)
 				log.Debug("Dryrun mode, skipping PUT")
 				return nil
 			}
@@ -245,6 +246,7 @@ func (c *Cli) CmdCreate() error {
 			log.Debug("JSON: %s", json)
 			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
 			if c.getOptBool("dryrun", false) {
+				log.Debug("POST: %s", json)
 				log.Debug("Dryrun mode, skipping POST")
 				return nil
 			}
@@ -306,6 +308,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
 	if c.getOptBool("dryrun", false) {
+		log.Debug("POST: %s", json)
 		log.Debug("Dryrun mode, skipping POST")
 		return nil
 	}
@@ -346,6 +349,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
 	if c.getOptBool("dryrun", false) {
+		log.Debug("POST: %s", json)
 		log.Debug("Dryrun mode, skipping POST")
 		return nil
 	}
@@ -377,6 +381,7 @@ func (c *Cli) CmdWatch(issue string) error {
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", c.endpoint, issue)
 	if c.getOptBool("dryrun", false) {
+		log.Debug("POST: %s", json)
 		log.Debug("Dryrun mode, skipping POST")
 		return nil
 	}
@@ -430,6 +435,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		// os.Exit(0)
 		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
+			log.Debug("POST: %s", json)
 			log.Debug("Dryrun mode, skipping POST")
 			return nil
 		}
@@ -479,6 +485,7 @@ func (c *Cli) CmdComment(issue string) error {
 		log.Debug("JSON: %s", json)
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
+			log.Debug("POST: %s", json)
 			log.Debug("Dryrun mode, skipping POST")
 			return nil
 		}
@@ -531,6 +538,7 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", c.endpoint, issue)
 	if c.getOptBool("dryrun", false) {
+		log.Debug("PUT: %s", json)
 		log.Debug("Dryrun mode, skipping PUT")
 		return nil
 	}
