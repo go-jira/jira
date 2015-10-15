@@ -28,7 +28,7 @@ func main() {
 
 	user := os.Getenv("USER")
 	home := os.Getenv("HOME")
-	defaultQueryFields := "summary,created,priority,status,reporter,assignee"
+	defaultQueryFields := "summary,created,updated,priority,status,reporter,assignee"
 	defaultSort := "priority asc, created"
 	defaultMaxResults := 500
 
