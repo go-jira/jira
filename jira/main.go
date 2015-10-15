@@ -352,7 +352,7 @@ Command Options:
 	case "browse":
 		opts["browse"] = true
 		err = c.Browse(args[0])
-	case "export-tempaltes":
+	case "export-templates":
 		err = c.CmdExportTemplates()
 	case "assign":
 		err = c.CmdAssign(args[0], args[1])
