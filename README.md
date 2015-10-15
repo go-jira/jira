@@ -211,7 +211,7 @@ General Options:
 Query Options:
   -a --assignee=USER        Username assigned the issue
   -c --component=COMPONENT  Component to Search for
-  -f --queryfields=FIELDS   Fields that are used in "list" template: (default: summary,created,priority,status,reporter,assignee)
+  -f --queryfields=FIELDS   Fields that are used in "list" template: (default: summary,created,updated,priority,status,reporter,assignee)
   -i --issuetype=ISSUETYPE  The Issue Type
   -l --limit=VAL            Maximum number of results to return in query (default: 500)
   -p --project=PROJECT      Project to Search for

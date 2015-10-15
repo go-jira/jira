@@ -100,6 +100,14 @@ func fuzzyAge(start string) (string, error) {
 	return "unknown", nil
 }
 
+func dateFormat(format string, content string) (string, error) {
+	if t, err := time.Parse("2006-01-02T15:04:05.000-0700", content); err != nil {
+		return "", err
+	} else {
+		return t.Format(format), nil
+	}
+}
+
 func runTemplate(templateContent string, data interface{}, out io.Writer) error {
 
 	if out == nil {
@@ -170,6 +178,9 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 		},
 		"age": func(content string) (string, error) {
 			return fuzzyAge(content)
+		},
+		"dateFormat": func(format string, content string) (string, error) {
+			return dateFormat(format, content)
 		},
 	}
 	if tmpl, err := template.New("template").Funcs(funcs).Parse(templateContent); err != nil {

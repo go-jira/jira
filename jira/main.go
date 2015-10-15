@@ -28,7 +28,7 @@ func main() {
 
 	user := os.Getenv("USER")
 	home := os.Getenv("HOME")
-	defaultQueryFields := "summary,created,priority,status,reporter,assignee"
+	defaultQueryFields := "summary,created,updated,priority,status,reporter,assignee"
 	defaultSort := "priority asc, created"
 	defaultMaxResults := 500
 
@@ -352,7 +352,7 @@ Command Options:
 	case "browse":
 		opts["browse"] = true
 		err = c.Browse(args[0])
-	case "export-tempaltes":
+	case "export-templates":
 		err = c.CmdExportTemplates()
 	case "assign":
 		err = c.CmdAssign(args[0], args[1])
