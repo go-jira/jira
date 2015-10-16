@@ -244,7 +244,7 @@ Command Options:
 	log.Debug("args: %v", args)
 
 	if _, ok := opts["endpoint"]; !ok {
-		log.Error("endpoint option required.  Either use --endpoint or set a enpoint option in your ~/.jira.d/config.yml file")
+		log.Error("endpoint option required.  Either use --endpoint or set a endpoint option in your ~/.jira.d/config.yml file")
 		os.Exit(1)
 	}
 
