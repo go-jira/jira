@@ -18,7 +18,7 @@ export GOPATH=$(shell pwd)
 GOBIN ?= $(shell pwd)/bin
 NAME=jira
 
-CURVER ?= $(shell git describe --abbrev=0 --tags)
+CURVER ?= $(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}')
 LDFLAGS:=-X main.buildVersion=$(CURVER)
 
 build: src/github.com/Netflix-Skunkworks/go-jira
