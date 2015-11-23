@@ -22,17 +22,12 @@ CURVER ?= $(shell git describe --abbrev=0 --tags)
 LDFLAGS:=-X main.buildVersion=$(CURVER)
 
 build: src/github.com/Netflix-Skunkworks/go-jira
-	go get -v github.com/coryb/optigo
-	go get -v github.com/kballard/go-shellquote
-	go get -v github.com/mgutz/ansi
-	go get -v github.com/op/go-logging
-	go get -v golang.org/x/crypto/ssh/terminal
 	go build -ldflags "$(LDFLAGS)" -o $(GOBIN)/$(NAME) jira/main.go
 
 src/%:
 	mkdir -p $(@D)
 	test -L $@ || ln -sf ../../.. $@
-	go get -v $*
+	go get -v $*/jira
 
 cross-setup:
 	for p in $(PLATFORMS); do \
