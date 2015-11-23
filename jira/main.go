@@ -13,8 +13,11 @@ import (
 	"strings"
 )
 
-var log = logging.MustGetLogger("jira")
-var format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+var (
+	log = logging.MustGetLogger("jira")
+	format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+	buildVersion string
+)	
 
 func main() {
 	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
@@ -166,7 +169,7 @@ Command Options:
 	op := optigo.NewDirectAssignParser(map[string]interface{}{
 		"h|help": usage,
 		"version": func() {
-			fmt.Println("version: 0.0.14")
+			fmt.Println(fmt.Sprintf("version: %s", buildVersion))
 			os.Exit(0)
 		},
 		"v|verbose+": func() {
@@ -216,7 +219,7 @@ Command Options:
 		}
 	}
 
-	if command == "" {
+	if command == "" && len(args) > 0 {
 		command = args[0]
 		args = args[1:]
 	}
@@ -228,7 +231,9 @@ Command Options:
 	if value, ok := opts["command"].(string); ok {
 		command = value
 	} else if _, ok := jiraCommands[command]; !ok || command == "" {
-		args = append([]string{command}, args...)
+		if command != "" {
+			args = append([]string{command}, args...)
+		}
 		command = "view"
 	}
 
@@ -270,6 +275,13 @@ Command Options:
 		}
 	}
 
+	requireArgs := func(count int) {
+		if len(args) < count {
+			log.Error("Not enough arguments. %d required, %d provided", count, len(args))
+			usage(false)
+		}
+	}
+
 	var err error
 	switch command {
 	case "login":
@@ -279,6 +291,7 @@ Command Options:
 	case "list":
 		err = c.CmdList()
 	case "edit":
+		requireArgs(1)
 		setEditing(true)
 		if len(args) > 0 {
 			err = c.CmdEdit(args[0])
@@ -300,8 +313,10 @@ Command Options:
 			}
 		}
 	case "editmeta":
+		requireArgs(1)
 		err = c.CmdEditMeta(args[0])
 	case "transmeta":
+		requireArgs(1)
 		err = c.CmdTransitionMeta(args[0])
 	case "issuelinktypes":
 		err = c.CmdIssueLinkTypes()
@@ -313,50 +328,66 @@ Command Options:
 		setEditing(true)
 		err = c.CmdCreate()
 	case "transitions":
+		requireArgs(1)
 		err = c.CmdTransitions(args[0])
 	case "blocks":
+		requireArgs(2)
 		err = c.CmdBlocks(args[0], args[1])
 	case "dups":
+		requireArgs(2)
 		if err = c.CmdDups(args[0], args[1]); err == nil {
 			opts["resolution"] = "Duplicate"
 			err = c.CmdTransition(args[0], "close")
 		}
 	case "watch":
+		requireArgs(1)
 		err = c.CmdWatch(args[0])
 	case "transition":
+		requireArgs(2)
 		setEditing(true)
 		err = c.CmdTransition(args[0], args[1])
 	case "close":
+		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "close")
 	case "acknowledge":
+		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "acknowledge")
 	case "reopen":
+		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "reopen")
 	case "resolve":
+		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "resolve")
 	case "start":
+		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "start")
 	case "stop":
+		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "stop")
 	case "comment":
+		requireArgs(1)
 		setEditing(true)
 		err = c.CmdComment(args[0])
 	case "take":
+		requireArgs(1)
 		err = c.CmdAssign(args[0], opts["user"].(string))
 	case "browse":
+		requireArgs(1)
 		opts["browse"] = true
 		err = c.Browse(args[0])
 	case "export-templates":
 		err = c.CmdExportTemplates()
 	case "assign":
+		requireArgs(2)
 		err = c.CmdAssign(args[0], args[1])
 	case "view":
+		requireArgs(1)
 		err = c.CmdView(args[0])
 	default:
 		log.Error("Unknown command %s", command)
