@@ -15,27 +15,38 @@ PLATFORMS= \
 
 DIST=$(shell pwd)/dist
 export GOPATH=$(shell pwd)
+GOBIN ?= $(shell pwd)/bin
+NAME=jira
 
-build:
-	cd src/github.com/Netflix-Skunkworks/go-jira/jira; \
-	go get -v
+CURVER ?= $(shell git describe --abbrev=0 --tags)
+LDFLAGS:=-X main.buildVersion=$(CURVER)
 
+build: src/github.com/Netflix-Skunkworks/go-jira
+	go get -v github.com/coryb/optigo
+	go get -v github.com/kballard/go-shellquote
+	go get -v github.com/mgutz/ansi
+	go get -v github.com/op/go-logging
+	go get -v golang.org/x/crypto/ssh/terminal
+	go build -ldflags "$(LDFLAGS)" -o $(GOBIN)/$(NAME) jira/main.go
+
+src/%:
+	mkdir -p $(@D)
+	test -L $@ || ln -sf ../../.. $@
+	go get -v $*
 
 cross-setup:
 	for p in $(PLATFORMS); do \
         echo "Building for $$p"; \
-		cd $(GOROOT)/src && sudo GOOS=$${p/-*/} GOARCH=$${p/*-/} bash ./make.bash --no-clean; \
+		cd $(GOROOT)/src && sudo GOROOT_BOOTSTRAP=$(GOROOT) GOOS=$${p/-*/} GOARCH=$${p/*-/} bash ./make.bash --no-clean; \
    done
 
 all:
 	rm -rf $(DIST); \
 	mkdir -p $(DIST); \
-	cd src/github.com/Netflix-Skunkworks/go-jira/jira; \
-	go get -d; \
 	for p in $(PLATFORMS); do \
         echo "Building for $$p"; \
-		GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -ldflags -s -o $(DIST)/jira-$$p; \
-   done
+        GOOS=$${p/-*/} GOARCH=$${p/*-/} go build -v -ldflags "$(LDFLAGS) -s" -o $(DIST)/$(NAME)-$$p jira/main.go ; \
+    done
 
 fmt:
 	gofmt -s -w jira
@@ -43,11 +54,6 @@ fmt:
 install:
 	export GOBIN=~/bin && ${MAKE} build
 
-# need gsort on OSX (brew install coreutils) or newer sort on linux
-# that supports the -V option for version sorting
-SORT=gsort
-
-CURVER ?= $(shell git fetch --tags && git tag | $(SORT) -V | tail -1)
 NEWVER ?= $(shell echo $(CURVER) | awk -F. '{print $$1"."$$2"."$$3+1}')
 TODAY  := $(shell date +%Y-%m-%d)
 
@@ -65,9 +71,7 @@ update-changelog:
 	tail +2 CHANGELOG.md >> CHANGELOG.md.new; \
 	mv CHANGELOG.md.new CHANGELOG.md; \
 	git commit -m "Updated Changelog" CHANGELOG.md; \
-	perl -pi -e "s/version: $(CURVER)/version: $(NEWVER)/" jira/main.go; \
-	git commit -m "bump version" jira/main.go; \
 	git tag $(NEWVER)
 
 clean:
-	rm -rf pkg dist bin && find src \! -path \*/go-jira\* -delete
+	rm -rf pkg dist bin src ./toolkit
