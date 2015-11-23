@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.15 - 2015-11-23
+
+* [[#17](https://github.com/Netflix-Skunkworks/go-jira/issues/17)] print usage on missing arguments [Cory Bennett] [[fd2a2fe](https://github.com/Netflix-Skunkworks/go-jira/commit/fd2a2fe)]
+
 ## 0.0.14 - 2015-11-17
 
 * s/enpoint/endpoint/g [Oliver Schrenk] [[c5d251d](https://github.com/Netflix-Skunkworks/go-jira/commit/c5d251d)]
