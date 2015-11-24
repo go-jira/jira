@@ -291,7 +291,6 @@ Command Options:
 	case "list":
 		err = c.CmdList()
 	case "edit":
-		requireArgs(1)
 		setEditing(true)
 		if len(args) > 0 {
 			err = c.CmdEdit(args[0])
