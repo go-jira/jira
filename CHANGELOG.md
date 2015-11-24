@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.16 - 2015-11-23
+
+* jira edit should not require one arguemnt (allow for --query) [Cory Bennett] [[a1eb4a1](https://github.com/Netflix-Skunkworks/go-jira/commit/a1eb4a1)]
+
 ## 0.0.15 - 2015-11-23
 
 * [[#17](https://github.com/Netflix-Skunkworks/go-jira/issues/17)] print usage on missing arguments [Cory Bennett] [[fd2a2fe](https://github.com/Netflix-Skunkworks/go-jira/commit/fd2a2fe)]
