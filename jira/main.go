@@ -78,6 +78,7 @@ Usage:
   jira export-templates [-d DIR] [-t template]
   jira (b|browse) ISSUE
   jira login
+  jira request [-M METHOD] URI [DATA]
   jira ISSUE
 
 General Options:
@@ -149,6 +150,8 @@ Command Options:
 		"export-templates": "export-templates",
 		"browse":           "browse",
 		"login":            "login",
+		"req":              "request",
+		"request":          "request",
 	}
 
 	defaults := map[string]interface{}{
@@ -157,6 +160,7 @@ Command Options:
 		"directory":   fmt.Sprintf("%s/.jira.d/templates", home),
 		"sort":        defaultSort,
 		"max_results": defaultMaxResults,
+		"method":      "GET",
 	}
 	opts := make(map[string]interface{})
 
@@ -196,6 +200,7 @@ Command Options:
 		"edit":                  setopt,
 		"m|comment=s":           setopt,
 		"d|dir|directory=s":     setopt,
+		"M|method=s":            setopt,
 	})
 
 	if err := op.ProcessAll(os.Args[1:]); err != nil {
@@ -388,6 +393,13 @@ Command Options:
 	case "view":
 		requireArgs(1)
 		err = c.CmdView(args[0])
+	case "request":
+		requireArgs(1)
+		data := ""
+		if len(args) > 1 {
+			data = args[1]
+		}
+		err = c.CmdRequest(args[0], data)
 	default:
 		log.Error("Unknown command %s", command)
 		os.Exit(1)
