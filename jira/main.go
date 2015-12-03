@@ -164,8 +164,6 @@ Command Options:
 	}
 	opts := make(map[string]interface{})
 
-	overrides := make(map[string]string)
-
 	setopt := func(name string, value interface{}) {
 		opts[name] = value
 	}
@@ -195,7 +193,7 @@ Command Options:
 		"f|queryfields=s":       setopt,
 		"s|sort=s":              setopt,
 		"l|limit|max_results=i": setopt,
-		"o|override=s%":         &overrides,
+		"o|override=s%":         &opts,
 		"noedit":                setopt,
 		"edit":                  setopt,
 		"m|comment=s":           setopt,
@@ -208,7 +206,6 @@ Command Options:
 		usage(false)
 	}
 	args := op.Args
-	opts["overrides"] = overrides
 
 	var command string
 	if len(args) > 0 {
