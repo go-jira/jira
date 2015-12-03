@@ -52,12 +52,18 @@ comments:
 `
 const default_edit_template = `# issue: {{ .key }}
 update:
+{{if .overrides.comment}}
   comment:
-    - add: 
+    - add:
         body: |~
           {{ or .overrides.comment "" | indent 10 }}
+{{end}}
+{{ if .overrides.label }}
+  labels:
+    - add: {{ .overrides.label }}
+{{end}}
 fields:
-  summary: {{ or .overrides.summary .fields.summary }}
+  summary: "{{ or .overrides.summary .fields.summary }}"
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
     - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
     - name: {{ .name }}{{end}}{{end}}

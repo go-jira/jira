@@ -203,7 +203,10 @@ Command Options:
 		usage(false)
 	}
 	args := op.Args
-	opts["overrides"] = overrides
+
+	for k, v := range overrides {
+		opts[k] = v
+	}
 
 	var command string
 	if len(args) > 0 {
