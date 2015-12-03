@@ -161,6 +161,7 @@ Command Options:
 		"sort":        defaultSort,
 		"max_results": defaultMaxResults,
 		"method":      "GET",
+		"quiet":       false,
 	}
 	opts := make(map[string]interface{})
 
