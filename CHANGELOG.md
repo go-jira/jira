@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.18 - 2015-12-03
+
+* need to default "quiet" to false [Cory Bennett] [[4f4a89b](https://github.com/Netflix-Skunkworks/go-jira/commit/4f4a89b)]
+
 ## 0.0.17 - 2015-12-03
 
 * add --quiet command to not print the OK .. add --saveFile option to print the issue/link to a file on create command [Cory Bennett] [[c9ac162](https://github.com/Netflix-Skunkworks/go-jira/commit/c9ac162)]
