@@ -199,6 +199,8 @@ Command Options:
 		"m|comment=s":           setopt,
 		"d|dir|directory=s":     setopt,
 		"M|method=s":            setopt,
+		"S|saveFile=s":          setopt,
+		"Q|quiet":               setopt,
 	})
 
 	if err := op.ProcessAll(os.Args[1:]); err != nil {

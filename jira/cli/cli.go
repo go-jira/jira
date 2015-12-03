@@ -354,6 +354,13 @@ func (c *Cli) Browse(issue string) error {
 	return nil
 }
 
+func (c *Cli) SaveData(data interface{}) error {
+	if val, ok := c.opts["saveFile"].(string); ok && val != "" {
+		yamlWrite(val, data)
+	}
+	return nil
+}
+
 func (c *Cli) FindIssues() (interface{}, error) {
 	var query string
 	var ok bool
