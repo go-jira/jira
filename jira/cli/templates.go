@@ -16,6 +16,7 @@ var all_templates = map[string]string{
 	"create":         default_create_template,
 	"comment":        default_comment_template,
 	"transition":     default_transition_template,
+	"request":        default_debug_template,
 }
 
 const default_debug_template = "{{ . | toJson}}\n"

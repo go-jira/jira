@@ -585,3 +585,25 @@ func (c *Cli) CmdExportTemplates() error {
 	}
 	return nil
 }
+
+func (c *Cli) CmdRequest(uri, content string) (err error) {
+	log.Debug("request called")
+
+	if ! strings.HasPrefix(uri, "http") {
+		uri = fmt.Sprintf("%s%s", c.endpoint, uri)
+	}
+
+	method := strings.ToUpper(c.opts["method"].(string))
+	var data interface{}
+	if  method == "GET" {
+		data, err = responseToJson(c.get(uri))
+	} else if method == "POST" {
+		data, err = responseToJson(c.post(uri, content))
+	} else if method == "PUT" {
+		data, err = responseToJson(c.put(uri, content))
+	}
+	if err != nil {
+		return err
+	}
+	return runTemplate(c.getTemplate("request"), data, nil)
+}
