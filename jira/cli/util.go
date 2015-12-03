@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gopkg.in/coryb/yaml.v2"
 	"github.com/mgutz/ansi"
 	"io"
 	"io/ioutil"
@@ -243,6 +244,21 @@ func jsonWrite(file string, data interface{}) {
 	}
 	enc := json.NewEncoder(fh)
 	enc.Encode(data)
+}
+
+func yamlWrite(file string, data interface{}) {
+	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	defer fh.Close()
+	if err != nil {
+		log.Error("Failed to open %s: %s", file, err)
+		os.Exit(1)
+	}
+	if out, err := yaml.Marshal(data); err != nil {
+		log.Error("Failed to marshal yaml %v: %s", data, err)
+		os.Exit(1)
+	} else {
+		fh.Write(out)
+	}
 }
 
 func promptYN(prompt string, yes bool) bool {

@@ -126,7 +126,9 @@ func (c *Cli) CmdEdit(issue string) error {
 
 			if resp.StatusCode == 204 {
 				c.Browse(issueData["key"].(string))
-				fmt.Printf("OK %s %s/browse/%s\n", issueData["key"], c.endpoint, issueData["key"])
+				if ! c.opts["quiet"].(bool) {
+					fmt.Printf("OK %s %s/browse/%s\n", issueData["key"], c.endpoint, issueData["key"])
+				}
 				return nil
 			} else {
 				logBuffer := bytes.NewBuffer(make([]byte, 0))
@@ -260,10 +262,16 @@ func (c *Cli) CmdCreate() error {
 				if json, err := responseToJson(resp, nil); err != nil {
 					return err
 				} else {
-					key := json.(map[string]interface{})["key"]
-					c.Browse(key.(string))
-					fmt.Printf("OK %s %s/browse/%s\n", key, c.endpoint, key)
-
+					key := json.(map[string]interface{})["key"].(string)
+					link := fmt.Sprintf("%s/browse/%s", c.endpoint, key)
+					c.Browse(key)
+					c.SaveData(map[string]string{
+						"issue": key,
+						"link": link,
+					})
+					if ! c.opts["quiet"].(bool) {
+						fmt.Printf("OK %s %s\n", key, link)
+					}
 				}
 				return nil
 			} else {
@@ -318,7 +326,9 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	}
 	if resp.StatusCode == 201 {
 		c.Browse(issue)
-		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		if ! c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		}
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
@@ -359,7 +369,9 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	}
 	if resp.StatusCode == 201 {
 		c.Browse(issue)
-		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		if ! c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		}
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
@@ -391,7 +403,9 @@ func (c *Cli) CmdWatch(issue string) error {
 	}
 	if resp.StatusCode == 204 {
 		c.Browse(issue)
-		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		if ! c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		}
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
@@ -445,7 +459,9 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		}
 		if resp.StatusCode == 204 {
 			c.Browse(issue)
-			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+			if ! c.opts["quiet"].(bool) {
+				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+			}
 		} else {
 			logBuffer := bytes.NewBuffer(make([]byte, 0))
 			resp.Write(logBuffer)
@@ -496,7 +512,9 @@ func (c *Cli) CmdComment(issue string) error {
 
 		if resp.StatusCode == 201 {
 			c.Browse(issue)
-			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+			if ! c.opts["quiet"].(bool) {
+				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+			}
 			return nil
 		} else {
 			logBuffer := bytes.NewBuffer(make([]byte, 0))
@@ -548,7 +566,9 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 	}
 	if resp.StatusCode == 204 {
 		c.Browse(issue)
-		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		if ! c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		}
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
