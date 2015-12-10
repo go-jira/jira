@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.19 - 2015-12-09
+
+* fix jira trans TRANS ISSUE (case sensitivity issue), also go fmt [Cory Bennett] [[3c30f3b](https://github.com/Netflix-Skunkworks/go-jira/commit/3c30f3b)]
+
 ## 0.0.18 - 2015-12-03
 
 * need to default "quiet" to false [Cory Bennett] [[4f4a89b](https://github.com/Netflix-Skunkworks/go-jira/commit/4f4a89b)]
