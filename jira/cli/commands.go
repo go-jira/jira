@@ -126,7 +126,7 @@ func (c *Cli) CmdEdit(issue string) error {
 
 			if resp.StatusCode == 204 {
 				c.Browse(issueData["key"].(string))
-				if ! c.opts["quiet"].(bool) {
+				if !c.opts["quiet"].(bool) {
 					fmt.Printf("OK %s %s/browse/%s\n", issueData["key"], c.endpoint, issueData["key"])
 				}
 				return nil
@@ -267,9 +267,9 @@ func (c *Cli) CmdCreate() error {
 					c.Browse(key)
 					c.SaveData(map[string]string{
 						"issue": key,
-						"link": link,
+						"link":  link,
 					})
-					if ! c.opts["quiet"].(bool) {
+					if !c.opts["quiet"].(bool) {
 						fmt.Printf("OK %s %s\n", key, link)
 					}
 				}
@@ -326,7 +326,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	}
 	if resp.StatusCode == 201 {
 		c.Browse(issue)
-		if ! c.opts["quiet"].(bool) {
+		if !c.opts["quiet"].(bool) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -369,7 +369,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	}
 	if resp.StatusCode == 201 {
 		c.Browse(issue)
-		if ! c.opts["quiet"].(bool) {
+		if !c.opts["quiet"].(bool) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -403,7 +403,7 @@ func (c *Cli) CmdWatch(issue string) error {
 	}
 	if resp.StatusCode == 204 {
 		c.Browse(issue)
-		if ! c.opts["quiet"].(bool) {
+		if !c.opts["quiet"].(bool) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -432,7 +432,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		name := transition.(map[string]interface{})["name"].(string)
 		id := transition.(map[string]interface{})["id"].(string)
 		found = append(found, name)
-		if strings.Contains(strings.ToLower(name), trans) {
+		if strings.Contains(strings.ToLower(name), strings.ToLower(trans)) {
 			transName = name
 			transId = id
 			transMeta = transition.(map[string]interface{})
@@ -459,7 +459,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		}
 		if resp.StatusCode == 204 {
 			c.Browse(issue)
-			if ! c.opts["quiet"].(bool) {
+			if !c.opts["quiet"].(bool) {
 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			}
 		} else {
@@ -512,7 +512,7 @@ func (c *Cli) CmdComment(issue string) error {
 
 		if resp.StatusCode == 201 {
 			c.Browse(issue)
-			if ! c.opts["quiet"].(bool) {
+			if !c.opts["quiet"].(bool) {
 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			}
 			return nil
@@ -566,7 +566,7 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 	}
 	if resp.StatusCode == 204 {
 		c.Browse(issue)
-		if ! c.opts["quiet"].(bool) {
+		if !c.opts["quiet"].(bool) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -609,13 +609,13 @@ func (c *Cli) CmdExportTemplates() error {
 func (c *Cli) CmdRequest(uri, content string) (err error) {
 	log.Debug("request called")
 
-	if ! strings.HasPrefix(uri, "http") {
+	if !strings.HasPrefix(uri, "http") {
 		uri = fmt.Sprintf("%s%s", c.endpoint, uri)
 	}
 
 	method := strings.ToUpper(c.opts["method"].(string))
 	var data interface{}
-	if  method == "GET" {
+	if method == "GET" {
 		data, err = responseToJson(c.get(uri))
 	} else if method == "POST" {
 		data, err = responseToJson(c.post(uri, content))
