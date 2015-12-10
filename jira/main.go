@@ -14,10 +14,10 @@ import (
 )
 
 var (
-	log = logging.MustGetLogger("jira")
-	format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+	log          = logging.MustGetLogger("jira")
+	format       = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
 	buildVersion string
-)	
+)
 
 func main() {
 	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
@@ -349,7 +349,7 @@ Command Options:
 	case "transition":
 		requireArgs(2)
 		setEditing(true)
-		err = c.CmdTransition(args[0], args[1])
+		err = c.CmdTransition(args[1], args[0])
 	case "close":
 		requireArgs(1)
 		setEditing(false)
