@@ -1,4 +1,4 @@
-package cli
+package jira
 
 import (
 	"bytes"
