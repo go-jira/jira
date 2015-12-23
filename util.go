@@ -161,6 +161,13 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 		"split": func(sep string, content string) []string {
 			return strings.Split(content, sep)
 		},
+		"join": func(sep string, content []interface{}) string {
+			vals := make([]string, len(content))
+			for i, v := range content {
+				vals[i] = v.(string)
+			}
+			return strings.Join(vals, sep)
+		},
 		"abbrev": func(max int, content string) string {
 			if len(content) > max {
 				var buffer bytes.Buffer
