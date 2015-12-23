@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/Netflix-Skunkworks/go-jira/jira/cli"
+	"github.com/Netflix-Skunkworks/go-jira"
 	"github.com/coryb/optigo"
 	"github.com/op/go-logging"
 	"gopkg.in/coryb/yaml.v2"
@@ -16,7 +16,6 @@ import (
 var (
 	log          = logging.MustGetLogger("jira")
 	format       = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
-	buildVersion string
 )
 
 func main() {
@@ -172,7 +171,7 @@ Command Options:
 	op := optigo.NewDirectAssignParser(map[string]interface{}{
 		"h|help": usage,
 		"version": func() {
-			fmt.Println(fmt.Sprintf("version: %s", buildVersion))
+			fmt.Println(fmt.Sprintf("version: %s", jira.VERSION))
 			os.Exit(0)
 		},
 		"v|verbose+": func() {
@@ -258,7 +257,7 @@ Command Options:
 		os.Exit(1)
 	}
 
-	c := cli.New(opts)
+	c := jira.New(opts)
 
 	log.Debug("opts: %s", opts)
 
@@ -306,7 +305,7 @@ Command Options:
 				for _, issue := range issues {
 					if err = c.CmdEdit(issue.(map[string]interface{})["key"].(string)); err != nil {
 						switch err.(type) {
-						case cli.NoChangesFound:
+						case jira.NoChangesFound:
 							log.Warning("No Changes found: %s", err)
 							err = nil
 							continue
@@ -441,9 +440,9 @@ func populateEnv(opts map[string]interface{}) {
 
 func loadConfigs(opts map[string]interface{}) {
 	populateEnv(opts)
-	paths := cli.FindParentPaths(".jira.d/config.yml")
+	paths := jira.FindParentPaths(".jira.d/config.yml")
 	// prepend
-	paths = append([]string{"/etc/jira-cli.yml"}, paths...)
+	paths = append([]string{"/etc/go-jira.yml"}, paths...)
 
 	// iterate paths in reverse
 	for i := len(paths) - 1; i >= 0; i-- {

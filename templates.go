@@ -1,4 +1,4 @@
-package cli
+package jira
 
 var all_templates = map[string]string{
 	"debug":          default_debug_template,

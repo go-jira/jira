@@ -1,4 +1,4 @@
-package cli
+package jira
 
 import (
 	"bytes"
@@ -18,7 +18,10 @@ import (
 	"time"
 )
 
-var log = logging.MustGetLogger("jira.cli")
+var (
+	log = logging.MustGetLogger("jira")
+	VERSION string
+)
 
 type Cli struct {
 	endpoint   *url.URL
