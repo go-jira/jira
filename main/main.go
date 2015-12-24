@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	log          = logging.MustGetLogger("jira")
-	format       = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+	log    = logging.MustGetLogger("jira")
+	format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
 )
 
 func main() {
@@ -65,6 +65,7 @@ Usage:
   jira start ISSUE [--edit] <Edit Options>
   jira stop ISSUE [--edit] <Edit Options>
   jira comment ISSUE [--noedit] <Edit Options>
+  jira labels ISSUE set,add,remove [LABEL] ...
   jira take ISSUE
   jira (assign|give) ISSUE ASSIGNEE
   jira fields
@@ -136,6 +137,8 @@ Command Options:
 		"start":            "start",
 		"stop":             "stop",
 		"comment":          "comment",
+		"label":            "labels",
+		"labels":           "labels",
 		"take":             "take",
 		"assign":           "assign",
 		"give":             "assign",
@@ -377,6 +380,9 @@ Command Options:
 		requireArgs(1)
 		setEditing(true)
 		err = c.CmdComment(args[0])
+	case "labels":
+		requireArgs(2)
+		err = c.CmdLabels(args[0], args[1], args[2:])
 	case "take":
 		requireArgs(1)
 		err = c.CmdAssign(args[0], opts["user"].(string))

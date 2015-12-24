@@ -544,6 +544,71 @@ func (c *Cli) CmdComment(issue string) error {
 	return nil
 }
 
+func (c *Cli) CmdLabels(issue string, command string, labels []string) error {
+	log.Debug("label called")
+
+	if command != "add" && command != "remove" && command != "set" {
+		return fmt.Errorf("command must be 'add', 'set' or 'remove': %q is invalid", command)
+	}
+
+	handlePut := func(json string) error {
+		log.Debug("JSON: %s", json)
+		uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
+		if c.getOptBool("dryrun", false) {
+			log.Debug("PUT: %s", json)
+			log.Debug("Dryrun mode, skipping POST")
+			return nil
+		}
+		resp, err := c.put(uri, json)
+		if err != nil {
+			return err
+		}
+
+		if resp.StatusCode == 204 {
+			c.Browse(issue)
+			if !c.opts["quiet"].(bool) {
+				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+			}
+			return nil
+		} else {
+			logBuffer := bytes.NewBuffer(make([]byte, 0))
+			resp.Write(logBuffer)
+			err := fmt.Errorf("Unexpected Response From PUT")
+			log.Error("%s:\n%s", err, logBuffer)
+			return err
+		}
+	}
+
+	var labels_json string
+	var err error
+	if command == "set" {
+		labelsCommands := make([]map[string][]string, 1)
+		labelsCommands[0] = map[string][]string{
+			"set": labels,
+		}
+		labels_json, err = jsonEncode(map[string]interface{}{
+			"labels": labelsCommands,
+		})
+	} else {
+		labelsCommands := make([]map[string]string, len(labels))
+		for i, label := range labels {
+			labelCommandMap := map[string]string{
+				command: label,
+			}
+			labelsCommands[i] = labelCommandMap
+		}
+		labels_json, err = jsonEncode(map[string]interface{}{
+			"labels": labelsCommands,
+		})
+	}
+	if err != nil {
+		return err
+	}
+	json := fmt.Sprintf("{ \"update\": %s }", labels_json)
+	return handlePut(json)
+
+}
+
 func (c *Cli) CmdAssign(issue string, user string) error {
 	log.Debug("assign called")
 
