@@ -368,6 +368,16 @@ func (c *Cli) SaveData(data interface{}) error {
 	return nil
 }
 
+func (c *Cli) ViewIssue(issue string) (interface{}, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
+	data, err := responseToJson(c.get(uri))
+	if err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
+}
+
 func (c *Cli) FindIssues() (interface{}, error) {
 	var query string
 	var ok bool
