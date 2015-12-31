@@ -109,8 +109,11 @@ func dateFormat(format string, content string) (string, error) {
 	}
 }
 
-func runTemplate(templateContent string, data interface{}, out io.Writer) error {
+func RunTemplate(templateContent string, data interface{}, out io.Writer) error {
+	return runTemplate(templateContent, data, out)
+}
 
+func runTemplate(templateContent string, data interface{}, out io.Writer) error {
 	if out == nil {
 		out = os.Stdout
 	}
