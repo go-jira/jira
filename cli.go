@@ -177,6 +177,10 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	return resp, nil
 }
 
+func (c *Cli) GetTemplate(name string) string {
+	return c.getTemplate(name)
+}
+
 func (c *Cli) getTemplate(name string) string {
 	if override, ok := c.opts["template"].(string); ok {
 		if _, err := os.Stat(override); err == nil {
