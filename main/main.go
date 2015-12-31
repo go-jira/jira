@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	log          = logging.MustGetLogger("jira")
-	format       = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+	log    = logging.MustGetLogger("jira")
+	format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
 )
 
 func main() {

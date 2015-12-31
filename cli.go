@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	log = logging.MustGetLogger("jira")
+	log     = logging.MustGetLogger("jira")
 	VERSION string
 )
 
