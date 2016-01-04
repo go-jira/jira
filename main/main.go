@@ -65,7 +65,7 @@ Usage:
   jira start ISSUE [--edit] <Edit Options>
   jira stop ISSUE [--edit] <Edit Options>
   jira comment ISSUE [--noedit] <Edit Options>
-  jira labels ISSUE set,add,remove [LABEL] ...
+  jira (set,add,remove) labels ISSUE [LABEL] ...
   jira take ISSUE
   jira (assign|give) ISSUE ASSIGNEE
   jira fields
@@ -219,6 +219,7 @@ Command Options:
 			args = args[1:]
 		} else if len(args) > 1 {
 			// look at second arg for "dups" and "blocks" commands
+			// also for 'set/add/remove' actions like 'labels'
 			if alias, ok := jiraCommands[args[1]]; ok {
 				command = alias
 				args = append(args[:1], args[2:]...)
@@ -382,7 +383,10 @@ Command Options:
 		err = c.CmdComment(args[0])
 	case "labels":
 		requireArgs(2)
-		err = c.CmdLabels(args[0], args[1], args[2:])
+		action := args[0]
+		issue := args[1]
+		labels := args[2:]
+		err = c.CmdLabels(action, issue, labels)
 	case "take":
 		requireArgs(1)
 		err = c.CmdAssign(args[0], opts["user"].(string))
