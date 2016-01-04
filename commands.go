@@ -80,12 +80,10 @@ func (c *Cli) CmdList() error {
 func (c *Cli) CmdView(issue string) error {
 	log.Debug("view called")
 	c.Browse(issue)
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
-	data, err := responseToJson(c.get(uri))
+	data, err := c.ViewIssue(issue)
 	if err != nil {
 		return err
 	}
-
 	return runTemplate(c.getTemplate("view"), data, nil)
 }
 
