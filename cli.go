@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	log = logging.MustGetLogger("jira")
+	log     = logging.MustGetLogger("jira")
 	VERSION string
 )
 
@@ -175,6 +175,10 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 		}
 	}
 	return resp, nil
+}
+
+func (c *Cli) GetTemplate(name string) string {
+	return c.getTemplate(name)
 }
 
 func (c *Cli) getTemplate(name string) string {
@@ -362,6 +366,16 @@ func (c *Cli) SaveData(data interface{}) error {
 		yamlWrite(val, data)
 	}
 	return nil
+}
+
+func (c *Cli) ViewIssue(issue string) (interface{}, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
+	data, err := responseToJson(c.get(uri))
+	if err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
 }
 
 func (c *Cli) FindIssues() (interface{}, error) {
