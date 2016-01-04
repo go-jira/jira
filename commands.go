@@ -542,11 +542,11 @@ func (c *Cli) CmdComment(issue string) error {
 	return nil
 }
 
-func (c *Cli) CmdLabels(command string, issue string, labels []string) error {
+func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 	log.Debug("label called")
 
-	if command != "add" && command != "remove" && command != "set" {
-		return fmt.Errorf("command must be 'add', 'set' or 'remove': %q is invalid", command)
+	if action != "add" && action != "remove" && action != "set" {
+		return fmt.Errorf("action must be 'add', 'set' or 'remove': %q is invalid", action)
 	}
 
 	handlePut := func(json string) error {
@@ -579,24 +579,24 @@ func (c *Cli) CmdLabels(command string, issue string, labels []string) error {
 
 	var labels_json string
 	var err error
-	if command == "set" {
-		labelsCommands := make([]map[string][]string, 1)
-		labelsCommands[0] = map[string][]string{
+	if action == "set" {
+		labelsActions := make([]map[string][]string, 1)
+		labelsActions[0] = map[string][]string{
 			"set": labels,
 		}
 		labels_json, err = jsonEncode(map[string]interface{}{
-			"labels": labelsCommands,
+			"labels": labelsActions,
 		})
 	} else {
-		labelsCommands := make([]map[string]string, len(labels))
+		labelsActions := make([]map[string]string, len(labels))
 		for i, label := range labels {
-			labelCommandMap := map[string]string{
-				command: label,
+			labelActionMap := map[string]string{
+				action: label,
 			}
-			labelsCommands[i] = labelCommandMap
+			labelsActions[i] = labelActionMap
 		}
 		labels_json, err = jsonEncode(map[string]interface{}{
-			"labels": labelsCommands,
+			"labels": labelsActions,
 		})
 	}
 	if err != nil {
