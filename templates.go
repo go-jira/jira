@@ -64,8 +64,8 @@ fields:
     - name: {{ .name }}{{end}}{{end}}
   assignee:
     name: {{ if .overrides.assignee }}{{.overrides.assignee}}{{else}}{{if .fields.assignee }}{{ .fields.assignee.name }}{{end}}{{end}}
-  reporter:
-    name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}
+#	reporter:
+#	  name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}
   # watchers
   customfield_10110: {{ range .fields.customfield_10110 }}
     - name: {{ .name }}{{end}}{{if .overrides.watcher}}
