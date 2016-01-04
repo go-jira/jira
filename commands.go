@@ -542,7 +542,7 @@ func (c *Cli) CmdComment(issue string) error {
 	return nil
 }
 
-func (c *Cli) CmdLabels(issue string, command string, labels []string) error {
+func (c *Cli) CmdLabels(command string, issue string, labels []string) error {
 	log.Debug("label called")
 
 	if command != "add" && command != "remove" && command != "set" {
