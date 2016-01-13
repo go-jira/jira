@@ -414,6 +414,62 @@ func (c *Cli) CmdWatch(issue string) error {
 	return nil
 }
 
+func (c *Cli) CmdVote(issue string) error {
+	log.Debug("vote called")
+
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", c.endpoint, issue)
+	if c.getOptBool("dryrun", false) {
+		log.Debug("POST: %s", "")
+		log.Debug("Dryrun mode, skipping POST")
+		return nil
+	}
+	resp, err := c.post(uri, "")
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode == 204 {
+		c.Browse(issue)
+		if !c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		}
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From POST")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
+
+func (c *Cli) CmdUnvote(issue string) error {
+	log.Debug("unvote called")
+
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", c.endpoint, issue)
+	if c.getOptBool("dryrun", false) {
+		log.Debug("DELETE: %s", "")
+		log.Debug("Dryrun mode, skipping DELETE")
+		return nil
+	}
+	resp, err := c.delete(uri)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode == 204 {
+		c.Browse(issue)
+		if !c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		}
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From DELETE")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
+
 func (c *Cli) CmdTransition(issue string, trans string) error {
 	log.Debug("transition called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
