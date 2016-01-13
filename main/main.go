@@ -151,6 +151,8 @@ Command Options:
 		"login":            "login",
 		"req":              "request",
 		"request":          "request",
+		"vote":             "vote",
+		"unvote":           "unvote",
 	}
 
 	defaults := map[string]interface{}{
@@ -392,6 +394,12 @@ Command Options:
 	case "view":
 		requireArgs(1)
 		err = c.CmdView(args[0])
+	case "vote":
+		requireArgs(1)
+		err = c.CmdVote(args[0])
+	case "unvote":
+		requireArgs(1)
+		err = c.CmdUnvote(args[0])
 	case "request":
 		requireArgs(1)
 		data := ""
