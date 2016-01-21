@@ -2,6 +2,7 @@ package jira
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/kballard/go-shellquote"
@@ -11,7 +12,6 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"crypto/tls"
 	"os"
 	"os/exec"
 	"runtime"
@@ -40,11 +40,11 @@ func New(opts map[string]interface{}) *Cli {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{},
 	}
-	
+
 	if project, ok := opts["project"].(string); ok {
 		opts["project"] = strings.ToUpper(project)
 	}
-	
+
 	if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
 		transport.TLSClientConfig.InsecureSkipVerify = insecureSkipVerify
 	}
@@ -53,8 +53,8 @@ func New(opts map[string]interface{}) *Cli {
 		endpoint:   url,
 		opts:       opts,
 		cookieFile: fmt.Sprintf("%s/.jira.d/cookies.js", homedir),
-		ua:         &http.Client{
-			Jar: cookieJar,
+		ua: &http.Client{
+			Jar:       cookieJar,
 			Transport: transport,
 		},
 	}
