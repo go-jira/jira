@@ -84,6 +84,7 @@ Usage:
 General Options:
   -b --browse         Open your browser to the Jira issue
   -e --endpoint=URI   URI to use for jira
+  -k --insecure       disable TLS certificate verification
   -h --help           Show this usage
   -t --template=FILE  Template file to use for output/editing
   -u --user=USER      Username to use for authenticaion (default: %s)
@@ -185,6 +186,7 @@ Command Options:
 		"editor=s":              setopt,
 		"u|user=s":              setopt,
 		"endpoint=s":            setopt,
+		"k|insecure":            setopt,
 		"t|template=s":          setopt,
 		"q|query=s":             setopt,
 		"p|project=s":           setopt,
