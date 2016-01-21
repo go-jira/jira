@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"crypto/tls"
 	"os"
 	"os/exec"
 	"runtime"
@@ -36,15 +37,26 @@ func New(opts map[string]interface{}) *Cli {
 	endpoint, _ := opts["endpoint"].(string)
 	url, _ := url.Parse(strings.TrimRight(endpoint, "/"))
 
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{},
+	}
+	
 	if project, ok := opts["project"].(string); ok {
 		opts["project"] = strings.ToUpper(project)
+	}
+	
+	if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
+		transport.TLSClientConfig.InsecureSkipVerify = insecureSkipVerify
 	}
 
 	cli := &Cli{
 		endpoint:   url,
 		opts:       opts,
 		cookieFile: fmt.Sprintf("%s/.jira.d/cookies.js", homedir),
-		ua:         &http.Client{Jar: cookieJar},
+		ua:         &http.Client{
+			Jar: cookieJar,
+			Transport: transport,
+		},
 	}
 
 	cli.ua.Jar.SetCookies(url, cli.loadCookies())
