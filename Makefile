@@ -78,7 +78,7 @@ update-changelog:
 	tail -n +2 CHANGELOG.md >> CHANGELOG.md.new; \
 	mv CHANGELOG.md.new CHANGELOG.md; \
 	git commit -m "Updated Changelog" CHANGELOG.md; \
-	git tag $(NEWVER)
+	git tag v$(NEWVER)
 
 version:
 	@echo $(patsubst v%,%,$(CURVER))
