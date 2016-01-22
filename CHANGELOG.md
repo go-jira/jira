@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.0.20 - 2016-01-21
+
+* [issue [#28](https://github.com/Netflix-Skunkworks/go-jira/issues/28)] check to make sure we got back issuetypes for create metadata [Cory Bennett] [[ee0e780](https://github.com/Netflix-Skunkworks/go-jira/commit/ee0e780)]
+* Add insecure option for TLS endpoints [Brian Lalor] [[6a88bb9](https://github.com/Netflix-Skunkworks/go-jira/commit/6a88bb9)]
+* Correct naming of parameter: set/add/remove are actions. [Mike Pountney] [[303784f](https://github.com/Netflix-Skunkworks/go-jira/commit/303784f)]
+* Tweak CmdLabels args so that magic happens with CLI [Mike Pountney] [[40a7c65](https://github.com/Netflix-Skunkworks/go-jira/commit/40a7c65)]
+* Expose ViewTicket as per FindIssues [Mike Pountney] [[8977f3d](https://github.com/Netflix-Skunkworks/go-jira/commit/8977f3d)]
+* Add exposed versions of getTemplate and runTemplate [Mike Pountney] [[da6cbd5](https://github.com/Netflix-Skunkworks/go-jira/commit/da6cbd5)]
+* Add 'labels' command to set/add/remove labels [Mike Pountney] [[230b52d](https://github.com/Netflix-Skunkworks/go-jira/commit/230b52d)]
+* Add a 'join' func to the template engine [Mike Pountney] [[a7820fe](https://github.com/Netflix-Skunkworks/go-jira/commit/a7820fe)]
+* make "jira" golang package, move code from jira/cli to root, move jira/main.go to main/main.go [Cory Bennett] [[7268b9e](https://github.com/Netflix-Skunkworks/go-jira/commit/7268b9e)]
+
 ## 0.0.19 - 2015-12-09
 
 * fix jira trans TRANS ISSUE (case sensitivity issue), also go fmt [Cory Bennett] [[3c30f3b](https://github.com/Netflix-Skunkworks/go-jira/commit/3c30f3b)]
