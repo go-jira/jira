@@ -288,6 +288,17 @@ Command Options:
 	case "fields":
 		err = c.CmdFields()
 	case "list":
+		if len(args) == 1 {
+			queryKey := args[0]
+			if query, ok := opts.Queries[queryKey]; ok {
+				opts.Query = query.JQL
+			} else {
+				log.Fatalf("no such stored query %s", queryKey)
+			}
+		} else if len(args) > 1 {
+			log.Error("Too many arguments. <= 1 required, %d provided", len(args))
+			usage(false)
+		}
 		err = c.CmdList()
 	case "edit":
 		setEditing(true)
@@ -425,7 +436,7 @@ func populateEnv(opts *jira.Options) {
 	for i := 0; i < valueField.NumField(); i++ {
 		typeField := valueField.Type().Field(i)
 		envName := typeField.Tag.Get("env")
-		
+
 		if envName == "" {
 			log.Debug("no 'env' tag for %s", typeField.Name)
 		} else {
