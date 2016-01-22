@@ -233,6 +233,11 @@ func (c *Cli) CmdCreate() error {
 			return err
 		}
 		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
+			if len(val.([]interface{})) == 0 {
+				err = fmt.Errorf("Project '%s' does not support issuetype '%s'.  Unable to create issue.", project, issuetype)
+				log.Error("%s", err)
+				return err
+			}
 			issueData["meta"] = val.([]interface{})[0]
 		}
 	}
