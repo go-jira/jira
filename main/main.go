@@ -293,7 +293,7 @@ Command Options:
 			if query, ok := opts.Queries[queryKey]; ok {
 				opts.Query = query.JQL
 
-				if query.Template != "" {
+				if (query.Template != "") && (opts.Template == "") {
 					opts.Template = query.Template
 				}
 			} else {
