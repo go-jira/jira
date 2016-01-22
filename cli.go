@@ -26,27 +26,24 @@ var (
 
 type Cli struct {
 	endpoint   *url.URL
-	opts       map[string]interface{}
+	opts       *Options
 	cookieFile string
 	ua         *http.Client
 }
 
-func New(opts map[string]interface{}) *Cli {
+func New(opts *Options) *Cli {
 	homedir := os.Getenv("HOME")
 	cookieJar, _ := cookiejar.New(nil)
-	endpoint, _ := opts["endpoint"].(string)
-	url, _ := url.Parse(strings.TrimRight(endpoint, "/"))
+	url, _ := url.Parse(strings.TrimRight(opts.Endpoint, "/"))
 
 	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{},
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: opts.Insecure,
+		},
 	}
 
-	if project, ok := opts["project"].(string); ok {
-		opts["project"] = strings.ToUpper(project)
-	}
-
-	if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
-		transport.TLSClientConfig.InsecureSkipVerify = insecureSkipVerify
+	if opts.Project != "" {
+		opts.Project = strings.ToUpper(opts.Project)
 	}
 
 	cli := &Cli{
@@ -194,14 +191,14 @@ func (c *Cli) GetTemplate(name string) string {
 }
 
 func (c *Cli) getTemplate(name string) string {
-	if override, ok := c.opts["template"].(string); ok {
-		if _, err := os.Stat(override); err == nil {
-			return readFile(override)
+	if c.opts.Template != "" {
+		if _, err := os.Stat(c.opts.Template); err == nil {
+			return readFile(c.opts.Template)
 		} else {
-			if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", override)); err == nil {
+			if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", c.opts.Template)); err == nil {
 				return readFile(file)
 			}
-			if dflt, ok := all_templates[override]; ok {
+			if dflt, ok := all_templates[c.opts.Template]; ok {
 				return dflt
 			}
 		}
@@ -258,8 +255,8 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 
 	fh.Close()
 
-	editor, ok := c.opts["editor"].(string)
-	if !ok {
+	editor := c.opts.Editor
+	if editor == "" {
 		editor = os.Getenv("JIRA_EDITOR")
 		if editor == "" {
 			editor = os.Getenv("EDITOR")
@@ -269,7 +266,10 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		}
 	}
 
-	editing := c.getOptBool("edit", true)
+	editing := true
+	if c.opts.Edit != nil {
+		editing = *c.opts.Edit
+	}
 
 	tmpFileNameOrig := fmt.Sprintf("%s.orig", tmpFileName)
 	copyFile(tmpFileName, tmpFileNameOrig)
@@ -363,7 +363,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 }
 
 func (c *Cli) Browse(issue string) error {
-	if val, ok := c.opts["browse"].(bool); ok && val {
+	if c.opts.Browse {
 		if runtime.GOOS == "darwin" {
 			return exec.Command("open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
 		} else if runtime.GOOS == "linux" {
@@ -374,8 +374,8 @@ func (c *Cli) Browse(issue string) error {
 }
 
 func (c *Cli) SaveData(data interface{}) error {
-	if val, ok := c.opts["saveFile"].(string); ok && val != "" {
-		yamlWrite(val, data)
+	if c.opts.SaveFile != "" {
+		yamlWrite(c.opts.SaveFile, data)
 	}
 	return nil
 }
@@ -391,49 +391,48 @@ func (c *Cli) ViewIssue(issue string) (interface{}, error) {
 }
 
 func (c *Cli) FindIssues() (interface{}, error) {
-	var query string
-	var ok bool
 	// project = BAKERY and status not in (Resolved, Closed)
-	if query, ok = c.opts["query"].(string); !ok {
+	query := c.opts.Query
+	if query == "" {
 		qbuff := bytes.NewBufferString("resolution = unresolved")
-		if project, ok := c.opts["project"]; !ok {
+		if c.opts.Project == "" {
 			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
 			log.Error("%s", err)
 			return nil, err
 		} else {
-			qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", project))
+			qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", c.opts.Project))
 		}
 
-		if component, ok := c.opts["component"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND component = '%s'", component))
+		if c.opts.Component != "" {
+			qbuff.WriteString(fmt.Sprintf(" AND component = '%s'", c.opts.Component))
 		}
 
-		if assignee, ok := c.opts["assignee"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND assignee = '%s'", assignee))
+		if c.opts.Assignee != "" {
+			qbuff.WriteString(fmt.Sprintf(" AND assignee = '%s'", c.opts.Assignee))
 		}
 
-		if issuetype, ok := c.opts["issuetype"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND issuetype = '%s'", issuetype))
+		if c.opts.IssueType != "" {
+			qbuff.WriteString(fmt.Sprintf(" AND issuetype = '%s'", c.opts.IssueType))
 		}
 
-		if watcher, ok := c.opts["watcher"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND watcher = '%s'", watcher))
+		if c.opts.Watcher != "" {
+			qbuff.WriteString(fmt.Sprintf(" AND watcher = '%s'", c.opts.Watcher))
 		}
 
-		if reporter, ok := c.opts["reporter"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", reporter))
+		if c.opts.Reporter != "" {
+			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", c.opts.Reporter))
 		}
 
-		if sort, ok := c.opts["sort"]; ok && sort != "" {
-			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", sort))
+		if c.opts.Sort != "" {
+			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", c.opts.Sort))
 		}
 
 		query = qbuff.String()
 	}
 
 	fields := make([]string, 0)
-	if qf, ok := c.opts["queryfields"].(string); ok {
-		fields = strings.Split(qf, ",")
+	if c.opts.QueryFields != "" {
+		fields = strings.Split(c.opts.QueryFields, ",")
 	} else {
 		fields = append(fields, "summary")
 	}
@@ -441,7 +440,7 @@ func (c *Cli) FindIssues() (interface{}, error) {
 	json, err := jsonEncode(map[string]interface{}{
 		"jql":        query,
 		"startAt":    "0",
-		"maxResults": c.opts["max_results"],
+		"maxResults": c.opts.MaxResults,
 		"fields":     fields,
 	})
 	if err != nil {
@@ -453,21 +452,5 @@ func (c *Cli) FindIssues() (interface{}, error) {
 		return nil, err
 	} else {
 		return data, nil
-	}
-}
-
-func (c *Cli) getOptString(optName string, dflt string) string {
-	if val, ok := c.opts[optName].(string); ok {
-		return val
-	} else {
-		return dflt
-	}
-}
-
-func (c *Cli) getOptBool(optName string, dflt bool) bool {
-	if val, ok := c.opts[optName].(bool); ok {
-		return val
-	} else {
-		return dflt
 	}
 }
