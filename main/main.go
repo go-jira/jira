@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
+	"reflect"
 )
 
 var (
@@ -32,7 +32,7 @@ func main() {
 	home := os.Getenv("HOME")
 	defaultQueryFields := "summary,created,updated,priority,status,reporter,assignee"
 	defaultSort := "priority asc, created"
-	defaultMaxResults := 500
+	defaultMaxResults := uint64(500)
 
 	usage := func(ok bool) {
 		printer := fmt.Printf
@@ -157,19 +157,14 @@ Command Options:
 		"request":          "request",
 	}
 
-	defaults := map[string]interface{}{
-		"user":        user,
-		"queryfields": defaultQueryFields,
-		"directory":   fmt.Sprintf("%s/.jira.d/templates", home),
-		"sort":        defaultSort,
-		"max_results": defaultMaxResults,
-		"method":      "GET",
-		"quiet":       false,
-	}
-	opts := make(map[string]interface{})
-
-	setopt := func(name string, value interface{}) {
-		opts[name] = value
+	opts := &jira.Options{
+		User:        user,
+		QueryFields: defaultQueryFields,
+		Directory:   fmt.Sprintf("%s/.jira.d/templates", home),
+		Sort:        defaultSort,
+		MaxResults:  defaultMaxResults,
+		Method:      "GET",
+		Quiet:       false,
 	}
 
 	op := optigo.NewDirectAssignParser(map[string]interface{}{
@@ -181,31 +176,31 @@ Command Options:
 		"v|verbose+": func() {
 			logging.SetLevel(logging.GetLevel("")+1, "")
 		},
-		"dryrun":                setopt,
-		"b|browse":              setopt,
-		"editor=s":              setopt,
-		"u|user=s":              setopt,
-		"endpoint=s":            setopt,
-		"k|insecure":            setopt,
-		"t|template=s":          setopt,
-		"q|query=s":             setopt,
-		"p|project=s":           setopt,
-		"c|component=s":         setopt,
-		"a|assignee=s":          setopt,
-		"i|issuetype=s":         setopt,
-		"w|watcher=s":           setopt,
-		"r|reporter=s":          setopt,
-		"f|queryfields=s":       setopt,
-		"s|sort=s":              setopt,
-		"l|limit|max_results=i": setopt,
+		"dryrun":                &opts.DryRun,
+		"b|browse":              &opts.Browse,
+		"editor=s":              &opts.Editor,
+		"u|user=s":              &opts.User,
+		"endpoint=s":            &opts.Endpoint,
+		"k|insecure":            &opts.Insecure,
+		"t|template=s":          &opts.Template,
+		"q|query=s":             &opts.Query,
+		"p|project=s":           &opts.Project,
+		"c|component=s":         &opts.Component,
+		"a|assignee=s":          &opts.Assignee,
+		"i|issuetype=s":         &opts.IssueType,
+		"w|watcher=s":           &opts.Watcher,
+		"r|reporter=s":          &opts.Reporter,
+		"f|queryfields=s":       &opts.QueryFields,
+		"s|sort=s":              &opts.Sort,
+		"l|limit|max_results=i": &opts.MaxResults,
 		"o|override=s%":         &opts,
-		"noedit":                setopt,
-		"edit":                  setopt,
-		"m|comment=s":           setopt,
-		"d|dir|directory=s":     setopt,
-		"M|method=s":            setopt,
-		"S|saveFile=s":          setopt,
-		"Q|quiet":               setopt,
+		"noedit":                &opts.NoEdit,
+		"edit":                  &opts.Edit,
+		"m|comment=s":           &opts.Comment,
+		"d|dir|directory=s":     &opts.Directory,
+		"M|method=s":            &opts.Method,
+		"S|saveFile=s":          &opts.SaveFile,
+		"Q|quiet":               &opts.Quiet,
 	})
 
 	if err := op.ProcessAll(os.Args[1:]); err != nil {
@@ -238,8 +233,8 @@ Command Options:
 	loadConfigs(opts)
 
 	// check to see if it was set in the configs:
-	if value, ok := opts["command"].(string); ok {
-		command = value
+	if opts.Command != "" {
+		command = opts.Command
 	} else if _, ok := jiraCommands[command]; !ok || command == "" {
 		if command != "" {
 			args = append([]string{command}, args...)
@@ -247,40 +242,34 @@ Command Options:
 		command = "view"
 	}
 
-	// apply defaults
-	for k, v := range defaults {
-		if _, ok := opts[k]; !ok {
-			log.Debug("Setting %q to %#v from defaults", k, v)
-			opts[k] = v
-		}
-	}
+	log.Debug("opts: %+v", opts)
+	log.Debug("args: %+v", args)
 
-	log.Debug("opts: %v", opts)
-	log.Debug("args: %v", args)
-
-	if _, ok := opts["endpoint"]; !ok {
+	if opts.Endpoint == "" {
 		log.Error("endpoint option required.  Either use --endpoint or set a endpoint option in your ~/.jira.d/config.yml file")
 		os.Exit(1)
 	}
 
 	c := jira.New(opts)
 
-	log.Debug("opts: %s", opts)
+	log.Debug("opts: %+v", opts)
 
 	setEditing := func(dflt bool) {
 		log.Debug("Default Editing: %t", dflt)
 		if dflt {
-			if val, ok := opts["noedit"].(bool); ok && val {
+			if opts.NoEdit {
 				log.Debug("Setting edit = false")
-				opts["edit"] = false
+				e := false
+				opts.Edit = &e
 			} else {
 				log.Debug("Setting edit = true")
-				opts["edit"] = true
+				e := true
+				opts.Edit = &e
 			}
 		} else {
-			if _, ok := opts["edit"].(bool); !ok {
+			if opts.Edit == nil {
 				log.Debug("Setting edit = %t", dflt)
-				opts["edit"] = dflt
+				opts.Edit = &dflt
 			}
 		}
 	}
@@ -299,6 +288,21 @@ Command Options:
 	case "fields":
 		err = c.CmdFields()
 	case "list":
+		if len(args) == 1 {
+			queryKey := args[0]
+			if query, ok := opts.Queries[queryKey]; ok {
+				opts.Query = query.JQL
+
+				if (query.Template != "") && (opts.Template == "") {
+					opts.Template = query.Template
+				}
+			} else {
+				log.Fatalf("no such stored query %s", queryKey)
+			}
+		} else if len(args) > 1 {
+			log.Error("Too many arguments. <= 1 required, %d provided", len(args))
+			usage(false)
+		}
 		err = c.CmdList()
 	case "edit":
 		setEditing(true)
@@ -345,7 +349,7 @@ Command Options:
 	case "dups":
 		requireArgs(2)
 		if err = c.CmdDups(args[0], args[1]); err == nil {
-			opts["resolution"] = "Duplicate"
+			opts.Resolution = "Duplicate"
 			err = c.CmdTransition(args[0], "close")
 		}
 	case "watch":
@@ -391,10 +395,10 @@ Command Options:
 		err = c.CmdLabels(action, issue, labels)
 	case "take":
 		requireArgs(1)
-		err = c.CmdAssign(args[0], opts["user"].(string))
+		err = c.CmdAssign(args[0], opts.User)
 	case "browse":
 		requireArgs(1)
-		opts["browse"] = true
+		opts.Browse = true
 		err = c.Browse(args[0])
 	case "export-templates":
 		err = c.CmdExportTemplates()
@@ -423,34 +427,42 @@ Command Options:
 	os.Exit(0)
 }
 
-func parseYaml(file string, opts map[string]interface{}) {
+func parseYaml(file string, opts *jira.Options) {
 	if fh, err := ioutil.ReadFile(file); err == nil {
 		log.Debug("Found Config file: %s", file)
-		yaml.Unmarshal(fh, &opts)
+		yaml.Unmarshal(fh, opts)
 	}
 }
 
-func populateEnv(opts map[string]interface{}) {
-	for k, v := range opts {
-		envName := fmt.Sprintf("JIRA_%s", strings.ToUpper(k))
-		var val string
-		switch t := v.(type) {
-		case string:
-			val = t
-		case int, int8, int16, int32, int64:
-			val = fmt.Sprintf("%d", t)
-		case float32, float64:
-			val = fmt.Sprintf("%f", t)
-		case bool:
-			val = fmt.Sprintf("%t", t)
-		default:
-			val = fmt.Sprintf("%v", t)
+func populateEnv(opts *jira.Options) {
+	valueField := reflect.ValueOf(opts).Elem()
+
+	for i := 0; i < valueField.NumField(); i++ {
+		typeField := valueField.Type().Field(i)
+		envName := typeField.Tag.Get("env")
+
+		if envName == "" {
+			log.Debug("no 'env' tag for %s", typeField.Name)
+		} else {
+			var val string
+			switch t := valueField.Field(i).Interface().(type) {
+			case string:
+				val = t
+			case int, int8, int16, int32, int64:
+				val = fmt.Sprintf("%d", t)
+			case float32, float64:
+				val = fmt.Sprintf("%f", t)
+			case bool:
+				val = fmt.Sprintf("%t", t)
+			default:
+				val = fmt.Sprintf("%v", t)
+			}
+			os.Setenv(envName, val)
 		}
-		os.Setenv(envName, val)
 	}
 }
 
-func loadConfigs(opts map[string]interface{}) {
+func loadConfigs(opts *jira.Options) {
 	populateEnv(opts)
 	paths := jira.FindParentPaths(".jira.d/config.yml")
 	// prepend
@@ -460,10 +472,9 @@ func loadConfigs(opts map[string]interface{}) {
 	for i := len(paths) - 1; i >= 0; i-- {
 		file := paths[i]
 		if stat, err := os.Stat(file); err == nil {
-			tmp := make(map[string]interface{})
 			// check to see if config file is exectuable
 			if stat.Mode()&0111 == 0 {
-				parseYaml(file, tmp)
+				parseYaml(file, opts)
 			} else {
 				log.Debug("Found Executable Config file: %s", file)
 				// it is executable, so run it and try to parse the output
@@ -475,13 +486,7 @@ func loadConfigs(opts map[string]interface{}) {
 					log.Error("%s is exectuable, but it failed to execute: %s\n%s", file, err, cmd.Stderr)
 					os.Exit(1)
 				}
-				yaml.Unmarshal(stdout.Bytes(), &tmp)
-			}
-			for k, v := range tmp {
-				if _, ok := opts[k]; !ok {
-					log.Debug("Setting %q to %#v from %s", k, v, file)
-					opts[k] = v
-				}
+				yaml.Unmarshal(stdout.Bytes(), &opts)
 			}
 			populateEnv(opts)
 		}
