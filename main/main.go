@@ -292,6 +292,10 @@ Command Options:
 			queryKey := args[0]
 			if query, ok := opts.Queries[queryKey]; ok {
 				opts.Query = query.JQL
+
+				if query.Template != "" {
+					opts.Template = query.Template
+				}
 			} else {
 				log.Fatalf("no such stored query %s", queryKey)
 			}

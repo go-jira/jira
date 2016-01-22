@@ -3,6 +3,7 @@ package jira
 type StoredQuery struct {
 	Description string `yaml:"description"`
 	JQL         string `yaml:"jql"`
+	Template    string `yaml:"template"`
 }
 
 type Options struct {
