@@ -65,6 +65,7 @@ Usage:
   jira start ISSUE [--edit] <Edit Options>
   jira stop ISSUE [--edit] <Edit Options>
   jira comment ISSUE [--noedit] <Edit Options>
+  jira (set,add,remove) labels ISSUE [LABEL] ...
   jira take ISSUE
   jira (assign|give) ISSUE ASSIGNEE
   jira fields
@@ -83,6 +84,7 @@ Usage:
 General Options:
   -b --browse         Open your browser to the Jira issue
   -e --endpoint=URI   URI to use for jira
+  -k --insecure       disable TLS certificate verification
   -h --help           Show this usage
   -t --template=FILE  Template file to use for output/editing
   -u --user=USER      Username to use for authenticaion (default: %s)
@@ -136,6 +138,8 @@ Command Options:
 		"start":            "start",
 		"stop":             "stop",
 		"comment":          "comment",
+		"label":            "labels",
+		"labels":           "labels",
 		"take":             "take",
 		"assign":           "assign",
 		"give":             "assign",
@@ -184,6 +188,7 @@ Command Options:
 		"editor=s":              setopt,
 		"u|user=s":              setopt,
 		"endpoint=s":            setopt,
+		"k|insecure":            setopt,
 		"t|template=s":          setopt,
 		"q|query=s":             setopt,
 		"p|project=s":           setopt,
@@ -218,6 +223,7 @@ Command Options:
 			args = args[1:]
 		} else if len(args) > 1 {
 			// look at second arg for "dups" and "blocks" commands
+			// also for 'set/add/remove' actions like 'labels'
 			if alias, ok := jiraCommands[args[1]]; ok {
 				command = alias
 				args = append(args[:1], args[2:]...)
@@ -379,6 +385,12 @@ Command Options:
 		requireArgs(1)
 		setEditing(true)
 		err = c.CmdComment(args[0])
+	case "labels":
+		requireArgs(2)
+		action := args[0]
+		issue := args[1]
+		labels := args[2:]
+		err = c.CmdLabels(action, issue, labels)
 	case "take":
 		requireArgs(1)
 		err = c.CmdAssign(args[0], opts["user"].(string))
