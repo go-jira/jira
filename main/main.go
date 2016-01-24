@@ -57,6 +57,7 @@ Usage:
   jira DUPLICATE dups ISSUE
   jira BLOCKER blocks ISSUE
   jira watch ISSUE [-w WATCHER]
+  jira vote ISSUE [--down]
   jira (trans|transition) TRANSITION ISSUE [--noedit] <Edit Options>
   jira ack ISSUE [--edit] <Edit Options>
   jira close ISSUE [--edit] <Edit Options>
@@ -155,6 +156,7 @@ Command Options:
 		"login":            "login",
 		"req":              "request",
 		"request":          "request",
+		"vote":             "vote",
 	}
 
 	defaults := map[string]interface{}{
@@ -206,6 +208,7 @@ Command Options:
 		"M|method=s":            setopt,
 		"S|saveFile=s":          setopt,
 		"Q|quiet":               setopt,
+		"down":                  setopt,
 	})
 
 	if err := op.ProcessAll(os.Args[1:]); err != nil {
@@ -404,6 +407,13 @@ Command Options:
 	case "view":
 		requireArgs(1)
 		err = c.CmdView(args[0])
+	case "vote":
+		requireArgs(1)
+		if val, ok := opts["down"]; ok {
+			err = c.CmdVote(args[0], !val.(bool))
+		} else {
+			err = c.CmdVote(args[0], true)
+		}
 	case "request":
 		requireArgs(1)
 		data := ""
