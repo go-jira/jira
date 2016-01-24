@@ -474,12 +474,20 @@ func (c *Cli) FindIssues() (interface{}, error) {
 	}
 }
 
+func (c *Cli) GetOptString(optName string, dflt string) string {
+	return c.getOptString(optName, dflt)
+}
+
 func (c *Cli) getOptString(optName string, dflt string) string {
 	if val, ok := c.opts[optName].(string); ok {
 		return val
 	} else {
 		return dflt
 	}
+}
+
+func (c *Cli) GetOptBool(optName string, dflt bool) bool {
+	return c.getOptBool(optName, dflt)
 }
 
 func (c *Cli) getOptBool(optName string, dflt bool) bool {
