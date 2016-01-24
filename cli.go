@@ -118,6 +118,24 @@ func (c *Cli) put(uri string, content string) (*http.Response, error) {
 	return c.makeRequestWithContent("PUT", uri, content)
 }
 
+func (c *Cli) delete(uri string) (*http.Response, error) {
+	method := "DELETE"
+	req, _ := http.NewRequest(method, uri, nil)
+	log.Info("%s %s", req.Method, req.URL.String())
+	if resp, err := c.makeRequest(req); err != nil {
+		return nil, err
+	} else {
+		if resp.StatusCode == 401 {
+			if err := c.CmdLogin(); err != nil {
+				return nil, err
+			}
+			req, _ = http.NewRequest(method, uri, nil)
+			return c.makeRequest(req)
+		}
+		return resp, err
+	}
+}
+
 func (c *Cli) makeRequestWithContent(method string, uri string, content string) (*http.Response, error) {
 	buffer := bytes.NewBufferString(content)
 	req, _ := http.NewRequest(method, uri, buffer)
