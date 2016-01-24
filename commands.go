@@ -419,16 +419,27 @@ func (c *Cli) CmdWatch(issue string) error {
 	return nil
 }
 
-func (c *Cli) CmdVote(issue string) error {
-	log.Debug("vote called")
+func (c *Cli) CmdVote(issue string, up bool) error {
+	log.Debug("vote called, with up: %n", up)
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", c.endpoint, issue)
 	if c.getOptBool("dryrun", false) {
-		log.Debug("POST: %s", "")
-		log.Debug("Dryrun mode, skipping POST")
+		if up {
+			log.Debug("POST: %s", "")
+			log.Debug("Dryrun mode, skipping POST")
+		} else {
+			log.Debug("DELETE: %s", "")
+			log.Debug("Dryrun mode, skipping DELETE")
+		}
 		return nil
 	}
-	resp, err := c.post(uri, "")
+	var resp *http.Response
+	var err error
+	if up {
+		resp, err = c.post(uri, "")
+	} else {
+		resp, err = c.delete(uri)
+	}
 	if err != nil {
 		return err
 	}
@@ -440,35 +451,11 @@ func (c *Cli) CmdVote(issue string) error {
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
-		err := fmt.Errorf("Unexpected Response From POST")
-		log.Error("%s:\n%s", err, logBuffer)
-		return err
-	}
-	return nil
-}
-
-func (c *Cli) CmdUnvote(issue string) error {
-	log.Debug("unvote called")
-
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", c.endpoint, issue)
-	if c.getOptBool("dryrun", false) {
-		log.Debug("DELETE: %s", "")
-		log.Debug("Dryrun mode, skipping DELETE")
-		return nil
-	}
-	resp, err := c.delete(uri)
-	if err != nil {
-		return err
-	}
-	if resp.StatusCode == 204 {
-		c.Browse(issue)
-		if !c.opts["quiet"].(bool) {
-			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		if up {
+			err = fmt.Errorf("Unexpected Response From POST")
+		} else {
+			err = fmt.Errorf("Unexpected Response From DELETE")
 		}
-	} else {
-		logBuffer := bytes.NewBuffer(make([]byte, 0))
-		resp.Write(logBuffer)
-		err := fmt.Errorf("Unexpected Response From DELETE")
 		log.Error("%s:\n%s", err, logBuffer)
 		return err
 	}
