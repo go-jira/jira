@@ -105,7 +105,7 @@ func (c *Cli) CmdEdit(issue string) error {
 	}
 
 	issueData["meta"] = editmeta.(map[string]interface{})
-	issueData["overrides"] = c.opts
+	issueData["overrides"] = c.opts.Overrides
 
 	return c.editTemplate(
 		c.getTemplate("edit"),
@@ -229,7 +229,7 @@ func (c *Cli) CmdCreate() error {
 	}
 
 	issueData := make(map[string]interface{})
-	issueData["overrides"] = c.opts
+	issueData["overrides"] = c.opts.Overrides
 	issueData["overrides"].(map[string]interface{})["issuetype"] = issuetype
 
 	if val, ok := data.(map[string]interface{})["projects"]; ok {
@@ -493,7 +493,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		issueData = data.(map[string]interface{})
 	}
 	issueData["meta"] = transMeta
-	issueData["overrides"] = c.opts
+	issueData["overrides"] = c.opts.Overrides
 	issueData["transition"] = map[string]interface{}{
 		"name": transName,
 		"id":   transId,

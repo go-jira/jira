@@ -166,6 +166,7 @@ Command Options:
 		Method:      "GET",
 		Quiet:       false,
 	}
+	opts.Overrides = make(map[string]interface{})
 
 	op := optigo.NewDirectAssignParser(map[string]interface{}{
 		"h|help": usage,
@@ -193,7 +194,7 @@ Command Options:
 		"f|queryfields=s":       &opts.QueryFields,
 		"s|sort=s":              &opts.Sort,
 		"l|limit|max_results=i": &opts.MaxResults,
-		"o|override=s%":         &opts,
+		"o|override=s%":         &opts.Overrides,
 		"noedit":                &opts.NoEdit,
 		"edit":                  &opts.Edit,
 		"m|comment=s":           &opts.Comment,
@@ -208,6 +209,15 @@ Command Options:
 		usage(false)
 	}
 	args := op.Args
+	
+	// copy overrides specified as flags into the right place
+	opts.Overrides["project"]   = opts.Project
+	opts.Overrides["issuetype"] = opts.IssueType
+	opts.Overrides["assignee"]  = opts.Assignee
+	opts.Overrides["reporter"]  = opts.Reporter
+	opts.Overrides["user"]      = opts.User
+	opts.Overrides["watcher"]   = opts.Watcher
+	opts.Overrides["comment"]   = opts.Comment
 
 	var command string
 	if len(args) > 0 {

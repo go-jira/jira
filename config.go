@@ -49,4 +49,7 @@ type Options struct {
 
 	// stored queries
 	Queries map[string]StoredQuery `yaml:"queries"`
+	
+	// overrides
+	Overrides map[string]interface{} `yaml:"overrides"`
 }
