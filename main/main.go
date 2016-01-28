@@ -196,7 +196,10 @@ Command Options:
 		"l|limit|max_results=i": &opts.MaxResults,
 		"o|override=s%":         &opts.Overrides,
 		"noedit":                &opts.NoEdit,
-		"edit":                  &opts.Edit,
+		"edit":                  func() {
+			e := true
+			opts.Edit = &e
+		},
 		"m|comment=s":           &opts.Comment,
 		"d|dir|directory=s":     &opts.Directory,
 		"M|method=s":            &opts.Method,
