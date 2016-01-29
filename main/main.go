@@ -56,7 +56,8 @@ Usage:
   jira create [--noedit] [-p PROJECT] <Create Options>
   jira DUPLICATE dups ISSUE
   jira BLOCKER blocks ISSUE
-  jira watch ISSUE [-w WATCHER]
+  jira vote ISSUE [--down]
+  jira watch ISSUE [-w WATCHER] [--remove]
   jira (trans|transition) TRANSITION ISSUE [--noedit] <Edit Options>
   jira ack ISSUE [--edit] <Edit Options>
   jira close ISSUE [--edit] <Edit Options>
@@ -155,6 +156,7 @@ Command Options:
 		"login":            "login",
 		"req":              "request",
 		"request":          "request",
+		"vote":             "vote",
 	}
 
 	defaults := map[string]interface{}{
@@ -194,6 +196,7 @@ Command Options:
 		"a|assignee=s":          setopt,
 		"i|issuetype=s":         setopt,
 		"w|watcher=s":           setopt,
+		"remove":                setopt,
 		"r|reporter=s":          setopt,
 		"f|queryfields=s":       setopt,
 		"s|sort=s":              setopt,
@@ -206,6 +209,7 @@ Command Options:
 		"M|method=s":            setopt,
 		"S|saveFile=s":          setopt,
 		"Q|quiet":               setopt,
+		"down":                  setopt,
 	})
 
 	if err := op.ProcessAll(os.Args[1:]); err != nil {
@@ -350,7 +354,9 @@ Command Options:
 		}
 	case "watch":
 		requireArgs(1)
-		err = c.CmdWatch(args[0])
+		watcher := c.GetOptString("watcher", opts["user"].(string))
+		remove := c.GetOptBool("remove", false)
+		err = c.CmdWatch(args[0], watcher, remove)
 	case "transition":
 		requireArgs(2)
 		setEditing(true)
@@ -404,6 +410,13 @@ Command Options:
 	case "view":
 		requireArgs(1)
 		err = c.CmdView(args[0])
+	case "vote":
+		requireArgs(1)
+		if val, ok := opts["down"]; ok {
+			err = c.CmdVote(args[0], !val.(bool))
+		} else {
+			err = c.CmdVote(args[0], true)
+		}
 	case "request":
 		requireArgs(1)
 		data := ""

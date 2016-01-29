@@ -385,22 +385,34 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	return nil
 }
 
-func (c *Cli) CmdWatch(issue string) error {
-	watcher := c.getOptString("watcher", c.opts["user"].(string))
-	log.Debug("watch called")
+func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
+	log.Debug("watch called: watcher: %q, remove: %n", watcher, remove)
 
+	var uri string
 	json, err := jsonEncode(watcher)
 	if err != nil {
 		return err
 	}
 
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", c.endpoint, issue)
 	if c.getOptBool("dryrun", false) {
-		log.Debug("POST: %s", json)
-		log.Debug("Dryrun mode, skipping POST")
+		if !remove {
+			log.Debug("POST: %s", json)
+			log.Debug("Dryrun mode, skipping POST")
+		} else {
+			log.Debug("DELETE: %s", watcher)
+			log.Debug("Dryrun mode, skipping POST")
+		}
 		return nil
 	}
-	resp, err := c.post(uri, json)
+
+	var resp *http.Response
+	if !remove {
+		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", c.endpoint, issue)
+		resp, err = c.post(uri, json)
+	} else {
+		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/watchers?username=%s", c.endpoint, issue, watcher)
+		resp, err = c.delete(uri)
+	}
 	if err != nil {
 		return err
 	}
@@ -412,7 +424,54 @@ func (c *Cli) CmdWatch(issue string) error {
 	} else {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
-		err := fmt.Errorf("Unexpected Response From POST")
+		if !remove {
+			err = fmt.Errorf("Unexpected Response From POST")
+		} else {
+			err = fmt.Errorf("Unexpected Response From DELETE")
+		}
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
+
+func (c *Cli) CmdVote(issue string, up bool) error {
+	log.Debug("vote called, with up: %n", up)
+
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", c.endpoint, issue)
+	if c.getOptBool("dryrun", false) {
+		if up {
+			log.Debug("POST: %s", "")
+			log.Debug("Dryrun mode, skipping POST")
+		} else {
+			log.Debug("DELETE: %s", "")
+			log.Debug("Dryrun mode, skipping DELETE")
+		}
+		return nil
+	}
+	var resp *http.Response
+	var err error
+	if up {
+		resp, err = c.post(uri, "")
+	} else {
+		resp, err = c.delete(uri)
+	}
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode == 204 {
+		c.Browse(issue)
+		if !c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+		}
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
+		resp.Write(logBuffer)
+		if up {
+			err = fmt.Errorf("Unexpected Response From POST")
+		} else {
+			err = fmt.Errorf("Unexpected Response From DELETE")
+		}
 		log.Error("%s:\n%s", err, logBuffer)
 		return err
 	}
