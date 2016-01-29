@@ -2,6 +2,7 @@ package jira
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/ssh/terminal"
 	"net/http"
@@ -198,6 +199,16 @@ func (c *Cli) CmdCreateMeta() error {
 	}
 
 	return runTemplate(c.getTemplate("createmeta"), data, nil)
+}
+
+func (c *Cli) CmdComponents(project string) error {
+	log.Debug("Components called")
+	uri := fmt.Sprintf("%s/rest/api/2/project/%s/components", c.endpoint, project)
+	data, err := responseToJson(c.get(uri))
+	if err != nil {
+		return err
+	}
+	return runTemplate(c.getTemplate("components"), data, nil)
 }
 
 func (c *Cli) CmdTransitions(issue string) error {
@@ -602,6 +613,49 @@ func (c *Cli) CmdComment(issue string) error {
 			map[string]interface{}{},
 			handlePost,
 		)
+	}
+	return nil
+}
+
+func (c *Cli) CmdComponent(action string, project string, name string, desc string, lead string) error {
+	log.Debug("component called")
+
+	switch action {
+	case "add":
+	default:
+		return errors.New(fmt.Sprintf("CmdComponent: %q is not a valid action", action))
+	}
+
+	json, err := jsonEncode(map[string]interface{}{
+		"name":         name,
+		"description":  desc,
+		"leadUserName": lead,
+		"project":      project,
+	})
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf("%s/rest/api/2/component", c.endpoint)
+	if c.getOptBool("dryrun", false) {
+		log.Debug("POST: %s", json)
+		log.Debug("Dryrun mode, skipping POST")
+		return nil
+	}
+	resp, err := c.post(uri, json)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode == 201 {
+		if !c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s\n", project, name)
+		}
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From POST")
+		log.Error("%s:\n%s", err, logBuffer)
+		return err
 	}
 	return nil
 }

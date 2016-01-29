@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"runtime"
 	"strings"
 	"time"
@@ -87,6 +88,7 @@ func (c *Cli) saveCookies(cookies []*http.Cookie) {
 		}
 		jsonWrite(c.cookieFile, mergedCookies)
 	} else {
+		mkdir(path.Dir(c.cookieFile))
 		jsonWrite(c.cookieFile, cookies)
 	}
 }
