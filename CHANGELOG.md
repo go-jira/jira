@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0 - 2016-01-29
+
+* Fixes [#32](https://github.com/Netflix-Skunkworks/go-jira/issues/32) - make path to cookieFile if it's not present [Mike Pountney] [[6644579](https://github.com/Netflix-Skunkworks/go-jira/commit/6644579)]
+* Add component/components support: add and list for now. [Mike Pountney] [[d7b3226](https://github.com/Netflix-Skunkworks/go-jira/commit/d7b3226)]
+* Tweak the CmdWatch contract and add watcher remove support [Mike Pountney] [[383847a](https://github.com/Netflix-Skunkworks/go-jira/commit/383847a)]
+* Amend vote/unvote to be vote/vote --down [Mike Pountney] [[797edef](https://github.com/Netflix-Skunkworks/go-jira/commit/797edef)]
+* Add 'vote' and 'unvote' [Mike Pountney] [[c95e66e](https://github.com/Netflix-Skunkworks/go-jira/commit/c95e66e)]
+
 ## 0.0.20 - 2016-01-21
 
 * [issue [#28](https://github.com/Netflix-Skunkworks/go-jira/issues/28)] check to make sure we got back issuetypes for create metadata [Cory Bennett] [[ee0e780](https://github.com/Netflix-Skunkworks/go-jira/commit/ee0e780)]
