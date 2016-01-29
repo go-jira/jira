@@ -73,6 +73,8 @@ Usage:
   jira issuelinktypes
   jira transmeta ISSUE
   jira editmeta ISSUE
+  jira add component [-p PROJECT] NAME DESCRIPTION LEAD
+  jira components [-p PROJECT]
   jira issuetypes [-p PROJECT] 
   jira createmeta [-p PROJECT] [-i ISSUETYPE] 
   jira transitions ISSUE
@@ -141,6 +143,8 @@ Command Options:
 		"comment":          "comment",
 		"label":            "labels",
 		"labels":           "labels",
+		"component":        "component",
+		"components":       "components",
 		"take":             "take",
 		"assign":           "assign",
 		"give":             "assign",
@@ -395,6 +399,23 @@ Command Options:
 		issue := args[1]
 		labels := args[2:]
 		err = c.CmdLabels(action, issue, labels)
+	case "component":
+		requireArgs(2)
+		action := args[0]
+		project := opts["project"].(string)
+		name := args[1]
+		var lead string
+		var description string
+		if len(args) > 2 {
+			description = args[2]
+		}
+		if len(args) > 3 {
+			lead = args[2]
+		}
+		err = c.CmdComponent(action, project, name, description, lead)
+	case "components":
+		project := opts["project"].(string)
+		err = c.CmdComponents(project)
 	case "take":
 		requireArgs(1)
 		err = c.CmdAssign(args[0], opts["user"].(string))
