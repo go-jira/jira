@@ -12,6 +12,7 @@ var all_templates = map[string]string{
 	"view":           default_view_template,
 	"edit":           default_edit_template,
 	"transitions":    default_transitions_template,
+	"components":     default_components_template,
 	"issuetypes":     default_issuetypes_template,
 	"create":         default_create_template,
 	"comment":        default_comment_template,
@@ -80,6 +81,9 @@ fields:
 # {{end}}
 `
 const default_transitions_template = `{{ range .transitions }}{{.id }}: {{.name}}
+{{end}}`
+
+const default_components_template = `{{ range . }}{{.id }}: {{.name}}
 {{end}}`
 
 const default_issuetypes_template = `{{ range .projects }}{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
