@@ -118,6 +118,24 @@ func (c *Cli) put(uri string, content string) (*http.Response, error) {
 	return c.makeRequestWithContent("PUT", uri, content)
 }
 
+func (c *Cli) delete(uri string) (*http.Response, error) {
+	method := "DELETE"
+	req, _ := http.NewRequest(method, uri, nil)
+	log.Info("%s %s", req.Method, req.URL.String())
+	if resp, err := c.makeRequest(req); err != nil {
+		return nil, err
+	} else {
+		if resp.StatusCode == 401 {
+			if err := c.CmdLogin(); err != nil {
+				return nil, err
+			}
+			req, _ = http.NewRequest(method, uri, nil)
+			return c.makeRequest(req)
+		}
+		return resp, err
+	}
+}
+
 func (c *Cli) makeRequestWithContent(method string, uri string, content string) (*http.Response, error) {
 	buffer := bytes.NewBufferString(content)
 	req, _ := http.NewRequest(method, uri, buffer)
@@ -456,12 +474,20 @@ func (c *Cli) FindIssues() (interface{}, error) {
 	}
 }
 
+func (c *Cli) GetOptString(optName string, dflt string) string {
+	return c.getOptString(optName, dflt)
+}
+
 func (c *Cli) getOptString(optName string, dflt string) string {
 	if val, ok := c.opts[optName].(string); ok {
 		return val
 	} else {
 		return dflt
 	}
+}
+
+func (c *Cli) GetOptBool(optName string, dflt bool) bool {
+	return c.getOptBool(optName, dflt)
 }
 
 func (c *Cli) getOptBool(optName string, dflt bool) bool {
