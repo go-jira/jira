@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 	"os"
 	"strings"
 	// "github.com/kr/pretty"
@@ -181,7 +182,7 @@ func (c *Cli) CmdCreateMeta() error {
 	issuetype := c.getOptString("issuetype", "Bug")
 
 	log.Debug("createMeta called")
-	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, issuetype)
+	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
 		return err
@@ -227,7 +228,7 @@ func (c *Cli) CmdCreate() error {
 	issuetype := c.getOptString("issuetype", "Bug")
 	log.Debug("create called")
 
-	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, issuetype)
+	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
 		return err
