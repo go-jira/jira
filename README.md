@@ -77,7 +77,7 @@ cd go-jira
 export GOPATH=$(pwd)
 export GOBIN=$GOPATH/bin
 export PATH=$GOBIN:$PATH
-cd src/github.com/Netflix-Skunkworks/go-jira/jira
+cd src/github.com/Netflix-Skunkworks/go-jira
 go get -v
 ```
 
