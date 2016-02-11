@@ -24,22 +24,22 @@ func (c *Cli) CmdLogin() error {
 		passwd := string(pwbytes)
 
 		req.SetBasicAuth(user, passwd)
-		log.Info("%s %s", req.Method, req.URL.String())
+		log.Infof("%s %s", req.Method, req.URL.String())
 		if resp, err := c.makeRequest(req); err != nil {
 			return err
 		} else {
 			out, _ := httputil.DumpResponse(resp, true)
-			log.Debug("%s", out)
+			log.Debugf("%s", out)
 			if resp.StatusCode == 403 {
 				// probably got this, need to redirect the user to login manually
 				// X-Authentication-Denied-Reason: CAPTCHA_CHALLENGE; login-url=https://jira/login.jsp
 				if reason := resp.Header.Get("X-Authentication-Denied-Reason"); reason != "" {
 					err := fmt.Errorf("Authenticaion Failed: %s", reason)
-					log.Error("%s", err)
+					log.Errorf("%s", err)
 					return err
 				}
 				err := fmt.Errorf("Authentication Failed: Unknown Reason")
-				log.Error("%s", err)
+				log.Errorf("%s", err)
 				return err
 
 			} else if resp.StatusCode == 200 {
@@ -60,7 +60,7 @@ func (c *Cli) CmdLogin() error {
 }
 
 func (c *Cli) CmdFields() error {
-	log.Debug("fields called")
+	log.Debugf("fields called")
 	uri := fmt.Sprintf("%s/rest/api/2/field", c.endpoint)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -71,7 +71,7 @@ func (c *Cli) CmdFields() error {
 }
 
 func (c *Cli) CmdList() error {
-	log.Debug("list called")
+	log.Debugf("list called")
 	if data, err := c.FindIssues(); err != nil {
 		return err
 	} else {
@@ -80,7 +80,7 @@ func (c *Cli) CmdList() error {
 }
 
 func (c *Cli) CmdView(issue string) error {
-	log.Debug("view called")
+	log.Debugf("view called")
 	c.Browse(issue)
 	data, err := c.ViewIssue(issue)
 	if err != nil {
@@ -90,7 +90,7 @@ func (c *Cli) CmdView(issue string) error {
 }
 
 func (c *Cli) CmdEdit(issue string) error {
-	log.Debug("edit called")
+	log.Debugf("edit called")
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/editmeta", c.endpoint, issue)
 	editmeta, err := responseToJson(c.get(uri))
@@ -115,8 +115,8 @@ func (c *Cli) CmdEdit(issue string) error {
 		issueData,
 		func(json string) error {
 			if c.getOptBool("dryrun", false) {
-				log.Debug("PUT: %s", json)
-				log.Debug("Dryrun mode, skipping PUT")
+				log.Debugf("PUT: %s", json)
+				log.Debugf("Dryrun mode, skipping PUT")
 				return nil
 			}
 			resp, err := c.put(uri, json)
@@ -134,7 +134,7 @@ func (c *Cli) CmdEdit(issue string) error {
 				logBuffer := bytes.NewBuffer(make([]byte, 0))
 				resp.Write(logBuffer)
 				err := fmt.Errorf("Unexpected Response From PUT")
-				log.Error("%s:\n%s", err, logBuffer)
+				log.Errorf("%s:\n%s", err, logBuffer)
 				return err
 			}
 		},
@@ -142,7 +142,7 @@ func (c *Cli) CmdEdit(issue string) error {
 }
 
 func (c *Cli) CmdEditMeta(issue string) error {
-	log.Debug("editMeta called")
+	log.Debugf("editMeta called")
 	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/editmeta", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
@@ -154,7 +154,7 @@ func (c *Cli) CmdEditMeta(issue string) error {
 }
 
 func (c *Cli) CmdTransitionMeta(issue string) error {
-	log.Debug("tranisionMeta called")
+	log.Debugf("tranisionMeta called")
 	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
@@ -167,7 +167,7 @@ func (c *Cli) CmdTransitionMeta(issue string) error {
 
 func (c *Cli) CmdIssueTypes() error {
 	project := c.opts["project"].(string)
-	log.Debug("issueTypes called")
+	log.Debugf("issueTypes called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -181,7 +181,7 @@ func (c *Cli) CmdCreateMeta() error {
 	project := c.opts["project"].(string)
 	issuetype := c.getOptString("issuetype", "Bug")
 
-	log.Debug("createMeta called")
+	log.Debugf("createMeta called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -191,7 +191,7 @@ func (c *Cli) CmdCreateMeta() error {
 	if val, ok := data.(map[string]interface{})["projects"]; ok {
 		if len(val.([]interface{})) == 0 {
 			err = fmt.Errorf("Project '%s' or issuetype '%s' unknown.  Unable to createmeta.", project, issuetype)
-			log.Error("%s", err)
+			log.Errorf("%s", err)
 			return err
 		}
 		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
@@ -203,7 +203,7 @@ func (c *Cli) CmdCreateMeta() error {
 }
 
 func (c *Cli) CmdComponents(project string) error {
-	log.Debug("Components called")
+	log.Debugf("Components called")
 	uri := fmt.Sprintf("%s/rest/api/2/project/%s/components", c.endpoint, project)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -213,7 +213,7 @@ func (c *Cli) CmdComponents(project string) error {
 }
 
 func (c *Cli) CmdTransitions(issue string) error {
-	log.Debug("Transitions called")
+	log.Debugf("Transitions called")
 	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
@@ -226,7 +226,7 @@ func (c *Cli) CmdTransitions(issue string) error {
 func (c *Cli) CmdCreate() error {
 	project := c.opts["project"].(string)
 	issuetype := c.getOptString("issuetype", "Bug")
-	log.Debug("create called")
+	log.Debugf("create called")
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
 	data, err := responseToJson(c.get(uri))
@@ -241,13 +241,13 @@ func (c *Cli) CmdCreate() error {
 	if val, ok := data.(map[string]interface{})["projects"]; ok {
 		if len(val.([]interface{})) == 0 {
 			err = fmt.Errorf("Project '%s' or issuetype '%s' unknown.  Unable to create issue.", project, issuetype)
-			log.Error("%s", err)
+			log.Errorf("%s", err)
 			return err
 		}
 		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
 			if len(val.([]interface{})) == 0 {
 				err = fmt.Errorf("Project '%s' does not support issuetype '%s'.  Unable to create issue.", project, issuetype)
-				log.Error("%s", err)
+				log.Errorf("%s", err)
 				return err
 			}
 			issueData["meta"] = val.([]interface{})[0]
@@ -260,11 +260,11 @@ func (c *Cli) CmdCreate() error {
 		fmt.Sprintf("create-%s-", sanitizedType),
 		issueData,
 		func(json string) error {
-			log.Debug("JSON: %s", json)
+			log.Debugf("JSON: %s", json)
 			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
 			if c.getOptBool("dryrun", false) {
-				log.Debug("POST: %s", json)
-				log.Debug("Dryrun mode, skipping POST")
+				log.Debugf("POST: %s", json)
+				log.Debugf("Dryrun mode, skipping POST")
 				return nil
 			}
 			resp, err := c.post(uri, json)
@@ -293,7 +293,7 @@ func (c *Cli) CmdCreate() error {
 				logBuffer := bytes.NewBuffer(make([]byte, 0))
 				resp.Write(logBuffer)
 				err := fmt.Errorf("Unexpected Response From POST")
-				log.Error("%s:\n%s", err, logBuffer)
+				log.Errorf("%s:\n%s", err, logBuffer)
 				return err
 			}
 		},
@@ -302,7 +302,7 @@ func (c *Cli) CmdCreate() error {
 }
 
 func (c *Cli) CmdIssueLinkTypes() error {
-	log.Debug("Transitions called")
+	log.Debugf("Transitions called")
 	uri := fmt.Sprintf("%s/rest/api/2/issueLinkType", c.endpoint)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -312,7 +312,7 @@ func (c *Cli) CmdIssueLinkTypes() error {
 }
 
 func (c *Cli) CmdBlocks(blocker string, issue string) error {
-	log.Debug("blocks called")
+	log.Debugf("blocks called")
 
 	json, err := jsonEncode(map[string]interface{}{
 		"type": map[string]string{
@@ -331,8 +331,8 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
 	if c.getOptBool("dryrun", false) {
-		log.Debug("POST: %s", json)
-		log.Debug("Dryrun mode, skipping POST")
+		log.Debugf("POST: %s", json)
+		log.Debugf("Dryrun mode, skipping POST")
 		return nil
 	}
 	resp, err := c.post(uri, json)
@@ -348,14 +348,14 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
 		err := fmt.Errorf("Unexpected Response From POST")
-		log.Error("%s:\n%s", err, logBuffer)
+		log.Errorf("%s:\n%s", err, logBuffer)
 		return err
 	}
 	return nil
 }
 
 func (c *Cli) CmdDups(duplicate string, issue string) error {
-	log.Debug("dups called")
+	log.Debugf("dups called")
 
 	json, err := jsonEncode(map[string]interface{}{
 		"type": map[string]string{
@@ -374,8 +374,8 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 
 	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
 	if c.getOptBool("dryrun", false) {
-		log.Debug("POST: %s", json)
-		log.Debug("Dryrun mode, skipping POST")
+		log.Debugf("POST: %s", json)
+		log.Debugf("Dryrun mode, skipping POST")
 		return nil
 	}
 	resp, err := c.post(uri, json)
@@ -391,14 +391,14 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
 		err := fmt.Errorf("Unexpected Response From POST")
-		log.Error("%s:\n%s", err, logBuffer)
+		log.Errorf("%s:\n%s", err, logBuffer)
 		return err
 	}
 	return nil
 }
 
 func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
-	log.Debug("watch called: watcher: %q, remove: %n", watcher, remove)
+	log.Debugf("watch called: watcher: %q, remove: %n", watcher, remove)
 
 	var uri string
 	json, err := jsonEncode(watcher)
@@ -408,11 +408,11 @@ func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
 
 	if c.getOptBool("dryrun", false) {
 		if !remove {
-			log.Debug("POST: %s", json)
-			log.Debug("Dryrun mode, skipping POST")
+			log.Debugf("POST: %s", json)
+			log.Debugf("Dryrun mode, skipping POST")
 		} else {
-			log.Debug("DELETE: %s", watcher)
-			log.Debug("Dryrun mode, skipping POST")
+			log.Debugf("DELETE: %s", watcher)
+			log.Debugf("Dryrun mode, skipping POST")
 		}
 		return nil
 	}
@@ -441,23 +441,23 @@ func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
 		} else {
 			err = fmt.Errorf("Unexpected Response From DELETE")
 		}
-		log.Error("%s:\n%s", err, logBuffer)
+		log.Errorf("%s:\n%s", err, logBuffer)
 		return err
 	}
 	return nil
 }
 
 func (c *Cli) CmdVote(issue string, up bool) error {
-	log.Debug("vote called, with up: %n", up)
+	log.Debugf("vote called, with up: %n", up)
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", c.endpoint, issue)
 	if c.getOptBool("dryrun", false) {
 		if up {
-			log.Debug("POST: %s", "")
-			log.Debug("Dryrun mode, skipping POST")
+			log.Debugf("POST: %s", "")
+			log.Debugf("Dryrun mode, skipping POST")
 		} else {
-			log.Debug("DELETE: %s", "")
-			log.Debug("Dryrun mode, skipping DELETE")
+			log.Debugf("DELETE: %s", "")
+			log.Debugf("Dryrun mode, skipping DELETE")
 		}
 		return nil
 	}
@@ -484,14 +484,14 @@ func (c *Cli) CmdVote(issue string, up bool) error {
 		} else {
 			err = fmt.Errorf("Unexpected Response From DELETE")
 		}
-		log.Error("%s:\n%s", err, logBuffer)
+		log.Errorf("%s:\n%s", err, logBuffer)
 		return err
 	}
 	return nil
 }
 
 func (c *Cli) CmdTransition(issue string, trans string) error {
-	log.Debug("transition called")
+	log.Debugf("transition called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
@@ -514,17 +514,17 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 	}
 	if transId == "" {
 		err := fmt.Errorf("Invalid Transition '%s', Available: %s", trans, strings.Join(found, ", "))
-		log.Error("%s", err)
+		log.Errorf("%s", err)
 		return err
 	}
 
 	handlePost := func(json string) error {
-		log.Debug("POST: %s", json)
+		log.Debugf("POST: %s", json)
 		// os.Exit(0)
 		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
-			log.Debug("POST: %s", json)
-			log.Debug("Dryrun mode, skipping POST")
+			log.Debugf("POST: %s", json)
+			log.Debugf("Dryrun mode, skipping POST")
 			return nil
 		}
 		resp, err := c.post(uri, json)
@@ -540,7 +540,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 			logBuffer := bytes.NewBuffer(make([]byte, 0))
 			resp.Write(logBuffer)
 			err := fmt.Errorf("Unexpected Response From POST")
-			log.Error("%s:\n%s", err, logBuffer)
+			log.Errorf("%s:\n%s", err, logBuffer)
 			return err
 		}
 		return nil
@@ -569,14 +569,14 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 }
 
 func (c *Cli) CmdComment(issue string) error {
-	log.Debug("comment called")
+	log.Debugf("comment called")
 
 	handlePost := func(json string) error {
-		log.Debug("JSON: %s", json)
+		log.Debugf("JSON: %s", json)
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
-			log.Debug("POST: %s", json)
-			log.Debug("Dryrun mode, skipping POST")
+			log.Debugf("POST: %s", json)
+			log.Debugf("Dryrun mode, skipping POST")
 			return nil
 		}
 		resp, err := c.post(uri, json)
@@ -594,7 +594,7 @@ func (c *Cli) CmdComment(issue string) error {
 			logBuffer := bytes.NewBuffer(make([]byte, 0))
 			resp.Write(logBuffer)
 			err := fmt.Errorf("Unexpected Response From POST")
-			log.Error("%s:\n%s", err, logBuffer)
+			log.Errorf("%s:\n%s", err, logBuffer)
 			return err
 		}
 	}
@@ -619,7 +619,7 @@ func (c *Cli) CmdComment(issue string) error {
 }
 
 func (c *Cli) CmdComponent(action string, project string, name string, desc string, lead string) error {
-	log.Debug("component called")
+	log.Debugf("component called")
 
 	switch action {
 	case "add":
@@ -639,8 +639,8 @@ func (c *Cli) CmdComponent(action string, project string, name string, desc stri
 
 	uri := fmt.Sprintf("%s/rest/api/2/component", c.endpoint)
 	if c.getOptBool("dryrun", false) {
-		log.Debug("POST: %s", json)
-		log.Debug("Dryrun mode, skipping POST")
+		log.Debugf("POST: %s", json)
+		log.Debugf("Dryrun mode, skipping POST")
 		return nil
 	}
 	resp, err := c.post(uri, json)
@@ -655,25 +655,25 @@ func (c *Cli) CmdComponent(action string, project string, name string, desc stri
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
 		err := fmt.Errorf("Unexpected Response From POST")
-		log.Error("%s:\n%s", err, logBuffer)
+		log.Errorf("%s:\n%s", err, logBuffer)
 		return err
 	}
 	return nil
 }
 
 func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
-	log.Debug("label called")
+	log.Debugf("label called")
 
 	if action != "add" && action != "remove" && action != "set" {
 		return fmt.Errorf("action must be 'add', 'set' or 'remove': %q is invalid", action)
 	}
 
 	handlePut := func(json string) error {
-		log.Debug("JSON: %s", json)
+		log.Debugf("JSON: %s", json)
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
-			log.Debug("PUT: %s", json)
-			log.Debug("Dryrun mode, skipping POST")
+			log.Debugf("PUT: %s", json)
+			log.Debugf("Dryrun mode, skipping POST")
 			return nil
 		}
 		resp, err := c.put(uri, json)
@@ -691,7 +691,7 @@ func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 			logBuffer := bytes.NewBuffer(make([]byte, 0))
 			resp.Write(logBuffer)
 			err := fmt.Errorf("Unexpected Response From PUT")
-			log.Error("%s:\n%s", err, logBuffer)
+			log.Errorf("%s:\n%s", err, logBuffer)
 			return err
 		}
 	}
@@ -727,7 +727,7 @@ func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 }
 
 func (c *Cli) CmdAssign(issue string, user string) error {
-	log.Debug("assign called")
+	log.Debugf("assign called")
 
 	json, err := jsonEncode(map[string]interface{}{
 		"name": user,
@@ -738,8 +738,8 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", c.endpoint, issue)
 	if c.getOptBool("dryrun", false) {
-		log.Debug("PUT: %s", json)
-		log.Debug("Dryrun mode, skipping PUT")
+		log.Debugf("PUT: %s", json)
+		log.Debugf("Dryrun mode, skipping PUT")
 		return nil
 	}
 	resp, err := c.put(uri, json)
@@ -755,7 +755,7 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 		logBuffer := bytes.NewBuffer(make([]byte, 0))
 		resp.Write(logBuffer)
 		err := fmt.Errorf("Unexpected Response From PUT")
-		log.Error("%s:\n%s", err, logBuffer)
+		log.Errorf("%s:\n%s", err, logBuffer)
 		return err
 	}
 	return nil
@@ -777,11 +777,11 @@ func (c *Cli) CmdExportTemplates() error {
 			continue
 		}
 		if fh, err := os.OpenFile(templateFile, os.O_WRONLY|os.O_CREATE, 0644); err != nil {
-			log.Error("Failed to open %s for writing: %s", templateFile, err)
+			log.Errorf("Failed to open %s for writing: %s", templateFile, err)
 			return err
 		} else {
 			defer fh.Close()
-			log.Notice("Creating %s", templateFile)
+			log.Noticef("Creating %s", templateFile)
 			fh.Write([]byte(template))
 		}
 	}
@@ -789,7 +789,7 @@ func (c *Cli) CmdExportTemplates() error {
 }
 
 func (c *Cli) CmdRequest(uri, content string) (err error) {
-	log.Debug("request called")
+	log.Debugf("request called")
 
 	if !strings.HasPrefix(uri, "http") {
 		uri = fmt.Sprintf("%s%s", c.endpoint, uri)
