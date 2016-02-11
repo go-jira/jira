@@ -69,25 +69,13 @@ You can download one of the pre-built binaries for **go-jira** [here](https://gi
 
 * **NOTE** You will need **`go-1.4.1`** minimum
 
-*  If you do not have a **GOPATH** setup, these are simple build steps:
-
+*  To build the `jira` binary the current directory just run:
 ```bash
-git clone git@github.com:Netflix-Skunkworks/go-jira.git
-cd go-jira
-export GOPATH=$(pwd)
-export GOBIN=$GOPATH/bin
-export PATH=$GOBIN:$PATH
-cd src/github.com/Netflix-Skunkworks/go-jira
-go get -v
+make
 ```
-
-* If you do have a **GOPATH** setup, these are the standard steps to build:
-
-```
-cd $GOPATH
-git clone git@github.com:Netflix-Skunkworks/go-jira.git src/github.com/Netflix-Skunkworks/go-jira
-cd src/github.com/Netflix-Skunkworks/go-jira/jira
-go get -v
+* To install the binary to you ~/bin directory you can run:
+```bash
+make install
 ```
 
 ## Configuration
