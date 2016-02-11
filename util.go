@@ -58,7 +58,7 @@ func readFile(file string) string {
 	var bytes []byte
 	var err error
 	if bytes, err = ioutil.ReadFile(file); err != nil {
-		log.Error("Failed to read file %s: %s", file, err)
+		log.Errorf("Failed to read file %s: %s", file, err)
 		os.Exit(1)
 	}
 	return string(bytes)
@@ -195,11 +195,11 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 		},
 	}
 	if tmpl, err := template.New("template").Funcs(funcs).Parse(templateContent); err != nil {
-		log.Error("Failed to parse template: %s", err)
+		log.Errorf("Failed to parse template: %s", err)
 		return err
 	} else {
 		if err := tmpl.Execute(out, data); err != nil {
-			log.Error("Failed to execute template: %s", err)
+			log.Errorf("Failed to execute template: %s", err)
 			return err
 		}
 	}
@@ -215,7 +215,7 @@ func responseToJson(resp *http.Response, err error) (interface{}, error) {
 	if resp.StatusCode == 400 {
 		if val, ok := data.(map[string]interface{})["errorMessages"]; ok {
 			for _, errMsg := range val.([]interface{}) {
-				log.Error("%s", errMsg)
+				log.Errorf("%s", errMsg)
 			}
 		}
 	}
@@ -228,7 +228,7 @@ func jsonDecode(io io.Reader) interface{} {
 	var data interface{}
 	err = json.Unmarshal(content, &data)
 	if err != nil {
-		log.Error("JSON Parse Error: %s from %s", err, content)
+		log.Errorf("JSON Parse Error: %s from %s", err, content)
 	}
 	return data
 }
@@ -239,7 +239,7 @@ func jsonEncode(data interface{}) (string, error) {
 
 	err := enc.Encode(data)
 	if err != nil {
-		log.Error("Failed to encode data %s: %s", data, err)
+		log.Errorf("Failed to encode data %s: %s", data, err)
 		return "", err
 	}
 	return buffer.String(), nil
@@ -249,7 +249,7 @@ func jsonWrite(file string, data interface{}) {
 	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	defer fh.Close()
 	if err != nil {
-		log.Error("Failed to open %s: %s", file, err)
+		log.Errorf("Failed to open %s: %s", file, err)
 		os.Exit(1)
 	}
 	enc := json.NewEncoder(fh)
@@ -260,11 +260,11 @@ func yamlWrite(file string, data interface{}) {
 	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	defer fh.Close()
 	if err != nil {
-		log.Error("Failed to open %s: %s", file, err)
+		log.Errorf("Failed to open %s: %s", file, err)
 		os.Exit(1)
 	}
 	if out, err := yaml.Marshal(data); err != nil {
-		log.Error("Failed to marshal yaml %v: %s", data, err)
+		log.Errorf("Failed to marshal yaml %v: %s", data, err)
 		os.Exit(1)
 	} else {
 		fh.Write(out)
@@ -306,7 +306,7 @@ func yamlFixup(data interface{}) (interface{}, error) {
 				}
 			default:
 				err := fmt.Errorf("YAML: key %s is type '%T', require 'string'", key, k)
-				log.Error("%s", err)
+				log.Errorf("%s", err)
 				return nil, err
 			}
 		}
@@ -343,16 +343,16 @@ func yamlFixup(data interface{}) (interface{}, error) {
 
 func mkdir(dir string) error {
 	if stat, err := os.Stat(dir); err != nil && !os.IsNotExist(err) {
-		log.Error("Failed to stat %s: %s", dir, err)
+		log.Errorf("Failed to stat %s: %s", dir, err)
 		return err
 	} else if err == nil && !stat.IsDir() {
 		err := fmt.Errorf("%s exists and is not a directory!", dir)
-		log.Error("%s", err)
+		log.Errorf("%s", err)
 		return err
 	} else {
 		// dir does not exist, so try to create it
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			log.Error("Failed to mkdir -p %s: %s", dir, err)
+			log.Errorf("Failed to mkdir -p %s: %s", dir, err)
 			return err
 		}
 	}

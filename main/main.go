@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/Netflix-Skunkworks/go-jira"
 	"github.com/coryb/optigo"
-	"github.com/op/go-logging"
 	"gopkg.in/coryb/yaml.v2"
+	"gopkg.in/op/go-logging.v1"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -217,7 +217,7 @@ Command Options:
 	})
 
 	if err := op.ProcessAll(os.Args[1:]); err != nil {
-		log.Error("%s", err)
+		log.Errorf("%s", err)
 		usage(false)
 	}
 	args := op.Args
@@ -258,36 +258,36 @@ Command Options:
 	// apply defaults
 	for k, v := range defaults {
 		if _, ok := opts[k]; !ok {
-			log.Debug("Setting %q to %#v from defaults", k, v)
+			log.Debugf("Setting %q to %#v from defaults", k, v)
 			opts[k] = v
 		}
 	}
 
-	log.Debug("opts: %v", opts)
-	log.Debug("args: %v", args)
+	log.Debugf("opts: %v", opts)
+	log.Debugf("args: %v", args)
 
 	if _, ok := opts["endpoint"]; !ok {
-		log.Error("endpoint option required.  Either use --endpoint or set a endpoint option in your ~/.jira.d/config.yml file")
+		log.Errorf("endpoint option required.  Either use --endpoint or set a endpoint option in your ~/.jira.d/config.yml file")
 		os.Exit(1)
 	}
 
 	c := jira.New(opts)
 
-	log.Debug("opts: %s", opts)
+	log.Debugf("opts: %s", opts)
 
 	setEditing := func(dflt bool) {
-		log.Debug("Default Editing: %t", dflt)
+		log.Debugf("Default Editing: %t", dflt)
 		if dflt {
 			if val, ok := opts["noedit"].(bool); ok && val {
-				log.Debug("Setting edit = false")
+				log.Debugf("Setting edit = false")
 				opts["edit"] = false
 			} else {
-				log.Debug("Setting edit = true")
+				log.Debugf("Setting edit = true")
 				opts["edit"] = true
 			}
 		} else {
 			if _, ok := opts["edit"].(bool); !ok {
-				log.Debug("Setting edit = %t", dflt)
+				log.Debugf("Setting edit = %t", dflt)
 				opts["edit"] = dflt
 			}
 		}
@@ -295,7 +295,7 @@ Command Options:
 
 	requireArgs := func(count int) {
 		if len(args) < count {
-			log.Error("Not enough arguments. %d required, %d provided", count, len(args))
+			log.Errorf("Not enough arguments. %d required, %d provided", count, len(args))
 			usage(false)
 		}
 	}
@@ -446,12 +446,12 @@ Command Options:
 		}
 		err = c.CmdRequest(args[0], data)
 	default:
-		log.Error("Unknown command %s", command)
+		log.Errorf("Unknown command %s", command)
 		os.Exit(1)
 	}
 
 	if err != nil {
-		log.Error("%s", err)
+		log.Errorf("%s", err)
 		os.Exit(1)
 	}
 	os.Exit(0)
@@ -459,7 +459,7 @@ Command Options:
 
 func parseYaml(file string, opts map[string]interface{}) {
 	if fh, err := ioutil.ReadFile(file); err == nil {
-		log.Debug("Found Config file: %s", file)
+		log.Debugf("Found Config file: %s", file)
 		yaml.Unmarshal(fh, &opts)
 	}
 }
@@ -499,21 +499,21 @@ func loadConfigs(opts map[string]interface{}) {
 			if stat.Mode()&0111 == 0 {
 				parseYaml(file, tmp)
 			} else {
-				log.Debug("Found Executable Config file: %s", file)
+				log.Debugf("Found Executable Config file: %s", file)
 				// it is executable, so run it and try to parse the output
 				cmd := exec.Command(file)
 				stdout := bytes.NewBufferString("")
 				cmd.Stdout = stdout
 				cmd.Stderr = bytes.NewBufferString("")
 				if err := cmd.Run(); err != nil {
-					log.Error("%s is exectuable, but it failed to execute: %s\n%s", file, err, cmd.Stderr)
+					log.Errorf("%s is exectuable, but it failed to execute: %s\n%s", file, err, cmd.Stderr)
 					os.Exit(1)
 				}
 				yaml.Unmarshal(stdout.Bytes(), &tmp)
 			}
 			for k, v := range tmp {
 				if _, ok := opts[k]; !ok {
-					log.Debug("Setting %q to %#v from %s", k, v, file)
+					log.Debugf("Setting %q to %#v from %s", k, v, file)
 					opts[k] = v
 				}
 			}
