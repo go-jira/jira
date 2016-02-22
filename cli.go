@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	log     = logging.MustGetLogger("jira")
+	log = logging.MustGetLogger("jira")
 	VERSION string
 )
 
@@ -402,6 +402,10 @@ func (c *Cli) SaveData(data interface{}) error {
 
 func (c *Cli) ViewIssue(issue string) (interface{}, error) {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
+	if x := c.expansions(); len(x) > 0 {
+		uri = fmt.Sprintf("%s?expand=%s", uri, strings.Join(x, ","))
+	}
+
 	data, err := responseToJson(c.get(uri))
 	if err != nil {
 		return nil, err
@@ -463,6 +467,7 @@ func (c *Cli) FindIssues() (interface{}, error) {
 		"startAt":    "0",
 		"maxResults": c.opts["max_results"],
 		"fields":     fields,
+		"expand":     c.expansions(),
 	})
 	if err != nil {
 		return nil, err
@@ -498,4 +503,13 @@ func (c *Cli) getOptBool(optName string, dflt bool) bool {
 	} else {
 		return dflt
 	}
+}
+
+// expansions returns a comma-separated list of values for field expansion
+func (c *Cli) expansions() []string {
+	expansions := make([]string, 0)
+	if x, ok := c.opts["expand"].(string); ok {
+		expansions = strings.Split(x, ",")
+	}
+	return expansions
 }
