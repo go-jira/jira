@@ -203,6 +203,7 @@ Command Options:
 		"remove":                setopt,
 		"r|reporter=s":          setopt,
 		"f|queryfields=s":       setopt,
+		"x|expand=s":            setopt,
 		"s|sort=s":              setopt,
 		"l|limit|max_results=i": setopt,
 		"o|override=s%":         &opts,
