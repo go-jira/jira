@@ -57,6 +57,7 @@ func FindClosestParentPath(fileName string) (string, error) {
 func readFile(file string) string {
 	var bytes []byte
 	var err error
+	log.Debugf("readFile: reading %q", file)
 	if bytes, err = ioutil.ReadFile(file); err != nil {
 		log.Errorf("Failed to read file %s: %s", file, err)
 		os.Exit(1)
