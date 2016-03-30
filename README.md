@@ -105,6 +105,8 @@ endpoint: https://jira.mycompany.com
 EOM
 ```
 
+Then use `jira login` to authenticate yourself.
+
 ### Dynamic Configuration
 
 If the **.jira.d/config.yml** file is executable, then **go-jira** will attempt to execute the file and use the stdout for configuration.  You can use this to customize templates or other overrides depending on what type of operation you are running.  For example if you would like to use the "table" template when ever you run `jira ls`, then you can create a template like this:
@@ -193,7 +195,7 @@ General Options:
   -e --endpoint=URI   URI to use for jira
   -h --help           Show this usage
   -t --template=FILE  Template file to use for output/editing
-  -u --user=USER      Username to use for authenticaion (default: $USER)
+  -u --user=USER      Username to use for authentication (default: $USER)
   -v --verbose        Increase output logging
 
 Query Options:
