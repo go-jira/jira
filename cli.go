@@ -213,33 +213,33 @@ func (c *Cli) GetTemplate(name string) string {
 	return c.getTemplate(name)
 }
 
+func getLookedUpTemplate(name string, dflt string) string {
+	if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", name)); err == nil {
+		return readFile(file)
+	}
+	if _, err := os.Stat(fmt.Sprintf("/etc/go-jira/templates/%s", name)); err == nil {
+		file := fmt.Sprintf("/etc/go-jira/templates/%s", name)
+		return readFile(file)
+	}
+	return dflt
+}
+
 func (c *Cli) getTemplate(name string) string {
 	if override, ok := c.opts["template"].(string); ok {
 		if _, err := os.Stat(override); err == nil {
 			return readFile(override)
 		} else {
-			if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", override)); err == nil {
-				return readFile(file)
-			}
-			if dflt, ok := all_templates[override]; ok {
-				return dflt
+			if t := getLookedUpTemplate(override, all_templates[override]); t != "" {
+				return t
 			}
 		}
 	}
-	if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", name)); err != nil {
-		// create-bug etc are special, if we dont find it in the path
-		// then just return a generic create template
-		if strings.HasPrefix(name, "create-") {
-			if file, err := FindClosestParentPath(".jira.d/templates/create"); err != nil {
-				return all_templates["create"]
-			} else {
-				return readFile(file)
-			}
-		}
-		return all_templates[name]
-	} else {
-		return readFile(file)
+	// create-bug etc are special, if we dont find it in the path
+	// then just return the create template
+	if strings.HasPrefix(name, "create-") {
+		return getLookedUpTemplate(name, c.getTemplate("create"))
 	}
+	return getLookedUpTemplate(name, all_templates[name])
 }
 
 type NoChangesFound struct{}
