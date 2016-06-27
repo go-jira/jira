@@ -13,14 +13,24 @@ PLATFORMS= \
 	darwin-amd64 \
 	$(NULL)
 
-DIST=$(shell pwd)/dist
+OS=$(shell uname -s)
+ifeq ($(filter CYGWIN%,$(OS)),$(OS))
+export CWD=$(shell cygpath -wa .)
+export SEP=\\
+export CYGWIN=winsymlinks:native
+else
+export CWD=$(shell pwd)
+export SEP=/
+endif
 
-export GOPATH=$(shell pwd)
+export GOPATH=$(CWD)
 
-GOBIN ?= $(shell pwd)
+DIST=$(CWD)$(SEP)dist
+
+GOBIN ?= $(CWD)
 NAME=jira
 
-BIN ?= $(GOBIN)/$(NAME)
+BIN ?= $(GOBIN)$(SEP)$(NAME)
 
 CURVER ?= $(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}')
 LDFLAGS:=-X jira.VERSION=$(patsubst v%,%,$(CURVER)) -w
@@ -34,11 +44,11 @@ else
 endif
 
 build: src/github.com/Netflix-Skunkworks/go-jira
-	$(GOBUILD) -o $(BIN) main/main.go
+	$(GOBUILD) -o '$(BIN)' main/main.go
 
 src/%:
 	mkdir -p $(@D)
-	test -L $@ || ln -sf ../../.. $@
+	test -L $@ || ln -sf '$(GOPATH)' $@ 
 	go get -v $* $*/main
 
 cross-setup:
