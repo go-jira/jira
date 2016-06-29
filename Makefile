@@ -33,8 +33,8 @@ DIST=$(CWD)$(SEP)dist
 
 GOBIN ?= $(CWD)
 
-CURVER ?= $(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}')
-LDFLAGS:=-X jira.VERSION=$(patsubst v%,%,$(CURVER)) -w
+CURVER ?= $(patsubst v%,%,$(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}'))
+LDFLAGS:=-X jira.VERSION=$(CURVER) -w
 
 # use make DEBUG=1 and you can get a debuggable golang binary
 # see https://github.com/mailgun/godebug
@@ -76,7 +76,7 @@ NEWVER ?= $(shell echo $(CURVER) | awk -F. '{print $$1"."$$2"."$$3+1}')
 TODAY  := $(shell date +%Y-%m-%d)
 
 changes:
-	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^$(CURVER) HEAD main/*.go *.go | grep -vE 'gofmt|go fmt'
+	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^v$(CURVER) HEAD main/*.go *.go | grep -vE 'gofmt|go fmt'
 
 update-changelog:
 	@echo "# Changelog" > CHANGELOG.md.new; \
@@ -92,7 +92,7 @@ update-changelog:
 	git tag v$(NEWVER)
 
 version:
-	@echo $(patsubst v%,%,$(CURVER))
+	@echo $(CURVER)
 
 clean:
 	rm -rf pkg dist bin src ./$(NAME)
