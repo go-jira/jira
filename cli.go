@@ -15,13 +15,14 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 )
 
 var (
-	log = logging.MustGetLogger("jira")
+	log     = logging.MustGetLogger("jira")
 	VERSION string
 )
 
@@ -33,7 +34,7 @@ type Cli struct {
 }
 
 func New(opts map[string]interface{}) *Cli {
-	homedir := os.Getenv("HOME")
+	homedir := homedir()
 	cookieJar, _ := cookiejar.New(nil)
 	endpoint, _ := opts["endpoint"].(string)
 	url, _ := url.Parse(strings.TrimRight(endpoint, "/"))
@@ -53,7 +54,7 @@ func New(opts map[string]interface{}) *Cli {
 	cli := &Cli{
 		endpoint:   url,
 		opts:       opts,
-		cookieFile: fmt.Sprintf("%s/.jira.d/cookies.js", homedir),
+		cookieFile: filepath.Join(homedir, ".jira.d", "cookies.js"),
 		ua: &http.Client{
 			Jar:       cookieJar,
 			Transport: transport,
@@ -214,7 +215,7 @@ func (c *Cli) GetTemplate(name string) string {
 }
 
 func getLookedUpTemplate(name string, dflt string) string {
-	if file, err := FindClosestParentPath(fmt.Sprintf(".jira.d/templates/%s", name)); err == nil {
+	if file, err := FindClosestParentPath(filepath.Join(".jira.d", "templates", name)); err == nil {
 		return readFile(file)
 	}
 	if _, err := os.Stat(fmt.Sprintf("/etc/go-jira/templates/%s", name)); err == nil {
@@ -250,7 +251,7 @@ func (f NoChangesFound) Error() string {
 
 func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData map[string]interface{}, templateProcessor func(string) error) error {
 
-	tmpdir := fmt.Sprintf("%s/.jira.d/tmp", os.Getenv("HOME"))
+	tmpdir := filepath.Join(homedir(), ".jira.d", "tmp")
 	if err := mkdir(tmpdir); err != nil {
 		return err
 	}

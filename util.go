@@ -6,25 +6,24 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"github.com/mgutz/ansi"
 	"gopkg.in/coryb/yaml.v2"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
+	"path/filepath"
 	"runtime"
+	"strings"
 	"text/template"
 	"time"
 )
 
 func homedir() string {
-	log.Errorf("GOOS: %s", runtime.GOOS)
-     if runtime.GOOS == "windows" {
-     	return os.Getenv("USERPROFILE")
-     }
-     return os.Getenv("HOME")
+	if runtime.GOOS == "windows" {
+		return os.Getenv("USERPROFILE")
+	}
+	return os.Getenv("HOME")
 }
 
 func FindParentPaths(fileName string) []string {
@@ -41,7 +40,6 @@ func FindParentPaths(fileName string) []string {
 		}
 	}
 
-
 	path := filepath.Join(cwd, fileName)
 	if _, err := os.Stat(path); err == nil {
 		paths = append(paths, path)
@@ -52,19 +50,10 @@ func FindParentPaths(fileName string) []string {
 		if _, err := os.Stat(path); err == nil {
 			paths = append(paths, path)
 		}
-		if cwd[len(cwd)-1]== filepath.Separator {
+		if cwd[len(cwd)-1] == filepath.Separator {
 			break
 		}
 	}
-	// for _, part := range strings.Split(cwd, string(os.PathSeparator)) {
-	// 	if dir == "/" {
-	// 		dir = fmt.Sprintf("/%s", part)
-	// 	} else {
-	// 		dir = fmt.Sprintf("%s/%s", dir, part)
-	// 	}
-	// 	file := fmt.Sprintf("%s/%s", dir, fileName)
-	// }
-	log.Errorf("PATHS: %#v", paths)
 	return paths
 }
 
