@@ -17,14 +17,14 @@ NAME=jira
 
 OS=$(shell uname -s)
 ifeq ($(filter CYGWIN%,$(OS)),$(OS))
-export CWD=$(shell cygpath -wa .)
-export SEP=\\
-export CYGWIN=winsymlinks:native
-BIN ?= $(GOBIN)$(SEP)$(NAME).exe
+	export CWD=$(shell cygpath -wa .)
+	export SEP=\\
+	export CYGWIN=winsymlinks:native
+	BIN ?= $(GOBIN)$(SEP)$(NAME).exe
 else
-export CWD=$(shell pwd)
-export SEP=/
-BIN ?= $(GOBIN)$(SEP)$(NAME)
+	export CWD=$(shell pwd)
+	export SEP=/
+	BIN ?= $(GOBIN)$(SEP)$(NAME)
 endif
 
 export GOPATH=$(CWD)
@@ -32,7 +32,6 @@ export GOPATH=$(CWD)
 DIST=$(CWD)$(SEP)dist
 
 GOBIN ?= $(CWD)
-
 
 CURVER ?= $(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}')
 LDFLAGS:=-X jira.VERSION=$(patsubst v%,%,$(CURVER)) -w
@@ -50,12 +49,12 @@ build: src/github.com/Netflix-Skunkworks/go-jira
 
 src/%:
 	mkdir -p $(@D)
-	test -L $@ || ln -sf '$(GOPATH)' $@ 
+	test -L $@ || ln -sf '$(GOPATH)' $@
 	go get -v $* $*/main
 
 cross-setup:
 	for p in $(PLATFORMS); do \
-        echo "Building for $$p"; \
+        echo Building for $$p"; \
 		cd $(GOROOT)/src && sudo GOROOT_BOOTSTRAP=$(GOROOT) GOOS=$${p/-*/} GOARCH=$${p/*-/} bash ./make.bash --no-clean; \
    done
 
