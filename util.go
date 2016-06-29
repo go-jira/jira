@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"github.com/mgutz/ansi"
 	"gopkg.in/coryb/yaml.v2"
 	"io"
@@ -13,9 +14,18 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"runtime"
 	"text/template"
 	"time"
 )
+
+func homedir() string {
+	log.Errorf("GOOS: %s", runtime.GOOS)
+     if runtime.GOOS == "windows" {
+     	return os.Getenv("USERPROFILE")
+     }
+     return os.Getenv("HOME")
+}
 
 func FindParentPaths(fileName string) []string {
 	cwd, _ := os.Getwd()
@@ -23,26 +33,38 @@ func FindParentPaths(fileName string) []string {
 	paths := make([]string, 0)
 
 	// special case if homedir is not in current path then check there anyway
-	homedir := os.Getenv("HOME")
-	if !strings.HasPrefix(cwd, homedir) {
-		file := fmt.Sprintf("%s/%s", homedir, fileName)
-		if _, err := os.Stat(file); err == nil {
-			paths = append(paths, file)
+	homedir := homedir()
+	if !filepath.HasPrefix(cwd, homedir) {
+		path := filepath.Join(homedir, fileName)
+		if _, err := os.Stat(path); err == nil {
+			paths = append(paths, path)
 		}
 	}
 
-	var dir string
-	for _, part := range strings.Split(cwd, string(os.PathSeparator)) {
-		if dir == "/" {
-			dir = fmt.Sprintf("/%s", part)
-		} else {
-			dir = fmt.Sprintf("%s/%s", dir, part)
+
+	path := filepath.Join(cwd, fileName)
+	if _, err := os.Stat(path); err == nil {
+		paths = append(paths, path)
+	}
+	for true {
+		cwd = filepath.Dir(cwd)
+		path := filepath.Join(cwd, fileName)
+		if _, err := os.Stat(path); err == nil {
+			paths = append(paths, path)
 		}
-		file := fmt.Sprintf("%s/%s", dir, fileName)
-		if _, err := os.Stat(file); err == nil {
-			paths = append(paths, file)
+		if cwd[len(cwd)-1]== filepath.Separator {
+			break
 		}
 	}
+	// for _, part := range strings.Split(cwd, string(os.PathSeparator)) {
+	// 	if dir == "/" {
+	// 		dir = fmt.Sprintf("/%s", part)
+	// 	} else {
+	// 		dir = fmt.Sprintf("%s/%s", dir, part)
+	// 	}
+	// 	file := fmt.Sprintf("%s/%s", dir, fileName)
+	// }
+	log.Errorf("PATHS: %#v", paths)
 	return paths
 }
 
