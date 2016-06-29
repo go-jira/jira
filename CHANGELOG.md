@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.1 - 2016-06-28
+
+* use USERPROFILE instead of HOME for windows, rework paths to use filepath.Join for better cross platform support [Cory Bennett] [[adcedc4](https://github.com/Netflix-Skunkworks/go-jira/commit/adcedc4)]
+* Include templates from a system path [Mike Pountney] [[cf10f53](https://github.com/Netflix-Skunkworks/go-jira/commit/cf10f53)]
+* Added support for the ```expand``` option for Issues [tobyjoe] [[fb4afc9](https://github.com/Netflix-Skunkworks/go-jira/commit/fb4afc9)]
+* change for api changes to go-logging [Cory Bennett] [[7bfc6e8](https://github.com/Netflix-Skunkworks/go-jira/commit/7bfc6e8)]
+* Fix issuetype calls adding URL escaping [Jonathan Wright] [[e4a25e2](https://github.com/Netflix-Skunkworks/go-jira/commit/e4a25e2)]
+
 ## 0.1.0 - 2016-01-29
 
 * Fixes [#32](https://github.com/Netflix-Skunkworks/go-jira/issues/32) - make path to cookieFile if it's not present [Mike Pountney] [[6644579](https://github.com/Netflix-Skunkworks/go-jira/commit/6644579)]
