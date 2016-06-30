@@ -261,13 +261,25 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		log.Errorf("Failed to make temp file in %s: %s", tmpdir, err)
 		return err
 	}
-	defer fh.Close()
 
-	tmpFileName := fmt.Sprintf("%s.yml", fh.Name())
-	if err := os.Rename(fh.Name(), tmpFileName); err != nil {
-		log.Errorf("Failed to rename %s to %s: %s", fh.Name(), fmt.Sprintf("%s.yml", fh.Name()), err)
+	oldFileName := fh.Name()
+	tmpFileName := fmt.Sprintf("%s.yml", oldFileName)
+
+	// close tmpfile so we can rename on windows
+	fh.Close()
+
+	if err := os.Rename(oldFileName, tmpFileName); err != nil {
+		log.Errorf("Failed to rename %s to %s: %s", oldFileName, tmpFileName, err)
 		return err
 	}
+
+	fh, err = os.OpenFile(tmpFileName, os.O_RDWR|os.O_EXCL, 0600)
+	if err != nil {
+		log.Errorf("Failed to reopen temp file file in %s: %s", tmpFileName, err)
+		return err
+	}
+
+	defer fh.Close()
 	defer func() {
 		os.Remove(tmpFileName)
 	}()
