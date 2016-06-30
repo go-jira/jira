@@ -1,17 +1,18 @@
 PLATFORMS= \
-	freebsd-386 \
 	freebsd-amd64 \
-	freebsd-arm \
 	linux-386 \
 	linux-amd64 \
-	linux-arm \
-	openbsd-386 \
-	openbsd-amd64 \
 	windows-386 \
 	windows-amd64 \
-	darwin-386 \
 	darwin-amd64 \
 	$(NULL)
+
+	# freebsd-386 \
+	# freebsd-arm \
+	# linux-arm \
+	# openbsd-386 \
+	# openbsd-amd64 \
+	# darwin-386
 
 NAME=jira
 
@@ -65,6 +66,7 @@ all:
         echo "Building for $$p"; \
         ${MAKE} build GOOS=$${p/-*/} GOARCH=$${p/*-/} BIN=$(DIST)/$(NAME)-$$p; \
     done
+	for x in $(DIST)/jira-windows-*; do mv $$x $$x.exe; done
 
 fmt:
 	gofmt -s -w main/*.go *.go
