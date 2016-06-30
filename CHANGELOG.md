@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 - 2016-06-29
+
+* [[#44](https://github.com/Netflix-Skunkworks/go-jira/issues/44)] Close tmpfile before rename to work around "The process cannot access the file because it is being used by another process" error on windows. [Cory Bennett] [[0980f8e](https://github.com/Netflix-Skunkworks/go-jira/commit/0980f8e)]
+
 ## 0.1.1 - 2016-06-28
 
 * use USERPROFILE instead of HOME for windows, rework paths to use filepath.Join for better cross platform support [Cory Bennett] [[adcedc4](https://github.com/Netflix-Skunkworks/go-jira/commit/adcedc4)]
