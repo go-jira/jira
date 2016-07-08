@@ -157,6 +157,26 @@ When running a command like `jira edit` it will look through the current directo
 if found it will use that file as the template, otherwise it will use the default **edit** template hard-coded into **go-jira**.  You can export the default
 hard-coded templates with `jira export-templates` which will write them to **~/.jira.d/templates/**.
 
+#### Writing/Editing Templates
+
+First the basic templating functionality is defined by the Go language 'text/template' library.  The library reference documentation can be found [here](https://golang.org/pkg/text/template/), and there is a good primer document [here](https://gohugo.io/templates/go-templates/).  `go-jira` also provides a few extra helper functions to make it a bit easlier to format the data, those functions are defined [here](https://github.com/Netflix-Skunkworks/go-jira/blob/master/util.go#L133).
+
+Knowing what data and fields are available to any given template is not obvious. The easiest approach to determine what is available is to use the `debug` template on any given operation.  For eample to find out what is available to the "view" templates, you can use:
+```
+jira view GOJIRA-321 -t debug
+```
+
+This will print out the data in JSON format that is available to the template.  You can do this for any other operation, like "list":
+```
+jira list -t debug
+```
+
+Figuring out what is available to input templates (like for the `create` operation) is a bit more tricky, but similar.  To find the data available for a `create` template you can run:
+```
+jira create --dryrun -t debug --editor /bin/cat
+```
+This will attempt to fetch metadata for your default project (you can provide any options that you would normally specify for the `create` operation).  It uses the `--dryrun` option to prevent any actual updates being sent to Jira.  The `-t debug` is like before to cause the input to be serialized to JSON and printed for your inspection.  Finally the `--editor /bin/cat` will cause `go-jira` to just print the template rather than open up an editor and wait for you to edit/save it.
+
 ## Usage
 
 ```
