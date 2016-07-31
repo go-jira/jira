@@ -65,6 +65,9 @@ Usage:
   jira reopen ISSUE [--edit] <Edit Options>
   jira start ISSUE [--edit] <Edit Options>
   jira stop ISSUE [--edit] <Edit Options>
+  jira todo ISSUE [--edit] <Edit Options>
+  jira done ISSUE [--edit] <Edit Options>
+  jira prog|progress|in-progress [--edit] <Edit Options>
   jira comment ISSUE [--noedit] <Edit Options>
   jira (set,add,remove) labels ISSUE [LABEL] ...
   jira take ISSUE
@@ -140,6 +143,11 @@ Command Options:
 		"reopen":           "reopen",
 		"start":            "start",
 		"stop":             "stop",
+		"todo":             "todo",
+		"done":             "done",
+		"prog":             "in-progress",
+		"progress":         "in-progress",
+		"in-progress":      "in-progress",
 		"comment":          "comment",
 		"label":            "labels",
 		"labels":           "labels",
@@ -390,6 +398,18 @@ Command Options:
 		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "stop")
+	case "todo":
+		requireArgs(1)
+		setEditing(false)
+		err = c.CmdTransition(args[0], "To Do")
+	case "done":
+		requireArgs(1)
+		setEditing(false)
+		err = c.CmdTransition(args[0], "Done")
+	case "in-progress":
+		requireArgs(1)
+		setEditing(false)
+		err = c.CmdTransition(args[0], "In Progress")
 	case "comment":
 		requireArgs(1)
 		setEditing(true)
