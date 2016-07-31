@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3 - 2016-07-30
+
+* [[#43](https://github.com/Netflix-Skunkworks/go-jira/issues/43)] add support for jira done|todo|prog commands [Cory Bennett] [[dd7d1cc](https://github.com/Netflix-Skunkworks/go-jira/commit/dd7d1cc)]
+* Reporter is not generally editable. [Mike Pountney] [[a637b43](https://github.com/Netflix-Skunkworks/go-jira/commit/a637b43)]
+
 ## 0.1.2 - 2016-06-29
 
 * [[#44](https://github.com/Netflix-Skunkworks/go-jira/issues/44)] Close tmpfile before rename to work around "The process cannot access the file because it is being used by another process" error on windows. [Cory Bennett] [[0980f8e](https://github.com/Netflix-Skunkworks/go-jira/commit/0980f8e)]
