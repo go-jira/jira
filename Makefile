@@ -72,7 +72,7 @@ fmt:
 	gofmt -s -w main/*.go *.go
 
 install:
-	${MAKE} GOBIN=~/bin build
+	${MAKE} GOBIN=$$HOME/bin build
 
 NEWVER ?= $(shell echo $(CURVER) | awk -F. '{print $$1"."$$2"."$$3+1}')
 TODAY  := $(shell date +%Y-%m-%d)
