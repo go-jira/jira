@@ -1,12 +1,12 @@
 ## Tests
 
-The test are written using the `osht` bash testing framework.  Please read the (documentation)[https://github.com/coryb/osht/blob/master/README.md] for `osht`.
+The test are written using the `osht` bash testing framework.  Please read the [documentation](https://github.com/coryb/osht/blob/master/README.md) for `osht`.
 
 ## Setup
 These tests assume there is a jira service running at 127.0.0.1:8080 with user "gojira" and password "gojira123".
 There should also be a poweruser "admin" with password "admin123"
 
-The test Jira was setup following the instructions (here)[https://github.com/cptactionhank/docker-atlassian-jira].
+The test Jira was setup following the instructions [here](https://github.com/cptactionhank/docker-atlassian-jira).
 
 
 ### build base docker image
