@@ -15,11 +15,15 @@ import (
 
 var (
 	log    = logging.MustGetLogger("jira")
-	format = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+	defaultFormat = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
 )
 
 func main() {
 	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
+	format := os.Getenv("JIRA_LOG_FORMAT")
+	if format == "" {
+		format = defaultFormat
+	}
 	logging.SetBackend(
 		logging.NewBackendFormatter(
 			logBackend,
