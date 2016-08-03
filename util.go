@@ -322,6 +322,9 @@ func yamlFixup(data interface{}) (interface{}, error) {
 				return nil, err
 			}
 		}
+		if len(copy) == 0 {
+			return nil, nil
+		}
 		return copy, nil
 	case map[string]interface{}:
 		copy := make(map[string]interface{})
@@ -332,6 +335,9 @@ func yamlFixup(data interface{}) (interface{}, error) {
 				copy[k] = fixed
 			}
 		}
+		if len(copy) == 0 {
+			return nil, nil
+		}
 		return copy, nil
 	case []interface{}:
 		copy := make([]interface{}, 0, len(d))
@@ -341,6 +347,9 @@ func yamlFixup(data interface{}) (interface{}, error) {
 			} else if fixed != nil {
 				copy = append(copy, fixed)
 			}
+		}
+		if len(copy) == 0 {
+			return nil, nil
 		}
 		return copy, nil
 	case string:
