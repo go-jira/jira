@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/howeyc/gopass"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"os"
 	"strings"
@@ -19,9 +18,12 @@ func (c *Cli) CmdLogin() error {
 		req, _ := http.NewRequest("GET", uri, nil)
 		user, _ := c.opts["user"].(string)
 
-		fmt.Printf("Enter Password for %s: ", user)
-		pwbytes, _ := terminal.ReadPassword(int(os.Stdin.Fd()))
-		passwd := string(pwbytes)
+		fmt.Printf("Jira Password [%s]: ", user)
+        pw, err := gopass.GetPasswdMasked()
+		if err != nil {
+			return err
+		}
+		passwd := string(pw)
 
 		req.SetBasicAuth(user, passwd)
 		log.Infof("%s %s", req.Method, req.URL.String())
@@ -54,6 +56,24 @@ func (c *Cli) CmdLogin() error {
 		}
 		return nil
 	}
+	return nil
+}
+
+func (c *Cli) CmdLogout() error {
+	uri := fmt.Sprintf("%s/rest/auth/1/session", c.endpoint)
+	req, _ := http.NewRequest("DELETE", uri, nil)
+	if resp, err := c.makeRequest(req); err != nil {
+		return err
+	} else {
+		if resp.StatusCode == 401 || resp.StatusCode == 204 {
+			// 401 == no active session
+			// 204 == successfully logged out
+		} else {
+			err := fmt.Errorf("Failed to Logout: %s", err)
+			return err
+		}
+	}
+	log.Notice("OK")
 	return nil
 }
 

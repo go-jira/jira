@@ -84,6 +84,7 @@ Usage:
   jira export-templates [-d DIR] [-t template]
   jira (b|browse) ISSUE
   jira login
+  jira logout
   jira request [-M METHOD] URI [DATA]
   jira ISSUE
 
@@ -166,6 +167,7 @@ Command Options:
 		"export-templates": "export-templates",
 		"browse":           "browse",
 		"login":            "login",
+		"logout":           "logout",
 		"req":              "request",
 		"request":          "request",
 		"vote":             "vote",
@@ -313,6 +315,8 @@ Command Options:
 	switch command {
 	case "login":
 		err = c.CmdLogin()
+	case "logout":
+		err = c.CmdLogout()
 	case "fields":
 		err = c.CmdFields()
 	case "list":
