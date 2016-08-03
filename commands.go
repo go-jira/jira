@@ -194,9 +194,41 @@ func (c *Cli) CmdIssueTypes() error {
 	return runTemplate(c.getTemplate("issuetypes"), data, nil)
 }
 
+func (c *Cli) defaultIssueType() string {
+	project := c.opts["project"].(string)
+	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
+	data, _ := responseToJson(c.get(uri))
+	issueTypeNames := make(map[string]bool)
+	
+	if data, ok := data.(map[string]interface{}); ok {
+		if projects, ok := data["projects"].([]interface{}); ok {
+			for _, project := range projects {
+				if project, ok := project.(map[string]interface{}); ok {
+					if issuetypes, ok := project["issuetypes"].([]interface{}); ok {
+						if len(issuetypes) > 0 {
+							for _, issuetype := range issuetypes {
+								issueTypeNames[ issuetype.(map[string]interface{})["name"].(string) ] = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if _, ok := issueTypeNames["Bug"]; ok {
+		return "Bug"
+	} else if _, ok := issueTypeNames["Task"]; ok {
+		return "Task"
+	}
+	return ""
+}
+
 func (c *Cli) CmdCreateMeta() error {
 	project := c.opts["project"].(string)
-	issuetype := c.getOptString("issuetype", "Bug")
+	issuetype := c.getOptString("issuetype", "")
+	if issuetype == "" {
+		issuetype = c.defaultIssueType()
+	}
 
 	log.Debugf("createMeta called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
@@ -241,9 +273,12 @@ func (c *Cli) CmdTransitions(issue string) error {
 }
 
 func (c *Cli) CmdCreate() error {
-	project := c.opts["project"].(string)
-	issuetype := c.getOptString("issuetype", "Bug")
 	log.Debugf("create called")
+	project := c.opts["project"].(string)
+	issuetype := c.getOptString("issuetype", "")
+	if issuetype == "" {
+		issuetype = c.defaultIssueType()
+	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
 	data, err := responseToJson(c.get(uri))
