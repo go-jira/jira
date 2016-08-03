@@ -481,7 +481,9 @@ Command Options:
 func parseYaml(file string, opts map[string]interface{}) {
 	if fh, err := ioutil.ReadFile(file); err == nil {
 		log.Debugf("Found Config file: %s", file)
-		yaml.Unmarshal(fh, &opts)
+		if err := yaml.Unmarshal(fh, &opts); err != nil {
+			log.Errorf("Unable to parse %s: %s", file, err)
+		}
 	}
 }
 
@@ -509,10 +511,10 @@ func loadConfigs(opts map[string]interface{}) {
 	populateEnv(opts)
 	paths := jira.FindParentPaths(".jira.d/config.yml")
 	// prepend
-	paths = append([]string{"/etc/go-jira.yml"}, paths...)
+	paths = append(paths, "/etc/go-jira.yml")
 
 	// iterate paths in reverse
-	for i := len(paths) - 1; i >= 0; i-- {
+	for i := 0; i < len(paths); i++ {
 		file := paths[i]
 		if stat, err := os.Stat(file); err == nil {
 			tmp := make(map[string]interface{})
