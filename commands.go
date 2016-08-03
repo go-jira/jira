@@ -26,7 +26,6 @@ func (c *Cli) CmdLogin() error {
 		passwd := string(pw)
 
 		req.SetBasicAuth(user, passwd)
-		log.Infof("%s %s", req.Method, req.URL.String())
 		if resp, err := c.makeRequest(req); err != nil {
 			return err
 		} else {
