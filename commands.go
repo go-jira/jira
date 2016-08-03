@@ -28,8 +28,6 @@ func (c *Cli) CmdLogin() error {
 		if resp, err := c.makeRequest(req); err != nil {
 			return err
 		} else {
-			out, _ := httputil.DumpResponse(resp, true)
-			log.Debugf("%s", out)
 			if resp.StatusCode == 403 {
 				// probably got this, need to redirect the user to login manually
 				// X-Authentication-Denied-Reason: CAPTCHA_CHALLENGE; login-url=https://jira/login.jsp
@@ -260,7 +258,6 @@ func (c *Cli) CmdCreate() error {
 		fmt.Sprintf("create-%s-", sanitizedType),
 		issueData,
 		func(json string) error {
-			log.Debugf("JSON: %s", json)
 			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
 			if c.getOptBool("dryrun", false) {
 				log.Debugf("POST: %s", json)
@@ -519,8 +516,6 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 	}
 
 	handlePost := func(json string) error {
-		log.Debugf("POST: %s", json)
-		// os.Exit(0)
 		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
 			log.Debugf("POST: %s", json)
@@ -572,7 +567,6 @@ func (c *Cli) CmdComment(issue string) error {
 	log.Debugf("comment called")
 
 	handlePost := func(json string) error {
-		log.Debugf("JSON: %s", json)
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
 			log.Debugf("POST: %s", json)
@@ -669,7 +663,6 @@ func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 	}
 
 	handlePut := func(json string) error {
-		log.Debugf("JSON: %s", json)
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
 		if c.getOptBool("dryrun", false) {
 			log.Debugf("PUT: %s", json)

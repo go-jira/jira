@@ -10,11 +10,11 @@ import (
 	"gopkg.in/op/go-logging.v1"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -66,7 +66,22 @@ func New(opts map[string]interface{}) *Cli {
 	return cli
 }
 
-func (c *Cli) saveCookies(cookies []*http.Cookie) {
+func (c *Cli) saveCookies(resp *http.Response) {
+	if _, ok := resp.Header["Set-Cookie"]; !ok {
+		return
+	}
+
+	cookies := resp.Cookies()
+	for _, cookie := range cookies {
+		if cookie.Domain == "" {
+			// if it is host:port then we need to split off port
+			parts := strings.Split(resp.Request.URL.Host, ":")
+			host := parts[0]
+			log.Debugf("Setting DOMAIN to %s for Cookie: %s", host, cookie)
+			cookie.Domain = host
+		}
+	}
+
 	// expiry in one week from now
 	expiry := time.Now().Add(24 * 7 * time.Hour)
 	for _, cookie := range cookies {
@@ -76,11 +91,11 @@ func (c *Cli) saveCookies(cookies []*http.Cookie) {
 	if currentCookies := c.loadCookies(); currentCookies != nil {
 		currentCookiesByName := make(map[string]*http.Cookie)
 		for _, cookie := range currentCookies {
-			currentCookiesByName[cookie.Name] = cookie
+			currentCookiesByName[cookie.Name+cookie.Domain] = cookie
 		}
 
 		for _, cookie := range cookies {
-			currentCookiesByName[cookie.Name] = cookie
+			currentCookiesByName[cookie.Name+cookie.Domain] = cookie
 		}
 
 		mergedCookies := make([]*http.Cookie, 0, len(currentCookiesByName))
@@ -102,14 +117,17 @@ func (c *Cli) loadCookies() []*http.Cookie {
 	}
 	if err != nil {
 		log.Errorf("Failed to open %s: %s", c.cookieFile, err)
-		os.Exit(1)
+		panic(err)
 	}
 	cookies := make([]*http.Cookie, 0)
 	err = json.Unmarshal(bytes, &cookies)
 	if err != nil {
 		log.Errorf("Failed to parse json from file %s: %s", c.cookieFile, err)
 	}
-	log.Debugf("Loading Cookies: %s", cookies)
+
+	if os.Getenv("LOG_TRACE") != "" && log.IsEnabledFor(logging.DEBUG) {
+		log.Debugf("Loading Cookies: %s", cookies)
+	}
 	return cookies
 }
 
@@ -142,17 +160,8 @@ func (c *Cli) delete(uri string) (*http.Response, error) {
 func (c *Cli) makeRequestWithContent(method string, uri string, content string) (*http.Response, error) {
 	buffer := bytes.NewBufferString(content)
 	req, _ := http.NewRequest(method, uri, buffer)
-
+	
 	log.Infof("%s %s", req.Method, req.URL.String())
-	if log.IsEnabledFor(logging.DEBUG) {
-		logBuffer := bytes.NewBuffer(make([]byte, 0, len(content)))
-		req.Write(logBuffer)
-		log.Debugf("%s", logBuffer)
-		// need to recreate the buffer since the offset is now at the end
-		// need to be able to rewind the buffer offset, dont know how yet
-		req, _ = http.NewRequest(method, uri, bytes.NewBufferString(content))
-	}
-
 	if resp, err := c.makeRequest(req); err != nil {
 		return nil, err
 	} else {
@@ -190,7 +199,20 @@ func (c *Cli) get(uri string) (*http.Response, error) {
 }
 
 func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
+	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
+
+	// this is actually done in http.send but doing it
+	// here so we can log it in DumpRequest for debugging
+	for _, cookie := range c.ua.Jar.Cookies(req.URL) {
+		req.AddCookie(cookie)
+	}
+
+	if log.IsEnabledFor(logging.DEBUG) {
+		out, _ := httputil.DumpRequest(req,true);
+		log.Debugf("Request: %s", out)
+	}
+
 	if resp, err = c.ua.Do(req); err != nil {
 		log.Errorf("Failed to %s %s: %s", req.Method, req.URL.String(), err)
 		return nil, err
@@ -204,8 +226,12 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 		})
 
 		if _, ok := resp.Header["Set-Cookie"]; ok {
-			c.saveCookies(resp.Cookies())
+			c.saveCookies(resp)
 		}
+	}
+	if log.IsEnabledFor(logging.DEBUG) {
+		out, _ := httputil.DumpResponse(resp,true);
+		log.Debugf("Response: %s", out)
 	}
 	return resp, nil
 }
