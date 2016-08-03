@@ -91,25 +91,24 @@ const default_issuetypes_template = `{{ range .projects }}{{ range .issuetypes }
 
 const default_create_template = `fields:
   project:
-    key: {{ .overrides.project }}
+    key: {{ or .overrides.project "" }}
   issuetype:
-    name: {{ .overrides.issuetype }}
-  summary: {{ or .overrides.summary "" }}
+    name: {{ or .overrides.issuetype "" }}
+  summary: {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority "unassigned" }}
+    name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
-    - name: {{ . }}{{end}}
+    - name: {{ . }}{{end}}{{end}}
   description: |~
-    {{ or .overrides.description "" | indent 4 }}
+    {{ or .overrides.description "" | indent 4 }}{{if .meta.fields.assignee}}
   assignee:
-    name: {{ or .overrides.assignee "" }}
+    name: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
   reporter:
-    name: {{ or .overrides.reporter .overrides.user }}
+    name: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
-    - name:
-`
+    - name:{{end}}`
 
 const default_comment_template = `body: |~
   {{ or .overrides.comment "" | indent 2 }}
