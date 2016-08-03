@@ -31,26 +31,26 @@ const default_table_template = `+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | 
 {{ end }}+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 `
 
-const default_view_template = `issue: {{ .key }}
-created: {{ .fields.created }}
-status: {{ .fields.status.name }}
+const default_view_template = `issue: {{ .key }}{{if .fields.created}}
+created: {{ .fields.created | age }} ago{{end}}{{if .fields.status}}
+status: {{ .fields.status.name }}{{end}}
 summary: {{ .fields.summary }}
-project: {{ .fields.project.key }}
-components: {{ range .fields.components }}{{ .name }} {{end}}
-issuetype: {{ .fields.issuetype.name }}
-assignee: {{ if .fields.assignee }}{{ .fields.assignee.name }}{{end}}
-reporter: {{ if .fields.reporter }}{{ .fields.reporter.name }}{{end}}
-watchers: {{ range .fields.customfield_10110 }}{{ .name }} {{end}}
+project: {{ .fields.project.key }}{{if .fields.components}}
+components: {{ range .fields.components }}{{ .name }} {{end}}{{end}}{{if .fields.issuetype}}
+issuetype: {{ .fields.issuetype.name }}{{end}}{{if .fields.assignee}}
+assignee: {{ .fields.assignee.name }}{{end}}
+reporter: {{ if .fields.reporter }}{{ .fields.reporter.name }}{{end}}{{if .fields.customfield_10110}}
+watchers: {{ range .fields.customfield_10110 }}{{ .name }} {{end}}{{end}}{{if .fields.issuelinks}}
 blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key }}[{{.outwardIssue.fields.status.name}}]{{end}}{{end}}
-depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}
-priority: {{ .fields.priority.name }}
+depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}{{end}}{{if .fields.priority}}
+priority: {{ .fields.priority.name }}{{end}}
 description: |
-  {{ or .fields.description "" | indent 2 }}
+  {{ or .fields.description "" | indent 2 }}{{if .fields.comment.comments}}
 
 comments:
 {{ range .fields.comment.comments }}  - | # {{.author.name}} at {{.created}}
     {{ or .body "" | indent 4}}
-{{end}}
+{{end}}{{end}}
 `
 const default_edit_template = `# issue: {{ .key }}
 update:
