@@ -1,0 +1,3 @@
+INCLUDE MERGE -VOLUME -COPY \
+        https://raw.githubusercontent.com/cptactionhank/docker-atlassian-jira-software/master/Dockerfile \
+        Dockerfile.inc
