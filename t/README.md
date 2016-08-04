@@ -11,7 +11,7 @@ The test Jira was setup following the instructions [here](https://github.com/cpt
 
 ### build base docker image
 ```
-docker run --rm -i -v $(pwd):/root:ro coryb/dfpp Dockerfile.pre | docker build -t go-jira-base:latest - 
+docker run --rm -i -v $(pwd):/root:ro coryb/dfpp:1.0.2 Dockerfile.pre | docker build -t go-jira-base:latest - 
 ```
 
 ### Initialize container
@@ -25,29 +25,12 @@ open http://localhost:8080
 ```
 Then follow UI workflow to create "admin" user, skip intro and project creation.
 
-### Create gojira user
-```
-jira req --user admin -M POST /rest/api/2/user '{"name":"gojira","password":"gojira123","emailAddress":"gojira@example.com","displayName":"Go Jira"}'
-```
-
-### Initialize new projects
-```
-jira req --user admin -M POST /rest/api/2/project '{"key":"SCRUM","name":"Scrum","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-scrum-template","lead":"gojira"}'
-jira req --user admin -M POST /rest/api/2/project '{"key":"KANBAN","name":"Kanban","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-kanban-template","lead":"gojira"}'
-jira req --user admin -M POST /rest/api/2/project '{"key":"BASIC","name":"Basic","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:basic-software-development-template","lead":"gojira"}'
-
-jira req --user admin -M POST /rest/api/2/project '{"key":"PROJECT","name":"Project","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-project-management","lead":"gojira"}'
-jira req --user admin -M POST /rest/api/2/project '{"key":"PROCESS","name":"Process","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-process-management","lead":"gojira"}'
-jira req --user admin -M POST /rest/api/2/project '{"key":"TASK","name":"Task","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-task-management","lead":"gojira"}'
-```
-
 ### snapshot docker container
 ```
 docker commit go-jira-test go-jira-test:latest
 ```
 
 ### Destroy base container
-
 ```
 docker rm -f go-jira-test
 ```
