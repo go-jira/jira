@@ -440,6 +440,42 @@ func (c *Cli) SaveData(data interface{}) error {
 	return nil
 }
 
+func (c *Cli) NewIssueWorkLog(issue string, timeSpentInSecond int, comment, started string) (interface{}, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/worklog", c.endpoint, issue)
+	if x := c.expansions(); len(x) > 0 {
+		uri = fmt.Sprintf("%s?expand=%s", uri, strings.Join(x, ","))
+	}
+
+	json, err := jsonEncode(map[string]interface{}{
+		"timeSpentSeconds": timeSpentInSecond,
+		"comment":          comment,
+		"started":          started,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if data, err := responseToJson(c.post(uri, json)); err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
+}
+
+func (c *Cli) ViewIssueWorkLogs(issue string) (interface{}, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/worklog", c.endpoint, issue)
+	if x := c.expansions(); len(x) > 0 {
+		uri = fmt.Sprintf("%s?expand=%s", uri, strings.Join(x, ","))
+	}
+
+	data, err := responseToJson(c.get(uri))
+	if err != nil {
+		return nil, err
+	} else {
+		return data, nil
+	}
+}
+
 func (c *Cli) ViewIssue(issue string) (interface{}, error) {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
 	if x := c.expansions(); len(x) > 0 {

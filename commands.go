@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/howeyc/gopass"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/howeyc/gopass"
 	// "github.com/kr/pretty"
 )
 
@@ -19,7 +20,7 @@ func (c *Cli) CmdLogin() error {
 		user, _ := c.opts["user"].(string)
 
 		fmt.Printf("Jira Password [%s]: ", user)
-        pw, err := gopass.GetPasswdMasked()
+		pw, err := gopass.GetPasswdMasked()
 		if err != nil {
 			return err
 		}
@@ -106,6 +107,28 @@ func (c *Cli) CmdView(issue string) error {
 	return runTemplate(c.getTemplate("view"), data, nil)
 }
 
+func (c *Cli) CmdWorklogs(issue string) error {
+	log.Debugf("worklogs called")
+	c.Browse(issue)
+	data, err := c.ViewIssueWorkLogs(issue)
+	if err != nil {
+		return err
+	}
+	fmt.Println(data)
+	return nil
+	// TODO : add decent output template return runTemplate(c.getTemplate("view"), data, nil)
+}
+
+func (c *Cli) CmdNewWorklog(issue string, timeSpentInSeconds int, comment, timeStarted string) error {
+	log.Debugf("new worklog called")
+	c.Browse(issue)
+	data, err := c.NewIssueWorkLog(issue, timeSpentInSeconds, comment, timeStarted)
+	if err != nil {
+		return err
+	}
+	log.Debugf(fmt.Sprintf("%v", data))
+	return nil
+}
 func (c *Cli) CmdEdit(issue string) error {
 	log.Debugf("edit called")
 
@@ -199,7 +222,7 @@ func (c *Cli) defaultIssueType() string {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
 	data, _ := responseToJson(c.get(uri))
 	issueTypeNames := make(map[string]bool)
-	
+
 	if data, ok := data.(map[string]interface{}); ok {
 		if projects, ok := data["projects"].([]interface{}); ok {
 			for _, project := range projects {
@@ -207,7 +230,7 @@ func (c *Cli) defaultIssueType() string {
 					if issuetypes, ok := project["issuetypes"].([]interface{}); ok {
 						if len(issuetypes) > 0 {
 							for _, issuetype := range issuetypes {
-								issueTypeNames[ issuetype.(map[string]interface{})["name"].(string) ] = true
+								issueTypeNames[issuetype.(map[string]interface{})["name"].(string)] = true
 							}
 						}
 					}
