@@ -56,6 +56,8 @@ func main() {
 Usage:
   jira (ls|list) <Query Options> 
   jira view ISSUE
+  jira worklog ISSUE
+  jira addworklog ISSUE time comment
   jira edit [--noedit] <Edit Options> [ISSUE | <Query Options>]
   jira create [--noedit] [-p PROJECT] <Create Options>
   jira DUPLICATE dups ISSUE
@@ -175,6 +177,8 @@ Command Options:
 		"req":              "request",
 		"request":          "request",
 		"vote":             "vote",
+		"worklog":          "worklog",
+		"addworklog":       "addworklog",
 	}
 
 	defaults := map[string]interface{}{
@@ -460,6 +464,15 @@ Command Options:
 	case "view":
 		requireArgs(1)
 		err = c.CmdView(args[0])
+	case "worklog":
+		requireArgs(1)
+		err = c.CmdWorklogs(args[0])
+	case "addworklog":
+		requireArgs(4)
+		timeInSeconds, err := strconv.Atoi(args[1])
+		if err == nil {
+			err = c.CmdNewWorklog(args[0], timeInSeconds, args[2], args[3])
+		}
 	case "vote":
 		requireArgs(1)
 		if val, ok := opts["down"]; ok {
