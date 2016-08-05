@@ -1,3 +1,5 @@
++[![Join the chat at https://gitter.im/go-jira-cli/Lobby](https://badges.gitter.im/go-jira-cli/Lobby.svg)](https://gitter.im/go-jira-cli/Lobby?utm_source=badge&utm_medium=badge&utm_content=badge)
+
 # go-jira
 simple command line client for Atlassian's Jira service written in Go
 
