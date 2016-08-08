@@ -371,7 +371,18 @@ Command Options:
 		requireArgs(2)
 		if err = c.CmdDups(args[0], args[1]); err == nil {
 			opts["resolution"] = "Duplicate"
-			err = c.CmdTransition(args[0], "close")
+			trans, err := c.ValidTransitions(args[0])
+			if err == nil {
+				close := trans.Find("close")
+				if close != nil {
+					err = c.CmdTransition(args[0], "close")
+				} else {
+					// for now just assume if there is no "close", then
+					// there is a "done" state
+					err = c.CmdTransition(args[0], "done")
+				}
+			}
+				
 		}
 	case "watch":
 		requireArgs(1)

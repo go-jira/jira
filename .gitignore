@@ -7,3 +7,4 @@ src/github.com/op/
 src/gopkg.in/
 jira
 jira.exe
+schemas/*.json

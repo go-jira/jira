@@ -3,7 +3,7 @@ eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira="../jira --user admin"
 
-PLAN 13
+PLAN 14
 
 # clean out any old containers
 RUNS sh -c "docker rm -f go-jira-test || true"
@@ -42,3 +42,7 @@ RUNS $jira req -M POST /rest/api/2/project '{"key":"PROCESS","name":"Process","p
 RUNS $jira req -M POST /rest/api/2/project '{"key":"TASK","name":"Task","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-task-management","lead":"gojira"}'
 
 RUNS $jira logout
+
+# export new templates so we are always using whatever is latest
+# and not whatever is in the test-runners homedir
+RUNS $jira export-templates -d .jira.d/templates
