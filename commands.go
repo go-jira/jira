@@ -2,9 +2,12 @@ package jira
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/howeyc/gopass"
+	"github.com/Netflix-Skunkworks/go-jira/data"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -261,8 +264,29 @@ func (c *Cli) CmdComponents(project string) error {
 	return runTemplate(c.getTemplate("components"), data, nil)
 }
 
+func (c *Cli) ValidTransitions(issue string) (jiradata.Transitions,error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
+	resp, err := c.get(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	transMeta := &jiradata.TransitionsMeta{}
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(content, transMeta)
+	if err != nil {
+		return nil, err
+	}
+
+	return transMeta.Transitions, nil
+}
+
 func (c *Cli) CmdTransitions(issue string) error {
 	log.Debugf("Transitions called")
+	// FIXME this should just call ValidTransitions then pass that data to templates
 	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
 	data, err := responseToJson(c.get(uri))
@@ -565,7 +589,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 	}
 	if transId == "" {
 		err := fmt.Errorf("Invalid Transition '%s', Available: %s", trans, strings.Join(found, ", "))
-		log.Errorf("%s", err)
+		log.Debugf("%s", err)
 		return err
 	}
 
