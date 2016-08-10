@@ -391,7 +391,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 
 	json, err := jsonEncode(map[string]interface{}{
 		"type": map[string]string{
-			"name": "Depends", // TODO This is probably not constant across Jira installs
+			"name": c.GetOptString("blockerType", "Blocks"),
 		},
 		"inwardIssue": map[string]string{
 			"key": issue,
