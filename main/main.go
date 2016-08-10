@@ -70,6 +70,7 @@ Usage:
   jira start ISSUE [--edit] <Edit Options>
   jira stop ISSUE [--edit] <Edit Options>
   jira todo ISSUE [--edit] <Edit Options>
+  jira backlog ISSUE [--edit] <Edit Options>
   jira done ISSUE [--edit] <Edit Options>
   jira prog|progress|in-progress [--edit] <Edit Options>
   jira comment ISSUE [--noedit] <Edit Options>
@@ -149,6 +150,7 @@ Command Options:
 		"start":            "start",
 		"stop":             "stop",
 		"todo":             "todo",
+		"backlog":          "backlog",
 		"done":             "done",
 		"prog":             "in-progress",
 		"progress":         "in-progress",
@@ -422,6 +424,10 @@ Command Options:
 		requireArgs(1)
 		setEditing(false)
 		err = c.CmdTransition(args[0], "To Do")
+	case "backlog":
+		requireArgs(1)
+		setEditing(false)
+		err = c.CmdTransition(args[0], "Backlog")
 	case "done":
 		requireArgs(1)
 		setEditing(false)
