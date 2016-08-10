@@ -48,6 +48,9 @@ endif
 build: src/github.com/Netflix-Skunkworks/go-jira
 	$(GOBUILD) -o '$(BIN)' main/main.go
 
+debug:
+	$(MAKE) DEBUG=1
+
 src/%:
 	mkdir -p $(@D)
 	test -L $@ || ln -sf '$(GOPATH)' $@
