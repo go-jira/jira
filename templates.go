@@ -43,12 +43,14 @@ reporter: {{ if .fields.reporter }}{{ .fields.reporter.name }}{{end}}{{if .field
 watchers: {{ range .fields.customfield_10110 }}{{ .name }} {{end}}{{end}}{{if .fields.issuelinks}}
 blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key }}[{{.outwardIssue.fields.status.name}}]{{end}}{{end}}
 depends: {{ range .fields.issuelinks }}{{if .inwardIssue}}{{ .inwardIssue.key }}[{{.inwardIssue.fields.status.name}}]{{end}}{{end}}{{end}}{{if .fields.priority}}
-priority: {{ .fields.priority.name }}{{end}}
+priority: {{ .fields.priority.name }}{{end}}{{if .fields.votes}}
+votes: {{ .fields.votes.votes}}{{end}}{{if .fields.labels}}
+labels: {{ join ", " .fields.labels }}{{end}}
 description: |
   {{ or .fields.description "" | indent 2 }}{{if .fields.comment.comments}}
 
 comments:
-{{ range .fields.comment.comments }}  - | # {{.author.name}} at {{.created}}
+{{ range .fields.comment.comments }}  - | # {{.author.name}}, {{.created | age}} ago
     {{ or .body "" | indent 4}}
 {{end}}{{end}}
 `
@@ -76,7 +78,7 @@ fields:
   description: |~
     {{ or .overrides.description (or .fields.description "") | indent 4 }}
 # comments:
-# {{ range .fields.comment.comments }}  - | # {{.author.name}} at {{.created}}
+# {{ range .fields.comment.comments }}  - | # {{.author.name}}, {{.created | age}} ago
 #     {{ or .body "" | indent 4 | comment}}
 # {{end}}
 `
