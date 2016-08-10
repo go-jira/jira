@@ -3,7 +3,7 @@ eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira="../jira --user admin"
 
-PLAN 14
+PLAN 15
 
 # clean out any old containers
 RUNS sh -c "docker rm -f go-jira-test || true"
@@ -22,6 +22,9 @@ echo "admin123" | RUNS $jira login
 
 # create gojira user
 RUNS $jira req -M POST /rest/api/2/user '{"name":"gojira","password":"gojira123","emailAddress":"gojira@example.com","displayName":"Go Jira"}'
+
+# create mojira user (need secondary user for voting)
+RUNS $jira req -M POST /rest/api/2/user '{"name":"mojira","password":"mojira123","emailAddress":"mojira@example.com","displayName":"Mo Jira"}'
 
 # create SCRUM softwareproject
 RUNS $jira req -M POST /rest/api/2/project '{"key":"SCRUM","name":"Scrum","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-scrum-template","lead":"gojira"}'
