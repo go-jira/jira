@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	log    = logging.MustGetLogger("jira")
+	log           = logging.MustGetLogger("jira")
 	defaultFormat = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
 )
 
@@ -35,7 +35,7 @@ func main() {
 	user := os.Getenv("USER")
 	home := os.Getenv("HOME")
 	defaultQueryFields := "summary,created,updated,priority,status,reporter,assignee"
-	defaultSort := "priority asc, created"
+	defaultSort := "priority asc, key"
 	defaultMaxResults := 500
 
 	usage := func(ok bool) {
@@ -368,6 +368,7 @@ Command Options:
 		requireArgs(2)
 		err = c.CmdBlocks(args[0], args[1])
 	case "dups":
+		setEditing(true)
 		requireArgs(2)
 		if err = c.CmdDups(args[0], args[1]); err == nil {
 			opts["resolution"] = "Duplicate"
@@ -382,7 +383,7 @@ Command Options:
 					err = c.CmdTransition(args[0], "done")
 				}
 			}
-				
+
 		}
 	case "watch":
 		requireArgs(1)
