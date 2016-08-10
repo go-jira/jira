@@ -10,8 +10,8 @@ import (
 	"gopkg.in/op/go-logging.v1"
 	"io/ioutil"
 	"net/http"
-	"net/http/httputil"
 	"net/http/cookiejar"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"os/exec"
@@ -161,7 +161,7 @@ func (c *Cli) delete(uri string) (*http.Response, error) {
 func (c *Cli) makeRequestWithContent(method string, uri string, content string) (*http.Response, error) {
 	buffer := bytes.NewBufferString(content)
 	req, _ := http.NewRequest(method, uri, buffer)
-	
+
 	log.Infof("%s %s", req.Method, req.URL.String())
 	if resp, err := c.makeRequest(req); err != nil {
 		return nil, err
@@ -210,7 +210,7 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	}
 
 	if log.IsEnabledFor(logging.DEBUG) {
-		out, _ := httputil.DumpRequest(req,true);
+		out, _ := httputil.DumpRequest(req, true)
 		log.Debugf("Request: %s", out)
 	}
 
@@ -231,7 +231,7 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 		}
 	}
 	if log.IsEnabledFor(logging.DEBUG) {
-		out, _ := httputil.DumpResponse(resp,true);
+		out, _ := httputil.DumpResponse(resp, true)
 		log.Debugf("Response: %s", out)
 	}
 	return resp, nil
