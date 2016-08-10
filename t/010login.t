@@ -5,6 +5,10 @@ jira=../jira
 
 PLAN 7
 
+###############################################################################
+## Verify logout works, we expect when we call the session api
+## that we will get a 401 and prompt user for password
+################################################################################
 RUNS $jira logout
 
 NRUNS $jira req /rest/auth/1/session </dev/null
@@ -12,6 +16,10 @@ ODIFF <<EOF
 Jira Password [gojira]: 
 EOF
 
+###############################################################################
+## Verify login works (password read from stdin) and verify that the
+## sesion api no longer prompts
+###############################################################################
 echo "gojira123" | RUNS $jira login
 
 RUNS $jira req /rest/auth/1/session </dev/null
