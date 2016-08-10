@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/howeyc/gopass"
 	"github.com/Netflix-Skunkworks/go-jira/data"
+	"github.com/howeyc/gopass"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -22,7 +22,7 @@ func (c *Cli) CmdLogin() error {
 		user, _ := c.opts["user"].(string)
 
 		fmt.Printf("Jira Password [%s]: ", user)
-        pw, err := gopass.GetPasswdMasked()
+		pw, err := gopass.GetPasswdMasked()
 		if err != nil {
 			return err
 		}
@@ -202,7 +202,7 @@ func (c *Cli) defaultIssueType() string {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
 	data, _ := responseToJson(c.get(uri))
 	issueTypeNames := make(map[string]bool)
-	
+
 	if data, ok := data.(map[string]interface{}); ok {
 		if projects, ok := data["projects"].([]interface{}); ok {
 			for _, project := range projects {
@@ -210,7 +210,7 @@ func (c *Cli) defaultIssueType() string {
 					if issuetypes, ok := project["issuetypes"].([]interface{}); ok {
 						if len(issuetypes) > 0 {
 							for _, issuetype := range issuetypes {
-								issueTypeNames[ issuetype.(map[string]interface{})["name"].(string) ] = true
+								issueTypeNames[issuetype.(map[string]interface{})["name"].(string)] = true
 							}
 						}
 					}
@@ -264,7 +264,7 @@ func (c *Cli) CmdComponents(project string) error {
 	return runTemplate(c.getTemplate("components"), data, nil)
 }
 
-func (c *Cli) ValidTransitions(issue string) (jiradata.Transitions,error) {
+func (c *Cli) ValidTransitions(issue string) (jiradata.Transitions, error) {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
 	resp, err := c.get(uri)
 	if err != nil {
@@ -632,7 +632,6 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		"name": transName,
 		"id":   transId,
 	}
-
 	return c.editTemplate(
 		c.getTemplate("transition"),
 		fmt.Sprintf("%s-trans-%s-", issue, trans),
