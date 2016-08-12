@@ -627,6 +627,24 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		issueData = data.(map[string]interface{})
 	}
 	issueData["meta"] = transMeta
+	if c.GetOptString("defaultResolution", "") == "" {
+		// .meta.fields.resolution.allowedValues
+		if fields, ok := transMeta["fields"].(map[string]interface{}); ok {
+			if resolution, ok := fields["resolution"].(map[string]interface{}); ok {
+				if allowedValues, ok := resolution["allowedValues"].([]interface{}); ok {
+					for _, allowedValueRaw := range allowedValues {
+						if allowedValues, ok := allowedValueRaw.(map[string]interface{}); ok {
+							if allowedValues["name"] == "Fixed" {
+								c.opts["defaultResolution"] = "Fixed"
+							} else if allowedValues["name"] == "Done" {
+								c.opts["defaultResolution"] = "Done"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	issueData["overrides"] = c.opts
 	issueData["transition"] = map[string]interface{}{
 		"name": transName,

@@ -141,7 +141,7 @@ fields:{{if .meta.fields.assignee}}
   reporter:
     name: {{if .overrides.reporter}}{{.overrides.reporter}}{{else}}{{if .fields.reporter}}{{.fields.reporter.name}}{{end}}{{end}}{{end}}{{if .meta.fields.resolution}}
   resolution: # Values: {{ range .meta.fields.resolution.allowedValues }}{{.name}}, {{end}}
-    name: {{if .overrides.resolution}}{{.overrides.resolution}}{{else if .fields.resolution}}{{.fields.resolution.name}}{{else}}Fixed{{end}}{{end}}{{if .meta.fields.summary}}
+    name: {{if .overrides.resolution}}{{.overrides.resolution}}{{else if .fields.resolution}}{{.fields.resolution.name}}{{else}}{{or .overrides.defaultResolution "Fixed"}}{{end}}{{end}}{{if .meta.fields.summary}}
   summary: {{or .overrides.summary .fields.summary}}{{end}}{{if .meta.fields.versions.allowedValues}}
   versions: # Values: {{ range .meta.fields.versions.allowedValues }}{{.name}}, {{end}}{{if .overrides.versions}}{{ range (split "," .overrides.versions)}}
     - name: {{.}}{{end}}{{else}}{{range .fields.versions}}
