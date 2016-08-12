@@ -7,7 +7,7 @@ export JIRA_LOG_FORMAT="%{level:-5s} %{message}"
 PLAN 84
 
 # cleanup from previous failed test executions
-$jira ls | awk -F: '{print $1}' | while read issue; do ../jira done $issue; done
+($jira ls | awk -F: '{print $1}' | while read issue; do ../jira done $issue; done) | sed 's/^/# CLEANUP: /g'
 
 # reset login
 RUNS $jira logout

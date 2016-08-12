@@ -376,13 +376,17 @@ Command Options:
 			opts["resolution"] = "Duplicate"
 			trans, err := c.ValidTransitions(args[0])
 			if err == nil {
-				close := trans.Find("close")
-				if close != nil {
+				if trans.Find("close") != nil {
 					err = c.CmdTransition(args[0], "close")
-				} else {
+				} else if trans.Find("done") != nil {
 					// for now just assume if there is no "close", then
 					// there is a "done" state
 					err = c.CmdTransition(args[0], "done")
+				} else if trans.Find("start") != nil {
+					err = c.CmdTransition(args[0], "start")
+					if err == nil {
+						err = c.CmdTransition(args[0], "stop")
+					}
 				}
 			}
 
@@ -435,7 +439,7 @@ Command Options:
 	case "in-progress":
 		requireArgs(1)
 		setEditing(false)
-		err = c.CmdTransition(args[0], "In Progress")
+		err = c.CmdTransition(args[0], "Progress")
 	case "comment":
 		requireArgs(1)
 		setEditing(true)
