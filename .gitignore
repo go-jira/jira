@@ -8,3 +8,4 @@ src/gopkg.in/
 jira
 jira.exe
 schemas/*.json
+t/issue.props
