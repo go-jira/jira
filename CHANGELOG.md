@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.4 - 2016-08-12
+
+* when running "dups" on a Process Management Project type, you have to start/stop the task to resolve it [Cory Bennett] [[2c91905](https://github.com/Netflix-Skunkworks/go-jira/commit/2c91905)]
+* allow for defaultResolution option for transition command [Cory Bennett] [[a328c2d](https://github.com/Netflix-Skunkworks/go-jira/commit/a328c2d)]
+* add "backlog" command for Kanban related Issues [Cory Bennett] [[5d39b23](https://github.com/Netflix-Skunkworks/go-jira/commit/5d39b23)]
+* fix --noedit flag with "dups" command [Cory Bennett] [[37c07fa](https://github.com/Netflix-Skunkworks/go-jira/commit/37c07fa)]
+* add "votes" and "labels" to default view template [Cory Bennett] [[6f73b8c](https://github.com/Netflix-Skunkworks/go-jira/commit/6f73b8c)]
+* add "blockerType" config param, for issueLinkType use for "blocks" command [Cory Bennett] [[30fd301](https://github.com/Netflix-Skunkworks/go-jira/commit/30fd301)]
+* update gitter room [Cory Bennett] [[4b822b1](https://github.com/Netflix-Skunkworks/go-jira/commit/4b822b1)]
+* default issuetype to "Bug" for project that have Bug, otherwise try "Task" [Cory Bennett] [[0c807b4](https://github.com/Netflix-Skunkworks/go-jira/commit/0c807b4)]
+* make view template only show fields that have values [Cory Bennett] [[8238fe8](https://github.com/Netflix-Skunkworks/go-jira/commit/8238fe8)]
+* make default create template only display fields if they are valid fields for the project [Cory Bennett] [[adc2ace](https://github.com/Netflix-Skunkworks/go-jira/commit/adc2ace)]
+* ignore empty json fields when processing templates [Cory Bennett] [[f5f3e28](https://github.com/Netflix-Skunkworks/go-jira/commit/f5f3e28)]
+* allow JIRA_LOG_FORMAT env variable to control log output format [Cory Bennett] [[469def0](https://github.com/Netflix-Skunkworks/go-jira/commit/469def0)]
+* remove extraneous debug [Cory Bennett] [[752a94d](https://github.com/Netflix-Skunkworks/go-jira/commit/752a94d)]
+* add logout command modify password prompt to echo masked password [Cory Bennett] [[8ad91be](https://github.com/Netflix-Skunkworks/go-jira/commit/8ad91be)]
+* tweak cookies to store hostname dump all http request/response with --verbose [Cory Bennett] [[f93fe79](https://github.com/Netflix-Skunkworks/go-jira/commit/f93fe79)]
+* load configs in order of closest to cwd (/etc/go-jira.yml is last) [Cory Bennett] [[f54267b](https://github.com/Netflix-Skunkworks/go-jira/commit/f54267b)]
+
 ## 0.1.3 - 2016-07-30
 
 * [[#43](https://github.com/Netflix-Skunkworks/go-jira/issues/43)] add support for jira done|todo|prog commands [Cory Bennett] [[dd7d1cc](https://github.com/Netflix-Skunkworks/go-jira/commit/dd7d1cc)]
