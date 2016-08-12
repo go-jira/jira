@@ -9,3 +9,4 @@ jira
 jira.exe
 schemas/*.json
 t/issue.props
+t/.jira.d/templates
