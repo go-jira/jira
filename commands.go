@@ -373,7 +373,6 @@ func (c *Cli) CmdCreate() error {
 			}
 		},
 	)
-	return nil
 }
 
 func (c *Cli) CmdIssueLinkTypes() error {
@@ -704,7 +703,6 @@ func (c *Cli) CmdComment(issue string) error {
 			handlePost,
 		)
 	}
-	return nil
 }
 
 func (c *Cli) CmdComponent(action string, project string, name string, desc string, lead string) error {
