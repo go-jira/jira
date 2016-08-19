@@ -110,7 +110,6 @@ func fuzzyAge(start string) (string, error) {
 			return fmt.Sprintf("%d days", int(delta.Hours()/24)), nil
 		}
 	}
-	return "unknown", nil
 }
 
 func dateFormat(format string, content string) (string, error) {
