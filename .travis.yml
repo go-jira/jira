@@ -1,0 +1,15 @@
+language: go
+
+go:
+    - 1.6
+
+matrix:
+    fast_finish: true
+
+before_install:
+    - go get github.com/golang/lint/golint
+ 
+script:
+    - go vet -x ./...
+    - $HOME/gopath/bin/golint ./...
+    - make
