@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5 - 2016-08-21
+
+* update for golint [Cory Bennett] [[5a4e17c](https://github.com/Netflix-Skunkworks/go-jira/commit/5a4e17c)]
+* fix for go vet [Cory Bennett] [[355fb42](https://github.com/Netflix-Skunkworks/go-jira/commit/355fb42)]
+
 ## 0.1.4 - 2016-08-12
 
 * when running "dups" on a Process Management Project type, you have to start/stop the task to resolve it [Cory Bennett] [[2c91905](https://github.com/Netflix-Skunkworks/go-jira/commit/2c91905)]
