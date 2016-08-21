@@ -164,5 +164,4 @@ const defaultWorklogsTemplate = `{{ range .worklogs }}- # {{.author.name}}, {{.c
   comment: {{ or .comment "" }}
   timeSpent: {{ .timeSpent }}
 
-{{end}}
-`
+{{end}}`
