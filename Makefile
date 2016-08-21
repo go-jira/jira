@@ -56,6 +56,17 @@ src/%:
 	test -L $@ || ln -sf '$(GOPATH)' $@
 	go get -v $* $*/main
 
+vet:
+	@go vet .
+	@go vet ./data
+	@go vet ./main
+
+lint:
+	@go get github.com/golang/lint/golint
+	@./bin/golint .
+	@./bin/golint ./data
+	@./bin/golint ./main
+
 cross-setup:
 	for p in $(PLATFORMS); do \
         echo Building for $$p"; \
