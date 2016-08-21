@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6 - 2016-08-21
+
+* make "worklogs" command print output through template allow "add worklog" command to open edit template [Cory Bennett] [[cc3fbee](https://github.com/Netflix-Skunkworks/go-jira/commit/cc3fbee)]
+* remove extra newline at end of worklogs template [Cory Bennett] [[d08ef15](https://github.com/Netflix-Skunkworks/go-jira/commit/d08ef15)]
+* adding worklog related templates [Cory Bennett] [[ab1cd27](https://github.com/Netflix-Skunkworks/go-jira/commit/ab1cd27)]
+
 ## 0.1.5 - 2016-08-21
 
 * update for golint [Cory Bennett] [[5a4e17c](https://github.com/Netflix-Skunkworks/go-jira/commit/5a4e17c)]
