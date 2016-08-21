@@ -114,6 +114,68 @@ func (c *Cli) CmdView(issue string) error {
 	return runTemplate(c.getTemplate("view"), data, nil)
 }
 
+// CmdWorklogs will get worklog data for given issue and sent to the "worklogs" template
+func (c *Cli) CmdWorklogs(issue string) error {
+	log.Debugf("worklogs called")
+	c.Browse(issue)
+	data, err := c.ViewIssueWorkLogs(issue)
+	if err != nil {
+		return err
+	}
+	return runTemplate(c.getTemplate("worklogs"), data, nil)
+}
+
+// CmdWorklog will attempt to add (action=add) a worklog to the given issue.
+// It will spawn the editor (unless --noedit isused) and post edited YAML
+// content as JSON to the worklog endpoint
+func (c *Cli) CmdWorklog(action string, issue string) error {
+	log.Debugf("%s worklog called", action)
+	c.Browse(issue)
+	if action == "add" {
+		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/worklog", c.endpoint, issue)
+
+		worklogData := map[string]interface{}{
+			"issue": issue,
+			"comment": c.opts["comment"],
+		}
+
+		if v, ok := c.opts["time-spent"].(string); ok {
+			worklogData["timeSpent"] = v
+		}
+
+		return c.editTemplate(
+			c.getTemplate("worklog"),
+			fmt.Sprintf("%s-worklog-", issue),
+			worklogData,
+			func(json string) error {
+				if c.getOptBool("dryrun", false) {
+					log.Debugf("POST: %s", json)
+					log.Debugf("Dryrun mode, skipping POST")
+					return nil
+				}
+				resp, err := c.post(uri, json)
+				if err != nil {
+					return err
+				}
+				
+				if resp.StatusCode == 201 {
+					c.Browse(issue)
+					if !c.opts["quiet"].(bool) {
+						fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+					}
+					return nil
+				}
+				logBuffer := bytes.NewBuffer(make([]byte, 0))
+				resp.Write(logBuffer)
+				err = fmt.Errorf("Unexpected Response From POST")
+				log.Errorf("%s:\n%s", err, logBuffer)
+				return err
+			},
+		)
+	}
+	return nil
+}
+
 // CmdEdit will populate "edit" template with issue data and issue "editmeta" data.
 // Then will parse yaml template and submit data to jira.
 func (c *Cli) CmdEdit(issue string) error {

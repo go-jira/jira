@@ -443,6 +443,16 @@ func (c *Cli) SaveData(data interface{}) error {
 	return nil
 }
 
+// ViewIssueWorkLogs gets the worklog data for the given issue
+func (c *Cli) ViewIssueWorkLogs(issue string) (interface{}, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/worklog", c.endpoint, issue)
+	data, err := responseToJSON(c.get(uri))
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 // ViewIssue will return the details for the given issue id
 func (c *Cli) ViewIssue(issue string) (interface{}, error) {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)

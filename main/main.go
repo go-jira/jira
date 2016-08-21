@@ -56,6 +56,8 @@ func main() {
 Usage:
   jira (ls|list) <Query Options> 
   jira view ISSUE
+  jira worklog ISSUE
+  jira add worklog ISSUE <Worklog Options>
   jira edit [--noedit] <Edit Options> [ISSUE | <Query Options>]
   jira create [--noedit] [-p PROJECT] <Create Options>
   jira DUPLICATE dups ISSUE
@@ -125,6 +127,10 @@ Create Options:
   -m --comment=COMMENT      Comment message for transition
   -o --override=KEY=VAL     Set custom key/value pairs
 
+Worklog Options:
+  -T --time-spent=TIMESPENT Time spent working on issue
+  -m --comment=COMMENT      Comment message for worklog
+
 Command Options:
   -d --directory=DIR        Directory to export templates to (default: %s)
 `, user, defaultQueryFields, defaultMaxResults, defaultSort, user, fmt.Sprintf("%s/.jira.d/templates", home))
@@ -177,6 +183,8 @@ Command Options:
 		"req":              "request",
 		"request":          "request",
 		"vote":             "vote",
+		"worklog":          "worklog",
+		"addworklog":       "addworklog",
 	}
 
 	defaults := map[string]interface{}{
@@ -229,6 +237,7 @@ Command Options:
 		"d|dir|directory=s":     setopt,
 		"M|method=s":            setopt,
 		"S|saveFile=s":          setopt,
+		"T|time-spent=s":        setopt,
 		"Q|quiet":               setopt,
 		"down":                  setopt,
 	})
@@ -482,6 +491,15 @@ Command Options:
 	case "view":
 		requireArgs(1)
 		err = c.CmdView(args[0])
+	case "worklog":
+		if len(args) > 0 && args[0] == "add" {
+			setEditing(true)
+			requireArgs(2)
+			err = c.CmdWorklog(args[0], args[1])
+		} else {
+			requireArgs(1)
+			err = c.CmdWorklogs(args[0])
+		}
 	case "vote":
 		requireArgs(1)
 		if val, ok := opts["down"]; ok {
