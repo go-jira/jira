@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/mgutz/ansi"
 	"gopkg.in/coryb/yaml.v2"
@@ -26,10 +25,12 @@ func homedir() string {
 	return os.Getenv("HOME")
 }
 
+// FindParentPaths will find all available paths from the current path up to the root
+// that matches the given fileName path
 func FindParentPaths(fileName string) []string {
 	cwd, _ := os.Getwd()
 
-	paths := make([]string, 0)
+	paths := []string{}
 
 	// special case if homedir is not in current path then check there anyway
 	homedir := homedir()
@@ -57,12 +58,14 @@ func FindParentPaths(fileName string) []string {
 	return paths
 }
 
+// FindClosestParentPath finds the path that matches the given fileName path that is
+// closest to the current working directory
 func FindClosestParentPath(fileName string) (string, error) {
 	paths := FindParentPaths(fileName)
 	if len(paths) > 0 {
 		return paths[len(paths)-1], nil
 	}
-	return "", errors.New(fmt.Sprintf("%s not found in parent directory hierarchy", fileName))
+	return "", fmt.Errorf("%s not found in parent directory hierarchy", fileName)
 }
 
 func readFile(file string) string {
@@ -92,34 +95,36 @@ func copyFile(src, dst string) (err error) {
 }
 
 func fuzzyAge(start string) (string, error) {
-	if t, err := time.Parse("2006-01-02T15:04:05.000-0700", start); err != nil {
+	t, err := time.Parse("2006-01-02T15:04:05.000-0700", start)
+	if err != nil {
 		return "", err
-	} else {
-		delta := time.Now().Sub(t)
-		if delta.Minutes() < 2 {
-			return "a minute", nil
-		} else if dm := delta.Minutes(); dm < 45 {
-			return fmt.Sprintf("%d minutes", int(dm)), nil
-		} else if dm := delta.Minutes(); dm < 90 {
-			return "an hour", nil
-		} else if dh := delta.Hours(); dh < 24 {
-			return fmt.Sprintf("%d hours", int(dh)), nil
-		} else if dh := delta.Hours(); dh < 48 {
-			return "a day", nil
-		} else {
-			return fmt.Sprintf("%d days", int(delta.Hours()/24)), nil
-		}
 	}
+	delta := time.Now().Sub(t)
+	if delta.Minutes() < 2 {
+		return "a minute", nil
+	} else if dm := delta.Minutes(); dm < 45 {
+		return fmt.Sprintf("%d minutes", int(dm)), nil
+	} else if dm := delta.Minutes(); dm < 90 {
+		return "an hour", nil
+	} else if dh := delta.Hours(); dh < 24 {
+		return fmt.Sprintf("%d hours", int(dh)), nil
+	} else if dh := delta.Hours(); dh < 48 {
+		return "a day", nil
+	}
+	return fmt.Sprintf("%d days", int(delta.Hours()/24)), nil
 }
 
 func dateFormat(format string, content string) (string, error) {
-	if t, err := time.Parse("2006-01-02T15:04:05.000-0700", content); err != nil {
+	t, err := time.Parse("2006-01-02T15:04:05.000-0700", content)
+	if err != nil {
 		return "", err
-	} else {
-		return t.Format(format), nil
 	}
+	return t.Format(format), nil
 }
 
+// RunTemplate will run the give templateContent as a golang text/template
+// and pass the provided data to the template execution.  It will write
+// the output to the provided "out" writer.
 func RunTemplate(templateContent string, data interface{}, out io.Writer) error {
 	return runTemplate(templateContent, data, out)
 }
@@ -131,11 +136,11 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 
 	funcs := map[string]interface{}{
 		"toJson": func(content interface{}) (string, error) {
-			if bytes, err := json.MarshalIndent(content, "", "    "); err != nil {
+			bytes, err := json.MarshalIndent(content, "", "    ")
+			if err != nil {
 				return "", err
-			} else {
-				return string(bytes), nil
 			}
+			return string(bytes), nil
 		},
 		"append": func(more string, content interface{}) (string, error) {
 			switch value := content.(type) {
@@ -144,13 +149,13 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 			case []byte:
 				return string(append(content.([]byte), []byte(more)...)), nil
 			default:
-				return "", errors.New(fmt.Sprintf("Unknown type: %s", value))
+				return "", fmt.Errorf("Unknown type: %s", value)
 			}
 		},
 		"indent": func(spaces int, content string) string {
 			indent := make([]rune, spaces+1, spaces+1)
 			indent[0] = '\n'
-			for i := 1; i < spaces+1; i += 1 {
+			for i := 1; i < spaces+1; i++ {
 				indent[i] = ' '
 			}
 
@@ -193,7 +198,7 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 		},
 		"rep": func(count int, content string) string {
 			var buffer bytes.Buffer
-			for i := 0; i < count; i += 1 {
+			for i := 0; i < count; i++ {
 				buffer.WriteString(content)
 			}
 			return buffer.String()
@@ -205,19 +210,19 @@ func runTemplate(templateContent string, data interface{}, out io.Writer) error 
 			return dateFormat(format, content)
 		},
 	}
-	if tmpl, err := template.New("template").Funcs(funcs).Parse(templateContent); err != nil {
+	tmpl, err := template.New("template").Funcs(funcs).Parse(templateContent)
+	if err != nil {
 		log.Errorf("Failed to parse template: %s", err)
 		return err
-	} else {
-		if err := tmpl.Execute(out, data); err != nil {
-			log.Errorf("Failed to execute template: %s", err)
-			return err
-		}
+	}
+	if err := tmpl.Execute(out, data); err != nil {
+		log.Errorf("Failed to execute template: %s", err)
+		return err
 	}
 	return nil
 }
 
-func responseToJson(resp *http.Response, err error) (interface{}, error) {
+func responseToJSON(resp *http.Response, err error) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +371,7 @@ func mkdir(dir string) error {
 		log.Errorf("Failed to stat %s: %s", dir, err)
 		return err
 	} else if err == nil && !stat.IsDir() {
-		err := fmt.Errorf("%s exists and is not a directory!", dir)
+		err := fmt.Errorf("%s exists and is not a directory", dir)
 		log.Errorf("%s", err)
 		return err
 	} else {

@@ -1,37 +1,37 @@
 package jira
 
-var all_templates = map[string]string{
-	"debug":          default_debug_template,
-	"fields":         default_debug_template,
-	"editmeta":       default_debug_template,
-	"transmeta":      default_debug_template,
-	"createmeta":     default_debug_template,
-	"issuelinktypes": default_debug_template,
-	"list":           default_list_template,
-	"table":          default_table_template,
-	"view":           default_view_template,
-	"edit":           default_edit_template,
-	"transitions":    default_transitions_template,
-	"components":     default_components_template,
-	"issuetypes":     default_issuetypes_template,
-	"create":         default_create_template,
-	"comment":        default_comment_template,
-	"transition":     default_transition_template,
-	"request":        default_debug_template,
+var allTemplates = map[string]string{
+	"debug":          defaultDebugTemplate,
+	"fields":         defaultDebugTemplate,
+	"editmeta":       defaultDebugTemplate,
+	"transmeta":      defaultDebugTemplate,
+	"createmeta":     defaultDebugTemplate,
+	"issuelinktypes": defaultDebugTemplate,
+	"list":           defaultListTemplate,
+	"table":          defaultTableTemplate,
+	"view":           defaultViewTemplate,
+	"edit":           defaultEditTemplate,
+	"transitions":    defaultTransitionsTemplate,
+	"components":     defaultComponentsTemplate,
+	"issuetypes":     defaultIssuetypesTemplate,
+	"create":         defaultCreateTemplate,
+	"comment":        defaultCommentTemplate,
+	"transition":     defaultTransitionTemplate,
+	"request":        defaultDebugTemplate,
 }
 
-const default_debug_template = "{{ . | toJson}}\n"
+const defaultDebugTemplate = "{{ . | toJson}}\n"
 
-const default_list_template = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
+const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
 
-const default_table_template = `+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+const defaultTableTemplate = `+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 | {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf "%-55s" }} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
 +{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 {{ range .issues }}| {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev 55 | printf "%-55s" }} | {{.fields.priority.name | printf "%-12s" }} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned>{{end}} |
 {{ end }}+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 `
 
-const default_view_template = `issue: {{ .key }}{{if .fields.created}}
+const defaultViewTemplate = `issue: {{ .key }}{{if .fields.created}}
 created: {{ .fields.created | age }} ago{{end}}{{if .fields.status}}
 status: {{ .fields.status.name }}{{end}}
 summary: {{ .fields.summary }}
@@ -54,7 +54,7 @@ comments:
     {{ or .body "" | indent 4}}
 {{end}}{{end}}
 `
-const default_edit_template = `# issue: {{ .key }}
+const defaultEditTemplate = `# issue: {{ .key }}
 update:
   comment:
     - add: 
@@ -82,16 +82,16 @@ fields:
 #     {{ or .body "" | indent 4 | comment}}
 # {{end}}
 `
-const default_transitions_template = `{{ range .transitions }}{{.id }}: {{.name}}
+const defaultTransitionsTemplate = `{{ range .transitions }}{{.id }}: {{.name}}
 {{end}}`
 
-const default_components_template = `{{ range . }}{{.id }}: {{.name}}
+const defaultComponentsTemplate = `{{ range . }}{{.id }}: {{.name}}
 {{end}}`
 
-const default_issuetypes_template = `{{ range .projects }}{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
+const defaultIssuetypesTemplate = `{{ range .projects }}{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
 {{end}}{{end}}`
 
-const default_create_template = `fields:
+const defaultCreateTemplate = `fields:
   project:
     key: {{ or .overrides.project "" }}
   issuetype:
@@ -112,11 +112,11 @@ const default_create_template = `fields:
     - name: {{.}}{{end}}
     - name:{{end}}`
 
-const default_comment_template = `body: |~
+const defaultCommentTemplate = `body: |~
   {{ or .overrides.comment "" | indent 2 }}
 `
 
-const default_transition_template = `update:
+const defaultTransitionTemplate = `update:
   comment:
     - add: 
         body: |~

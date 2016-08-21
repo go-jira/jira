@@ -3,7 +3,6 @@ package jira
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/Netflix-Skunkworks/go-jira/data"
 	"github.com/howeyc/gopass"
@@ -15,9 +14,10 @@ import (
 	// "github.com/kr/pretty"
 )
 
+// CmdLogin will attempt to login into jira server
 func (c *Cli) CmdLogin() error {
 	uri := fmt.Sprintf("%s/rest/auth/1/session", c.endpoint)
-	for true {
+	for {
 		req, _ := http.NewRequest("GET", uri, nil)
 		user, _ := c.opts["user"].(string)
 
@@ -29,60 +29,63 @@ func (c *Cli) CmdLogin() error {
 		passwd := string(pw)
 
 		req.SetBasicAuth(user, passwd)
-		if resp, err := c.makeRequest(req); err != nil {
+
+		resp, err := c.makeRequest(req)
+		if err != nil {
 			return err
-		} else {
-			if resp.StatusCode == 403 {
-				// probably got this, need to redirect the user to login manually
-				// X-Authentication-Denied-Reason: CAPTCHA_CHALLENGE; login-url=https://jira/login.jsp
-				if reason := resp.Header.Get("X-Authentication-Denied-Reason"); reason != "" {
-					err := fmt.Errorf("Authenticaion Failed: %s", reason)
-					log.Errorf("%s", err)
-					return err
-				}
-				err := fmt.Errorf("Authentication Failed: Unknown Reason")
+		}
+		if resp.StatusCode == 403 {
+			// probably got this, need to redirect the user to login manually
+			// X-Authentication-Denied-Reason: CAPTCHA_CHALLENGE; login-url=https://jira/login.jsp
+			if reason := resp.Header.Get("X-Authentication-Denied-Reason"); reason != "" {
+				err := fmt.Errorf("Authenticaion Failed: %s", reason)
 				log.Errorf("%s", err)
 				return err
+			}
+			err := fmt.Errorf("Authentication Failed: Unknown Reason")
+			log.Errorf("%s", err)
+			return err
 
-			} else if resp.StatusCode == 200 {
-				// https://confluence.atlassian.com/display/JIRA043/JIRA+REST+API+%28Alpha%29+Tutorial#JIRARESTAPI%28Alpha%29Tutorial-CAPTCHAs
-				// probably bad password, try again
-				if reason := resp.Header.Get("X-Seraph-Loginreason"); reason == "AUTHENTICATION_DENIED" {
-					log.Warning("Authentication Failed: %s", reason)
-					continue
-				}
-			} else {
-				log.Warning("Login failed")
+		} else if resp.StatusCode == 200 {
+			// https://confluence.atlassian.com/display/JIRA043/JIRA+REST+API+%28Alpha%29+Tutorial#JIRARESTAPI%28Alpha%29Tutorial-CAPTCHAs
+			// probably bad password, try again
+			if reason := resp.Header.Get("X-Seraph-Loginreason"); reason == "AUTHENTICATION_DENIED" {
+				log.Warning("Authentication Failed: %s", reason)
 				continue
 			}
+			break
+		} else {
+			log.Warning("Login failed")
+			continue
 		}
-		return nil
 	}
 	return nil
 }
 
+// CmdLogout will close any active sessions
 func (c *Cli) CmdLogout() error {
 	uri := fmt.Sprintf("%s/rest/auth/1/session", c.endpoint)
 	req, _ := http.NewRequest("DELETE", uri, nil)
-	if resp, err := c.makeRequest(req); err != nil {
+	resp, err := c.makeRequest(req)
+	if err != nil {
 		return err
+	}
+	if resp.StatusCode == 401 || resp.StatusCode == 204 {
+		// 401 == no active session
+		// 204 == successfully logged out
 	} else {
-		if resp.StatusCode == 401 || resp.StatusCode == 204 {
-			// 401 == no active session
-			// 204 == successfully logged out
-		} else {
-			err := fmt.Errorf("Failed to Logout: %s", err)
-			return err
-		}
+		err := fmt.Errorf("Failed to Logout: %s", err)
+		return err
 	}
 	log.Notice("OK")
 	return nil
 }
 
+// CmdFields will send data from /rest/api/2/field API to "fields" template
 func (c *Cli) CmdFields() error {
 	log.Debugf("fields called")
 	uri := fmt.Sprintf("%s/rest/api/2/field", c.endpoint)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
@@ -90,15 +93,17 @@ func (c *Cli) CmdFields() error {
 	return runTemplate(c.getTemplate("fields"), data, nil)
 }
 
+// CmdList will query jira and send data to "list" template
 func (c *Cli) CmdList() error {
 	log.Debugf("list called")
-	if data, err := c.FindIssues(); err != nil {
+	data, err := c.FindIssues()
+	if err != nil {
 		return err
-	} else {
-		return runTemplate(c.getTemplate("list"), data, nil)
 	}
+	return runTemplate(c.getTemplate("list"), data, nil)
 }
 
+// CmdView will get issue data and send to "view" template
 func (c *Cli) CmdView(issue string) error {
 	log.Debugf("view called")
 	c.Browse(issue)
@@ -109,23 +114,23 @@ func (c *Cli) CmdView(issue string) error {
 	return runTemplate(c.getTemplate("view"), data, nil)
 }
 
+// CmdEdit will populate "edit" template with issue data and issue "editmeta" data.
+// Then will parse yaml template and submit data to jira.
 func (c *Cli) CmdEdit(issue string) error {
 	log.Debugf("edit called")
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/editmeta", c.endpoint, issue)
-	editmeta, err := responseToJson(c.get(uri))
+	editmeta, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
 
 	uri = fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
-	var issueData map[string]interface{}
-	if data, err := responseToJson(c.get(uri)); err != nil {
+	data, err := responseToJSON(c.get(uri))
+	if err != nil {
 		return err
-	} else {
-		issueData = data.(map[string]interface{})
 	}
-
+	issueData := data.(map[string]interface{})
 	issueData["meta"] = editmeta.(map[string]interface{})
 	issueData["overrides"] = c.opts
 
@@ -150,22 +155,22 @@ func (c *Cli) CmdEdit(issue string) error {
 					fmt.Printf("OK %s %s/browse/%s\n", issueData["key"], c.endpoint, issueData["key"])
 				}
 				return nil
-			} else {
-				logBuffer := bytes.NewBuffer(make([]byte, 0))
-				resp.Write(logBuffer)
-				err := fmt.Errorf("Unexpected Response From PUT")
-				log.Errorf("%s:\n%s", err, logBuffer)
-				return err
 			}
+			logBuffer := bytes.NewBuffer(make([]byte, 0))
+			resp.Write(logBuffer)
+			err = fmt.Errorf("Unexpected Response From PUT")
+			log.Errorf("%s:\n%s", err, logBuffer)
+			return err
 		},
 	)
 }
 
+// CmdEditMeta will send issue 'edit' metadata to the "editmeta" template
 func (c *Cli) CmdEditMeta(issue string) error {
 	log.Debugf("editMeta called")
 	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/editmeta", c.endpoint, issue)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
@@ -173,11 +178,12 @@ func (c *Cli) CmdEditMeta(issue string) error {
 	return runTemplate(c.getTemplate("editmeta"), data, nil)
 }
 
+// CmdTransitionMeta will send available transition metadata to the "transmeta" template
 func (c *Cli) CmdTransitionMeta(issue string) error {
 	log.Debugf("tranisionMeta called")
 	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
@@ -185,11 +191,12 @@ func (c *Cli) CmdTransitionMeta(issue string) error {
 	return runTemplate(c.getTemplate("transmeta"), data, nil)
 }
 
+// CmdIssueTypes will send issue 'create' metadata to the 'issuetypes'
 func (c *Cli) CmdIssueTypes() error {
 	project := c.opts["project"].(string)
 	log.Debugf("issueTypes called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
@@ -200,7 +207,7 @@ func (c *Cli) CmdIssueTypes() error {
 func (c *Cli) defaultIssueType() string {
 	project := c.opts["project"].(string)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
-	data, _ := responseToJson(c.get(uri))
+	data, _ := responseToJSON(c.get(uri))
 	issueTypeNames := make(map[string]bool)
 
 	if data, ok := data.(map[string]interface{}); ok {
@@ -226,6 +233,7 @@ func (c *Cli) defaultIssueType() string {
 	return ""
 }
 
+// CmdCreateMeta sends the 'create' metadata for the given project & issuetype and sends it to the 'createmeta' template
 func (c *Cli) CmdCreateMeta() error {
 	project := c.opts["project"].(string)
 	issuetype := c.getOptString("issuetype", "")
@@ -235,7 +243,7 @@ func (c *Cli) CmdCreateMeta() error {
 
 	log.Debugf("createMeta called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
@@ -254,16 +262,18 @@ func (c *Cli) CmdCreateMeta() error {
 	return runTemplate(c.getTemplate("createmeta"), data, nil)
 }
 
+// CmdComponents sends component data for given project and sends to the "components" template
 func (c *Cli) CmdComponents(project string) error {
 	log.Debugf("Components called")
 	uri := fmt.Sprintf("%s/rest/api/2/project/%s/components", c.endpoint, project)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
 	return runTemplate(c.getTemplate("components"), data, nil)
 }
 
+// ValidTransitions will return a list of valid transitions for given issue.
 func (c *Cli) ValidTransitions(issue string) (jiradata.Transitions, error) {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
 	resp, err := c.get(uri)
@@ -284,18 +294,21 @@ func (c *Cli) ValidTransitions(issue string) (jiradata.Transitions, error) {
 	return transMeta.Transitions, nil
 }
 
+// CmdTransitions sends valid transtions for given issue to the "transitions" template
 func (c *Cli) CmdTransitions(issue string) error {
 	log.Debugf("Transitions called")
 	// FIXME this should just call ValidTransitions then pass that data to templates
 	c.Browse(issue)
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", c.endpoint, issue)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
 	return runTemplate(c.getTemplate("transitions"), data, nil)
 }
 
+// CmdCreate sends the create-metadata to the "create" template for editing, then
+// will parse the edited document as YAML and submit the document to jira.
 func (c *Cli) CmdCreate() error {
 	log.Debugf("create called")
 	project := c.opts["project"].(string)
@@ -305,7 +318,7 @@ func (c *Cli) CmdCreate() error {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
@@ -349,42 +362,43 @@ func (c *Cli) CmdCreate() error {
 
 			if resp.StatusCode == 201 {
 				// response: {"id":"410836","key":"PROJ-238","self":"https://jira/rest/api/2/issue/410836"}
-				if json, err := responseToJson(resp, nil); err != nil {
+				json, err := responseToJSON(resp, nil)
+				if err != nil {
 					return err
-				} else {
-					key := json.(map[string]interface{})["key"].(string)
-					link := fmt.Sprintf("%s/browse/%s", c.endpoint, key)
-					c.Browse(key)
-					c.SaveData(map[string]string{
-						"issue": key,
-						"link":  link,
-					})
-					if !c.opts["quiet"].(bool) {
-						fmt.Printf("OK %s %s\n", key, link)
-					}
+				}
+				key := json.(map[string]interface{})["key"].(string)
+				link := fmt.Sprintf("%s/browse/%s", c.endpoint, key)
+				c.Browse(key)
+				c.SaveData(map[string]string{
+					"issue": key,
+					"link":  link,
+				})
+				if !c.opts["quiet"].(bool) {
+					fmt.Printf("OK %s %s\n", key, link)
 				}
 				return nil
-			} else {
-				logBuffer := bytes.NewBuffer(make([]byte, 0))
-				resp.Write(logBuffer)
-				err := fmt.Errorf("Unexpected Response From POST")
-				log.Errorf("%s:\n%s", err, logBuffer)
-				return err
 			}
+			logBuffer := bytes.NewBuffer(make([]byte, 0))
+			resp.Write(logBuffer)
+			err = fmt.Errorf("Unexpected Response From POST")
+			log.Errorf("%s:\n%s", err, logBuffer)
+			return err
 		},
 	)
 }
 
+// CmdIssueLinkTypes will send the issue link type data to the "issuelinktypes" template.
 func (c *Cli) CmdIssueLinkTypes() error {
 	log.Debugf("Transitions called")
 	uri := fmt.Sprintf("%s/rest/api/2/issueLinkType", c.endpoint)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
 	return runTemplate(c.getTemplate("issuelinktypes"), data, nil)
 }
 
+// CmdBlocks will update the given issue as being "blocked" by the given blocker
 func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	log.Debugf("blocks called")
 
@@ -428,6 +442,8 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	return nil
 }
 
+// CmdDups will update the given issue as being a duplicate by the given dup issue
+// and will attempt to resolve the dup issue
 func (c *Cli) CmdDups(duplicate string, issue string) error {
 	log.Debugf("dups called")
 
@@ -471,6 +487,8 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	return nil
 }
 
+// CmdWatch will add the given watcher to the issue (or remove the watcher
+// given the 'remove' flag)
 func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
 	log.Debugf("watch called: watcher: %q, remove: %n", watcher, remove)
 
@@ -521,6 +539,7 @@ func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
 	return nil
 }
 
+// CmdVote will add or remove a vote on an issue
 func (c *Cli) CmdVote(issue string, up bool) error {
 	log.Debugf("vote called, with up: %n", up)
 
@@ -564,16 +583,17 @@ func (c *Cli) CmdVote(issue string, up bool) error {
 	return nil
 }
 
+// CmdTransition will move state of the given issue to the given transtion
 func (c *Cli) CmdTransition(issue string, trans string) error {
 	log.Debugf("transition called")
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", c.endpoint, issue)
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return err
 	}
 
 	transitions := data.(map[string]interface{})["transitions"].([]interface{})
-	var transId, transName string
+	var transID, transName string
 	var transMeta map[string]interface{}
 	found := make([]string, 0, len(transitions))
 	for _, transition := range transitions {
@@ -582,11 +602,11 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		found = append(found, name)
 		if strings.Contains(strings.ToLower(name), strings.ToLower(trans)) {
 			transName = name
-			transId = id
+			transID = id
 			transMeta = transition.(map[string]interface{})
 		}
 	}
-	if transId == "" {
+	if transID == "" {
 		err := fmt.Errorf("Invalid Transition '%s', Available: %s", trans, strings.Join(found, ", "))
 		log.Debugf("%s", err)
 		return err
@@ -619,12 +639,11 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 	}
 
 	uri = fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
-	var issueData map[string]interface{}
-	if data, err := responseToJson(c.get(uri)); err != nil {
+	data, err = responseToJSON(c.get(uri))
+	if err != nil {
 		return err
-	} else {
-		issueData = data.(map[string]interface{})
 	}
+	issueData := data.(map[string]interface{})
 	issueData["meta"] = transMeta
 	if c.GetOptString("defaultResolution", "") == "" {
 		// .meta.fields.resolution.allowedValues
@@ -647,7 +666,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 	issueData["overrides"] = c.opts
 	issueData["transition"] = map[string]interface{}{
 		"name": transName,
-		"id":   transId,
+		"id":   transID,
 	}
 	return c.editTemplate(
 		c.getTemplate("transition"),
@@ -657,6 +676,8 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 	)
 }
 
+// CmdComment will open up editor with "comment" template and submit
+// YAML output to jira
 func (c *Cli) CmdComment(issue string) error {
 	log.Debugf("comment called")
 
@@ -678,13 +699,12 @@ func (c *Cli) CmdComment(issue string) error {
 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			}
 			return nil
-		} else {
-			logBuffer := bytes.NewBuffer(make([]byte, 0))
-			resp.Write(logBuffer)
-			err := fmt.Errorf("Unexpected Response From POST")
-			log.Errorf("%s:\n%s", err, logBuffer)
-			return err
 		}
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
+		resp.Write(logBuffer)
+		err = fmt.Errorf("Unexpected Response From POST")
+		log.Errorf("%s:\n%s", err, logBuffer)
+		return err
 	}
 
 	if comment, ok := c.opts["comment"]; ok && comment != "" {
@@ -695,23 +715,23 @@ func (c *Cli) CmdComment(issue string) error {
 			return err
 		}
 		return handlePost(json)
-	} else {
-		return c.editTemplate(
-			c.getTemplate("comment"),
-			fmt.Sprintf("%s-create-", issue),
-			map[string]interface{}{},
-			handlePost,
-		)
 	}
+	return c.editTemplate(
+		c.getTemplate("comment"),
+		fmt.Sprintf("%s-create-", issue),
+		map[string]interface{}{},
+		handlePost,
+	)
 }
 
+// CmdComponent will add a new component to given project
 func (c *Cli) CmdComponent(action string, project string, name string, desc string, lead string) error {
 	log.Debugf("component called")
 
 	switch action {
 	case "add":
 	default:
-		return errors.New(fmt.Sprintf("CmdComponent: %q is not a valid action", action))
+		return fmt.Errorf("CmdComponent: %q is not a valid action", action)
 	}
 
 	json, err := jsonEncode(map[string]interface{}{
@@ -748,6 +768,7 @@ func (c *Cli) CmdComponent(action string, project string, name string, desc stri
 	return nil
 }
 
+// CmdLabels will add, remove or set labels on a given issue
 func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 	log.Debugf("label called")
 
@@ -773,23 +794,22 @@ func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			}
 			return nil
-		} else {
-			logBuffer := bytes.NewBuffer(make([]byte, 0))
-			resp.Write(logBuffer)
-			err := fmt.Errorf("Unexpected Response From PUT")
-			log.Errorf("%s:\n%s", err, logBuffer)
-			return err
 		}
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
+		resp.Write(logBuffer)
+		err = fmt.Errorf("Unexpected Response From PUT")
+		log.Errorf("%s:\n%s", err, logBuffer)
+		return err
 	}
 
-	var labels_json string
+	var labelsJSON string
 	var err error
 	if action == "set" {
 		labelsActions := make([]map[string][]string, 1)
 		labelsActions[0] = map[string][]string{
 			"set": labels,
 		}
-		labels_json, err = jsonEncode(map[string]interface{}{
+		labelsJSON, err = jsonEncode(map[string]interface{}{
 			"labels": labelsActions,
 		})
 	} else {
@@ -800,18 +820,19 @@ func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 			}
 			labelsActions[i] = labelActionMap
 		}
-		labels_json, err = jsonEncode(map[string]interface{}{
+		labelsJSON, err = jsonEncode(map[string]interface{}{
 			"labels": labelsActions,
 		})
 	}
 	if err != nil {
 		return err
 	}
-	json := fmt.Sprintf("{ \"update\": %s }", labels_json)
+	json := fmt.Sprintf("{ \"update\": %s }", labelsJSON)
 	return handlePut(json)
 
 }
 
+// CmdAssign will assign the given user to be the owner of the given issue
 func (c *Cli) CmdAssign(issue string, user string) error {
 	log.Debugf("assign called")
 
@@ -847,13 +868,14 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 	return nil
 }
 
+// CmdExportTemplates will export the default templates to the template directory.
 func (c *Cli) CmdExportTemplates() error {
 	dir := c.opts["directory"].(string)
 	if err := mkdir(dir); err != nil {
 		return err
 	}
 
-	for name, template := range all_templates {
+	for name, template := range allTemplates {
 		if wanted, ok := c.opts["template"]; ok && wanted != name {
 			continue
 		}
@@ -862,18 +884,19 @@ func (c *Cli) CmdExportTemplates() error {
 			log.Warning("Skipping %s, already exists", templateFile)
 			continue
 		}
-		if fh, err := os.OpenFile(templateFile, os.O_WRONLY|os.O_CREATE, 0644); err != nil {
+		fh, err := os.OpenFile(templateFile, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
 			log.Errorf("Failed to open %s for writing: %s", templateFile, err)
 			return err
-		} else {
-			defer fh.Close()
-			log.Noticef("Creating %s", templateFile)
-			fh.Write([]byte(template))
 		}
+		defer fh.Close()
+		log.Noticef("Creating %s", templateFile)
+		fh.Write([]byte(template))
 	}
 	return nil
 }
 
+// CmdRequest will use the given uri to make a request and potentially send provided content.
 func (c *Cli) CmdRequest(uri, content string) (err error) {
 	log.Debugf("request called")
 
@@ -884,11 +907,11 @@ func (c *Cli) CmdRequest(uri, content string) (err error) {
 	method := strings.ToUpper(c.opts["method"].(string))
 	var data interface{}
 	if method == "GET" {
-		data, err = responseToJson(c.get(uri))
+		data, err = responseToJSON(c.get(uri))
 	} else if method == "POST" {
-		data, err = responseToJson(c.post(uri, content))
+		data, err = responseToJSON(c.post(uri, content))
 	} else if method == "PUT" {
-		data, err = responseToJson(c.put(uri, content))
+		data, err = responseToJSON(c.put(uri, content))
 	}
 	if err != nil {
 		return err

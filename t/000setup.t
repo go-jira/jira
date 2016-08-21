@@ -3,10 +3,10 @@ eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira="../jira --user admin"
 
-PLAN 15
+PLAN 14
 
 # clean out any old containers
-RUNS sh -c "docker rm -f go-jira-test || true"
+docker rm -f go-jira-test
 
 # start newt jira service
 RUNS docker run --detach --name go-jira-test --publish 8080:8080 go-jira-test:latest
@@ -14,8 +14,8 @@ RUNS docker run --detach --name go-jira-test --publish 8080:8080 go-jira-test:la
 # wait a few seconds for it to bind to port 8080
 RUNS sleep 10
 
-# wait for healthchecks to pass, curl will retry 60 times over 1 min waiting
-RUNS curl -q -L --retry 60 --retry-delay 1 -f -s "http://localhost:8080/rest/api/2/serverInfo?doHealthCheck=1"
+# wait for healthchecks to pass, curl will retry 60 times over 5 min waiting
+RUNS curl -q -L --retry 360 --retry-delay 1 -f -s "http://localhost:8080/rest/api/2/serverInfo?doHealthCheck=1"
 
 # login to jira as admin user
 echo "admin123" | RUNS $jira login
