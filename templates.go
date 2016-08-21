@@ -18,6 +18,8 @@ var allTemplates = map[string]string{
 	"comment":        defaultCommentTemplate,
 	"transition":     defaultTransitionTemplate,
 	"request":        defaultDebugTemplate,
+	"worklog":        defaultWorklogTemplate,
+	"worklogs":       defaultWorklogsTemplate,
 }
 
 const defaultDebugTemplate = "{{ . | toJson}}\n"
@@ -149,4 +151,18 @@ fields:{{if .meta.fields.assignee}}
 transition:
   id: {{ .transition.id }}
   name: {{ .transition.name }}
+`
+
+const defaultWorklogTemplate = `# issue: {{ .issue }}
+comment: |~
+  {{ or .comment "" }}
+timeSpent: {{ or .timeSpent "" }}
+started:
+`
+
+const defaultWorklogsTemplate = `{{ range .worklogs }}- # {{.author.name}}, {{.created | age}} ago
+  comment: {{ or .comment "" }}
+  timeSpent: {{ .timeSpent }}
+
+{{end}}
 `
