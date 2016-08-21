@@ -23,10 +23,12 @@ import (
 )
 
 var (
-	log     = logging.MustGetLogger("jira")
+	log = logging.MustGetLogger("jira")
+	// VERSION is the go-jira library version
 	VERSION string
 )
 
+// Cli is go-jira client object
 type Cli struct {
 	endpoint   *url.URL
 	opts       map[string]interface{}
@@ -34,6 +36,7 @@ type Cli struct {
 	ua         *http.Client
 }
 
+// New creates go-jira client object
 func New(opts map[string]interface{}) *Cli {
 	homedir := homedir()
 	cookieJar, _ := cookiejar.New(nil)
@@ -120,7 +123,7 @@ func (c *Cli) loadCookies() []*http.Cookie {
 		log.Errorf("Failed to open %s: %s", c.cookieFile, err)
 		panic(err)
 	}
-	cookies := make([]*http.Cookie, 0)
+	cookies := []*http.Cookie{}
 	err = json.Unmarshal(bytes, &cookies)
 	if err != nil {
 		log.Errorf("Failed to parse json from file %s: %s", c.cookieFile, err)
@@ -140,44 +143,42 @@ func (c *Cli) put(uri string, content string) (*http.Response, error) {
 	return c.makeRequestWithContent("PUT", uri, content)
 }
 
-func (c *Cli) delete(uri string) (*http.Response, error) {
+func (c *Cli) delete(uri string) (resp *http.Response, err error) {
 	method := "DELETE"
 	req, _ := http.NewRequest(method, uri, nil)
 	log.Infof("%s %s", req.Method, req.URL.String())
-	if resp, err := c.makeRequest(req); err != nil {
+	if resp, err = c.makeRequest(req); err != nil {
 		return nil, err
-	} else {
-		if resp.StatusCode == 401 {
-			if err := c.CmdLogin(); err != nil {
-				return nil, err
-			}
-			req, _ = http.NewRequest(method, uri, nil)
-			return c.makeRequest(req)
-		}
-		return resp, err
 	}
+	if resp.StatusCode == 401 {
+		if err = c.CmdLogin(); err != nil {
+			return nil, err
+		}
+		req, _ = http.NewRequest(method, uri, nil)
+		return c.makeRequest(req)
+	}
+	return resp, err
 }
 
-func (c *Cli) makeRequestWithContent(method string, uri string, content string) (*http.Response, error) {
+func (c *Cli) makeRequestWithContent(method string, uri string, content string) (resp *http.Response, err error) {
 	buffer := bytes.NewBufferString(content)
 	req, _ := http.NewRequest(method, uri, buffer)
 
 	log.Infof("%s %s", req.Method, req.URL.String())
-	if resp, err := c.makeRequest(req); err != nil {
+	if resp, err = c.makeRequest(req); err != nil {
 		return nil, err
-	} else {
-		if resp.StatusCode == 401 {
-			if err := c.CmdLogin(); err != nil {
-				return nil, err
-			}
-			req, _ = http.NewRequest(method, uri, bytes.NewBufferString(content))
-			return c.makeRequest(req)
-		}
-		return resp, err
 	}
+	if resp.StatusCode == 401 {
+		if err = c.CmdLogin(); err != nil {
+			return nil, err
+		}
+		req, _ = http.NewRequest(method, uri, bytes.NewBufferString(content))
+		return c.makeRequest(req)
+	}
+	return resp, err
 }
 
-func (c *Cli) get(uri string) (*http.Response, error) {
+func (c *Cli) get(uri string) (resp *http.Response, err error) {
 	req, _ := http.NewRequest("GET", uri, nil)
 	log.Infof("%s %s", req.Method, req.URL.String())
 	if log.IsEnabledFor(logging.DEBUG) {
@@ -186,17 +187,16 @@ func (c *Cli) get(uri string) (*http.Response, error) {
 		log.Debugf("%s", logBuffer)
 	}
 
-	if resp, err := c.makeRequest(req); err != nil {
+	if resp, err = c.makeRequest(req); err != nil {
 		return nil, err
-	} else {
-		if resp.StatusCode == 401 {
-			if err := c.CmdLogin(); err != nil {
-				return nil, err
-			}
-			return c.makeRequest(req)
-		}
-		return resp, err
 	}
+	if resp.StatusCode == 401 {
+		if err := c.CmdLogin(); err != nil {
+			return nil, err
+		}
+		return c.makeRequest(req)
+	}
+	return resp, err
 }
 
 func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
@@ -217,18 +217,17 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	if resp, err = c.ua.Do(req); err != nil {
 		log.Errorf("Failed to %s %s: %s", req.Method, req.URL.String(), err)
 		return nil, err
-	} else {
-		if resp.StatusCode < 200 || resp.StatusCode >= 300 && resp.StatusCode != 401 {
-			log.Errorf("response status: %s", resp.Status)
-		}
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 && resp.StatusCode != 401 {
+		log.Errorf("response status: %s", resp.Status)
+	}
 
-		runtime.SetFinalizer(resp, func(r *http.Response) {
-			r.Body.Close()
-		})
+	runtime.SetFinalizer(resp, func(r *http.Response) {
+		r.Body.Close()
+	})
 
-		if _, ok := resp.Header["Set-Cookie"]; ok {
-			c.saveCookies(resp)
-		}
+	if _, ok := resp.Header["Set-Cookie"]; ok {
+		c.saveCookies(resp)
 	}
 	if log.IsEnabledFor(logging.DEBUG) {
 		out, _ := httputil.DumpResponse(resp, true)
@@ -237,6 +236,7 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	return resp, nil
 }
 
+// GetTemplate will return the text/template for the given command name
 func (c *Cli) GetTemplate(name string) string {
 	return c.getTemplate(name)
 }
@@ -256,10 +256,9 @@ func (c *Cli) getTemplate(name string) string {
 	if override, ok := c.opts["template"].(string); ok {
 		if _, err := os.Stat(override); err == nil {
 			return readFile(override)
-		} else {
-			if t := getLookedUpTemplate(override, all_templates[override]); t != "" {
-				return t
-			}
+		}
+		if t := getLookedUpTemplate(override, allTemplates[override]); t != "" {
+			return t
 		}
 	}
 	// create-bug etc are special, if we dont find it in the path
@@ -267,9 +266,11 @@ func (c *Cli) getTemplate(name string) string {
 	if strings.HasPrefix(name, "create-") {
 		return getLookedUpTemplate(name, c.getTemplate("create"))
 	}
-	return getLookedUpTemplate(name, all_templates[name])
+	return getLookedUpTemplate(name, allTemplates[name])
 }
 
+// NoChangesFound is an error returned from when editing templates
+// and no modifications were made while editing
 type NoChangesFound struct{}
 
 func (f NoChangesFound) Error() string {
@@ -360,27 +361,27 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 		}
 
 		edited := make(map[string]interface{})
-		if fh, err := ioutil.ReadFile(tmpFileName); err != nil {
+		var data []byte
+		if data, err = ioutil.ReadFile(tmpFileName); err != nil {
 			log.Errorf("Failed to read tmpfile %s: %s", tmpFileName, err)
 			if editing && promptYN("edit again?", true) {
 				continue
 			}
 			return err
-		} else {
-			if err := yaml.Unmarshal(fh, &edited); err != nil {
-				log.Errorf("Failed to parse YAML: %s", err)
-				if editing && promptYN("edit again?", true) {
-					continue
-				}
-				return err
+		}
+		if err := yaml.Unmarshal(data, &edited); err != nil {
+			log.Errorf("Failed to parse YAML: %s", err)
+			if editing && promptYN("edit again?", true) {
+				continue
 			}
+			return err
 		}
 
-		if fixed, err := yamlFixup(edited); err != nil {
+		var fixed interface{}
+		if fixed, err = yamlFixup(edited); err != nil {
 			return err
-		} else {
-			edited = fixed.(map[string]interface{})
 		}
+		edited = fixed.(map[string]interface{})
 
 		// if you want to abort editing a jira issue then
 		// you can add the "abort: true" flag to the document
@@ -422,6 +423,7 @@ func (c *Cli) editTemplate(template string, tmpFilePrefix string, templateData m
 	return nil
 }
 
+// Browse will open up your default browser to the provided issue
 func (c *Cli) Browse(issue string) error {
 	if val, ok := c.opts["browse"].(bool); ok && val {
 		if runtime.GOOS == "darwin" {
@@ -433,6 +435,7 @@ func (c *Cli) Browse(issue string) error {
 	return nil
 }
 
+// SaveData will write out the yaml formated --saveFile file with provided data
 func (c *Cli) SaveData(data interface{}) error {
 	if val, ok := c.opts["saveFile"].(string); ok && val != "" {
 		yamlWrite(val, data)
@@ -440,33 +443,39 @@ func (c *Cli) SaveData(data interface{}) error {
 	return nil
 }
 
+// ViewIssue will return the details for the given issue id
 func (c *Cli) ViewIssue(issue string) (interface{}, error) {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
 	if x := c.expansions(); len(x) > 0 {
 		uri = fmt.Sprintf("%s?expand=%s", uri, strings.Join(x, ","))
 	}
 
-	data, err := responseToJson(c.get(uri))
+	data, err := responseToJSON(c.get(uri))
 	if err != nil {
 		return nil, err
-	} else {
-		return data, nil
 	}
+	return data, nil
 }
 
+// FindIssues will return a list of issues that match the given options.
+// If the "query" option is undefined it will generate a JQL query
+// using any/all of the provide options: project, component, assignee,
+// issuetype, watcher, reporter, sort
+// Further it will restrict the fields being extracted from the jira
+// response with the 'queryfields' option
 func (c *Cli) FindIssues() (interface{}, error) {
 	var query string
 	var ok bool
 	// project = BAKERY and status not in (Resolved, Closed)
 	if query, ok = c.opts["query"].(string); !ok {
 		qbuff := bytes.NewBufferString("resolution = unresolved")
-		if project, ok := c.opts["project"]; !ok {
+		var project string
+		if project, ok = c.opts["project"].(string); !ok {
 			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
 			log.Errorf("%s", err)
 			return nil, err
-		} else {
-			qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", project))
 		}
+		qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", project))
 
 		if component, ok := c.opts["component"]; ok {
 			qbuff.WriteString(fmt.Sprintf(" AND component = '%s'", component))
@@ -495,11 +504,9 @@ func (c *Cli) FindIssues() (interface{}, error) {
 		query = qbuff.String()
 	}
 
-	fields := make([]string, 0)
+	fields := []string{"summary"}
 	if qf, ok := c.opts["queryfields"].(string); ok {
 		fields = strings.Split(qf, ",")
-	} else {
-		fields = append(fields, "summary")
 	}
 
 	json, err := jsonEncode(map[string]interface{}{
@@ -514,13 +521,15 @@ func (c *Cli) FindIssues() (interface{}, error) {
 	}
 
 	uri := fmt.Sprintf("%s/rest/api/2/search", c.endpoint)
-	if data, err := responseToJson(c.post(uri, json)); err != nil {
+	var data interface{}
+	if data, err = responseToJSON(c.post(uri, json)); err != nil {
 		return nil, err
-	} else {
-		return data, nil
 	}
+	return data, nil
 }
 
+// GetOptString will extract the string from the Cli object options
+// otherwise return the provided default
 func (c *Cli) GetOptString(optName string, dflt string) string {
 	return c.getOptString(optName, dflt)
 }
@@ -528,11 +537,12 @@ func (c *Cli) GetOptString(optName string, dflt string) string {
 func (c *Cli) getOptString(optName string, dflt string) string {
 	if val, ok := c.opts[optName].(string); ok {
 		return val
-	} else {
-		return dflt
 	}
+	return dflt
 }
 
+// GetOptBool will extract the boolean value from the Client object options
+// otherwise return the provided default\
 func (c *Cli) GetOptBool(optName string, dflt bool) bool {
 	return c.getOptBool(optName, dflt)
 }
@@ -540,14 +550,13 @@ func (c *Cli) GetOptBool(optName string, dflt bool) bool {
 func (c *Cli) getOptBool(optName string, dflt bool) bool {
 	if val, ok := c.opts[optName].(bool); ok {
 		return val
-	} else {
-		return dflt
 	}
+	return dflt
 }
 
 // expansions returns a comma-separated list of values for field expansion
 func (c *Cli) expansions() []string {
-	expansions := make([]string, 0)
+	var expansions []string
 	if x, ok := c.opts["expand"].(string); ok {
 		expansions = strings.Split(x, ",")
 	}
