@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7 - 2016-08-24
+
+* Prefer transition names which match exactly [Don Brower] [[e40f9c1](https://github.com/Netflix-Skunkworks/go-jira/commit/e40f9c1)]
+* update tempates to make them more readable with space trimming added to go-1.6 [Cory Bennett] [[693b3e4](https://github.com/Netflix-Skunkworks/go-jira/commit/693b3e4)]
+
 ## 0.1.6 - 2016-08-21
 
 * make "worklogs" command print output through template allow "add worklog" command to open edit template [Cory Bennett] [[cc3fbee](https://github.com/Netflix-Skunkworks/go-jira/commit/cc3fbee)]
