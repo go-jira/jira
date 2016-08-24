@@ -666,6 +666,9 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 			transName = name
 			transID = id
 			transMeta = transition.(map[string]interface{})
+			if strings.ToLower(name) == strings.ToLower(trans) {
+				break
+			}
 		}
 	}
 	if transID == "" {
