@@ -43,26 +43,35 @@ func New(opts map[string]interface{}) *Cli {
 	endpoint, _ := opts["endpoint"].(string)
 	url, _ := url.Parse(strings.TrimRight(endpoint, "/"))
 
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{},
-	}
-
 	if project, ok := opts["project"].(string); ok {
 		opts["project"] = strings.ToUpper(project)
 	}
 
-	if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
-		transport.TLSClientConfig.InsecureSkipVerify = insecureSkipVerify
+	var ua *http.Client
+	if unixProxyPath, ok := opts["unixproxy"].(string); ok {
+		ua = &http.Client{
+			Jar:       cookieJar,
+			Transport: UnixProxy(unixProxyPath),
+		}
+	} else {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{},
+		}
+		if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
+			transport.TLSClientConfig.InsecureSkipVerify = insecureSkipVerify
+		}
+
+		ua = &http.Client{
+			Jar:       cookieJar,
+			Transport: transport,
+		}
 	}
 
 	cli := &Cli{
 		endpoint:   url,
 		opts:       opts,
 		cookieFile: filepath.Join(homedir, ".jira.d", "cookies.js"),
-		ua: &http.Client{
-			Jar:       cookieJar,
-			Transport: transport,
-		},
+		ua:         ua,
 	}
 
 	cli.ua.Jar.SetCookies(url, cli.loadCookies())
