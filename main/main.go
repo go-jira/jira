@@ -63,6 +63,7 @@ Usage:
   jira DUPLICATE dups ISSUE
   jira BLOCKER blocks ISSUE
   jira vote ISSUE [--down]
+  jira rank ISSUE (after|before) ISSUE
   jira watch ISSUE [-w WATCHER] [--remove]
   jira (trans|transition) TRANSITION ISSUE [--noedit] <Edit Options>
   jira ack ISSUE [--edit] <Edit Options>
@@ -183,6 +184,7 @@ Command Options:
 		"req":              "request",
 		"request":          "request",
 		"vote":             "vote",
+		"rank":             "rank",
 		"worklog":          "worklog",
 		"addworklog":       "addworklog",
 	}
@@ -506,6 +508,13 @@ Command Options:
 			err = c.CmdVote(args[0], !val.(bool))
 		} else {
 			err = c.CmdVote(args[0], true)
+		}
+	case "rank":
+		requireArgs(3)
+		if args[1] == "after" {
+			err = c.CmdRankAfter(args[0], args[2])
+		} else {
+			err = c.CmdRankBefore(args[0], args[2])
 		}
 	case "request":
 		requireArgs(1)
