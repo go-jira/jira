@@ -135,7 +135,7 @@ func (c *Cli) CmdWorklog(action string, issue string) error {
 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/worklog", c.endpoint, issue)
 
 		worklogData := map[string]interface{}{
-			"issue": issue,
+			"issue":   issue,
 			"comment": c.opts["comment"],
 		}
 
@@ -157,7 +157,7 @@ func (c *Cli) CmdWorklog(action string, issue string) error {
 				if err != nil {
 					return err
 				}
-				
+
 				if resp.StatusCode == 201 {
 					c.Browse(issue)
 					if !c.opts["quiet"].(bool) {
@@ -641,6 +641,28 @@ func (c *Cli) CmdVote(issue string, up bool) error {
 		}
 		log.Errorf("%s:\n%s", err, logBuffer)
 		return err
+	}
+	return nil
+}
+
+func (c *Cli) CmdRankAfter(issue, after string) error {
+	err := c.RankIssue(issue, after, RANKAFTER)
+	if err != nil {
+		return nil
+	}
+	if !c.opts["quiet"].(bool) {
+		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
+	}
+	return nil
+}
+
+func (c *Cli) CmdRankBefore(issue, before string) error {
+	err := c.RankIssue(issue, before, RANKBEFORE)
+	if err != nil {
+		return nil
+	}
+	if !c.opts["quiet"].(bool) {
+		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	}
 	return nil
 }
