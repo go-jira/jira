@@ -12,3 +12,4 @@ t/issue.props
 t/.jira.d/templates
 dist/
 src/
+t/.maven-cache
