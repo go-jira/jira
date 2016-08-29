@@ -15,7 +15,7 @@ script:
   - make vet
   - make lint
   - make
-  - export OSHT_VERBOSE=1 && prove -v
+  - prove -v
 
 cache:
   directories:
