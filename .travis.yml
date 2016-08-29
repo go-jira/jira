@@ -20,4 +20,3 @@ script:
 cache:
   directories:
     - t/.maven-cache
-    - t/start.log

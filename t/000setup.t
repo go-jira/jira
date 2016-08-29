@@ -19,7 +19,7 @@ RUNS docker run --detach -v $(pwd)/.maven-cache:/root/.m2/repository --name go-j
 RUNS sleep 5
 
 echo "# Waiting for jira service to be listening on port 8080"
-docker exec -i go-jira-test tail -f screenlog.0 | tee start.log | grep -m 1 'jira started successfully' | sed 's/^/# /'
+docker exec -i go-jira-test tail -f screenlog.0 | tee $(pwd)/.maven-cache/start.log | grep -m 1 'jira started successfully' | sed 's/^/# /'
 
 # wait for healthchecks to pass, curl will retry 900 times over 15 min waiting
 RUNS curl -q -L --retry 900 --retry-delay 1 -f -s "http://localhost:8080/rest/api/2/serverInfo?doHealthCheck=1"
