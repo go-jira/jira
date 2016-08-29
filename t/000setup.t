@@ -3,7 +3,7 @@ eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira="../jira --user admin"
 
-PLAN 14
+PLAN 15
 
 # clean out any old containers
 docker rm -f go-jira-test
