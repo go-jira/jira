@@ -538,13 +538,17 @@ func (c *Cli) FindIssues() (interface{}, error) {
 	return data, nil
 }
 
+// RankOrder type used to specify before/after ranking arguments to RankIssue
 type RankOrder int
 
 const (
+	// RANKBEFORE should be used to rank issue before the target issue
 	RANKBEFORE RankOrder = iota
+	// RANKAFTER should be used to rank issue after the target issue
 	RANKAFTER  RankOrder = iota
 )
 
+// RankIssue will modify issue to have rank before or after the target issue
 func (c *Cli) RankIssue(issue, target string, order RankOrder) error {
 	type RankRequest struct {
 		Issues []string `json:"issues"`
