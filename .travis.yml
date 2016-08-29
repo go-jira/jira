@@ -1,12 +1,18 @@
+# docker required for the tests (run via prove)
+sudo: required
+services:
+  - docker
+
 language: go
 
 go:
-    - 1.6
+  - 1.6
 
 matrix:
-    fast_finish: true
-
+  fast_finish: true
+  
 script:
-    - make vet
-    - make lint
-    - make
+  - make vet
+  - make lint
+  - make
+  - prove
