@@ -15,4 +15,4 @@ script:
   - make vet
   - make lint
   - make
-  - prove
+  - export OSHT_VERBOSE=1 && prove -v
