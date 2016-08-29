@@ -645,6 +645,7 @@ func (c *Cli) CmdVote(issue string, up bool) error {
 	return nil
 }
 
+// CmdRankAfter rank issue after target issue
 func (c *Cli) CmdRankAfter(issue, after string) error {
 	err := c.RankIssue(issue, after, RANKAFTER)
 	if err != nil {
@@ -656,6 +657,7 @@ func (c *Cli) CmdRankAfter(issue, after string) error {
 	return nil
 }
 
+// CmdRankBefore rank issue before target issue
 func (c *Cli) CmdRankBefore(issue, before string) error {
 	err := c.RankIssue(issue, before, RANKBEFORE)
 	if err != nil {
