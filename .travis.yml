@@ -16,3 +16,8 @@ script:
   - make lint
   - make
   - export OSHT_VERBOSE=1 && prove -v
+
+cache:
+  directories:
+    - t/.maven-cache
+    - t/start.log
