@@ -8,17 +8,19 @@ PLAN 14
 # clean out any old containers
 docker rm -f go-jira-test
 
-# start newt jira service
-RUNS docker run --detach --name go-jira-test --publish 8080:8080 go-jira-test:latest
+RUNS docker build . -t go-jira-test
 
-# wait a few seconds for it to bind to port 8080
-RUNS sleep 10
+# start newt jira service, cache the users m2 directory to make startup faster
+RUNS docker run --detach -v $HOME/.m2/repository:/root/.m2/repository --name go-jira-test --publish 8080:8080 go-jira-test:latest
 
-# wait for healthchecks to pass, curl will retry 60 times over 5 min waiting
-RUNS curl -q -L --retry 360 --retry-delay 1 -f -s "http://localhost:8080/rest/api/2/serverInfo?doHealthCheck=1"
+echo "# Waiting for jira service to be listening on port 8080"
+docker exec -i go-jira-test tail -f screenlog.0 | grep -m 1 'jira started successfully' | sed 's/^/# /'
+
+# wait for healthchecks to pass, curl will retry 900 times over 15 min waiting
+RUNS curl -q -L --retry 900 --retry-delay 1 -f -s "http://localhost:8080/rest/api/2/serverInfo?doHealthCheck=1"
 
 # login to jira as admin user
-echo "admin123" | RUNS $jira login
+echo "admin" | RUNS $jira login
 
 # create gojira user
 RUNS $jira req -M POST /rest/api/2/user '{"name":"gojira","password":"gojira123","emailAddress":"gojira@example.com","displayName":"Go Jira"}'

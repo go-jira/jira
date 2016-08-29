@@ -2,39 +2,6 @@
 
 The test are written using the `osht` bash testing framework.  Please read the [documentation](https://github.com/coryb/osht/blob/master/README.md) for `osht`.
 
-## Setup
-These tests assume there is a jira service running at 127.0.0.1:8080 with user "gojira" and password "gojira123".
-There should also be a poweruser "admin" with password "admin123"
-
-The test Jira was setup following the instructions [here](https://github.com/cptactionhank/docker-atlassian-jira).
-
-
-### build base docker image
-```
-docker run --rm -i -v $(pwd):/root:ro coryb/dfpp:1.0.2 Dockerfile.pre | docker build -t go-jira-base:latest - 
-```
-
-### Initialize container
-```
-docker run --detach --name go-jira-test --publish 8080:8080 go-jira-base:latest
-```
-
-### create admin user
-```
-open http://localhost:8080
-```
-Then follow UI workflow to create "admin" user, skip intro and project creation.
-
-### snapshot docker container
-```
-docker commit go-jira-test go-jira-test:latest
-```
-
-### Destroy base container
-```
-docker rm -f go-jira-test
-```
-
 ## Running Test:
 
 From the top level of the project you can run:
@@ -46,8 +13,24 @@ make
 prove
 ```
 
+### Running individual tests
+To run a specific test you can run it directly like:
+```
+./100basic.t
+```
+There is a useful `-v` option to make the test more verbose and an `-a` option to casue the test to abort after the first failure.
+
+The tests all require the jira service to be running from the docker container, so you will have to manually run the setup script:
+```
+./000setup.t
+```
+
+After than you can run the other tests over and over.  The jira service is just a test instance started for local development.  It comes with
+a temporary license (I think it is 8 hours) so you will have to run the `./000setup.t` script at least once daily.
+
 ## API Documentation:
 https://docs.atlassian.com/jira/REST/cloud/
+https://docs.atlassian.com/jira-software/REST/cloud
 
 ## projectTempalteKey missing documentation
 https://answers.atlassian.com/questions/36176301/jira-api-7.1.0-create-project
