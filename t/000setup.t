@@ -10,8 +10,10 @@ docker rm -f go-jira-test
 
 RUNS docker build . -t go-jira-test
 
+mkdir -p $(pwd)/.maven-cache
+
 # start newt jira service, cache the users m2 directory to make startup faster
-RUNS docker run --detach -v $HOME/.m2/repository:/root/.m2/repository --name go-jira-test --publish 8080:8080 go-jira-test:latest
+RUNS docker run --detach -v $(pwd)/.maven-cache:/root/.m2/repository --name go-jira-test --publish 8080:8080 go-jira-test:latest
 
 echo "# Waiting for jira service to be listening on port 8080"
 docker exec -i go-jira-test tail -f screenlog.0 | grep -m 1 'jira started successfully' | sed 's/^/# /'
