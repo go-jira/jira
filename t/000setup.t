@@ -15,6 +15,9 @@ mkdir -p $(pwd)/.maven-cache
 # start newt jira service, cache the users m2 directory to make startup faster
 RUNS docker run --detach -v $(pwd)/.maven-cache:/root/.m2/repository --name go-jira-test --publish 8080:8080 go-jira-test:latest
 
+# wait for docker service to get started
+RUNS sleep 5
+
 echo "# Waiting for jira service to be listening on port 8080"
 docker exec -i go-jira-test tail -f screenlog.0 | grep -m 1 'jira started successfully' | sed 's/^/# /'
 
