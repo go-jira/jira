@@ -45,7 +45,7 @@ else
 	GOBUILD=go build -v -ldflags "$(LDFLAGS) -s"
 endif
 
-build: src/github.com/Netflix-Skunkworks/go-jira
+build: src/gopkg.in/Netflix-Skunkworks/go-jira.v0
 	$(GOBUILD) -o '$(BIN)' main/main.go
 
 debug:
