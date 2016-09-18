@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/Netflix-Skunkworks/go-jira"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v0"
 	"github.com/coryb/optigo"
 	"gopkg.in/coryb/yaml.v2"
 	"gopkg.in/op/go-logging.v1"

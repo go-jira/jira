@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/Netflix-Skunkworks/go-jira/data"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v0/data"
 	"github.com/howeyc/gopass"
 	"io/ioutil"
 	"net/http"
