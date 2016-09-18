@@ -1,18 +1,11 @@
 PLATFORMS= \
-	freebsd-amd64 \
-	linux-386 \
-	linux-amd64 \
-	windows-386 \
-	windows-amd64 \
-	darwin-amd64 \
+	freebsd/amd64 \
+	linux/386 \
+	linux/amd64 \
+	windows/386 \
+	windows/amd64 \
+	darwin/amd64 \
 	$(NULL)
-
-	# freebsd-386 \
-	# freebsd-arm \
-	# linux-arm \
-	# openbsd-386 \
-	# openbsd-amd64 \
-	# darwin-386
 
 NAME=jira
 
@@ -28,44 +21,50 @@ else
 	BIN ?= $(GOBIN)$(SEP)$(NAME)
 endif
 
-export GOPATH=$(CWD)
+GOPATH ?= $(CWD)
+export GOPATH
 
 DIST=$(CWD)$(SEP)dist
 
 GOBIN ?= $(CWD)
 
 CURVER ?= $(patsubst v%,%,$(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}'))
-LDFLAGS:=-X jira.VERSION=$(CURVER) -w
+LDFLAGS := -w
 
-# use make DEBUG=1 and you can get a debuggable golang binary
-# see https://github.com/mailgun/godebug
+PACKAGE=github.com/Netflix-Skunkworks/go-jira
+
+# use 'make debug' and you can get a debuggable golang binary
+# see https://golang.org/doc/gdb
+# note on mac's you will need to codesign the gdb binary before you can use it:
+#     codesign -fs gdb-cert /usr/local/bin/gdb
 ifneq ($(DEBUG),)
-	GOBUILD=go get -v github.com/mailgun/godebug && ./bin/godebug build
+	GOBUILD=go build -ldflags "-s" -gcflags "-N -l"
 else
-	GOBUILD=go build -v -ldflags "$(LDFLAGS) -s"
+	GOBUILD=go build -ldflags "$(LDFLAGS) -s"
 endif
 
-build: src/github.com/Netflix-Skunkworks/go-jira
-	$(GOBUILD) -o '$(BIN)' main/main.go
+build: $(GOPATH)/src/$(PACKAGE)
+	cd $(GOPATH)/src/$(PACKAGE) && $(GOBUILD) -o $(BIN) main.go
 
 debug:
-	$(MAKE) DEBUG=1
+	$(MAKE) DEBUG=1 build
 
-src/%:
+$(GOPATH)/src/%:
 	mkdir -p $(@D)
-	test -L $@ || ln -sf '$(GOPATH)' $@
-	go get -v $* $*/main
+	test -L $@ || ln -sf ../../.. $@
+	glide install -v
 
 vet:
-	@go vet .
-	@go vet ./data
-	@go vet ./main
+	@go vet *.go lib/*.go data/*.go
 
 lint:
 	@go get github.com/golang/lint/golint
-	@./bin/golint .
-	@./bin/golint ./data
-	@./bin/golint ./main
+	@$(GOPATH)/bin/golint .
+	@$(GOPATH)/bin/golint ./data
+	@$(GOPATH)/bin/golint ./lib
+
+test: $(GOPATH)/src/$(PACKAGE)
+	cd $(GOPATH)/src/$(SUBPACKAGE) && go test -v
 
 cross-setup:
 	for p in $(PLATFORMS); do \
@@ -73,26 +72,24 @@ cross-setup:
 		cd $(GOROOT)/src && sudo GOROOT_BOOTSTRAP=$(GOROOT) GOOS=$${p/-*/} GOARCH=$${p/*-/} bash ./make.bash --no-clean; \
    done
 
-all:
-	rm -rf $(DIST); \
-	mkdir -p $(DIST); \
-	for p in $(PLATFORMS); do \
-        echo "Building for $$p"; \
-        ${MAKE} build GOOS=$${p/-*/} GOARCH=$${p/*-/} BIN=$(DIST)/$(NAME)-$$p; \
-    done
-	for x in $(DIST)/jira-windows-*; do mv $$x $$x.exe; done
+all: $(GOPATH)/src/$(PACKAGE)
+	docker pull karalabe/xgo-latest
+	rm -rf dist
+	mkdir -p dist
+	docker run --rm -e EXT_GOPATH=/gopath -v $(GOPATH):/gopath -e TARGETS="$(PLATFORMS)" -v $$(pwd)/dist:/build karalabe/xgo-latest $(PACKAGE)
+	cd $(DIST) && for x in go-jira-*; do mv $$x $$(echo $$x | cut -c 4-); done
 
 fmt:
-	gofmt -s -w main/*.go *.go
+	gofmt -s -w main.go lib/*.go data/*.go
 
 install:
-	${MAKE} GOBIN=$$HOME/bin build
+	${MAKE} GOBIN=$(shell echo ~)/bin build
 
 NEWVER ?= $(shell echo $(CURVER) | awk -F. '{print $$1"."$$2"."$$3+1}')
 TODAY  := $(shell date +%Y-%m-%d)
 
 changes:
-	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^v$(CURVER) HEAD main/*.go *.go | grep -vE 'gofmt|go fmt'
+	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^v$(CURVER) HEAD *.go lib/*.go data/*.go | grep -vE 'gofmt|go fmt'
 
 update-changelog:
 	@echo "# Changelog" > CHANGELOG.md.new; \
@@ -105,6 +102,8 @@ update-changelog:
 	tail -n +2 CHANGELOG.md >> CHANGELOG.md.new; \
 	mv CHANGELOG.md.new CHANGELOG.md; \
 	git commit -m "Updated Changelog" CHANGELOG.md; \
+	perl -pi -e 's{VERSION = "$(CURVER)"}{VERSION = "$(NEWVER)"}' lib/cli.go; \
+	git commit -m "version bump" lib/cli.go; \
 	git tag v$(NEWVER)
 
 version:

@@ -1,0 +1,10 @@
+package: .
+import:
+- package: github.com/coryb/optigo
+  version: ^0.0.4
+- package: github.com/howeyc/gopass
+- package: github.com/kballard/go-shellquote
+- package: github.com/mgutz/ansi
+- package: gopkg.in/coryb/yaml.v2
+- package: gopkg.in/op/go-logging.v1
+  version: ^1.0.0

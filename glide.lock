@@ -1,0 +1,24 @@
+hash: a55cf7bdfb7f3de5ec4ae965d19857e8bdba595a3bcd4b02e5be0efe8223f7c5
+updated: 2016-09-18T00:35:57.456978105-07:00
+imports:
+- name: github.com/coryb/optigo
+  version: 1b53172e5b4a00b528ea9fde88a4b76b596e293e
+- name: github.com/howeyc/gopass
+  version: 3ca23474a7c7203e0a0a070fd33508f6efdb9b3d
+- name: github.com/kballard/go-shellquote
+  version: d8ec1a69a250a17bb0e419c386eac1f3711dc142
+- name: github.com/mgutz/ansi
+  version: c286dcecd19ff979eeb73ea444e479b903f2cfcb
+- name: golang.org/x/crypto
+  version: b13fc1fd382d01861b16b2e6474487d3d4d27f20
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
+  subpackages:
+  - unix
+- name: gopkg.in/coryb/yaml.v2
+  version: bd17d4d1209d8af092496a57db259d2d472676eb
+- name: gopkg.in/op/go-logging.v1
+  version: b2cb9fa56473e98db8caba80237377e83fe44db5
+testImports: []

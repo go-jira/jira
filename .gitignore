@@ -13,3 +13,4 @@ t/.jira.d/templates
 dist/
 src/
 t/.maven-cache
+vendor/

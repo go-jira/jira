@@ -22,11 +22,9 @@ import (
 	"time"
 )
 
-var (
-	log = logging.MustGetLogger("jira")
-	// VERSION is the go-jira library version
-	VERSION string
-)
+const VERSION = "0.1.7"
+
+var log = logging.MustGetLogger("jira")
 
 // Cli is go-jira client object
 type Cli struct {
