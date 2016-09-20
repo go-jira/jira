@@ -103,6 +103,7 @@ General Options:
   -t --template=FILE  Template file to use for output/editing
   -u --user=USER      Username to use for authenticaion (default: %s)
   -v --verbose        Increase output logging
+  --unixproxy=PATH    Path for a local unix proxy (for client certificate injection)
   --version           Print version
 
 Query Options:
@@ -239,6 +240,7 @@ Command Options:
 		"S|saveFile=s":          setopt,
 		"T|time-spent=s":        setopt,
 		"Q|quiet":               setopt,
+		"unixproxy":             setopt,
 		"down":                  setopt,
 	})
 
