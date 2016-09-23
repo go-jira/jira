@@ -103,7 +103,7 @@ General Options:
   -t --template=FILE  Template file to use for output/editing
   -u --user=USER      Username to use for authenticaion (default: %s)
   -v --verbose        Increase output logging
-  --unixproxy=PATH    Path for a local unix proxy (for client certificate injection)
+  --unixproxy=PATH    Path for a unix-socket proxy (eg., --unixproxy /tmp/proxy.sock)
   --version           Print version
 
 Query Options:
