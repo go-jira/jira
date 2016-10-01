@@ -10,45 +10,32 @@ package jiradata
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
 
-// FieldMetaMap defined from schema:
+// JSONTypeMap defined from schema:
 // {
-//   "title": "fields",
+//   "title": "schema",
 //   "type": "object",
 //   "patternProperties": {
 //     ".+": {
-//       "title": "Field Meta",
+//       "title": "Json Type",
 //       "type": "object",
 //       "properties": {
-//         "allowedValues": {
-//           "type": "array",
-//           "items": {}
-//         },
-//         "autoCompleteUrl": {
+//         "custom": {
 //           "type": "string"
 //         },
-//         "hasDefaultValue": {
-//           "type": "boolean"
+//         "customId": {
+//           "type": "integer"
 //         },
-//         "key": {
+//         "items": {
 //           "type": "string"
 //         },
-//         "name": {
+//         "system": {
 //           "type": "string"
 //         },
-//         "operations": {
-//           "type": "array",
-//           "items": {
-//             "type": "string"
-//           }
-//         },
-//         "required": {
-//           "type": "boolean"
-//         },
-//         "schema": {
-//           "$ref": "#/definitions/json-type"
+//         "type": {
+//           "type": "string"
 //         }
 //       }
 //     }
 //   }
 // }
-type FieldMetaMap map[string]*FieldMeta
+type JSONTypeMap map[string]*JSONType

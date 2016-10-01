@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/Netflix-Skunkworks/go-jira/data"
 	"github.com/howeyc/gopass"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/data"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -96,7 +96,15 @@ func (c *Cli) CmdFields() error {
 // CmdList will query jira and send data to "list" template
 func (c *Cli) CmdList() error {
 	log.Debugf("list called")
-	data, err := c.FindIssues()
+	data, err := c.FindIssues(&SearchOptions{})
+	if err != nil {
+		return err
+	}
+	return runTemplate(c.getTemplate("list"), data, nil)
+}
+
+func (c *Cli) List(sp SearchProvider) error {
+	data, err := c.FindIssues(sp)
 	if err != nil {
 		return err
 	}

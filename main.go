@@ -3,34 +3,24 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/Netflix-Skunkworks/go-jira/lib"
-	"github.com/coryb/optigo"
-	"gopkg.in/coryb/yaml.v2"
-	"gopkg.in/op/go-logging.v1"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/coryb/optigo"
+	logging "github.com/op/go-logging"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/cli"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/lib"
+	"gopkg.in/coryb/yaml.v2"
 )
 
 var (
-	log           = logging.MustGetLogger("jira")
-	defaultFormat = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+	log = logging.MustGetLogger("jira")
 )
 
 func main() {
-	logBackend := logging.NewLogBackend(os.Stderr, "", 0)
-	format := os.Getenv("JIRA_LOG_FORMAT")
-	if format == "" {
-		format = defaultFormat
-	}
-	logging.SetBackend(
-		logging.NewBackendFormatter(
-			logBackend,
-			logging.MustStringFormatter(format),
-		),
-	)
-	logging.SetLevel(logging.NOTICE, "")
+	jiracli.InitLogging()
 
 	user := os.Getenv("USER")
 	home := os.Getenv("HOME")
@@ -211,7 +201,7 @@ Command Options:
 			os.Exit(0)
 		},
 		"v|verbose+": func() {
-			logging.SetLevel(logging.GetLevel("")+1, "")
+			jiracli.VerboseLogging()
 		},
 		"dryrun":                setopt,
 		"b|browse":              setopt,
@@ -344,7 +334,7 @@ Command Options:
 			err = c.CmdEdit(args[0])
 		} else {
 			var data interface{}
-			if data, err = c.FindIssues(); err == nil {
+			if data, err = c.FindIssues(&jira.SearchOptions{}); err == nil {
 				issues := data.(map[string]interface{})["issues"].([]interface{})
 				for _, issue := range issues {
 					if err = c.CmdEdit(issue.(map[string]interface{})["key"].(string)); err != nil {

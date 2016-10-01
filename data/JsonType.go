@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -pkg jiradata -overwrite ../schemas/TransitionsMeta.json
+// slipscheme -pkg jiradata -overwrite ../schemas/SearchResults.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -16,23 +16,18 @@ package jiradata
 //   "type": "object",
 //   "properties": {
 //     "custom": {
-//       "title": "custom",
 //       "type": "string"
 //     },
 //     "customId": {
-//       "title": "customId",
 //       "type": "integer"
 //     },
 //     "items": {
-//       "title": "items",
 //       "type": "string"
 //     },
 //     "system": {
-//       "title": "system",
 //       "type": "string"
 //     },
 //     "type": {
-//       "title": "type",
 //       "type": "string"
 //     }
 //   }

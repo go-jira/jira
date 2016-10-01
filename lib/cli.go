@@ -8,6 +8,7 @@ import (
 	"github.com/kballard/go-shellquote"
 	"gopkg.in/coryb/yaml.v2"
 	"gopkg.in/op/go-logging.v1"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/data"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -465,75 +466,39 @@ func (c *Cli) ViewIssue(issue string) (interface{}, error) {
 	return data, nil
 }
 
+type QueryOptions struct {
+	Assignee string
+}
+
 // FindIssues will return a list of issues that match the given options.
 // If the "query" option is undefined it will generate a JQL query
 // using any/all of the provide options: project, component, assignee,
 // issuetype, watcher, reporter, sort
 // Further it will restrict the fields being extracted from the jira
 // response with the 'queryfields' option
-func (c *Cli) FindIssues() (interface{}, error) {
-	var query string
-	var ok bool
-	// project = BAKERY and status not in (Resolved, Closed)
-	if query, ok = c.opts["query"].(string); !ok {
-		qbuff := bytes.NewBufferString("resolution = unresolved")
-		var project string
-		if project, ok = c.opts["project"].(string); !ok {
-			err := fmt.Errorf("Missing required arguments, either 'query' or 'project' are required")
-			log.Errorf("%s", err)
-			return nil, err
-		}
-		qbuff.WriteString(fmt.Sprintf(" AND project = '%s'", project))
-
-		if component, ok := c.opts["component"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND component = '%s'", component))
-		}
-
-		if assignee, ok := c.opts["assignee"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND assignee = '%s'", assignee))
-		}
-
-		if issuetype, ok := c.opts["issuetype"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND issuetype = '%s'", issuetype))
-		}
-
-		if watcher, ok := c.opts["watcher"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND watcher = '%s'", watcher))
-		}
-
-		if reporter, ok := c.opts["reporter"]; ok {
-			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", reporter))
-		}
-
-		if sort, ok := c.opts["sort"]; ok && sort != "" {
-			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", sort))
-		}
-
-		query = qbuff.String()
-	}
-
-	fields := []string{"summary"}
-	if qf, ok := c.opts["queryfields"].(string); ok {
-		fields = strings.Split(qf, ",")
-	}
-
-	json, err := jsonEncode(map[string]interface{}{
-		"jql":        query,
-		"startAt":    "0",
-		"maxResults": c.opts["max_results"],
-		"fields":     fields,
-		"expand":     c.expansions(),
-	})
+func (c *Cli) FindIssues(sp SearchProvider) (*jiradata.SearchResults, error) {
+	req := sp.SearchRequest()
+	encoded, err := jsonEncode(req)
 	if err != nil {
 		return nil, err
 	}
-
-	uri := fmt.Sprintf("%s/rest/api/2/search", c.endpoint)
-	var data interface{}
-	if data, err = responseToJSON(c.post(uri, json)); err != nil {
+	uri := fmt.Sprintf("%s/reest/api/2/search", c.endpoint)
+	resp, err := c.post(uri, encoded)
+	if err != nil {
 		return nil, err
 	}
-	return data, nil
+	defer resp.Body.Close()
+
+	results := &jiradata.SearchResults{}
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(content, results)
+	if err != nil {
+		log.Errorf("JSON Parse Error: %s from %s", err, content)
+	}
+	return results, nil
 }
 
 // RankOrder type used to specify before/after ranking arguments to RankIssue
@@ -543,7 +508,7 @@ const (
 	// RANKBEFORE should be used to rank issue before the target issue
 	RANKBEFORE RankOrder = iota
 	// RANKAFTER should be used to rank issue after the target issue
-	RANKAFTER  RankOrder = iota
+	RANKAFTER RankOrder = iota
 )
 
 // RankIssue will modify issue to have rank before or after the target issue

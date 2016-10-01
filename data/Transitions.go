@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -pkg jiradata -overwrite ../schemas/TransitionsMeta.json
+// slipscheme -pkg jiradata -overwrite ../schemas/SearchResults.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -31,62 +31,32 @@ package jiradata
 //             "type": "object",
 //             "properties": {
 //               "allowedValues": {
-//                 "title": "allowedValues",
 //                 "type": "array",
 //                 "items": {}
 //               },
 //               "autoCompleteUrl": {
-//                 "title": "autoCompleteUrl",
 //                 "type": "string"
 //               },
 //               "hasDefaultValue": {
-//                 "title": "hasDefaultValue",
 //                 "type": "boolean"
 //               },
 //               "key": {
-//                 "title": "key",
 //                 "type": "string"
 //               },
 //               "name": {
-//                 "title": "name",
 //                 "type": "string"
 //               },
 //               "operations": {
-//                 "title": "operations",
 //                 "type": "array",
 //                 "items": {
 //                   "type": "string"
 //                 }
 //               },
 //               "required": {
-//                 "title": "required",
 //                 "type": "boolean"
 //               },
 //               "schema": {
-//                 "title": "Json Type",
-//                 "type": "object",
-//                 "properties": {
-//                   "custom": {
-//                     "title": "custom",
-//                     "type": "string"
-//                   },
-//                   "customId": {
-//                     "title": "customId",
-//                     "type": "integer"
-//                   },
-//                   "items": {
-//                     "title": "items",
-//                     "type": "string"
-//                   },
-//                   "system": {
-//                     "title": "system",
-//                     "type": "string"
-//                   },
-//                   "type": {
-//                     "title": "type",
-//                     "type": "string"
-//                   }
-//                 }
+//                 "$ref": "#/definitions/json-type"
 //               }
 //             }
 //           }

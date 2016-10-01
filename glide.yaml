@@ -8,3 +8,8 @@ import:
 - package: gopkg.in/coryb/yaml.v2
 - package: gopkg.in/op/go-logging.v1
   version: ^1.0.0
+- package: gopkg.in/alecthomas/kingpin.v2
+  version: ^2.2.3
+- package: golang.org/x/tools
+  subpackages:
+  - cmd/gorename
