@@ -31,7 +31,7 @@ GOBIN ?= $(CWD)
 CURVER ?= $(patsubst v%,%,$(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}'))
 LDFLAGS := -w
 
-PACKAGE=github.com/Netflix-Skunkworks/go-jira
+PACKAGE=gopkg.in/Netflix-Skunkworks/go-jira.v1
 
 # use 'make debug' and you can get a debuggable golang binary
 # see https://golang.org/doc/gdb
@@ -44,7 +44,7 @@ else
 endif
 
 build: $(GOPATH)/src/$(PACKAGE)
-	cd $(GOPATH)/src/$(PACKAGE) && $(GOBUILD) -o $(BIN) main.go
+	cd $(GOPATH)/src/$(PACKAGE) && $(GOBUILD) -o $(BIN)
 
 debug:
 	$(MAKE) DEBUG=1 build
