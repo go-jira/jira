@@ -4,13 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v0/data"
-	"github.com/howeyc/gopass"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/howeyc/gopass"
+	"github.com/tmc/keyring"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v0/data"
 	// "github.com/kr/pretty"
 )
 
@@ -52,6 +54,14 @@ func (c *Cli) CmdLogin() error {
 			if reason := resp.Header.Get("X-Seraph-Loginreason"); reason == "AUTHENTICATION_DENIED" {
 				log.Warning("Authentication Failed: %s", reason)
 				continue
+			}
+			if val, ok := c.opts["password-keyring"].(bool); ok && val {
+				// save password in keychain so that it can be used for subsequent http requests
+				err := keyring.Set("go-jira", user, passwd)
+				if err != nil {
+					log.Errorf("Failed to set password in keyring: %s", err)
+					return err
+				}
 			}
 			break
 		} else {
