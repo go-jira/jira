@@ -5,9 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/kballard/go-shellquote"
-	"gopkg.in/coryb/yaml.v2"
-	"gopkg.in/op/go-logging.v1"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -20,6 +17,11 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/kballard/go-shellquote"
+	"github.com/tmc/keyring"
+	"gopkg.in/coryb/yaml.v2"
+	"gopkg.in/op/go-logging.v1"
 )
 
 var (
@@ -211,6 +213,19 @@ func (c *Cli) get(uri string) (resp *http.Response, err error) {
 func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
+
+	if val, ok := c.opts["password-keyring"].(bool); ok && val {
+		user, _ := c.opts["user"].(string)
+		password, err := keyring.Get("go-jira", user)
+		if err != nil {
+			log.Errorf("Failed to load password from keyring: %s", err)
+		}
+		if password == "" {
+			log.Warning("No password for user %s in keyring, please run the 'login' command first", user)
+		} else {
+			req.SetBasicAuth(user, password)
+		}
+	}
 
 	// this is actually done in http.send but doing it
 	// here so we can log it in DumpRequest for debugging
@@ -554,7 +569,7 @@ const (
 	// RANKBEFORE should be used to rank issue before the target issue
 	RANKBEFORE RankOrder = iota
 	// RANKAFTER should be used to rank issue after the target issue
-	RANKAFTER  RankOrder = iota
+	RANKAFTER RankOrder = iota
 )
 
 // RankIssue will modify issue to have rank before or after the target issue
