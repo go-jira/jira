@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.8 - 2016-11-24
+
+* [[#12](https://github.com/Netflix-Skunkworks/go-jira/issues/12)] integrate with keyring for password storage and provide http basic auth credentials for every request since most jira services have websudo enabled with does not allow cookie based authentication [Cory Bennett] [[b8a6e57](https://github.com/Netflix-Skunkworks/go-jira/commit/b8a6e57)]
+* Cleaning up usage [Jay Shirley] [[8add52b](https://github.com/Netflix-Skunkworks/go-jira/commit/8add52b)]
+* Update usage [Jay Shirley] [[b56e32a](https://github.com/Netflix-Skunkworks/go-jira/commit/b56e32a)]
+* use gopkg.in for links to maintain version compatibility [Cory Bennett] [[1414d1f](https://github.com/Netflix-Skunkworks/go-jira/commit/1414d1f)]
+* golint [Cory Bennett] [[44cdebf](https://github.com/Netflix-Skunkworks/go-jira/commit/44cdebf)]
+* add "rank" command allow ordering backlog issues in agile projects [Cory Bennett] [[e4cc9c6](https://github.com/Netflix-Skunkworks/go-jira/commit/e4cc9c6)]
+* Adding a unixproxy mechanism [Jay Shirley] [[5b9c0dd](https://github.com/Netflix-Skunkworks/go-jira/commit/5b9c0dd)]
+
 ## 0.1.7 - 2016-08-24
 
 * Prefer transition names which match exactly [Don Brower] [[e40f9c1](https://github.com/Netflix-Skunkworks/go-jira/commit/e40f9c1)]
