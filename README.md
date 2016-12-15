@@ -38,7 +38,7 @@ jira trans close GOJIRA-321 -o resolution="Won't Fix" --noedit
 # same as above
 jira close GOJIRA-321 -o resolution="Won't Fix"
 
-jira repopen GOJIRA-321 -m "reopening"  # reopen issue
+jira reopen GOJIRA-321 -m "reopening"  # reopen issue
 
 jira watch GOJIRA-321                   # add self as watcher to the issue
 
