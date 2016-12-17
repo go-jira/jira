@@ -57,15 +57,11 @@ func New(opts map[string]interface{}) *Cli {
 		}
 	} else {
 		transport := &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{},
 		}
 		if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
 			transport.TLSClientConfig.InsecureSkipVerify = insecureSkipVerify
-		}
-
-		if os.Getenv("HTTP_PROXY") != "" {
-			proxyURL, _ := url.Parse(os.Getenv("HTTP_PROXY"))
-			transport.Proxy = http.ProxyURL(proxyURL)
 		}
 
 		ua = &http.Client{
