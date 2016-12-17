@@ -63,6 +63,11 @@ func New(opts map[string]interface{}) *Cli {
 			transport.TLSClientConfig.InsecureSkipVerify = insecureSkipVerify
 		}
 
+		if os.Getenv("HTTP_PROXY") != "" {
+			proxyURL, _ := url.Parse(os.Getenv("HTTP_PROXY"))
+			transport.Proxy = http.ProxyURL(proxyURL)
+		}
+
 		ua = &http.Client{
 			Jar:       cookieJar,
 			Transport: transport,
