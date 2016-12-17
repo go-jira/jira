@@ -1,10 +1,10 @@
 PLATFORMS= \
-	freebsd-amd64 \
-	linux-386 \
-	linux-amd64 \
-	windows-386 \
-	windows-amd64 \
-	darwin-amd64 \
+	freebsd/amd64 \
+	linux/386 \
+	linux/amd64 \
+	windows/386 \
+	windows/amd64 \
+	darwin/amd64 \
 	$(NULL)
 
 	# freebsd-386 \
@@ -53,7 +53,7 @@ debug:
 
 src/%:
 	mkdir -p $(@D)
-	test -L $@ || ln -sf '$(GOPATH)' $@
+	test -L $@ || ln -sf '../../..' $@
 	go get -v $* $*/main
 
 vet:
@@ -73,14 +73,21 @@ cross-setup:
 		cd $(GOROOT)/src && sudo GOROOT_BOOTSTRAP=$(GOROOT) GOOS=$${p/-*/} GOARCH=$${p/*-/} bash ./make.bash --no-clean; \
    done
 
-all:
-	rm -rf $(DIST); \
-	mkdir -p $(DIST); \
-	for p in $(PLATFORMS); do \
-        echo "Building for $$p"; \
-        ${MAKE} build GOOS=$${p/-*/} GOARCH=$${p/*-/} BIN=$(DIST)/$(NAME)-$$p; \
-    done
-	for x in $(DIST)/jira-windows-*; do mv $$x $$x.exe; done
+all: src/gopkg.in/Netflix-Skunkworks/go-jira.v0
+	docker pull karalabe/xgo-latest
+	rm -rf dist
+	mkdir -p dist
+	docker run --rm -e EXT_GOPATH=/gopath -v $$(pwd):/gopath -e TARGETS="$(PLATFORMS)" -v $$(pwd)/dist:/build karalabe/xgo-latest gopkg.in/Netflix-Skunkworks/go-jira.v0/main
+	cd $(DIST) && for x in main-*; do mv $$x jira-$$(echo $$x | cut -c 6-); done
+
+# all:
+# 	rm -rf $(DIST); \
+# 	mkdir -p $(DIST); \
+# 	for p in $(PLATFORMS); do \
+#         echo "Building for $$p"; \
+#         ${MAKE} build GOOS=$${p/-*/} GOARCH=$${p/*-/} BIN=$(DIST)/$(NAME)-$$p; \
+#     done
+# 	for x in $(DIST)/jira-windows-*; do mv $$x $$x.exe; done
 
 fmt:
 	gofmt -s -w main/*.go *.go
