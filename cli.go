@@ -57,6 +57,7 @@ func New(opts map[string]interface{}) *Cli {
 		}
 	} else {
 		transport := &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{},
 		}
 		if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
