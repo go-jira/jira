@@ -125,6 +125,7 @@ export PASSWORD_STORE_DIR=$(CWD)/t/.password-store
 export JIRACLOUD=1
 
 prove:
+	chmod -R g-rwx,o-rwx $(GNUPGHOME)
 	pass
 	pass GoJira/gojira@example.com
 	./t/100basic.t -w -a
