@@ -57,7 +57,7 @@ func New(opts map[string]interface{}) *Cli {
 		}
 	} else {
 		transport := &http.Transport{
-			Proxy: http.ProxyFromEnvironment,
+			Proxy:           http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{},
 		}
 		if insecureSkipVerify, ok := opts["insecure"].(bool); ok {
@@ -215,12 +215,9 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
-	if val, ok := c.opts["password-keyring"].(bool); ok && val {
+	if val, ok := c.opts["password-keyring"].(bool); ok && val && !strings.HasSuffix(req.URL.Path, "/rest/auth/1/session") {
 		user, _ := c.opts["user"].(string)
-		password, err := keyring.Get("go-jira", user)
-		if err != nil {
-			log.Errorf("Failed to load password from keyring: %s", err)
-		}
+		password, _ := keyring.Get("go-jira", user)
 		if password == "" {
 			log.Warning("No password for user %s in keyring, please run the 'login' command first", user)
 		} else {
