@@ -3,8 +3,7 @@
 ## 0.1.9 - 2016-12-18
 
 * only warn about needing login when not already running the login command [Cory Bennett] [[6c24e55](https://github.com/Netflix-Skunkworks/go-jira/commit/6c24e55)]
-* fix(http): Add proxy transport [William Hearn] [[4bd740b](https://github.com/Netflix-Skunkworks/go-jira/commit/4bd740b)]
-* fix(http): Add proxy transport [William Hearn] [[2dff6c9](https://github.com/Netflix-Skunkworks/go-jira/commit/2dff6c9)]
+* fix(http): Add proxy transport [William Hearn] [[4bd740b](https://github.com/Netflix-Skunkworks/go-jira/commit/4bd740b)] [[2dff6c9](https://github.com/Netflix-Skunkworks/go-jira/commit/2dff6c9)]
 
 ## 0.1.8 - 2016-11-24
 
