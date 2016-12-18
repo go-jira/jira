@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/kballard/go-shellquote"
-	"github.com/tmc/keyring"
 	"gopkg.in/coryb/yaml.v2"
 	"gopkg.in/op/go-logging.v1"
 )
@@ -215,11 +214,11 @@ func (c *Cli) makeRequest(req *http.Request) (resp *http.Response, err error) {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
-	if val, ok := c.opts["password-keyring"].(bool); ok && val && !strings.HasSuffix(req.URL.Path, "/rest/auth/1/session") {
+	if source, ok := c.opts["password-source"]; ok && !strings.HasSuffix(req.URL.Path, "/rest/auth/1/session") {
 		user, _ := c.opts["user"].(string)
-		password, _ := keyring.Get("go-jira", user)
+		password := c.GetPass(user)
 		if password == "" {
-			log.Warning("No password for user %s in keyring, please run the 'login' command first", user)
+			log.Warning("No password for user %s in %s, please run the 'login' command first", user, source)
 		} else {
 			req.SetBasicAuth(user, password)
 		}

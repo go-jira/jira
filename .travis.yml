@@ -1,6 +1,6 @@
 sudo: true
 before_install:
-    - sudo apt-get update && sudo apt-get install -y libgnome-keyring-dev
+    - sudo apt-get update && sudo apt-get install -y pass gnupg
 
 language: go
 
@@ -14,8 +14,4 @@ script:
   - make vet
   - make lint
   - make
-  - JIRACLOUD=1 ./t/100basic.t -w -a 2>&1 
-
-cache:
-  directories:
-    - t/.maven-cache
+  - export GNUPGHOME=$(pwd)/t/.gnupg && export PASSWORD_STORE_DIR=$(pwd)/t/.password-store && export JIRACLOUD=1 && ./t/100basic.t -w -a 2>&1 
