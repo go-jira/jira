@@ -13,7 +13,7 @@ PLAN 86
 
 # reset login
 RUNS $jira logout
-echo "gojira123" | RUNS $jira login
+RUNS $jira login
 
 # cleanup from previous failed test executions
 ($jira ls | awk -F: '{print $1}' | while read issue; do ../jira done $issue; done) | sed 's/^/# CLEANUP: /g'
@@ -205,7 +205,7 @@ EOF
 jira="$jira --user mothra"
 
 RUNS $jira logout
-echo "mothra123" | RUNS $jira login
+RUNS $jira login
 
 ###############################################################################
 ## vote for main issue, verify it shows when viewing the issue

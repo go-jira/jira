@@ -10,8 +10,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/howeyc/gopass"
-	"github.com/tmc/keyring"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v0/data"
 	// "github.com/kr/pretty"
 )
@@ -23,13 +21,7 @@ func (c *Cli) CmdLogin() error {
 		req, _ := http.NewRequest("GET", uri, nil)
 		user, _ := c.opts["user"].(string)
 
-		fmt.Printf("Jira Password [%s]: ", user)
-		pw, err := gopass.GetPasswdMasked()
-		if err != nil {
-			return err
-		}
-		passwd := string(pw)
-
+		passwd := c.GetPass(user)
 		req.SetBasicAuth(user, passwd)
 
 		resp, err := c.makeRequest(req)
@@ -55,13 +47,8 @@ func (c *Cli) CmdLogin() error {
 				log.Warning("Authentication Failed: %s", reason)
 				continue
 			}
-			if val, ok := c.opts["password-keyring"].(bool); ok && val {
-				// save password in keychain so that it can be used for subsequent http requests
-				err := keyring.Set("go-jira", user, passwd)
-				if err != nil {
-					log.Errorf("Failed to set password in keyring: %s", err)
-					return err
-				}
+			if _, ok := c.opts["password-source"]; ok {
+				return c.SetPass(user, passwd)
 			}
 			break
 		} else {
