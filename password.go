@@ -55,7 +55,7 @@ func (c *Cli) SetPass(user, passwd string) error {
 			if bin, err := exec.LookPath("pass"); err == nil {
 				in := bytes.NewBufferString(fmt.Sprintf("%s\n%s\n", passwd, passwd))
 				out := bytes.NewBufferString("")
-				cmd := exec.Command(bin, "insert", fmt.Sprintf("GoJira/%s", user))
+				cmd := exec.Command(bin, "insert", "--force", fmt.Sprintf("GoJira/%s", user))
 				cmd.Stdin = in
 				cmd.Stdout = out
 				cmd.Stderr = out
