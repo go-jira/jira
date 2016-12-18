@@ -125,4 +125,6 @@ export PASSWORD_STORE_DIR=$(CWD)/t/.password-store
 export JIRACLOUD=1
 
 prove:
+	pass
+	pass GoJira/gojira@example.com
 	./t/100basic.t -w -a
