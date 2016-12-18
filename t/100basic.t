@@ -21,7 +21,7 @@ RUNS $jira login
 ###############################################################################
 ## Create an issue
 ###############################################################################
-RUNS $jira -v -v -v create -o summary=summary -o description=description --noedit --saveFile issue.props
+RUNS $jira create -o summary=summary -o description=description --noedit --saveFile issue.props
 issue=$(awk '/issue/{print $2}' issue.props)
 
 DIFF <<EOF

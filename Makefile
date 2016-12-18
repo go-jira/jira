@@ -119,3 +119,10 @@ version:
 
 clean:
 	rm -rf pkg dist bin src ./$(NAME)
+
+export GNUPGHOME=$(CWD)/t/.gnupg
+export PASSWORD_STORE_DIR=$(CWD)/t/.password-store
+export JIRACLOUD=1
+
+prove:
+	./t/100basic.t -w -a
