@@ -1,2 +1,9 @@
-endpoint: http://localhost:8080
-user: gojira
+#!/bin/sh
+if [ -z "$JIRACLOUD" ]; then
+    echo endpoint: http://localhost:8080
+    echo user: gojira
+    echo password-keyring: true
+else
+    echo endpoint: https://go-jira.atlassian.net
+    echo user: gojira@example.com
+fi    

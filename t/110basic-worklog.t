@@ -4,6 +4,11 @@ cd $(dirname $0)
 jira="../jira --project BASIC"
 export JIRA_LOG_FORMAT="%{level:-5s} %{message}"
 
+ENDPOINT="http://localhost:8080"
+if [ -n "$JIRACLOUD" ]; then
+    ENDPOINT="https://go-jira.atlassian.net"
+fi
+
 PLAN 8
 
 # reset login
@@ -20,7 +25,7 @@ RUNS $jira create -o summary=summary -o description=description --noedit --saveF
 issue=$(awk '/issue/{print $2}' issue.props)
 
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 ###############################################################################
@@ -28,7 +33,7 @@ EOF
 ###############################################################################
 RUNS $jira add worklog $issue --comment "work is hard" --time-spent "1h 12m" --noedit
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 ###############################################################################

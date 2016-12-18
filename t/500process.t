@@ -4,6 +4,11 @@ cd $(dirname $0)
 jira="../jira --project PROCESS"
 export JIRA_LOG_FORMAT="%{level:-5s} %{message}"
 
+ENDPOINT="http://localhost:8080"
+if [ -n "$JIRACLOUD" ]; then
+    ENDPOINT="https://go-jira.atlassian.net"
+fi
+
 PLAN 84
 
 # cleanup from previous failed test executions
@@ -21,7 +26,7 @@ RUNS $jira create -o summary=summary -o description=description --noedit --saveF
 issue=$(awk '/issue/{print $2}' issue.props)
 
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 ###############################################################################
@@ -69,13 +74,13 @@ EOF
 
 RUNS $jira start $issue
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 
 RUNS $jira stop $issue
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 ###############################################################################
@@ -93,13 +98,13 @@ EOF
 RUNS $jira create -o summary=summary -o description=description --noedit --saveFile issue.props
 issue=$(awk '/issue/{print $2}' issue.props)
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 RUNS $jira create -o summary=dup -o description=dup --noedit --saveFile issue.props
 dup=$(awk '/issue/{print $2}' issue.props)
 DIFF <<EOF
-OK $dup http://localhost:8080/browse/$dup
+OK $dup $ENDPOINT/browse/$dup
 EOF
 
 ###############################################################################
@@ -112,9 +117,9 @@ EOF
 
 RUNS $jira $dup dups $issue --noedit
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
-OK $dup http://localhost:8080/browse/$dup
-OK $dup http://localhost:8080/browse/$dup
+OK $issue $ENDPOINT/browse/$issue
+OK $dup $ENDPOINT/browse/$dup
+OK $dup $ENDPOINT/browse/$dup
 EOF
 
 RUNS $jira $issue
@@ -151,7 +156,7 @@ EOF
 RUNS $jira create -o summary=blocks -o description=blocks --noedit --saveFile issue.props
 blocker=$(awk '/issue/{print $2}' issue.props)
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 ###############################################################################
@@ -160,7 +165,7 @@ EOF
 
 RUNS $jira $blocker blocks $issue
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 RUNS $jira $issue
@@ -192,13 +197,13 @@ $(printf %-12s $blocker:) blocks
 EOF
 
 ###############################################################################
-# reset login for mojira for voting
+# reset login for mothra for voting
 ###############################################################################
 
-jira="$jira --user mojira"
+jira="$jira --user mothra"
 
 RUNS $jira logout
-echo "mojira123" | RUNS $jira login
+echo "mothra123" | RUNS $jira login
 
 ###############################################################################
 ## vote for main issue, verify it shows when viewing the issue
@@ -206,7 +211,7 @@ echo "mojira123" | RUNS $jira login
 
 RUNS $jira vote $issue
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 RUNS $jira $issue
@@ -233,7 +238,7 @@ EOF
 
 RUNS $jira vote $issue --down
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 RUNS $jira $issue
@@ -255,19 +260,19 @@ description: |
 EOF
 
 ###############################################################################
-## set mojira user as watcher to issue and verify from REST api
+## set mothra user as watcher to issue and verify from REST api
 ###############################################################################
 
 RUNS $jira watch $issue
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 # FIXME we probably need a watchers command to wrap this?
 RUNS sh -c "$jira req /rest/api/2/issue/$issue/watchers | jq -r .watchers[].name"
 DIFF <<EOF
 gojira
-mojira
+mothra
 EOF
 
 ###############################################################################
@@ -295,7 +300,7 @@ EOF
 
 RUNS $jira start $blocker
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 ###############################################################################
@@ -304,7 +309,7 @@ EOF
 
 RUNS $jira stop $blocker
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 
@@ -314,7 +319,7 @@ EOF
 
 RUNS $jira reopen $blocker
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 ###############################################################################
@@ -345,7 +350,7 @@ EOF
 
 RUNS $jira comment $issue --noedit -m "Yo, Comment"
 DIFF <<EOF
-OK $issue http://localhost:8080/browse/$issue
+OK $issue $ENDPOINT/browse/$issue
 EOF
 
 RUNS $jira $issue
@@ -366,7 +371,7 @@ description: |
   description
 
 comments:
-  - | # mojira, a minute ago
+  - | # mothra, a minute ago
     Yo, Comment
 
 EOF
@@ -377,7 +382,7 @@ EOF
 
 RUNS $jira add labels $blocker test-label another-label
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 RUNS $jira $blocker
@@ -405,7 +410,7 @@ EOF
 
 RUNS $jira remove labels $blocker another-label
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 RUNS $jira $blocker
@@ -433,7 +438,7 @@ EOF
 
 RUNS $jira set labels $blocker more-label better-label
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 RUNS $jira $blocker
@@ -456,12 +461,12 @@ description: |
 EOF
 
 ###############################################################################
-## Verify that "mojira" user can take the issue (reassign to self)
+## Verify that "mothra" user can take the issue (reassign to self)
 ###############################################################################
 
 RUNS $jira take $blocker
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 RUNS $jira $blocker
@@ -472,7 +477,7 @@ status: Open
 summary: blocks
 project: PROCESS
 issuetype: Task
-assignee: mojira
+assignee: mothra
 reporter: gojira
 blockers: 
 depends: $issue[Open]
@@ -489,7 +494,7 @@ EOF
 
 RUNS $jira give $blocker gojira
 DIFF <<EOF
-OK $blocker http://localhost:8080/browse/$blocker
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 RUNS $jira $blocker

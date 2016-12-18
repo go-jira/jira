@@ -3,6 +3,7 @@ eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira="../jira --user admin"
 
+SKIP test -n "$JIRACLOUD" # using Jira Cloud at go-jira.atlassian.net
 PLAN 15
 
 # clean out any old containers
@@ -25,13 +26,13 @@ docker exec -i go-jira-test tail -f screenlog.0 | grep -m 1 'jira started succes
 RUNS curl -q -L --retry 900 --retry-delay 1 -f -s "http://localhost:8080/rest/api/2/serverInfo?doHealthCheck=1"
 
 # login to jira as admin user
-echo "admin" | RUNS $jira login
+RUNS $jira login
 
 # create gojira user
-RUNS $jira req -M POST /rest/api/2/user '{"name":"gojira","password":"gojira123","emailAddress":"gojira@example.com","displayName":"Go Jira"}'
+RUNS $jira req -M POST /rest/api/2/user '{"name":"gojira","password":"gojira123","emailAddress":"gojira@example.com","displayName":"GoJira"}'
 
-# create mojira user (need secondary user for voting)
-RUNS $jira req -M POST /rest/api/2/user '{"name":"mojira","password":"mojira123","emailAddress":"mojira@example.com","displayName":"Mo Jira"}'
+# create mothra user (need secondary user for voting)
+RUNS $jira req -M POST /rest/api/2/user '{"name":"mothra","password":"mothra123","emailAddress":"mothra@example.com","displayName":"Mothra"}'
 
 # create SCRUM softwareproject
 RUNS $jira req -M POST /rest/api/2/project '{"key":"SCRUM","name":"Scrum","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-scrum-template","lead":"gojira"}'

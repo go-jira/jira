@@ -3,6 +3,8 @@ eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira=../jira
 
+SKIP test -n "$JIRACLOUD" # using Jira Cloud at go-jira.atlassian.net
+
 PLAN 7
 
 ###############################################################################
@@ -24,6 +26,6 @@ echo "gojira123" | RUNS $jira login
 
 RUNS $jira req /rest/auth/1/session </dev/null
 GREP '"name": "gojira"'
-GREP '"self": "http://localhost:8080/rest/api/latest/user?username=gojira"'
+GREP "\"self\": \"$ENDPOINT/rest/api/latest/user?username=gojira\""
 
 
