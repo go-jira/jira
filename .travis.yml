@@ -10,7 +10,7 @@ script:
   - make vet
   - make lint
   - make
-  - ./t/100basic.t -w -a 2>&1 
+  - JIRACLOUD=1 ./t/100basic.t -w -a 2>&1 
 
 cache:
   directories:
