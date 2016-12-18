@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.9 - 2016-12-18
+
+* only warn about needing login when not already running the login command [Cory Bennett] [[6c24e55](https://github.com/Netflix-Skunkworks/go-jira/commit/6c24e55)]
+* fix(http): Add proxy transport [William Hearn] [[4bd740b](https://github.com/Netflix-Skunkworks/go-jira/commit/4bd740b)]
+* fix(http): Add proxy transport [William Hearn] [[2dff6c9](https://github.com/Netflix-Skunkworks/go-jira/commit/2dff6c9)]
+
 ## 0.1.8 - 2016-11-24
 
 * [[#12](https://github.com/Netflix-Skunkworks/go-jira/issues/12)] integrate with keyring for password storage and provide http basic auth credentials for every request since most jira services have websudo enabled with does not allow cookie based authentication [Cory Bennett] [[b8a6e57](https://github.com/Netflix-Skunkworks/go-jira/commit/b8a6e57)]
