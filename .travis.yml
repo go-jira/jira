@@ -10,7 +10,7 @@ script:
   - make vet
   - make lint
   - make
-  - OSHT_VERBOSE=1 JIRACLOUD=1 prove -v
+  - ./t/100basic.t -w -a 2>&1 
 
 cache:
   directories:
