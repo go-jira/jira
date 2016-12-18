@@ -14,4 +14,4 @@ script:
   - make vet
   - make lint
   - make
-  - export GNUPGHOME=$(pwd)/t/.gnupg && export PASSWORD_STORE_DIR=$(pwd)/t/.password-store && export JIRACLOUD=1 && ./t/100basic.t -w -a 2>&1 
+  - make prove 2>&1 
