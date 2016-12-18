@@ -126,6 +126,4 @@ export JIRACLOUD=1
 
 prove:
 	chmod -R g-rwx,o-rwx $(GNUPGHOME)
-	pass
-	pass GoJira/gojira@example.com
-	./t/100basic.t -w -a
+	OSHT_VERBOSE=1 prove -v 
