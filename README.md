@@ -182,6 +182,56 @@ jira create --dryrun -t debug --editor /bin/cat
 ```
 This will attempt to fetch metadata for your default project (you can provide any options that you would normally specify for the `create` operation).  It uses the `--dryrun` option to prevent any actual updates being sent to Jira.  The `-t debug` is like before to cause the input to be serialized to JSON and printed for your inspection.  Finally the `--editor /bin/cat` will cause `go-jira` to just print the template rather than open up an editor and wait for you to edit/save it.
 
+### Authentication
+
+By default `go-jira` will prompt for a password automatically when we receive an 403 http response.  Then after authentication we cache the JSESSSION cookie returned by the service and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  Many deployments of Jira (like the cloud services on atlassian.net) have "websudo" enabled which will prevent the cookie based authentcation from working.  On these deployments you have a few options with `go-jira`.  You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring` or `pass`.
+
+#### keyring password source
+**Note: Version 0.1.9 required.**
+On OSX and Linux there are a few keyring providers that `go-jira` can use (via this [golang module](https://github.com/tmc/keyring)).  To integrate `go-jira` with a supported keyring just add this configuration to `$HOME/.jira.d/config.yml`:
+```yaml
+password-source: keyring
+```
+
+#### `pass` password source
+**Note: Version 0.1.9 required.**
+An alternative to the keyring password source is the `pass` tool (documentation [here](https://www.passwordstore.org/).  This uses gpg to encrypt/decrypt passwords on demand and by using `gpg-agent` you can cache the gpg credentials for a period of time so you will not be prompted repeatedly for decrypting the passwords.  The advantage over the keyring integrtaion is that `pass` can be used on more platforms than OSX and Linux.  To use `pass` for password storage and retrieval via `go-jira` just add this configuration to `$HOME/.jira.d/config.yml`:
+```yaml
+password-source: pass
+```
+
+This assumes you have already setup `pass` correctly on your system.  Specifically you will need to have created a gpg key like this:
+
+```
+$ gpg --gen-key
+```
+
+Then you will need the GPG Key ID you want associated with `pass`.  First list the available keys:
+```
+$ gpg --list-keys
+/home/gojira/.gnupg/pubring.gpg
+-------------------------------------------------
+pub   2048R/A307D709 2016-12-18
+uid                  Go Jira <gojira@example.com>
+sub   2048R/F9A047B8 2016-12-18
+```
+
+Then initialize the `pass` tool to use the correct key:
+```
+$ pass init "Go Jira <gojira@example.com>"
+```
+
+You probably want to setup gpg-agent so that you dont have to type in your gpg passphrase all the time.  You can get `gpg-agent` to automatically start by adding something like this to your `$HOME/.bashrc`
+```bash
+if [ ! -f $HOME/.gpg-agent-info ]; then
+    # set passphrase cache so I only have to type my passphrase once a day
+    gpg-agent --default-cache-ttl 86400 --daemon --write-env-file $HOME/.gpg-agent-info
+fi
+. $HOME/.gpg-agent-info
+export GPG_AGENT_INFO
+```
+
+
 ## Usage
 
 ```
