@@ -229,6 +229,7 @@ if [ ! -f $HOME/.gpg-agent-info ]; then
 fi
 . $HOME/.gpg-agent-info
 export GPG_AGENT_INFO
+export GPG_TTY=$(tty)
 ```
 
 
