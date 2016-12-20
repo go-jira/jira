@@ -43,7 +43,9 @@ func (c *Cli) GetPass(user string) string {
 }
 
 func (c *Cli) SetPass(user, passwd string) error {
+	log.Debugf("SetPass called: %s => %s", user, passwd)
 	if source, ok := c.opts["password-source"].(string); ok {
+		log.Debugf("password-source: %s", source)
 		if source == "keyring" {
 			// save password in keychain so that it can be used for subsequent http requests
 			err := keyring.Set("go-jira", user, passwd)
@@ -52,7 +54,9 @@ func (c *Cli) SetPass(user, passwd string) error {
 				return err
 			}
 		} else if source == "pass" {
+			log.Debugf("processing %s", source)
 			if bin, err := exec.LookPath("pass"); err == nil {
+				log.Debugf("using %s", bin)
 				in := bytes.NewBufferString(fmt.Sprintf("%s\n%s\n", passwd, passwd))
 				out := bytes.NewBufferString("")
 				cmd := exec.Command(bin, "insert", "--force", fmt.Sprintf("GoJira/%s", user))
