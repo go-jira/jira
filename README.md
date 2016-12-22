@@ -223,12 +223,15 @@ $ pass init "Go Jira <gojira@example.com>"
 
 You probably want to setup gpg-agent so that you dont have to type in your gpg passphrase all the time.  You can get `gpg-agent` to automatically start by adding something like this to your `$HOME/.bashrc`
 ```bash
-if [ ! -f $HOME/.gpg-agent-info ]; then
-    # set passphrase cache so I only have to type my passphrase once a day
-    gpg-agent --default-cache-ttl 86400 --daemon --write-env-file $HOME/.gpg-agent-info
+if [ -f $HOME/.gpg-agent-info ]; then
+    . $HOME/.gpg-agent-info
+    export GPG_AGENT_INFO
 fi
-. $HOME/.gpg-agent-info
-export GPG_AGENT_INFO
+# verify sock file from GPG_AGENT_INFO is actually present
+if [ ! -S "${GPG_AGENT_INFO%%:*}" ]; then
+    # set passphrase cache so I only have to type my passphrase once a day
+    eval $(gpg-agent --default-cache-ttl 604800 --daemon --write-env-file $HOME/.gpg-agent-info)
+fi
 export GPG_TTY=$(tty)
 ```
 
