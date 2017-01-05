@@ -110,7 +110,7 @@ endpoint: https://jira.mycompany.com
 EOM
 ```
 
-Then use `jira login` to authenticate yourself.
+Then use `jira login` to authenticate yourself as $USER. To change your username, use the `-u` CLI flag or set `user:` in your config.yml
 
 ### Dynamic Configuration
 
