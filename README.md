@@ -192,6 +192,7 @@ On OSX and Linux there are a few keyring providers that `go-jira` can use (via t
 ```yaml
 password-source: keyring
 ```
+After setting this and issuing a `jira login`, your credentials will be stored in your platform's backend (e.g. Keychain for Mac OS X) automatically. Subsequent operations, like a `jira ls`, should "just work" from there.
 
 #### `pass` password source
 **Note: Version 0.1.9 required.**
