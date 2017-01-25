@@ -9,7 +9,7 @@ simple command line client for Atlassian's Jira service written in Go
 ## Synopsis
 
 ```bash
-jira ls -p GOJIRA                       # list all unresolved issues for project GOJRIA
+jira ls -p GOJIRA                       # list all unresolved issues for project GOJIRA
 jira ls -p GOJIRA -a mothra             # as above also assigned to user mothra
 jira ls -p GOJIRA -w mothra             # lists GOJIRA unresolved issues watched by user mothra
 jira ls -p GOJIRA -r mothra             # list GOJIRA unresolved issues reported by user mothra
@@ -21,7 +21,7 @@ jira GOJIRA-321                         # same as above
 jira edit GOJIRA-321                    # open up the issue in an editor, when you exit the
                                         # editor the issue will post the updates to the server
 
-# edit the issue, using the overirdes on the command line, skip the interactive editor:
+# edit the issue, using the overrides on the command line, skip the interactive editor:
 jira edit GOJIRA-321 --noedit \
      -o assignee=mothra \
      -o comment="mothra, please take care of this." \
@@ -91,7 +91,7 @@ a child directory of your homedir, then your homedir will also be inspected for 
 discovered **go-jira** will load a **config.yml** if found.  The configuration properties found in a file closests to your current working directory
 will have precedence.  Properties overriden with command line options will have final precedence.
 
-The complicated configuration heirarchy is used because **go-jira** attempts to be context aware.  For example, if you are working on a "foo" project and
+The complicated configuration hierarchy is used because **go-jira** attempts to be context aware.  For example, if you are working on a "foo" project and
 you `cd` into your project workspace, wouldn't it be nice if `jira ls` automatically knew to list only issues related to the "foo" project?  Likewise when you
 `cd` to the "bar" project then `jira ls` should only list issues related to "bar" project.  You can do this with by creating a configuration under your project
 workspace at **./.jira.d/config.yml** that looks like:
