@@ -73,7 +73,10 @@ cross-setup:
 		cd $(GOROOT)/src && sudo GOROOT_BOOTSTRAP=$(GOROOT) GOOS=$${p/-*/} GOARCH=$${p/*-/} bash ./make.bash --no-clean; \
    done
 
-all: src/gopkg.in/Netflix-Skunkworks/go-jira.v0
+all: 
+	git push --tags
+	rm -rf src
+	${MAKE} src/gopkg.in/Netflix-Skunkworks/go-jira.v0
 	docker pull karalabe/xgo-latest
 	rm -rf dist
 	mkdir -p dist
