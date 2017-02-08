@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10 - 2017-02-08
+
+* set GPG_TTY in .bashrc [Cory Bennett] [[b1e552f](https://github.com/Netflix-Skunkworks/go-jira/commit/b1e552f)]
+* force password in case password already exists [Cory Bennett] [[d5a2c3b](https://github.com/Netflix-Skunkworks/go-jira/commit/d5a2c3b)]
+* refactor password source, allow for "pass" to be used, update tests to use `password-source: pass` [Cory Bennett] [[5a71939](https://github.com/Netflix-Skunkworks/go-jira/commit/5a71939)]
+
 ## 0.1.9 - 2016-12-18
 
 * only warn about needing login when not already running the login command [Cory Bennett] [[6c24e55](https://github.com/Netflix-Skunkworks/go-jira/commit/6c24e55)]
