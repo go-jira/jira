@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.11 - 2017-02-26
+
+* [[#69](https://github.com/Netflix-Skunkworks/go-jira/issues/69)] add subtask command [Cory Bennett] [[21a2ed5](https://github.com/Netflix-Skunkworks/go-jira/commit/21a2ed5)]
+
 ## 0.1.10 - 2017-02-08
 
 * set GPG_TTY in .bashrc [Cory Bennett] [[b1e552f](https://github.com/Netflix-Skunkworks/go-jira/commit/b1e552f)]
