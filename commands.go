@@ -376,37 +376,111 @@ func (c *Cli) CmdCreate() error {
 		issuetype = c.defaultIssueType()
 	}
 
-	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
-	data, err := responseToJSON(c.get(uri))
-	if err != nil {
-		return err
-	}
-
 	issueData := make(map[string]interface{})
 	issueData["overrides"] = c.opts
 	issueData["overrides"].(map[string]interface{})["issuetype"] = issuetype
 
-	if val, ok := data.(map[string]interface{})["projects"]; ok {
-		if len(val.([]interface{})) == 0 {
-			err = fmt.Errorf("Project '%s' or issuetype '%s' unknown.  Unable to create issue.", project, issuetype)
-			log.Errorf("%s", err)
-			return err
-		}
-		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
-			if len(val.([]interface{})) == 0 {
-				err = fmt.Errorf("Project '%s' does not support issuetype '%s'.  Unable to create issue.", project, issuetype)
-				log.Errorf("%s", err)
-				return err
-			}
-			issueData["meta"] = val.([]interface{})[0]
-		}
+	meta, err := c.createIssueMetaData(project, issuetype)
+	if err != nil {
+		return err
 	}
+	issueData["meta"] = meta
 
 	sanitizedType := strings.ToLower(strings.Replace(issuetype, " ", "", -1))
 	return c.editTemplate(
 		c.getTemplate(fmt.Sprintf("create-%s", sanitizedType)),
 		fmt.Sprintf("create-%s-", sanitizedType),
 		issueData,
+		func(json string) error {
+			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
+			if c.getOptBool("dryrun", false) {
+				log.Debugf("POST: %s", json)
+				log.Debugf("Dryrun mode, skipping POST")
+				return nil
+			}
+			resp, err := c.post(uri, json)
+			if err != nil {
+				return err
+			}
+
+			if resp.StatusCode == 201 {
+				// response: {"id":"410836","key":"PROJ-238","self":"https://jira/rest/api/2/issue/410836"}
+				json, err := responseToJSON(resp, nil)
+				if err != nil {
+					return err
+				}
+				key := json.(map[string]interface{})["key"].(string)
+				link := fmt.Sprintf("%s/browse/%s", c.endpoint, key)
+				c.Browse(key)
+				c.SaveData(map[string]string{
+					"issue": key,
+					"link":  link,
+				})
+				if !c.opts["quiet"].(bool) {
+					fmt.Printf("OK %s %s\n", key, link)
+				}
+				return nil
+			}
+			logBuffer := bytes.NewBuffer(make([]byte, 0))
+			resp.Write(logBuffer)
+			err = fmt.Errorf("Unexpected Response From POST")
+			log.Errorf("%s:\n%s", err, logBuffer)
+			return err
+		},
+	)
+}
+
+func (c *Cli) createIssueMetaData(project, issuetype string) (interface{}, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", c.endpoint, project, url.QueryEscape(issuetype))
+	metaData, err := responseToJSON(c.get(uri))
+	if err != nil {
+		return nil, err
+	}
+
+	if val, ok := metaData.(map[string]interface{})["projects"]; ok {
+		if len(val.([]interface{})) == 0 {
+			err = fmt.Errorf("Project '%s' or issuetype '%s' unknown.  Unable to create issue.", project, issuetype)
+			log.Errorf("%s", err)
+			return nil, err
+		}
+		if val, ok = val.([]interface{})[0].(map[string]interface{})["issuetypes"]; ok {
+			if len(val.([]interface{})) == 0 {
+				err = fmt.Errorf("Project '%s' does not support issuetype '%s'.  Unable to create issue.", project, issuetype)
+				log.Errorf("%s", err)
+				return nil, err
+			}
+			return val.([]interface{})[0], nil
+		}
+	}
+	return nil, nil
+}
+
+// CmdSubtask sends the create-metadata to the "subtask" template for editing, then
+// will parse the edited document as YAML and submit the document to jira.
+func (c *Cli) CmdSubtask(issue string) error {
+	log.Debugf("subtask called")
+
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", c.endpoint, issue)
+	parentData, err := responseToJSON(c.get(uri))
+	if err != nil {
+		return err
+	}
+
+	subtaskData := make(map[string]interface{})
+	subtaskData["parent"] = parentData
+	subtaskData["overrides"] = c.opts
+
+	project := parentData.(map[string]interface{})["fields"].(map[string]interface{})["project"].(map[string]interface{})["key"].(string)
+	meta, err := c.createIssueMetaData(project, "Sub-task")
+	if err != nil {
+		return err
+	}
+	subtaskData["meta"] = meta
+
+	return c.editTemplate(
+		c.getTemplate("subtask"),
+		"subtask-",
+		subtaskData,
 		func(json string) error {
 			uri := fmt.Sprintf("%s/rest/api/2/issue", c.endpoint)
 			if c.getOptBool("dryrun", false) {

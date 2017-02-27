@@ -15,6 +15,7 @@ var allTemplates = map[string]string{
 	"components":     defaultComponentsTemplate,
 	"issuetypes":     defaultIssuetypesTemplate,
 	"create":         defaultCreateTemplate,
+	"subtask":        defaultSubtaskTemplate,
 	"comment":        defaultCommentTemplate,
 	"transition":     defaultTransitionTemplate,
 	"request":        defaultDebugTemplate,
@@ -139,6 +140,30 @@ fields:
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
     - name:{{end}}`
+
+const defaultSubtaskTemplate = `{{/* create subtask template */ -}}
+fields:
+  project:
+    key: {{ .parent.fields.project.key }}
+  summary: {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+  priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
+    name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
+    - name: {{ . }}{{end}}{{end}}
+  description: |~
+    {{ or .overrides.description "" | indent 4 }}{{if .meta.fields.assignee}}
+  assignee:
+    name: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
+  reporter:
+    name: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
+  # watchers
+  customfield_10110: {{ range split "," (or .overrides.watchers "")}}
+    - name: {{.}}{{end}}
+    - name:{{end}}
+  issuetype:
+    name: Sub-task
+  parent:
+    key: {{ .parent.key }}`
 
 const defaultCommentTemplate = `body: |~
   {{ or .overrides.comment "" | indent 2 }}

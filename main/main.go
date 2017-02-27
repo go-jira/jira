@@ -3,14 +3,15 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v0"
-	"github.com/coryb/optigo"
-	"gopkg.in/coryb/yaml.v2"
-	"gopkg.in/op/go-logging.v1"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/coryb/optigo"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v0"
+	"gopkg.in/coryb/yaml.v2"
+	"gopkg.in/op/go-logging.v1"
 )
 
 var (
@@ -60,6 +61,7 @@ Usage:
   jira add worklog ISSUE <Worklog Options>
   jira edit [--noedit] <Edit Options> [ISSUE | <Query Options>]
   jira create [--noedit] [-p PROJECT] <Create Options>
+  jira subtask ISSUE [--noedit] <Create Options>
   jira DUPLICATE dups ISSUE
   jira BLOCKER blocks ISSUE
   jira vote ISSUE [--down]
@@ -145,6 +147,7 @@ Command Options:
 		"view":             "view",
 		"edit":             "edit",
 		"create":           "create",
+		"subtask":          "subtask",
 		"dups":             "dups",
 		"blocks":           "blocks",
 		"watch":            "watch",
@@ -376,6 +379,9 @@ Command Options:
 	case "create":
 		setEditing(true)
 		err = c.CmdCreate()
+	case "subtask":
+		setEditing(true)
+		err = c.CmdSubtask(args[0])
 	case "transitions":
 		requireArgs(1)
 		err = c.CmdTransitions(args[0])
