@@ -451,6 +451,8 @@ func (c *Cli) Browse(issue string) error {
 			return exec.Command("open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
 		} else if runtime.GOOS == "linux" {
 			return exec.Command("xdg-open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
+		} else if runtime.GOOS == "windows" {
+			return exec.Command("cmd", "/c", "start", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
 		}
 	}
 	return nil
