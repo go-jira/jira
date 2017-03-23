@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.12 - 2017-03-22
+
+* Implement "browse" subcommand on Windows [Claus Brod] [[ca333d8](https://github.com/Netflix-Skunkworks/go-jira/commit/ca333d8)]
+
 ## 0.1.11 - 2017-02-26
 
 * [[#69](https://github.com/Netflix-Skunkworks/go-jira/issues/69)] add subtask command [Cory Bennett] [[21a2ed5](https://github.com/Netflix-Skunkworks/go-jira/commit/21a2ed5)]
