@@ -7,14 +7,17 @@ import (
 	"strings"
 
 	"github.com/howeyc/gopass"
-	"github.com/tmc/keyring"
 )
 
 func (c *Cli) GetPass(user string) string {
 	passwd := ""
 	if source, ok := c.opts["password-source"].(string); ok {
 		if source == "keyring" {
-			passwd, _ = keyring.Get("go-jira", user)
+			var err error
+			passwd, err = keyringGet(user)
+			if err != nil {
+				panic(err)
+			}
 		} else if source == "pass" {
 			if bin, err := exec.LookPath("pass"); err == nil {
 				buf := bytes.NewBufferString("")
@@ -48,7 +51,7 @@ func (c *Cli) SetPass(user, passwd string) error {
 		log.Debugf("password-source: %s", source)
 		if source == "keyring" {
 			// save password in keychain so that it can be used for subsequent http requests
-			err := keyring.Set("go-jira", user, passwd)
+			err := keyringSet(user, passwd)
 			if err != nil {
 				log.Errorf("Failed to set password in keyring: %s", err)
 				return err
