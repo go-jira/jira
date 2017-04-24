@@ -115,6 +115,7 @@ Query Options:
   -f --queryfields=FIELDS   Fields that are used in "list" template: (default: %s)
   -i --issuetype=ISSUETYPE  The Issue Type
   -l --limit=VAL            Maximum number of results to return in query (default: %d)
+  --start=START             Start parameter for pagination
   -p --project=PROJECT      Project to Search for
   -q --query=JQL            Jira Query Language expression for the search
   -r --reporter=USER        Reporter to search for
@@ -236,6 +237,7 @@ Command Options:
 		"x|expand=s":            setopt,
 		"s|sort=s":              setopt,
 		"l|limit|max_results=i": setopt,
+		"start|start_at=i":      setopt,
 		"o|override=s%":         &opts,
 		"noedit":                setopt,
 		"edit":                  setopt,
