@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.13 - 2017-04-24
+
+* work around `github.com/tmc/keyring` compile error for windows [Cory Bennett] [[85298e9](https://github.com/Netflix-Skunkworks/go-jira/commit/85298e9)]
+* Added generic issuelink command [David Reuss] [[cc54d11](https://github.com/Netflix-Skunkworks/go-jira/commit/cc54d11)]
+* Added --start parameter for pagination on results [David Reuss] [[9b94d9e](https://github.com/Netflix-Skunkworks/go-jira/commit/9b94d9e)]
+
 ## 0.1.12 - 2017-03-22
 
 * Implement "browse" subcommand on Windows [Claus Brod] [[ca333d8](https://github.com/Netflix-Skunkworks/go-jira/commit/ca333d8)]
