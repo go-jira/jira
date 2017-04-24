@@ -544,7 +544,7 @@ func (c *Cli) FindIssues() (interface{}, error) {
 
 	json, err := jsonEncode(map[string]interface{}{
 		"jql":        query,
-		"startAt":    "0",
+		"startAt":    c.opts["start_at"],
 		"maxResults": c.opts["max_results"],
 		"fields":     fields,
 		"expand":     c.expansions(),
