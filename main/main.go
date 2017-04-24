@@ -64,6 +64,7 @@ Usage:
   jira subtask ISSUE [--noedit] <Create Options>
   jira DUPLICATE dups ISSUE
   jira BLOCKER blocks ISSUE
+  jira issuelink OUTWARDISSUE ISSUELINKTYPE INWARDISSUE
   jira vote ISSUE [--down]
   jira rank ISSUE (after|before) ISSUE
   jira watch ISSUE [-w WATCHER] [--remove]
@@ -151,6 +152,7 @@ Command Options:
 		"subtask":          "subtask",
 		"dups":             "dups",
 		"blocks":           "blocks",
+		"issuelink":        "issuelink",
 		"watch":            "watch",
 		"trans":            "transition",
 		"transition":       "transition",
@@ -337,6 +339,9 @@ Command Options:
 
 	var err error
 	switch command {
+	case "issuelink":
+		requireArgs(3)
+		err = c.CmdIssueLink(args[0], args[1], args[2])
 	case "login":
 		err = c.CmdLogin()
 	case "logout":
