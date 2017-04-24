@@ -531,6 +531,50 @@ func (c *Cli) CmdIssueLinkTypes() error {
 	return runTemplate(c.getTemplate("issuelinktypes"), data, nil)
 }
 
+// CmdIssueLink is a generic function for adding a link type to an issue
+func (c *Cli) CmdIssueLink(inwardIssue string, issueLinkTypeName string, outwardIssue string) error {
+	log.Debugf("issuelink called")
+
+	json, err := jsonEncode(map[string]interface{}{
+		"type": map[string]string{
+			"name": issueLinkTypeName,
+		},
+		"inwardIssue": map[string]string{
+			"key": inwardIssue,
+		},
+		"outwardIssue": map[string]string{
+			"key": outwardIssue,
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf("%s/rest/api/2/issueLink", c.endpoint)
+	if c.getOptBool("dryrun", false) {
+		log.Debugf("POST: %s", json)
+		log.Debugf("Dryrun mode, skipping POST")
+		return nil
+	}
+	resp, err := c.post(uri, json)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode == 201 {
+		c.Browse(inwardIssue)
+		if !c.opts["quiet"].(bool) {
+			fmt.Printf("OK %s %s/browse/%s\n", inwardIssue, c.endpoint, inwardIssue)
+		}
+	} else {
+		logBuffer := bytes.NewBuffer(make([]byte, 0))
+		resp.Write(logBuffer)
+		err := fmt.Errorf("Unexpected Response From POST")
+		log.Errorf("%s:\n%s", err, logBuffer)
+		return err
+	}
+	return nil
+}
+
 // CmdBlocks will update the given issue as being "blocked" by the given blocker
 func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	log.Debugf("blocks called")
