@@ -157,7 +157,7 @@ func (c *Cli) CmdWorklog(action string, issue string) error {
 
 				if resp.StatusCode == 201 {
 					c.Browse(issue)
-					if !c.opts["quiet"].(bool) {
+					if !c.GetOptBool("quiet", false) {
 						fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 					}
 					return nil
@@ -210,7 +210,7 @@ func (c *Cli) CmdEdit(issue string) error {
 
 			if resp.StatusCode == 204 {
 				c.Browse(issueData["key"].(string))
-				if !c.opts["quiet"].(bool) {
+				if !c.GetOptBool("quiet", false) {
 					fmt.Printf("OK %s %s/browse/%s\n", issueData["key"], c.endpoint, issueData["key"])
 				}
 				return nil
@@ -416,7 +416,7 @@ func (c *Cli) CmdCreate() error {
 					"issue": key,
 					"link":  link,
 				})
-				if !c.opts["quiet"].(bool) {
+				if !c.GetOptBool("quiet", false) {
 					fmt.Printf("OK %s %s\n", key, link)
 				}
 				return nil
@@ -506,7 +506,7 @@ func (c *Cli) CmdSubtask(issue string) error {
 					"issue": key,
 					"link":  link,
 				})
-				if !c.opts["quiet"].(bool) {
+				if !c.GetOptBool("quiet", false) {
 					fmt.Printf("OK %s %s\n", key, link)
 				}
 				return nil
@@ -562,7 +562,7 @@ func (c *Cli) CmdIssueLink(inwardIssue string, issueLinkTypeName string, outward
 	}
 	if resp.StatusCode == 201 {
 		c.Browse(inwardIssue)
-		if !c.opts["quiet"].(bool) {
+		if !c.GetOptBool("quiet", false) {
 			fmt.Printf("OK %s %s/browse/%s\n", inwardIssue, c.endpoint, inwardIssue)
 		}
 	} else {
@@ -606,7 +606,7 @@ func (c *Cli) CmdBlocks(blocker string, issue string) error {
 	}
 	if resp.StatusCode == 201 {
 		c.Browse(issue)
-		if !c.opts["quiet"].(bool) {
+		if !c.GetOptBool("quiet", false) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -651,7 +651,7 @@ func (c *Cli) CmdDups(duplicate string, issue string) error {
 	}
 	if resp.StatusCode == 201 {
 		c.Browse(issue)
-		if !c.opts["quiet"].(bool) {
+		if !c.GetOptBool("quiet", false) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -699,7 +699,7 @@ func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
 	}
 	if resp.StatusCode == 204 {
 		c.Browse(issue)
-		if !c.opts["quiet"].(bool) {
+		if !c.GetOptBool("quiet", false) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -743,7 +743,7 @@ func (c *Cli) CmdVote(issue string, up bool) error {
 	}
 	if resp.StatusCode == 204 {
 		c.Browse(issue)
-		if !c.opts["quiet"].(bool) {
+		if !c.GetOptBool("quiet", false) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
@@ -766,7 +766,7 @@ func (c *Cli) CmdRankAfter(issue, after string) error {
 	if err != nil {
 		return nil
 	}
-	if !c.opts["quiet"].(bool) {
+	if !c.GetOptBool("quiet", false) {
 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	}
 	return nil
@@ -778,7 +778,7 @@ func (c *Cli) CmdRankBefore(issue, before string) error {
 	if err != nil {
 		return nil
 	}
-	if !c.opts["quiet"].(bool) {
+	if !c.GetOptBool("quiet", false) {
 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 	}
 	return nil
@@ -829,7 +829,7 @@ func (c *Cli) CmdTransition(issue string, trans string) error {
 		}
 		if resp.StatusCode == 204 {
 			c.Browse(issue)
-			if !c.opts["quiet"].(bool) {
+			if !c.GetOptBool("quiet", false) {
 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			}
 		} else {
@@ -899,7 +899,7 @@ func (c *Cli) CmdComment(issue string) error {
 
 		if resp.StatusCode == 201 {
 			c.Browse(issue)
-			if !c.opts["quiet"].(bool) {
+			if !c.GetOptBool("quiet", false) {
 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			}
 			return nil
@@ -959,7 +959,7 @@ func (c *Cli) CmdComponent(action string, project string, name string, desc stri
 		return err
 	}
 	if resp.StatusCode == 201 {
-		if !c.opts["quiet"].(bool) {
+		if !c.GetOptBool("quiet", false) {
 			fmt.Printf("OK %s %s\n", project, name)
 		}
 	} else {
@@ -994,7 +994,7 @@ func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 
 		if resp.StatusCode == 204 {
 			c.Browse(issue)
-			if !c.opts["quiet"].(bool) {
+			if !c.GetOptBool("quiet", false) {
 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 			}
 			return nil
@@ -1069,7 +1069,7 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 	}
 	if resp.StatusCode == 204 {
 		c.Browse(issue)
-		if !c.opts["quiet"].(bool) {
+		if !c.GetOptBool("quiet", false) {
 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
 		}
 	} else {
