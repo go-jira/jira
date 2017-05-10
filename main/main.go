@@ -82,7 +82,8 @@ Usage:
   jira comment ISSUE [--noedit] <Edit Options>
   jira (set,add,remove) labels ISSUE [LABEL] ...
   jira take ISSUE
-  jira (assign|give) ISSUE ASSIGNEE
+  jira (assign|give) ISSUE [ASSIGNEE|--default]
+  jira unassign ISSUE
   jira fields
   jira issuelinktypes
   jira transmeta ISSUE
@@ -194,6 +195,7 @@ Command Options:
 		"rank":             "rank",
 		"worklog":          "worklog",
 		"addworklog":       "addworklog",
+		"unassign":         "unassign",
 	}
 
 	defaults := map[string]interface{}{
@@ -251,6 +253,7 @@ Command Options:
 		"Q|quiet":               setopt,
 		"unixproxy":             setopt,
 		"down":                  setopt,
+		"default":               setopt,
 	})
 
 	if err := op.ProcessAll(os.Args[1:]); err != nil {
@@ -503,8 +506,15 @@ Command Options:
 	case "export-templates":
 		err = c.CmdExportTemplates()
 	case "assign":
-		requireArgs(2)
-		err = c.CmdAssign(args[0], args[1])
+		requireArgs(1)
+		assignee := ""
+		if len(args) > 1 {
+			assignee = args[1]
+		}
+		err = c.CmdAssign(args[0], assignee)
+	case "unassign":
+		requireArgs(1)
+		err = c.CmdUnassign(args[0])
 	case "view":
 		requireArgs(1)
 		err = c.CmdView(args[0])

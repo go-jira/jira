@@ -1040,8 +1040,18 @@ func (c *Cli) CmdLabels(action string, issue string, labels []string) error {
 func (c *Cli) CmdAssign(issue string, user string) error {
 	log.Debugf("assign called")
 
+	var userVal interface{} = user
+	// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-assign
+	// If the name is "-1" automatic assignee is used. A null name will remove the assignee.
+	if user == "" {
+		userVal = nil
+	}
+	if c.GetOptBool("default", false) {
+		userVal = "-1"
+	}
+
 	json, err := jsonEncode(map[string]interface{}{
-		"name": user,
+		"name": userVal,
 	})
 	if err != nil {
 		return err
@@ -1070,6 +1080,10 @@ func (c *Cli) CmdAssign(issue string, user string) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Cli) CmdUnassign(issue string) error {
+	return c.CmdAssign(issue, "")
 }
 
 // CmdExportTemplates will export the default templates to the template directory.
