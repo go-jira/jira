@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.14 - 2017-05-10
+
+* fix unsafe casting for --quiet flag [Cory Bennett] [[6f29f43](https://github.com/Netflix-Skunkworks/go-jira/commit/6f29f43)]
+* [[#80](https://github.com/Netflix-Skunkworks/go-jira/issues/80)] add `jira unassign` and `jira give ISSUE --default` commands [Cory Bennett] [[03d8633](https://github.com/Netflix-Skunkworks/go-jira/commit/03d8633)]
+
 ## 0.1.13 - 2017-04-24
 
 * work around `github.com/tmc/keyring` compile error for windows [Cory Bennett] [[85298e9](https://github.com/Netflix-Skunkworks/go-jira/commit/85298e9)]
