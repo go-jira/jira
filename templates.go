@@ -191,8 +191,8 @@ fields:
 {{if .meta.fields.fixVersions -}}
   {{if .meta.fields.fixVersions.allowedValues}}
   fixVersions: # Values: {{ range .meta.fields.fixVersions.allowedValues }}{{.name}}, {{end}}{{if .overrides.fixVersions}}{{ range (split "," .overrides.fixVersions)}}
-    - name: {{.}}{{end}}{{else}}{{range .fields.fixVersions}}
-    - name: {{.}}{{end}}{{end}}
+    - name: {{.name}}{{end}}{{else}}{{range .fields.fixVersions}}
+    - name: {{.name}}{{end}}{{end}}
   {{- end -}}
 {{- end -}}
 {{if .meta.fields.issuetype}}
