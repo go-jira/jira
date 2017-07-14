@@ -222,6 +222,12 @@ Then initialize the `pass` tool to use the correct key:
 $ pass init "Go Jira <gojira@example.com>"
 ```
 
+`go-jira` expects user's password to be stored under `GoJira/<user>`:
+```
+$ pass insert GoJira/<user>
+```
+
+
 You probably want to setup gpg-agent so that you dont have to type in your gpg passphrase all the time.  You can get `gpg-agent` to automatically start by adding something like this to your `$HOME/.bashrc`
 ```bash
 if [ -f $HOME/.gpg-agent-info ]; then
