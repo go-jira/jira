@@ -129,6 +129,10 @@ func main() {
 			Entry:   cli.CmdIssueLinkRegistry(),
 		},
 		jiracli.CommandRegistry{
+			Command: "issuelinktypes",
+			Entry:   cli.CmdIssueLinkTypesRegistry(),
+		},
+		jiracli.CommandRegistry{
 			Command: "transition",
 			Aliases: []string{"trans"},
 			Entry:   cli.CmdTransitionRegistry(""),
@@ -230,7 +234,6 @@ func main() {
 	//   jira take ISSUE
 	//   jira (assign|give) ISSUE [ASSIGNEE|--default]
 	//   jira unassign ISSUE
-	//   jira issuelinktypes
 	//   jira transmeta ISSUE
 	//   jira add component [-p PROJECT] NAME DESCRIPTION LEAD
 	//   jira components [-p PROJECT]
@@ -296,13 +299,7 @@ func main() {
 	// 		"take":             "take",
 	// 		"assign":           "assign",
 	// 		"give":             "assign",
-	// 		"fields":           "fields",
-	// 		"issuelinktypes":   "issuelinktypes",
-	// 		"transmeta":        "transmeta",
-	// 		"editmeta":         "editmeta",
 	// 		"issuetypes":       "issuetypes",
-	// 		"createmeta":       "createmeta",
-	// 		"transitions":      "transitions",
 	// 		"export-templates": "export-templates",
 	// 		"browse":           "browse",
 	// 		"req":              "request",
@@ -456,8 +453,6 @@ func main() {
 
 	// 	var err error
 	// 	switch command {
-	// 	case "issuelinktypes":
-	// 		err = c.CmdIssueLinkTypes()
 	// 	case "issuetypes":
 	// 		err = c.CmdIssueTypes()
 	// 	case "watch":

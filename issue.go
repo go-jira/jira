@@ -295,3 +295,23 @@ func (j *Jira) TransitionIssue(issue string, iup IssueUpdateProvider) error {
 	}
 	return responseError(resp)
 }
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issueLinkType-getIssueLinkTypes
+func (j *Jira) GetIssueLinkTypes() (*jiradata.IssueLinkTypes, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/issueLinkType", j.Endpoint)
+	resp, err := j.UA.GetJSON(uri)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		results := struct {
+			IssueLinkTypes jiradata.IssueLinkTypes
+		}{
+			IssueLinkTypes: jiradata.IssueLinkTypes{},
+		}
+		return &results.IssueLinkTypes, readJSON(resp.Body, &results)
+	}
+	return nil, responseError(resp)
+}
