@@ -1,15 +1,1 @@
-bin/
-pkg/
-src/code.google.com/
-src/github.com/docopt/
-src/github.com/mgutz/
-src/github.com/op/
-src/gopkg.in/
-jira
-jira.exe
 schemas/*.json
-t/issue.props
-t/.jira.d/templates
-dist/
-src/
-t/.maven-cache

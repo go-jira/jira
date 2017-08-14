@@ -1,0 +1,23 @@
+package: gopkg.in/Netflix-Skunkworks/go-jira.v1
+import:
+- package: github.com/coryb/figtree
+- package: github.com/coryb/oreo
+- package: github.com/mgutz/ansi
+- package: github.com/pkg/errors
+  version: ^0.8.0
+- package: github.com/sethgrid/pester
+- package: github.com/theckman/go-flock
+- package: gopkg.in/alecthomas/kingpin.v2
+  version: ^2.2.4
+- package: gopkg.in/op/go-logging.v1
+  version: ^1.0.0
+- package: github.com/AlecAivazis/survey
+  version: ^1.2.4
+- package: github.com/tmc/keyring
+- package: github.com/kballard/go-shellquote
+- package: github.com/jinzhu/copier
+testImport:
+- package: github.com/stretchr/testify
+  version: ^1.1.4
+  subpackages:
+  - assert

@@ -28,8 +28,6 @@ else
 	BIN ?= $(GOBIN)$(SEP)$(NAME)
 endif
 
-export GOPATH=$(CWD)
-
 DIST=$(CWD)$(SEP)dist
 
 GOBIN ?= $(CWD)
@@ -40,16 +38,16 @@ LDFLAGS:=-X jira.VERSION=$(CURVER) -w
 # use make DEBUG=1 and you can get a debuggable golang binary
 # see https://github.com/mailgun/godebug
 ifneq ($(DEBUG),)
-	GOBUILD=go get -v github.com/mailgun/godebug && ./bin/godebug build
+	GOBUILD=go get -v github.com/mailgun/godebug && 
 else
 	GOBUILD=go build -v -ldflags "$(LDFLAGS) -s"
 endif
 
 build: src/gopkg.in/Netflix-Skunkworks/go-jira.v0
-	$(GOBUILD) -o '$(BIN)' main/main.go
+	$(GOBUILD) -o '$(BIN)' cmd/jira/main.go
 
 debug:
-	$(MAKE) DEBUG=1
+	go build -v -o '$(BIN)' cmd/jira/main.go
 
 src/%:
 	mkdir -p $(@D)

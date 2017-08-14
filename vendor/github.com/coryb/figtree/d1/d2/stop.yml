@@ -1,0 +1,12 @@
+config:
+  stop: true
+str1: d2str1val1
+arr1:
+  - d2arr1val1
+  - d2arr1val2
+map1:
+  key1: d2map1val1
+  key2: d2map1val2
+int1: 222
+float1: 2.22
+bool1: false

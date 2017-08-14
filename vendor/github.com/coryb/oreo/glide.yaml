@@ -1,0 +1,6 @@
+package: github.com/coryb/oreo
+import:
+- package: github.com/sethgrid/pester
+- package: gopkg.in/op/go-logging.v1
+  version: ^1.0.0
+- package: github.com/theckman/go-flock
