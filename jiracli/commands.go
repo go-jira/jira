@@ -116,58 +116,6 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 // 	return runTemplate(c.getTemplate("components"), data, nil)
 // }
 
-// // CmdWatch will add the given watcher to the issue (or remove the watcher
-// // given the 'remove' flag)
-// func (c *Cli) CmdWatch(issue string, watcher string, remove bool) error {
-// 	log.Debugf("watch called: watcher: %q, remove: %n", watcher, remove)
-
-// 	var uri string
-// 	json, err := jsonEncode(watcher)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	if c.getOptBool("dryrun", false) {
-// 		if !remove {
-// 			log.Debugf("POST: %s", json)
-// 			log.Debugf("Dryrun mode, skipping POST")
-// 		} else {
-// 			log.Debugf("DELETE: %s", watcher)
-// 			log.Debugf("Dryrun mode, skipping POST")
-// 		}
-// 		return nil
-// 	}
-
-// 	var resp *http.Response
-// 	if !remove {
-// 		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", c.endpoint, issue)
-// 		resp, err = c.post(uri, json)
-// 	} else {
-// 		uri = fmt.Sprintf("%s/rest/api/2/issue/%s/watchers?username=%s", c.endpoint, issue, watcher)
-// 		resp, err = c.delete(uri)
-// 	}
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if resp.StatusCode == 204 {
-// 		c.Browse(issue)
-// 		if !c.GetOptBool("quiet", false) {
-// 			fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
-// 		}
-// 	} else {
-// 		logBuffer := bytes.NewBuffer(make([]byte, 0))
-// 		resp.Write(logBuffer)
-// 		if !remove {
-// 			err = fmt.Errorf("Unexpected Response From POST")
-// 		} else {
-// 			err = fmt.Errorf("Unexpected Response From DELETE")
-// 		}
-// 		log.Errorf("%s:\n%s", err, logBuffer)
-// 		return err
-// 	}
-// 	return nil
-// }
-
 // // CmdComment will open up editor with "comment" template and submit
 // // YAML output to jira
 // func (c *Cli) CmdComment(issue string) error {

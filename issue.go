@@ -369,3 +369,33 @@ func (j *Jira) RankIssues(rrp RankRequestProvider) error {
 	}
 	return responseError(resp)
 }
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addWatcher
+func (j *Jira) IssueAddWatcher(issue, user string) error {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", j.Endpoint, issue)
+	resp, err := j.UA.Post(uri, "application/json", strings.NewReader(fmt.Sprintf("%q", user)))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addWatcher
+func (j *Jira) IssueRemoveWatcher(issue, user string) error {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers?username=%s", j.Endpoint, issue, user)
+	resp, err := j.UA.Delete(uri)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}

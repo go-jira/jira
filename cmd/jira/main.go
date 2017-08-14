@@ -195,6 +195,10 @@ func main() {
 			Command: "rank",
 			Entry:   cli.CmdRankRegistry(),
 		},
+		jiracli.CommandRegistry{
+			Command: "watch",
+			Entry:   cli.CmdWatchRegistry(),
+		},
 	}
 
 	cli.Register(app, registry)
@@ -211,29 +215,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("%s", err)
 	}
-	// 	user := os.Getenv("USER")
-	// 	home := os.Getenv("HOME")
-	// 	defaultQueryFields := "summary,created,updated,priority,status,reporter,assignee"
-	// 	defaultSort := "priority asc, key"
-	// 	defaultMaxResults := 500
 
-	// 	usage := func(ok bool) {
-	// 		printer := fmt.Printf
-	// 		if !ok {
-	// 			printer = func(format string, args ...interface{}) (int, error) {
-	// 				return fmt.Fprintf(os.Stderr, format, args...)
-	// 			}
-	// 			defer func() {
-	// 				os.Exit(1)
-	// 			}()
-	// 		} else {
-	// 			defer func() {
-	// 				os.Exit(0)
-	// 			}()
-	// 		}
-	// 		output := fmt.Sprintf(`
 	// Usage:
-	//   jira watch ISSUE [-w WATCHER] [--remove]
 	//   jira comment ISSUE [--noedit] <Edit Options>
 	//   jira (set,add,remove) labels ISSUE [LABEL] ...
 	//   jira take ISSUE
@@ -269,8 +252,6 @@ func main() {
 	//   -q --query=JQL            Jira Query Language expression for the search
 	//   -r --reporter=USER        Reporter to search for
 	//   -s --sort=ORDER           For list operations, sort issues (default: %s)
-	//   -w --watcher=USER         Watcher to add to issue (default: %s)
-	//                             or Watcher to search for
 
 	// Edit Options:
 	//   -m --comment=COMMENT      Comment message for transition
@@ -292,7 +273,6 @@ func main() {
 	// 	}
 
 	// 	jiraCommands := map[string]string{
-	// 		"watch":            "watch",
 	// 		"comment":          "comment",
 	// 		"label":            "labels",
 	// 		"labels":           "labels",
@@ -345,7 +325,6 @@ func main() {
 	// 		"c|component=s":         setopt,
 	// 		"a|assignee=s":          setopt,
 	// 		"i|issuetype=s":         setopt,
-	// 		"w|watcher=s":           setopt,
 	// 		"remove":                setopt,
 	// 		"r|reporter=s":          setopt,
 	// 		"f|queryfields=s":       setopt,
@@ -455,11 +434,6 @@ func main() {
 	// 	switch command {
 	// 	case "issuetypes":
 	// 		err = c.CmdIssueTypes()
-	// 	case "watch":
-	// 		requireArgs(1)
-	// 		watcher := c.GetOptString("watcher", opts["user"].(string))
-	// 		remove := c.GetOptBool("remove", false)
-	// 		err = c.CmdWatch(args[0], watcher, remove)
 	// 	case "comment":
 	// 		requireArgs(1)
 	// 		setEditing(true)
