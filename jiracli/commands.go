@@ -168,30 +168,6 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 // 	return nil
 // }
 
-// // CmdRankAfter rank issue after target issue
-// func (c *Cli) CmdRankAfter(issue, after string) error {
-// 	err := c.RankIssue(issue, after, RANKAFTER)
-// 	if err != nil {
-// 		return nil
-// 	}
-// 	if !c.GetOptBool("quiet", false) {
-// 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
-// 	}
-// 	return nil
-// }
-
-// // CmdRankBefore rank issue before target issue
-// func (c *Cli) CmdRankBefore(issue, before string) error {
-// 	err := c.RankIssue(issue, before, RANKBEFORE)
-// 	if err != nil {
-// 		return nil
-// 	}
-// 	if !c.GetOptBool("quiet", false) {
-// 		fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
-// 	}
-// 	return nil
-// }
-
 // // CmdComment will open up editor with "comment" template and submit
 // // YAML output to jira
 // func (c *Cli) CmdComment(issue string) error {

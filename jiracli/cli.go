@@ -553,55 +553,6 @@ func (jc *JiraCli) editLoop(opts *GlobalOptions, input interface{}, output inter
 // 	return data, nil
 // }
 
-// // RankOrder type used to specify before/after ranking arguments to RankIssue
-// type RankOrder int
-
-// const (
-// 	// RANKBEFORE should be used to rank issue before the target issue
-// 	RANKBEFORE RankOrder = iota
-// 	// RANKAFTER should be used to rank issue after the target issue
-// 	RANKAFTER RankOrder = iota
-// )
-
-// // RankIssue will modify issue to have rank before or after the target issue
-// func (c *Cli) RankIssue(issue, target string, order RankOrder) error {
-// 	type RankRequest struct {
-// 		Issues []string `json:"issues"`
-// 		Before string   `json:"rankBeforeIssue,omitempty"`
-// 		After  string   `json:"rankAfterIssue,omitempty"`
-// 	}
-// 	req := &RankRequest{
-// 		Issues: []string{
-// 			issue,
-// 		},
-// 	}
-// 	if order == RANKBEFORE {
-// 		req.Before = target
-// 	} else {
-// 		req.After = target
-// 	}
-
-// 	json, err := jsonEncode(req)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	uri := fmt.Sprintf("%s/rest/agile/1.0/issue/rank", c.endpoint)
-// 	if c.getOptBool("dryrun", false) {
-// 		log.Debugf("PUT: %s", json)
-// 		log.Debugf("Dryrun mode, skipping PUT")
-// 		return nil
-// 	}
-// 	resp, err := c.put(uri, json)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if resp.StatusCode != 204 {
-// 		return fmt.Errorf("failed to modify issue rank: %s", resp.Status)
-// 	}
-// 	return nil
-// }
-
 // // GetOptString will extract the string from the Cli object options
 // // otherwise return the provided default
 // func (c *Cli) GetOptString(optName string, dflt string) string {

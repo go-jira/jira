@@ -191,6 +191,10 @@ func main() {
 			Command: "vote",
 			Entry:   cli.CmdVoteRegistry(),
 		},
+		jiracli.CommandRegistry{
+			Command: "rank",
+			Entry:   cli.CmdRankRegistry(),
+		},
 	}
 
 	cli.Register(app, registry)
@@ -229,7 +233,6 @@ func main() {
 	// 		}
 	// 		output := fmt.Sprintf(`
 	// Usage:
-	//   jira rank ISSUE (after|before) ISSUE
 	//   jira watch ISSUE [-w WATCHER] [--remove]
 	//   jira comment ISSUE [--noedit] <Edit Options>
 	//   jira (set,add,remove) labels ISSUE [LABEL] ...
@@ -303,7 +306,6 @@ func main() {
 	// 		"browse":           "browse",
 	// 		"req":              "request",
 	// 		"request":          "request",
-	// 		"rank":             "rank",
 	// 		"unassign":         "unassign",
 	// 	}
 
@@ -504,13 +506,6 @@ func main() {
 	// 	case "unassign":
 	// 		requireArgs(1)
 	// 		err = c.CmdUnassign(args[0])
-	// 	case "rank":
-	// 		requireArgs(3)
-	// 		if args[1] == "after" {
-	// 			err = c.CmdRankAfter(args[0], args[2])
-	// 		} else {
-	// 			err = c.CmdRankBefore(args[0], args[2])
-	// 		}
 	// 	case "request":
 	// 		requireArgs(1)
 	// 		data := ""

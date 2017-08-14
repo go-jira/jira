@@ -13,3 +13,7 @@ func (w *Worklog) ProvideWorklog() *Worklog {
 func (l *LinkIssueRequest) ProvideLinkIssueRequest() *LinkIssueRequest {
 	return l
 }
+
+func (r *RankRequest) ProvideRankRequest() *RankRequest {
+	return r
+}

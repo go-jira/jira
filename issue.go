@@ -345,3 +345,27 @@ func (j *Jira) IssueRemoveVote(issue string) error {
 	}
 	return responseError(resp)
 }
+
+type RankRequestProvider interface {
+	ProvideRankRequest() *jiradata.RankRequest
+}
+
+// https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/issue-rankIssues
+func (j *Jira) RankIssues(rrp RankRequestProvider) error {
+	req := rrp.ProvideRankRequest()
+	encoded, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+	uri := fmt.Sprintf("%s/rest/agile/1.0/issue/rank", j.Endpoint)
+	resp, err := j.UA.Put(uri, "application/json", bytes.NewBuffer(encoded))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}

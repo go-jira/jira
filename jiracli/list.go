@@ -37,13 +37,16 @@ func (jc *JiraCli) CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error
 	cmd.Flag("assignee", "User assigned the issue").Short('a').StringVar(&opts.Assignee)
 	cmd.Flag("component", "Component to search for").Short('c').StringVar(&opts.Component)
 	cmd.Flag("issuetype", "Issue type to search for").Short('i').StringVar(&opts.IssueType)
+	// FIXME Default
 	cmd.Flag("limit", "Maximum number of results to return in search").Short('l').Default("500").IntVar(&opts.MaxResults)
 	cmd.Flag("project", "Project to search for").Short('p').StringVar(&opts.Project)
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search").Short('q').StringVar(&opts.Query)
+	// FIXME Default
 	cmd.Flag("queryfields", "Fields that are used in \"list\" template").Short('f').Default(
 		"assignee,created,priority,reporter,status,summary,updated",
 	).StringVar(&opts.QueryFields)
 	cmd.Flag("reporter", "Reporter to search for").Short('r').StringVar(&opts.Reporter)
+	// FIXME Default
 	cmd.Flag("sort", "Sort order to return").Short('s').Default("priority asc, key").StringVar(&opts.Sort)
 	cmd.Flag("watcher", "Watcher to search for").Short('w').StringVar(&opts.Watcher)
 	return nil
