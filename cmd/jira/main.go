@@ -187,6 +187,10 @@ func main() {
 			Aliases: []string{"prog", "progress"},
 			Entry:   cli.CmdTransitionRegistry("Progress"),
 		},
+		jiracli.CommandRegistry{
+			Command: "vote",
+			Entry:   cli.CmdVoteRegistry(),
+		},
 	}
 
 	cli.Register(app, registry)
@@ -225,21 +229,16 @@ func main() {
 	// 		}
 	// 		output := fmt.Sprintf(`
 	// Usage:
-	//   jira vote ISSUE [--down]
 	//   jira rank ISSUE (after|before) ISSUE
 	//   jira watch ISSUE [-w WATCHER] [--remove]
-	//   jira (trans|transition) TRANSITION ISSUE [--noedit] <Edit Options>
 	//   jira comment ISSUE [--noedit] <Edit Options>
 	//   jira (set,add,remove) labels ISSUE [LABEL] ...
 	//   jira take ISSUE
 	//   jira (assign|give) ISSUE [ASSIGNEE|--default]
 	//   jira unassign ISSUE
-	//   jira transmeta ISSUE
 	//   jira add component [-p PROJECT] NAME DESCRIPTION LEAD
 	//   jira components [-p PROJECT]
 	//   jira issuetypes [-p PROJECT]
-	//   jira createmeta [-p PROJECT] [-i ISSUETYPE]
-	//   jira transitions ISSUE
 	//   jira export-templates [-d DIR] [-t template]
 	//   jira (b|browse) ISSUE
 	//   jira request [-M METHOD] URI [DATA]
@@ -304,7 +303,6 @@ func main() {
 	// 		"browse":           "browse",
 	// 		"req":              "request",
 	// 		"request":          "request",
-	// 		"vote":             "vote",
 	// 		"rank":             "rank",
 	// 		"unassign":         "unassign",
 	// 	}
@@ -506,13 +504,6 @@ func main() {
 	// 	case "unassign":
 	// 		requireArgs(1)
 	// 		err = c.CmdUnassign(args[0])
-	// 	case "vote":
-	// 		requireArgs(1)
-	// 		if val, ok := opts["down"]; ok {
-	// 			err = c.CmdVote(args[0], !val.(bool))
-	// 		} else {
-	// 			err = c.CmdVote(args[0], true)
-	// 		}
 	// 	case "rank":
 	// 		requireArgs(3)
 	// 		if args[1] == "after" {

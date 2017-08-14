@@ -315,3 +315,33 @@ func (j *Jira) GetIssueLinkTypes() (*jiradata.IssueLinkTypes, error) {
 	}
 	return nil, responseError(resp)
 }
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addVote
+func (j *Jira) IssueAddVote(issue string) error {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", j.Endpoint, issue)
+	resp, err := j.UA.Post(uri, "application/json", strings.NewReader("{}"))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-removeVote
+func (j *Jira) IssueRemoveVote(issue string) error {
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", j.Endpoint, issue)
+	resp, err := j.UA.Delete(uri)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}
