@@ -7,65 +7,61 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-type BlockOptions struct {
+type IssueLinkOptions struct {
 	GlobalOptions
 	jiradata.LinkIssueRequest
-	Blocker string
-	Issue   string
+	LinkType string
 }
 
-func (jc *JiraCli) CmdBlockRegistry() *CommandRegistryEntry {
-	opts := BlockOptions{
+func (jc *JiraCli) CmdIssueLinkRegistry() *CommandRegistryEntry {
+	opts := IssueLinkOptions{
 		GlobalOptions: GlobalOptions{
 			Template: "edit",
 		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
-			Type: &jiradata.IssueLinkType{
-				// FIXME is this consitent across multiple jira installs?
-				Name: "Blocks",
-			},
+			Type:         &jiradata.IssueLinkType{},
 			InwardIssue:  &jiradata.IssueRef{},
 			OutwardIssue: &jiradata.IssueRef{},
 		},
 	}
-
 	return &CommandRegistryEntry{
-		"Mark issues as blocker",
+		"Link two issues",
 		func() error {
-			return jc.CmdBlock(&opts)
+			return jc.CmdIssueLink(&opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdBlockUsage(cmd, &opts)
+			return jc.CmdIssueLinkUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdBlockUsage(cmd *kingpin.CmdClause, opts *BlockOptions) error {
+func (jc *JiraCli) CmdIssueLinkUsage(cmd *kingpin.CmdClause, opts *IssueLinkOptions) error {
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
-	cmd.Flag("comment", "Comment message when marking issue as blocker").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
+	cmd.Flag("comment", "Comment message when linking issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Comment = &jiradata.Comment{
 			Body: flagValue(ctx, "comment"),
 		}
 		return nil
 	}).String()
-	cmd.Arg("BLOCKER", "blocker issue").Required().StringVar(&opts.OutwardIssue.Key)
-	cmd.Arg("ISSUE", "issue that is blocked").Required().StringVar(&opts.InwardIssue.Key)
+	cmd.Arg("OUTWARDISSUE", "outward issue").Required().StringVar(&opts.OutwardIssue.Key)
+	cmd.Arg("ISSUELINKTYPE", "issue link type").Required().StringVar(&opts.Type.Name)
+	cmd.Arg("INWARDISSUE", "inward issue").Required().StringVar(&opts.InwardIssue.Key)
 	return nil
 }
 
 // CmdBlock will update the given issue as being a duplicate by the given dup issue
 // and will attempt to resolve the dup issue
-func (jc *JiraCli) CmdBlock(opts *BlockOptions) error {
+func (jc *JiraCli) CmdIssueLink(opts *IssueLinkOptions) error {
 	if err := jc.LinkIssues(&opts.LinkIssueRequest); err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Blocker, jc.Endpoint, opts.Blocker)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, jc.Endpoint, opts.InwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
 
 	// FIXME implement browse
 

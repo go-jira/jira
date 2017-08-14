@@ -19,6 +19,14 @@ func (jc *JiraCli) CmdDupRegistry() *CommandRegistryEntry {
 		GlobalOptions: GlobalOptions{
 			Template: "edit",
 		},
+		LinkIssueRequest: jiradata.LinkIssueRequest{
+			Type: &jiradata.IssueLinkType{
+				// FIXME is this consitent across multiple jira installs?
+				Name: "Duplicate",
+			},
+			InwardIssue:  &jiradata.IssueRef{},
+			OutwardIssue: &jiradata.IssueRef{},
+		},
 	}
 
 	return &CommandRegistryEntry{
@@ -44,31 +52,20 @@ func (jc *JiraCli) CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
 		}
 		return nil
 	}).String()
-	cmd.Arg("DUPLICATE", "duplicate issue to mark closed").Required().StringVar(&opts.Duplicate)
-	cmd.Arg("ISSUE", "duplicate issue to leave open").Required().StringVar(&opts.Issue)
+	cmd.Arg("DUPLICATE", "duplicate issue to mark closed").Required().StringVar(&opts.InwardIssue.Key)
+	cmd.Arg("ISSUE", "duplicate issue to leave open").Required().StringVar(&opts.OutwardIssue.Key)
 	return nil
 }
 
 // CmdDups will update the given issue as being a duplicate by the given dup issue
 // and will attempt to resolve the dup issue
 func (jc *JiraCli) CmdDup(opts *DupOptions) error {
-	opts.Type = &jiradata.IssueLinkType{
-		// FIXME is this consitent across multiple jira installs?
-		Name: "Duplicate",
-	}
-	opts.InwardIssue = &jiradata.IssueRef{
-		Key: opts.Duplicate,
-	}
-	opts.OutwardIssue = &jiradata.IssueRef{
-		Key: opts.Issue,
-	}
-
 	if err := jc.LinkIssues(&opts.LinkIssueRequest); err != nil {
 		return err
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
 
-	meta, err := jc.GetIssueTransitions(opts.Duplicate)
+	meta, err := jc.GetIssueTransitions(opts.InwardIssue.Key)
 	if err != nil {
 		return err
 	}
@@ -78,7 +75,7 @@ func (jc *JiraCli) CmdDup(opts *DupOptions) error {
 			issueUpdate := jiradata.IssueUpdate{
 				Transition: transMeta,
 			}
-			if err = jc.TransitionIssue(opts.Duplicate, &issueUpdate); err != nil {
+			if err = jc.TransitionIssue(opts.InwardIssue.Key, &issueUpdate); err != nil {
 				return err
 			}
 			// if we just started the issue now we need to stop it
@@ -88,7 +85,7 @@ func (jc *JiraCli) CmdDup(opts *DupOptions) error {
 		}
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Duplicate, jc.Endpoint, opts.Duplicate)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, jc.Endpoint, opts.InwardIssue.Key)
 
 	// FIXME implement browse
 

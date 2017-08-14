@@ -125,6 +125,10 @@ func main() {
 			Entry:   cli.CmdBlockRegistry(),
 		},
 		jiracli.CommandRegistry{
+			Command: "issuelink",
+			Entry:   cli.CmdIssueLinkRegistry(),
+		},
+		jiracli.CommandRegistry{
 			Command: "transition",
 			Aliases: []string{"trans"},
 			Entry:   cli.CmdTransitionRegistry(""),
@@ -217,8 +221,6 @@ func main() {
 	// 		}
 	// 		output := fmt.Sprintf(`
 	// Usage:
-	//   jira BLOCKER blocks ISSUE
-	//   jira issuelink OUTWARDISSUE ISSUELINKTYPE INWARDISSUE
 	//   jira vote ISSUE [--down]
 	//   jira rank ISSUE (after|before) ISSUE
 	//   jira watch ISSUE [-w WATCHER] [--remove]
@@ -285,8 +287,6 @@ func main() {
 	// 	}
 
 	// 	jiraCommands := map[string]string{
-	// 		"blocks":           "blocks",
-	// 		"issuelink":        "issuelink",
 	// 		"watch":            "watch",
 	// 		"comment":          "comment",
 	// 		"label":            "labels",
@@ -456,93 +456,15 @@ func main() {
 
 	// 	var err error
 	// 	switch command {
-	// 	case "issuelink":
-	// 		requireArgs(3)
-	// 		err = c.CmdIssueLink(args[0], args[1], args[2])
-	// 	case "login":
-	// 		err = c.CmdLogin()
-	// 	case "logout":
-	// 		err = c.CmdLogout()
-	// 	case "fields":
-	// 		err = c.CmdFields()
-	// 	case "list":
-	// 		err = c.CmdList()
-	// 	case "edit":
-	// 		setEditing(true)
-	// 		if len(args) > 0 {
-	// 			err = c.CmdEdit(args[0])
-	// 		} else {
-	// 			var data interface{}
-	// 			if data, err = c.FindIssues(); err == nil {
-	// 				issues := data.(map[string]interface{})["issues"].([]interface{})
-	// 				for _, issue := range issues {
-	// 					if err = c.CmdEdit(issue.(map[string]interface{})["key"].(string)); err != nil {
-	// 						switch err.(type) {
-	// 						case jira.NoChangesFound:
-	// 							log.Warning("No Changes found: %s", err)
-	// 							err = nil
-	// 							continue
-	// 						}
-	// 						break
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	case "editmeta":
-	// 		requireArgs(1)
-	// 		err = c.CmdEditMeta(args[0])
-	// 	case "transmeta":
-	// 		requireArgs(1)
-	// 		err = c.CmdTransitionMeta(args[0])
 	// 	case "issuelinktypes":
 	// 		err = c.CmdIssueLinkTypes()
 	// 	case "issuetypes":
 	// 		err = c.CmdIssueTypes()
-	// 	case "createmeta":
-	// 		err = c.CmdCreateMeta()
-	// 	case "create":
-	// 		setEditing(true)
-	// 		err = c.CmdCreate()
-	// 	case "subtask":
-	// 		setEditing(true)
-	// 		err = c.CmdSubtask(args[0])
-	// 	case "transitions":
-	// 		requireArgs(1)
-	// 		err = c.CmdTransitions(args[0])
-	// 	case "blocks":
-	// 		requireArgs(2)
-	// 		err = c.CmdBlocks(args[0], args[1])
-	// 	case "dups":
-	// 		setEditing(true)
-	// 		requireArgs(2)
-	// 		if err = c.CmdDups(args[0], args[1]); err == nil {
-	// 			opts["resolution"] = "Duplicate"
-	// 			trans, err := c.ValidTransitions(args[0])
-	// 			if err == nil {
-	// 				if trans.Find("close") != nil {
-	// 					err = c.CmdTransition(args[0], "close")
-	// 				} else if trans.Find("done") != nil {
-	// 					// for now just assume if there is no "close", then
-	// 					// there is a "done" state
-	// 					err = c.CmdTransition(args[0], "done")
-	// 				} else if trans.Find("start") != nil {
-	// 					err = c.CmdTransition(args[0], "start")
-	// 					if err == nil {
-	// 						err = c.CmdTransition(args[0], "stop")
-	// 					}
-	// 				}
-	// 			}
-
-	// 		}
 	// 	case "watch":
 	// 		requireArgs(1)
 	// 		watcher := c.GetOptString("watcher", opts["user"].(string))
 	// 		remove := c.GetOptBool("remove", false)
 	// 		err = c.CmdWatch(args[0], watcher, remove)
-	// 	case "transition":
-	// 		requireArgs(2)
-	// 		setEditing(true)
-	// 		err = c.CmdTransition(args[1], args[0])
 	// 	case "comment":
 	// 		requireArgs(1)
 	// 		setEditing(true)
@@ -589,18 +511,6 @@ func main() {
 	// 	case "unassign":
 	// 		requireArgs(1)
 	// 		err = c.CmdUnassign(args[0])
-	// 	case "view":
-	// 		requireArgs(1)
-	// 		err = c.CmdView(args[0])
-	// 	case "worklog":
-	// 		if len(args) > 0 && args[0] == "add" {
-	// 			setEditing(true)
-	// 			requireArgs(2)
-	// 			err = c.CmdWorklog(args[0], args[1])
-	// 		} else {
-	// 			requireArgs(1)
-	// 			err = c.CmdWorklogs(args[0])
-	// 		}
 	// 	case "vote":
 	// 		requireArgs(1)
 	// 		if val, ok := opts["down"]; ok {
