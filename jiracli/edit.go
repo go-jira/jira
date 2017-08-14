@@ -109,8 +109,8 @@ func (jc *JiraCli) CmdEdit(issue string, opts *EditOptions) error {
 		if err != nil {
 			return err
 		}
-		link := fmt.Sprintf("%s/browse/%s", jc.Endpoint, issueData.Key)
-		fmt.Printf("OK %s %s\n", issueData.Key, link)
+		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, jc.Endpoint, issueData.Key)
+
 		// FIXME implement browse
 	}
 	return nil

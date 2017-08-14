@@ -85,8 +85,7 @@ func (jc *JiraCli) CmdCreate(opts *CreateOptions) error {
 		return err
 	}
 
-	link := fmt.Sprintf("%s/browse/%s", jc.Endpoint, issueResp.Key)
-	fmt.Printf("OK %s %s\n", issueResp.Key, link)
+	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, jc.Endpoint, issueResp.Key)
 
 	// FIXME implement browse
 	return nil

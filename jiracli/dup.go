@@ -1,6 +1,8 @@
 package jiracli
 
 import (
+	"fmt"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -61,9 +63,32 @@ func (jc *JiraCli) CmdDup(opts *DupOptions) error {
 		Key: opts.Issue,
 	}
 
-	return jc.LinkIssues(&opts.LinkIssueRequest)
+	if err := jc.LinkIssues(&opts.LinkIssueRequest); err != nil {
+		return err
+	}
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 
-	// FIXME need to close/done/start&stop dup issue
+	meta, err := jc.GetIssueTransitions(opts.Duplicate)
+	if err != nil {
+		return err
+	}
+	for _, trans := range []string{"close", "done", "start", "stop"} {
+		transMeta := meta.Transitions.Find(trans)
+		if transMeta != nil {
+			issueUpdate := jiradata.IssueUpdate{
+				Transition: transMeta,
+			}
+			if err = jc.TransitionIssue(opts.Duplicate, &issueUpdate); err != nil {
+				return err
+			}
+			// if we just started the issue now we need to stop it
+			if trans != "start" {
+				break
+			}
+		}
+	}
+
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Duplicate, jc.Endpoint, opts.Duplicate)
 
 	// FIXME implement browse
 

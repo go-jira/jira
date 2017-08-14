@@ -121,6 +121,10 @@ func main() {
 			Entry:   cli.CmdDupRegistry(),
 		},
 		jiracli.CommandRegistry{
+			Command: "block",
+			Entry:   cli.CmdBlockRegistry(),
+		},
+		jiracli.CommandRegistry{
 			Command: "transition",
 			Aliases: []string{"trans"},
 			Entry:   cli.CmdTransitionRegistry(""),

@@ -1,6 +1,8 @@
 package jiracli
 
 import (
+	"fmt"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -61,7 +63,12 @@ func (jc *JiraCli) CmdBlock(opts *BlockOptions) error {
 		Key: opts.Blocker,
 	}
 
-	return jc.LinkIssues(&opts.LinkIssueRequest)
+	if err := jc.LinkIssues(&opts.LinkIssueRequest); err != nil {
+		return err
+	}
+
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Blocker, jc.Endpoint, opts.Blocker)
 
 	// FIXME implement browse
 
