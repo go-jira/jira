@@ -216,6 +216,19 @@ func main() {
 			Entry:   cli.CmdLabelsAddRegistry(),
 			Aliases: []string{"rm"},
 		},
+		jiracli.CommandRegistry{
+			Command: "take",
+			Entry:   cli.CmdTakeRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "assign",
+			Entry:   cli.CmdAssignRegistry(),
+			Aliases: []string{"give"},
+		},
+		jiracli.CommandRegistry{
+			Command: "unassign",
+			Entry:   cli.CmdUnassignRegistry(),
+		},
 	}
 
 	cli.Register(app, registry)
@@ -234,9 +247,6 @@ func main() {
 	}
 
 	// Usage:
-	//   jira take ISSUE
-	//   jira (assign|give) ISSUE [ASSIGNEE|--default]
-	//   jira unassign ISSUE
 	//   jira add component [-p PROJECT] NAME DESCRIPTION LEAD
 	//   jira components [-p PROJECT]
 	//   jira issuetypes [-p PROJECT]
@@ -290,15 +300,12 @@ func main() {
 	// 	jiraCommands := map[string]string{
 	// 		"component":        "component",
 	// 		"components":       "components",
-	// 		"take":             "take",
-	// 		"assign":           "assign",
 	// 		"give":             "assign",
 	// 		"issuetypes":       "issuetypes",
 	// 		"export-templates": "export-templates",
 	// 		"browse":           "browse",
 	// 		"req":              "request",
 	// 		"request":          "request",
-	// 		"unassign":         "unassign",
 	// 	}
 
 	// 	defaults := map[string]interface{}{
@@ -463,25 +470,12 @@ func main() {
 	// 	case "components":
 	// 		project := opts["project"].(string)
 	// 		err = c.CmdComponents(project)
-	// 	case "take":
-	// 		requireArgs(1)
-	// 		err = c.CmdAssign(args[0], opts["user"].(string))
 	// 	case "browse":
 	// 		requireArgs(1)
 	// 		opts["browse"] = true
 	// 		err = c.Browse(args[0])
 	// 	case "export-templates":
 	// 		err = c.CmdExportTemplates()
-	// 	case "assign":
-	// 		requireArgs(1)
-	// 		assignee := ""
-	// 		if len(args) > 1 {
-	// 			assignee = args[1]
-	// 		}
-	// 		err = c.CmdAssign(args[0], assignee)
-	// 	case "unassign":
-	// 		requireArgs(1)
-	// 		err = c.CmdUnassign(args[0])
 	// 	case "request":
 	// 		requireArgs(1)
 	// 		data := ""

@@ -21,3 +21,7 @@ func (r *RankRequest) ProvideRankRequest() *RankRequest {
 func (c *Comment) ProvideComment() *Comment {
 	return c
 }
+
+func (u *User) ProvideUser() *User {
+	return u
+}

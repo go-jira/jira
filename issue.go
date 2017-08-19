@@ -424,3 +424,36 @@ func (j *Jira) IssueAddComment(issue string, cp CommentProvider) (*jiradata.Comm
 	}
 	return nil, responseError(resp)
 }
+
+type UserProvider interface {
+	ProvideUser() *jiradata.User
+}
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-assign
+func (j *Jira) IssueAssign(issue, name string) error {
+	// this is special, not using the jiradata.User structure
+	// because we need to be able to send `null` as the name param
+	// when we want to un-assign the issue
+	req := struct {
+		Name *string `json:"name"`
+	}{&name}
+	if name == "" {
+		req.Name = nil
+	}
+
+	encoded, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", j.Endpoint, issue)
+	resp, err := j.UA.Post(uri, "application/json", bytes.NewBuffer(encoded))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}
