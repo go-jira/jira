@@ -116,54 +116,6 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 // 	return runTemplate(c.getTemplate("components"), data, nil)
 // }
 
-// // CmdComment will open up editor with "comment" template and submit
-// // YAML output to jira
-// func (c *Cli) CmdComment(issue string) error {
-// 	log.Debugf("comment called")
-
-// 	handlePost := func(json string) error {
-// 		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", c.endpoint, issue)
-// 		if c.getOptBool("dryrun", false) {
-// 			log.Debugf("POST: %s", json)
-// 			log.Debugf("Dryrun mode, skipping POST")
-// 			return nil
-// 		}
-// 		resp, err := c.post(uri, json)
-// 		if err != nil {
-// 			return err
-// 		}
-
-// 		if resp.StatusCode == 201 {
-// 			c.Browse(issue)
-// 			if !c.GetOptBool("quiet", false) {
-// 				fmt.Printf("OK %s %s/browse/%s\n", issue, c.endpoint, issue)
-// 			}
-// 			return nil
-// 		}
-// 		logBuffer := bytes.NewBuffer(make([]byte, 0))
-// 		resp.Write(logBuffer)
-// 		err = fmt.Errorf("Unexpected Response From POST")
-// 		log.Errorf("%s:\n%s", err, logBuffer)
-// 		return err
-// 	}
-
-// 	if comment, ok := c.opts["comment"]; ok && comment != "" {
-// 		json, err := jsonEncode(map[string]interface{}{
-// 			"body": comment,
-// 		})
-// 		if err != nil {
-// 			return err
-// 		}
-// 		return handlePost(json)
-// 	}
-// 	return c.editTemplate(
-// 		c.getTemplate("comment"),
-// 		fmt.Sprintf("%s-create-", issue),
-// 		map[string]interface{}{},
-// 		handlePost,
-// 	)
-// }
-
 // // CmdComponent will add a new component to given project
 // func (c *Cli) CmdComponent(action string, project string, name string, desc string, lead string) error {
 // 	log.Debugf("component called")

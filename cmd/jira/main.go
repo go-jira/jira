@@ -203,6 +203,19 @@ func main() {
 			Command: "watch",
 			Entry:   cli.CmdWatchRegistry(),
 		},
+		jiracli.CommandRegistry{
+			Command: "labels add",
+			Entry:   cli.CmdLabelsAddRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "labels set",
+			Entry:   cli.CmdLabelsAddRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "labels remove",
+			Entry:   cli.CmdLabelsAddRegistry(),
+			Aliases: []string{"rm"},
+		},
 	}
 
 	cli.Register(app, registry)
@@ -221,8 +234,6 @@ func main() {
 	}
 
 	// Usage:
-	//   jira comment ISSUE [--noedit] <Edit Options>
-	//   jira (set,add,remove) labels ISSUE [LABEL] ...
 	//   jira take ISSUE
 	//   jira (assign|give) ISSUE [ASSIGNEE|--default]
 	//   jira unassign ISSUE
@@ -277,9 +288,6 @@ func main() {
 	// 	}
 
 	// 	jiraCommands := map[string]string{
-	// 		"comment":          "comment",
-	// 		"label":            "labels",
-	// 		"labels":           "labels",
 	// 		"component":        "component",
 	// 		"components":       "components",
 	// 		"take":             "take",
@@ -438,16 +446,6 @@ func main() {
 	// 	switch command {
 	// 	case "issuetypes":
 	// 		err = c.CmdIssueTypes()
-	// 	case "comment":
-	// 		requireArgs(1)
-	// 		setEditing(true)
-	// 		err = c.CmdComment(args[0])
-	// 	case "labels":
-	// 		requireArgs(2)
-	// 		action := args[0]
-	// 		issue := args[1]
-	// 		labels := args[2:]
-	// 		err = c.CmdLabels(action, issue, labels)
 	// 	case "component":
 	// 		requireArgs(2)
 	// 		action := args[0]

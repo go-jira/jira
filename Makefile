@@ -43,16 +43,11 @@ else
 	GOBUILD=go build -v -ldflags "$(LDFLAGS) -s"
 endif
 
-build: src/gopkg.in/Netflix-Skunkworks/go-jira.v0
+build:
 	$(GOBUILD) -o '$(BIN)' cmd/jira/main.go
 
 debug:
 	go build -v -o '$(BIN)' cmd/jira/main.go
-
-src/%:
-	mkdir -p $(@D)
-	test -L $@ || ln -sf '../../..' $@
-	go get -v $* $*/main
 
 vet:
 	@go vet .
