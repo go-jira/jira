@@ -399,3 +399,28 @@ func (j *Jira) IssueRemoveWatcher(issue, user string) error {
 	}
 	return responseError(resp)
 }
+
+type CommentProvider interface {
+	ProvideComment() *jiradata.Comment
+}
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue/{issueIdOrKey}/comment-addComment
+func (j *Jira) IssueAddComment(issue string, cp CommentProvider) (*jiradata.Comment, error) {
+	req := cp.ProvideComment()
+	encoded, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", j.Endpoint, issue)
+	resp, err := j.UA.Post(uri, "application/json", bytes.NewBuffer(encoded))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 201 {
+		results := jiradata.Comment{}
+		return &results, readJSON(resp.Body, &results)
+	}
+	return nil, responseError(resp)
+}

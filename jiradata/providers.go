@@ -17,3 +17,7 @@ func (l *LinkIssueRequest) ProvideLinkIssueRequest() *LinkIssueRequest {
 func (r *RankRequest) ProvideRankRequest() *RankRequest {
 	return r
 }
+
+func (c *Comment) ProvideComment() *Comment {
+	return c
+}

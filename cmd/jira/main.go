@@ -92,6 +92,10 @@ func main() {
 			Entry:   cli.CmdEditRegistry(),
 		},
 		jiracli.CommandRegistry{
+			Command: "comment",
+			Entry:   cli.CmdCommentRegistry(),
+		},
+		jiracli.CommandRegistry{
 			Command: "worklog list",
 			Entry:   cli.CmdWorklogListRegistry(),
 			Default: true,
