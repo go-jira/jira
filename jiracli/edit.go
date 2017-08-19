@@ -13,10 +13,10 @@ type EditOptions struct {
 	jiradata.IssueUpdate
 	jira.SearchOptions
 	Overrides map[string]string
+	Issue     string
 }
 
 func (jc *JiraCli) CmdEditRegistry() *CommandRegistryEntry {
-	issue := ""
 	opts := EditOptions{
 		GlobalOptions: GlobalOptions{
 			Template: "edit",
@@ -27,15 +27,15 @@ func (jc *JiraCli) CmdEditRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Edit issue details",
 		func() error {
-			return jc.CmdEdit(issue, &opts)
+			return jc.CmdEdit(&opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdEditUsage(cmd, &issue, &opts)
+			return jc.CmdEditUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdEditUsage(cmd *kingpin.CmdClause, issue *string, opts *EditOptions) error {
+func (jc *JiraCli) CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error {
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
@@ -56,23 +56,23 @@ func (jc *JiraCli) CmdEditUsage(cmd *kingpin.CmdClause, issue *string, opts *Edi
 		return nil
 	}).String()
 	cmd.Flag("override", "Set issue property").Short('o').StringMapVar(&opts.Overrides)
-	cmd.Arg("ISSUE", "issue id to edit").StringVar(issue)
+	cmd.Arg("ISSUE", "issue id to edit").StringVar(&opts.Issue)
 	return nil
 }
 
 // Edit will get issue data and send to "edit" template
-func (jc *JiraCli) CmdEdit(issue string, opts *EditOptions) error {
+func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
 	type templateInput struct {
 		*jiradata.Issue `yaml:",inline"`
 		Meta            *jiradata.EditMeta `yaml:"meta" json:"meta"`
 		Overrides       map[string]string  `yaml:"overrides" json:"overrides"`
 	}
-	if issue != "" {
-		issueData, err := jc.GetIssue(issue, nil)
+	if opts.Issue != "" {
+		issueData, err := jc.GetIssue(opts.Issue, nil)
 		if err != nil {
 			return err
 		}
-		editMeta, err := jc.GetIssueEditMeta(issue)
+		editMeta, err := jc.GetIssueEditMeta(opts.Issue)
 		if err != nil {
 			return err
 		}
@@ -83,9 +83,14 @@ func (jc *JiraCli) CmdEdit(issue string, opts *EditOptions) error {
 			Meta:      editMeta,
 			Overrides: opts.Overrides,
 		}
-		return jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-			return jc.EditIssue(issue, &issueUpdate)
+		err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
+			return jc.EditIssue(opts.Issue, &issueUpdate)
 		})
+		if err != nil {
+			return err
+		}
+		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+
 		// FIXME implement browse
 	}
 	results, err := jc.Search(opts)
