@@ -229,6 +229,10 @@ func main() {
 			Command: "unassign",
 			Entry:   cli.CmdUnassignRegistry(),
 		},
+		jiracli.CommandRegistry{
+			Command: "component add",
+			Entry:   cli.CmdComponentAddRegistry(),
+		},
 	}
 
 	cli.Register(app, registry)
@@ -247,7 +251,6 @@ func main() {
 	}
 
 	// Usage:
-	//   jira add component [-p PROJECT] NAME DESCRIPTION LEAD
 	//   jira components [-p PROJECT]
 	//   jira issuetypes [-p PROJECT]
 	//   jira export-templates [-d DIR] [-t template]
@@ -298,9 +301,7 @@ func main() {
 	// 	}
 
 	// 	jiraCommands := map[string]string{
-	// 		"component":        "component",
 	// 		"components":       "components",
-	// 		"give":             "assign",
 	// 		"issuetypes":       "issuetypes",
 	// 		"export-templates": "export-templates",
 	// 		"browse":           "browse",
@@ -453,20 +454,6 @@ func main() {
 	// 	switch command {
 	// 	case "issuetypes":
 	// 		err = c.CmdIssueTypes()
-	// 	case "component":
-	// 		requireArgs(2)
-	// 		action := args[0]
-	// 		project := opts["project"].(string)
-	// 		name := args[1]
-	// 		var lead string
-	// 		var description string
-	// 		if len(args) > 2 {
-	// 			description = args[2]
-	// 		}
-	// 		if len(args) > 3 {
-	// 			lead = args[2]
-	// 		}
-	// 		err = c.CmdComponent(action, project, name, description, lead)
 	// 	case "components":
 	// 		project := opts["project"].(string)
 	// 		err = c.CmdComponents(project)

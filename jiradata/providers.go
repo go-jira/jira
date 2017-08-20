@@ -22,6 +22,6 @@ func (c *Comment) ProvideComment() *Comment {
 	return c
 }
 
-func (u *User) ProvideUser() *User {
-	return u
+func (c *Component) ProvideComponent() *Component {
+	return c
 }

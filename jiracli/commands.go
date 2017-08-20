@@ -116,50 +116,6 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 // 	return runTemplate(c.getTemplate("components"), data, nil)
 // }
 
-// // CmdComponent will add a new component to given project
-// func (c *Cli) CmdComponent(action string, project string, name string, desc string, lead string) error {
-// 	log.Debugf("component called")
-
-// 	switch action {
-// 	case "add":
-// 	default:
-// 		return fmt.Errorf("CmdComponent: %q is not a valid action", action)
-// 	}
-
-// 	json, err := jsonEncode(map[string]interface{}{
-// 		"name":         name,
-// 		"description":  desc,
-// 		"leadUserName": lead,
-// 		"project":      project,
-// 	})
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	uri := fmt.Sprintf("%s/rest/api/2/component", c.endpoint)
-// 	if c.getOptBool("dryrun", false) {
-// 		log.Debugf("POST: %s", json)
-// 		log.Debugf("Dryrun mode, skipping POST")
-// 		return nil
-// 	}
-// 	resp, err := c.post(uri, json)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if resp.StatusCode == 201 {
-// 		if !c.GetOptBool("quiet", false) {
-// 			fmt.Printf("OK %s %s\n", project, name)
-// 		}
-// 	} else {
-// 		logBuffer := bytes.NewBuffer(make([]byte, 0))
-// 		resp.Write(logBuffer)
-// 		err := fmt.Errorf("Unexpected Response From POST")
-// 		log.Errorf("%s:\n%s", err, logBuffer)
-// 		return err
-// 	}
-// 	return nil
-// }
-
 // // CmdExportTemplates will export the default templates to the template directory.
 // func (c *Cli) CmdExportTemplates() error {
 // 	dir := c.opts["directory"].(string)
