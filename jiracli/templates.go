@@ -306,8 +306,9 @@ description: {{or .description ""}}
 leadUserName: {{or .leadUserName ""}}
 `
 
-const defaultIssuetypesTemplate = `{{ range .projects }}{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
-{{end}}{{end}}`
+const defaultIssuetypesTemplate = `{{/* issuetypes template */ -}}
+{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
+{{end}}`
 
 const defaultCreateTemplate = `{{/* create template */ -}}
 fields:

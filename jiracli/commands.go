@@ -63,48 +63,6 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 	}
 }
 
-// // CmdIssueTypes will send issue 'create' metadata to the 'issuetypes'
-// func (c *Cli) CmdIssueTypes() error {
-// 	project := c.opts["project"].(string)
-// 	log.Debugf("issueTypes called")
-// 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
-// 	data, err := responseToJSON(c.get(uri))
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return runTemplate(c.getTemplate("issuetypes"), data, nil)
-// }
-
-// func (c *Cli) defaultIssueType() string {
-// 	project := c.opts["project"].(string)
-// 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s", c.endpoint, project)
-// 	data, _ := responseToJSON(c.get(uri))
-// 	issueTypeNames := make(map[string]bool)
-
-// 	if data, ok := data.(map[string]interface{}); ok {
-// 		if projects, ok := data["projects"].([]interface{}); ok {
-// 			for _, project := range projects {
-// 				if project, ok := project.(map[string]interface{}); ok {
-// 					if issuetypes, ok := project["issuetypes"].([]interface{}); ok {
-// 						if len(issuetypes) > 0 {
-// 							for _, issuetype := range issuetypes {
-// 								issueTypeNames[issuetype.(map[string]interface{})["name"].(string)] = true
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	if _, ok := issueTypeNames["Bug"]; ok {
-// 		return "Bug"
-// 	} else if _, ok := issueTypeNames["Task"]; ok {
-// 		return "Task"
-// 	}
-// 	return ""
-// }
-
 // // CmdExportTemplates will export the default templates to the template directory.
 // func (c *Cli) CmdExportTemplates() error {
 // 	dir := c.opts["directory"].(string)
