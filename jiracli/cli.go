@@ -222,7 +222,7 @@ func (jc *JiraCli) editLoop(opts *GlobalOptions, input interface{}, output inter
 		// etc.  We need to do this because jira will reject json documents
 		// with empty arrays, or empty strings typically.  So here we process
 		// the data to a raw interface{} then we fixup the yaml parsed
-		// inferface, then we serialize to a new yaml document ... then is
+		// interface, then we serialize to a new yaml document ... then is
 		// parsed as the original document to populate the output struct.  Phew.
 		var raw interface{}
 		if err := yaml.Unmarshal(data, &raw); err != nil {

@@ -105,17 +105,6 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 // 	return ""
 // }
 
-// // CmdComponents sends component data for given project and sends to the "components" template
-// func (c *Cli) CmdComponents(project string) error {
-// 	log.Debugf("Components called")
-// 	uri := fmt.Sprintf("%s/rest/api/2/project/%s/components", c.endpoint, project)
-// 	data, err := responseToJSON(c.get(uri))
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return runTemplate(c.getTemplate("components"), data, nil)
-// }
-
 // // CmdExportTemplates will export the default templates to the template directory.
 // func (c *Cli) CmdExportTemplates() error {
 // 	dir := c.opts["directory"].(string)

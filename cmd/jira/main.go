@@ -233,6 +233,10 @@ func main() {
 			Command: "component add",
 			Entry:   cli.CmdComponentAddRegistry(),
 		},
+		jiracli.CommandRegistry{
+			Command: "components",
+			Entry:   cli.CmdComponentsRegistry(),
+		},
 	}
 
 	cli.Register(app, registry)
@@ -251,7 +255,6 @@ func main() {
 	}
 
 	// Usage:
-	//   jira components [-p PROJECT]
 	//   jira issuetypes [-p PROJECT]
 	//   jira export-templates [-d DIR] [-t template]
 	//   jira (b|browse) ISSUE
@@ -301,7 +304,6 @@ func main() {
 	// 	}
 
 	// 	jiraCommands := map[string]string{
-	// 		"components":       "components",
 	// 		"issuetypes":       "issuetypes",
 	// 		"export-templates": "export-templates",
 	// 		"browse":           "browse",
@@ -454,9 +456,6 @@ func main() {
 	// 	switch command {
 	// 	case "issuetypes":
 	// 		err = c.CmdIssueTypes()
-	// 	case "components":
-	// 		project := opts["project"].(string)
-	// 		err = c.CmdComponents(project)
 	// 	case "browse":
 	// 		requireArgs(1)
 	// 		opts["browse"] = true

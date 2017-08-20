@@ -300,10 +300,10 @@ const defaultComponentsTemplate = `{{ range . }}{{.id }}: {{.name}}
 {{end}}`
 
 const defaultComponentAddTemplate = `{{/* compoinent add template */ -}}
-project: {{or .overrides.project ""}}
-name: {{or .overrides.name ""}}
-description: {{or .overrides.description ""}}
-leadUserName: {{or .overrides.lead ""}}
+project: {{or .project ""}}
+name: {{or .name ""}}
+description: {{or .description ""}}
+leadUserName: {{or .leadUserName ""}}
 `
 
 const defaultIssuetypesTemplate = `{{ range .projects }}{{ range .issuetypes }}{{color "+bh"}}{{.name | append ":" | printf "%-13s" }}{{color "reset"}} {{.description}}
