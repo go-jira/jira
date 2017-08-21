@@ -446,7 +446,7 @@ func (j *Jira) IssueAssign(issue, name string) error {
 		return err
 	}
 	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", j.Endpoint, issue)
-	resp, err := j.UA.Post(uri, "application/json", bytes.NewBuffer(encoded))
+	resp, err := j.UA.Put(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
 	}

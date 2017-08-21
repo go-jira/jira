@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-
-	"github.com/pkg/errors"
 )
 
 func readJSON(input io.Reader, data interface{}) error {
@@ -14,9 +12,12 @@ func readJSON(input io.Reader, data interface{}) error {
 	if err != nil {
 		return err
 	}
+	if len(content) == 0 {
+		return nil
+	}
 	err = json.Unmarshal(content, data)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("JSON Parse Error: %s from %s", err, content))
+		return fmt.Errorf("JSON Parse Error: %s from %q", err, content)
 	}
 	return nil
 }
