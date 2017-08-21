@@ -67,17 +67,6 @@ func flagValue(ctx *kingpin.ParseContext, name string) string {
 	return ""
 }
 
-// func readFile(file string) string {
-// 	var bytes []byte
-// 	var err error
-// 	log.Debugf("readFile: reading %q", file)
-// 	if bytes, err = ioutil.ReadFile(file); err != nil {
-// 		log.Errorf("Failed to read file %s: %s", file, err)
-// 		os.Exit(1)
-// 	}
-// 	return string(bytes)
-// }
-
 func copyFile(src, dst string) (err error) {
 	var s, d *os.File
 	if s, err = os.Open(src); err == nil {
@@ -120,98 +109,6 @@ func dateFormat(format string, content string) (string, error) {
 	}
 	return t.Format(format), nil
 }
-
-// // RunTemplate will run the give templateContent as a golang text/template
-// // and pass the provided data to the template execution.  It will write
-// // the output to the provided "out" writer.
-// func RunTemplate(templateContent string, data interface{}, out io.Writer) error {
-// 	return runTemplate(templateContent, data, out)
-// }
-
-// func responseToJSON(resp *http.Response, err error) (interface{}, error) {
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	data := jsonDecode(resp.Body)
-// 	if resp.StatusCode == 400 {
-// 		if val, ok := data.(map[string]interface{})["errorMessages"]; ok {
-// 			for _, errMsg := range val.([]interface{}) {
-// 				log.Errorf("%s", errMsg)
-// 			}
-// 		}
-// 	}
-
-// 	return data, nil
-// }
-
-// func jsonDecode(io io.Reader) interface{} {
-// 	content, err := ioutil.ReadAll(io)
-// 	var data interface{}
-// 	err = json.Unmarshal(content, &data)
-// 	if err != nil {
-// 		log.Errorf("JSON Parse Error: %s from %s", err, content)
-// 	}
-// 	return data
-// }
-
-// func jsonEncode(data interface{}) (string, error) {
-// 	buffer := bytes.NewBuffer(make([]byte, 0))
-// 	enc := json.NewEncoder(buffer)
-
-// 	err := enc.Encode(data)
-// 	if err != nil {
-// 		log.Errorf("Failed to encode data %s: %s", data, err)
-// 		return "", err
-// 	}
-// 	return buffer.String(), nil
-// }
-
-// func jsonWrite(file string, data interface{}) {
-// 	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-// 	defer fh.Close()
-// 	if err != nil {
-// 		log.Errorf("Failed to open %s: %s", file, err)
-// 		os.Exit(1)
-// 	}
-// 	enc := json.NewEncoder(fh)
-// 	enc.Encode(data)
-// }
-
-// func yamlWrite(file string, data interface{}) {
-// 	fh, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-// 	defer fh.Close()
-// 	if err != nil {
-// 		log.Errorf("Failed to open %s: %s", file, err)
-// 		os.Exit(1)
-// 	}
-// 	if out, err := yaml.Marshal(data); err != nil {
-// 		log.Errorf("Failed to marshal yaml %v: %s", data, err)
-// 		os.Exit(1)
-// 	} else {
-// 		fh.Write(out)
-// 	}
-// }
-
-// func promptYN(prompt string, yes bool) bool {
-// 	reader := bufio.NewReader(os.Stdin)
-// 	if !yes {
-// 		prompt = fmt.Sprintf("%s [y/N]: ", prompt)
-// 	} else {
-// 		prompt = fmt.Sprintf("%s [Y/n]: ", prompt)
-// 	}
-
-// 	fmt.Printf("%s", prompt)
-// 	text, _ := reader.ReadString('\n')
-// 	ans := strings.ToLower(strings.TrimRight(text, "\n"))
-// 	if ans == "" {
-// 		return yes
-// 	}
-// 	if strings.HasPrefix(ans, "y") {
-// 		return true
-// 	}
-// 	return false
-// }
 
 // this is a HACK to make yaml parsed documents to be serializable
 // to json, so prevent this:
@@ -283,21 +180,3 @@ func yamlFixup(data interface{}) (interface{}, error) {
 		return d, nil
 	}
 }
-
-// func mkdir(dir string) error {
-// 	if stat, err := os.Stat(dir); err != nil && !os.IsNotExist(err) {
-// 		log.Errorf("Failed to stat %s: %s", dir, err)
-// 		return err
-// 	} else if err == nil && !stat.IsDir() {
-// 		err := fmt.Errorf("%s exists and is not a directory", dir)
-// 		log.Errorf("%s", err)
-// 		return err
-// 	} else {
-// 		// dir does not exist, so try to create it
-// 		if err := os.MkdirAll(dir, 0755); err != nil {
-// 			log.Errorf("Failed to mkdir -p %s: %s", dir, err)
-// 			return err
-// 		}
-// 	}
-// 	return nil
-// }
