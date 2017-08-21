@@ -45,6 +45,7 @@ func (jc *JiraCli) CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOp
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = flagValue(ctx, "comment")
@@ -125,6 +126,8 @@ func (jc *JiraCli) CmdTransition(opts *TransitionOptions) error {
 	}
 	fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, jc.Endpoint, issueData.Key)
 
-	// FIXME implement browse
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
 	return nil
 }

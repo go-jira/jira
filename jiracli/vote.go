@@ -40,6 +40,7 @@ func (jc *JiraCli) CmdVoteUsage(cmd *kingpin.CmdClause, opts *VoteOptions) error
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("down", "downvote the issue").Short('d').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Action = VoteDown
 		return nil
@@ -61,6 +62,8 @@ func (jc *JiraCli) CmdVote(opts *VoteOptions) error {
 	}
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 
-	// FIXME implement browse
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
 	return nil
 }

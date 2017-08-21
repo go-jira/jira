@@ -41,6 +41,7 @@ func (jc *JiraCli) CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) err
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("remove", "remove watcher from issue").Short('r').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Action = WatcherRemove
 		return nil
@@ -68,7 +69,9 @@ func (jc *JiraCli) CmdWatch(opts *WatchOptions) error {
 
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 
-	// FIXME implement browse
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
 
 	return nil
 }

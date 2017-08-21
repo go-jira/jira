@@ -28,11 +28,13 @@ func TestOptionsMarshalYAML(t *testing.T) {
 arr1:
 - d3arr1val1
 - d3arr1val2
+- dupval
 - d2arr1val1
 - d2arr1val2
 - d1arr1val1
 - d1arr1val2
 map1:
+  dup: d3dupval
   key0: d1map1val0
   key1: d2map1val1
   key2: d3map1val2
@@ -60,6 +62,6 @@ func TestOptionsMarshalJSON(t *testing.T) {
 	// note that "leave-empty" is serialized even though "omitempty" tag is set
 	// this is because json always assumes structs are not empty and there
 	// is no interface to override this behavior
-	expected := `{"str1":"d3str1val1","leave-empty":"","arr1":["d3arr1val1","d3arr1val2","d2arr1val1","d2arr1val2","d1arr1val1","d1arr1val2"],"map1":{"key0":"d1map1val0","key1":"d2map1val1","key2":"d3map1val2","key3":"d3map1val3"},"int1":333,"float1":3.33,"bool1":true}`
+	expected := `{"str1":"d3str1val1","leave-empty":"","arr1":["d3arr1val1","d3arr1val2","dupval","d2arr1val1","d2arr1val2","d1arr1val1","d1arr1val2"],"map1":{"dup":"d3dupval","key0":"d1map1val0","key1":"d2map1val1","key2":"d3map1val2","key3":"d3map1val3"},"int1":333,"float1":3.33,"bool1":true}`
 	assert.Equal(t, expected, string(got))
 }

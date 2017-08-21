@@ -33,6 +33,10 @@ func (o *RawTypeOption) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *RawTypeOption) GetSource() string {
+	return o.Source
+}
+
 func (o RawTypeOption) GetValue() interface{} {
 	return o.Value
 }

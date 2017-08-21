@@ -34,6 +34,7 @@ func TestCommandLine(t *testing.T) {
 	arr1 := ListStringOption{}
 	arr1 = append(arr1, StringOption{"figtree.yml", true, "d3arr1val1"})
 	arr1 = append(arr1, StringOption{"figtree.yml", true, "d3arr1val2"})
+	arr1 = append(arr1, StringOption{"figtree.yml", true, "dupval"})
 	arr1 = append(arr1, StringOption{"../figtree.yml", true, "d2arr1val1"})
 	arr1 = append(arr1, StringOption{"../figtree.yml", true, "d2arr1val2"})
 	arr1 = append(arr1, StringOption{"../../figtree.yml", true, "d1arr1val1"})
@@ -49,6 +50,7 @@ func TestCommandLine(t *testing.T) {
 			"key1": StringOption{"../figtree.yml", true, "d2map1val1"},
 			"key2": StringOption{"figtree.yml", true, "d3map1val2"},
 			"key3": StringOption{"figtree.yml", true, "d3map1val3"},
+			"dup":  StringOption{"figtree.yml", true, "d3dupval"},
 			"k1":   StringOption{"override", true, "v1"},
 			"k2":   StringOption{"override", true, "v2"},
 		},

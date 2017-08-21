@@ -172,6 +172,17 @@ func (m *merger) mustOverwrite(name string) bool {
 	return false
 }
 
+func isDefault(v reflect.Value) bool {
+	if v.CanAddr() {
+		if option, ok := v.Addr().Interface().(Option); ok {
+			if option.GetSource() == "default" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func isEmpty(v reflect.Value) bool {
 	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
@@ -249,7 +260,7 @@ func (m *merger) mergeStructs(ov, nv reflect.Value) {
 		}
 		fieldName := yamlFieldName(ovStructField)
 
-		if (isEmpty(ov.Field(i)) || m.mustOverwrite(fieldName)) && !isSame(ov.Field(i), nv.Field(i)) {
+		if (isEmpty(ov.Field(i)) || isDefault(ov.Field(i)) || m.mustOverwrite(fieldName)) && !isEmpty(nv.Field(i)) && !isSame(ov.Field(i), nv.Field(i)) {
 			log.Debugf("Setting %s to %#v", nv.Type().Field(i).Name, nv.Field(i).Interface())
 			ov.Field(i).Set(nv.Field(i))
 		} else {
@@ -317,6 +328,15 @@ Outer:
 		niv := nv.Index(ni)
 		for oi := 0; oi < ov.Len(); oi++ {
 			oiv := ov.Index(oi)
+			if oiv.CanAddr() && niv.CanAddr() {
+				if oOption, ok := oiv.Addr().Interface().(Option); ok {
+					if nOption, ok := niv.Addr().Interface().(Option); ok {
+						if reflect.DeepEqual(oOption.GetValue(), nOption.GetValue()) {
+							continue Outer
+						}
+					}
+				}
+			}
 			if reflect.DeepEqual(niv.Interface(), oiv.Interface()) {
 				continue Outer
 			}
@@ -340,7 +360,24 @@ func (f *FigTree) populateEnv(data interface{}) {
 				// unexported field, skipping
 				continue
 			}
+
 			name := strings.Join(camelcase.Split(structField.Name), "_")
+
+			if tag := structField.Tag.Get("figtree"); tag != "" {
+				if strings.HasSuffix(tag, ",inline") {
+					// if we have a tag like: `figtree:",inline"` then we
+					// want to the field as a top level member and not serialize
+					// the raw struct to json, so just recurse here
+					f.populateEnv(options.Field(i).Interface())
+					continue
+				}
+				// next look for `figtree:"env,..."` to set the env name to that
+				parts := strings.Split(tag, ",")
+				if len(parts) > 0 {
+					name = parts[0]
+				}
+			}
+
 			envName := fmt.Sprintf("%s_%s", f.EnvPrefix, strings.ToUpper(name))
 
 			envName = strings.Map(func(r rune) rune {

@@ -33,11 +33,11 @@ func TestOptionsEnv(t *testing.T) {
 	sort.StringSlice(got).Sort()
 
 	expected := []string{
-		"FIGTREE_ARRAY_1=[\"d1arr1val1\",\"d1arr1val2\"]",
+		"FIGTREE_ARRAY_1=[\"d1arr1val1\",\"d1arr1val2\",\"dupval\"]",
 		"FIGTREE_BOOL_1=true",
 		"FIGTREE_FLOAT_1=1.11",
 		"FIGTREE_INT_1=111",
-		"FIGTREE_MAP_1={\"key0\":\"d1map1val0\",\"key1\":\"d1map1val1\"}",
+		"FIGTREE_MAP_1={\"dup\":\"d1dupval\",\"key0\":\"d1map1val0\",\"key1\":\"d1map1val1\"}",
 		"FIGTREE_STRING_1=d1str1val1",
 	}
 
@@ -70,11 +70,11 @@ func TestOptionsNamedEnv(t *testing.T) {
 	sort.StringSlice(got).Sort()
 
 	expected := []string{
-		"TEST_ARRAY_1=[\"d1arr1val1\",\"d1arr1val2\"]",
+		"TEST_ARRAY_1=[\"d1arr1val1\",\"d1arr1val2\",\"dupval\"]",
 		"TEST_BOOL_1=true",
 		"TEST_FLOAT_1=1.11",
 		"TEST_INT_1=111",
-		"TEST_MAP_1={\"key0\":\"d1map1val0\",\"key1\":\"d1map1val1\"}",
+		"TEST_MAP_1={\"dup\":\"d1dupval\",\"key0\":\"d1map1val0\",\"key1\":\"d1map1val1\"}",
 		"TEST_STRING_1=d1str1val1",
 	}
 
@@ -100,12 +100,12 @@ func TestBuiltinEnv(t *testing.T) {
 	sort.StringSlice(got).Sort()
 
 	expected := []string{
-		"FIGTREE_ARRAY_1=[\"d1arr1val1\",\"d1arr1val2\"]",
+		"FIGTREE_ARRAY_1=[\"d1arr1val1\",\"d1arr1val2\",\"dupval\"]",
 		"FIGTREE_BOOL_1=true",
 		"FIGTREE_FLOAT_1=1.11",
 		"FIGTREE_INT_1=111",
 		"FIGTREE_LEAVE_EMPTY=",
-		"FIGTREE_MAP_1={\"key0\":\"d1map1val0\",\"key1\":\"d1map1val1\"}",
+		"FIGTREE_MAP_1={\"dup\":\"d1dupval\",\"key0\":\"d1map1val0\",\"key1\":\"d1map1val1\"}",
 		"FIGTREE_STRING_1=d1str1val1",
 	}
 

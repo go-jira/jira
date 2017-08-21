@@ -39,6 +39,7 @@ func (jc *JiraCli) CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
@@ -91,7 +92,9 @@ func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
 		}
 		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 
-		// FIXME implement browse
+		if opts.Browse {
+			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		}
 	}
 	results, err := jc.Search(opts)
 	if err != nil {
@@ -116,7 +119,9 @@ func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
 		}
 		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, jc.Endpoint, issueData.Key)
 
-		// FIXME implement browse
+		if opts.Browse {
+			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueData.Key})
+		}
 	}
 	return nil
 }

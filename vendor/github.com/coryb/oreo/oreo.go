@@ -186,6 +186,9 @@ func (e *SaveCookieError) Error() string {
 }
 
 func (c *Client) saveCookies(resp *http.Response) error {
+	if c.cookieFile == "" {
+		return nil
+	}
 	if _, ok := resp.Header["Set-Cookie"]; !ok {
 		return nil
 	}
@@ -311,9 +314,10 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 
 	log.Debugf("%s %s", req.Method, req.URL.String())
 	if log.IsEnabledFor(logging.DEBUG) && TraceRequestBody {
-		out, _ := httputil.DumpRequestOut(req, true)
+		out, _ := httputil.DumpRequest(req, true)
 		log.Debugf("Request: %s", out)
 	}
+
 	resp, err = c.Client.Do(req)
 	if err != nil {
 		return nil, err
@@ -329,11 +333,6 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 				}
 			}
 		}
-	}
-
-	if log.IsEnabledFor(logging.DEBUG) && TraceResponseBody {
-		out, _ := httputil.DumpResponse(resp, true)
-		log.Debugf("Response: %s", out)
 	}
 
 	err = c.saveCookies(resp)

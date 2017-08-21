@@ -1,5 +1,5 @@
-hash: 8ca06c1ec629a3203f7d4289f69fd4e88672d2e66a12110ba4e1ac9b0edb5888
-updated: 2017-07-30T20:24:36.662438626-07:00
+hash: 832776d030ce571aae3c187a399b4ebbf86d1b887f9d3779b29c1c2434cb30e6
+updated: 2017-08-20T22:37:55.734545077-05:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: 73fd4d7829877a72e03dbb42f84ed383fbbc5fa0
@@ -17,9 +17,9 @@ imports:
   subpackages:
   - generic
 - name: github.com/coryb/figtree
-  version: 924d400f931992b528015d92be87a73e6e3a66c3
+  version: 97f630386644abe852de0f4df3befd74bf0a5f9e
 - name: github.com/coryb/oreo
-  version: e3bbbcdf1c7eac4e992018bc452230c02d9632c2
+  version: a99f8c323f9746fc5b576349f1ffee4af0bc5ff2
 - name: github.com/fatih/camelcase
   version: f6a740d52f961c60348ebb109adde9f4635d7540
 - name: github.com/guelfey/go.dbus
@@ -28,14 +28,12 @@ imports:
   version: 8bfca8a02a0ce12119cdc4974143c834ca589257
 - name: github.com/kballard/go-shellquote
   version: d8ec1a69a250a17bb0e419c386eac1f3711dc142
-- name: github.com/kr/pretty
-  version: cfb55aafdaf3ec08f0db22699ab822c50091b1c4
-- name: github.com/kr/text
-  version: 7cafcd837844e784b526369c9bce262804aebc60
 - name: github.com/mattn/go-isatty
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/mgutz/ansi
   version: c286dcecd19ff979eeb73ea444e479b903f2cfcb
+- name: github.com/pkg/browser
+  version: c90ca0c84f15f81c982e32665bffd8d7aac8f097
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/sethgrid/pester
@@ -55,14 +53,6 @@ imports:
 - name: gopkg.in/op/go-logging.v1
   version: b2cb9fa56473e98db8caba80237377e83fe44db5
 testImports:
-- name: github.com/davecgh/go-spew
-  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
-  subpackages:
-  - spew
-- name: github.com/pmezard/go-difflib
-  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
-  subpackages:
-  - difflib
 - name: github.com/stretchr/testify
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:

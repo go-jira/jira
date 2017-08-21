@@ -249,6 +249,11 @@ func main() {
 			Command: "unexport-templates",
 			Entry:   cli.CmdUnexportTemplatesRegistry(),
 		},
+		jiracli.CommandRegistry{
+			Command: "browse",
+			Entry:   cli.CmdBrowseRegistry(),
+			Aliases: []string{"b"},
+		},
 	}
 
 	cli.Register(app, registry)
@@ -462,10 +467,6 @@ func main() {
 
 	// 	var err error
 	// 	switch command {
-	// 	case "browse":
-	// 		requireArgs(1)
-	// 		opts["browse"] = true
-	// 		err = c.Browse(args[0])
 	// 	case "request":
 	// 		requireArgs(1)
 	// 		data := ""

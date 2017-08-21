@@ -1,0 +1,9 @@
+str1:
+  foo: bar
+arr1: strval1
+map1:
+  - abc
+  - def
+int1: true
+float1: "strval2"
+bool1: 123.45

@@ -40,6 +40,7 @@ func (jc *JiraCli) CmdSubtaskUsage(cmd *kingpin.CmdClause, opts *SubtaskOptions)
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
@@ -103,6 +104,8 @@ func (jc *JiraCli) CmdSubtask(opts *SubtaskOptions) error {
 
 	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, jc.Endpoint, issueResp.Key)
 
-	// FIXME implement browse
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
 	return nil
 }

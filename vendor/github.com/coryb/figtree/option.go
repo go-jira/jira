@@ -7,6 +7,7 @@ type Option interface {
 	GetValue() interface{}
 	SetValue(interface{}) error
 	SetSource(string)
+	GetSource() string
 }
 
 var StringifyValue = true

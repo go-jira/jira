@@ -34,6 +34,7 @@ func (jc *JiraCli) CmdRankUsage(cmd *kingpin.CmdClause, opts *RankOptions) error
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("FIRST-ISSUE", "first issue").Required().StringVar(&opts.First)
 	cmd.Arg("after|before", "rank ordering").Required().HintOptions("after", "before").EnumVar(&opts.Order, "after", "before")
 	cmd.Arg("SECOND-ISSUE", "second issue").Required().StringVar(&opts.Second)
@@ -59,7 +60,11 @@ func (jc *JiraCli) CmdRank(opts *RankOptions) error {
 	fmt.Printf("OK %s %s/browse/%s\n", opts.First, jc.Endpoint, opts.First)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Second, jc.Endpoint, opts.Second)
 
-	// FIXME implement browse
+	if opts.Browse {
+		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.First}); err != nil {
+			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Second})
+		}
+	}
 
 	return nil
 }

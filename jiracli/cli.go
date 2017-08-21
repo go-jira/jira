@@ -47,7 +47,7 @@ type Exit struct {
 }
 
 type GlobalOptions struct {
-	Browse         string `json:"browse,omitempty" yaml:"browse,omitempty"`
+	Browse         bool   `json:"browse,omitempty" yaml:"browse,omitempty"`
 	Editor         string `json:"editor,omitempty" yaml:"editor,omitempty"`
 	SkipEditing    bool   `json:"noedit,omitempty" yaml:"noedit,omitempty"`
 	PasswordSource string `json:"password-source,omitempty" yaml:"password-source,omitempty"`
@@ -85,6 +85,10 @@ func (jc *JiraCli) LoadConfigs(cmd *kingpin.CmdClause, opts interface{}) {
 		// then load generic configs if not already populated above
 		return fig.LoadAllConfigs(path.Join(jc.ConfigDir, "config.yml"), opts)
 	})
+}
+
+func (jc *JiraCli) BrowseUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
+	cmd.Flag("browse", "Open issue(s) in browser after operation").Short('b').BoolVar(&opts.Browse)
 }
 
 func (jc *JiraCli) EditorUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
@@ -456,20 +460,6 @@ func (jc *JiraCli) editLoop(opts *GlobalOptions, input interface{}, output inter
 // 			}
 // 		}
 // 		return nil
-// 	}
-// 	return nil
-// }
-
-// // Browse will open up your default browser to the provided issue
-// func (c *Cli) Browse(issue string) error {
-// 	if val, ok := c.opts["browse"].(bool); ok && val {
-// 		if runtime.GOOS == "darwin" {
-// 			return exec.Command("open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
-// 		} else if runtime.GOOS == "linux" {
-// 			return exec.Command("xdg-open", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
-// 		} else if runtime.GOOS == "windows" {
-// 			return exec.Command("cmd", "/c", "start", fmt.Sprintf("%s/browse/%s", c.endpoint, issue)).Run()
-// 		}
 // 	}
 // 	return nil
 // }

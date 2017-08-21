@@ -31,6 +31,10 @@ func (o *BoolOption) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *BoolOption) GetSource() string {
+	return o.Source
+}
+
 func (o BoolOption) GetValue() interface{} {
 	return o.Value
 }
@@ -248,6 +252,10 @@ func (o ByteOption) IsDefined() bool {
 
 func (o *ByteOption) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *ByteOption) GetSource() string {
+	return o.Source
 }
 
 func (o ByteOption) GetValue() interface{} {
@@ -469,6 +477,10 @@ func (o *Complex128Option) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *Complex128Option) GetSource() string {
+	return o.Source
+}
+
 func (o Complex128Option) GetValue() interface{} {
 	return o.Value
 }
@@ -686,6 +698,10 @@ func (o Complex64Option) IsDefined() bool {
 
 func (o *Complex64Option) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *Complex64Option) GetSource() string {
+	return o.Source
 }
 
 func (o Complex64Option) GetValue() interface{} {
@@ -907,6 +923,10 @@ func (o *ErrorOption) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *ErrorOption) GetSource() string {
+	return o.Source
+}
+
 func (o ErrorOption) GetValue() interface{} {
 	return o.Value
 }
@@ -1124,6 +1144,10 @@ func (o Float32Option) IsDefined() bool {
 
 func (o *Float32Option) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *Float32Option) GetSource() string {
+	return o.Source
 }
 
 func (o Float32Option) GetValue() interface{} {
@@ -1345,6 +1369,10 @@ func (o *Float64Option) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *Float64Option) GetSource() string {
+	return o.Source
+}
+
 func (o Float64Option) GetValue() interface{} {
 	return o.Value
 }
@@ -1562,6 +1590,10 @@ func (o IntOption) IsDefined() bool {
 
 func (o *IntOption) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *IntOption) GetSource() string {
+	return o.Source
 }
 
 func (o IntOption) GetValue() interface{} {
@@ -1783,6 +1815,10 @@ func (o *Int16Option) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *Int16Option) GetSource() string {
+	return o.Source
+}
+
 func (o Int16Option) GetValue() interface{} {
 	return o.Value
 }
@@ -2000,6 +2036,10 @@ func (o Int32Option) IsDefined() bool {
 
 func (o *Int32Option) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *Int32Option) GetSource() string {
+	return o.Source
 }
 
 func (o Int32Option) GetValue() interface{} {
@@ -2221,6 +2261,10 @@ func (o *Int64Option) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *Int64Option) GetSource() string {
+	return o.Source
+}
+
 func (o Int64Option) GetValue() interface{} {
 	return o.Value
 }
@@ -2438,6 +2482,10 @@ func (o Int8Option) IsDefined() bool {
 
 func (o *Int8Option) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *Int8Option) GetSource() string {
+	return o.Source
 }
 
 func (o Int8Option) GetValue() interface{} {
@@ -2659,6 +2707,10 @@ func (o *RuneOption) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *RuneOption) GetSource() string {
+	return o.Source
+}
+
 func (o RuneOption) GetValue() interface{} {
 	return o.Value
 }
@@ -2876,6 +2928,10 @@ func (o StringOption) IsDefined() bool {
 
 func (o *StringOption) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *StringOption) GetSource() string {
+	return o.Source
 }
 
 func (o StringOption) GetValue() interface{} {
@@ -3097,6 +3153,10 @@ func (o *UintOption) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *UintOption) GetSource() string {
+	return o.Source
+}
+
 func (o UintOption) GetValue() interface{} {
 	return o.Value
 }
@@ -3314,6 +3374,10 @@ func (o Uint16Option) IsDefined() bool {
 
 func (o *Uint16Option) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *Uint16Option) GetSource() string {
+	return o.Source
 }
 
 func (o Uint16Option) GetValue() interface{} {
@@ -3535,6 +3599,10 @@ func (o *Uint32Option) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *Uint32Option) GetSource() string {
+	return o.Source
+}
+
 func (o Uint32Option) GetValue() interface{} {
 	return o.Value
 }
@@ -3752,6 +3820,10 @@ func (o Uint64Option) IsDefined() bool {
 
 func (o *Uint64Option) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *Uint64Option) GetSource() string {
+	return o.Source
 }
 
 func (o Uint64Option) GetValue() interface{} {
@@ -3973,6 +4045,10 @@ func (o *Uint8Option) SetSource(source string) {
 	o.Source = source
 }
 
+func (o *Uint8Option) GetSource() string {
+	return o.Source
+}
+
 func (o Uint8Option) GetValue() interface{} {
 	return o.Value
 }
@@ -4190,6 +4266,10 @@ func (o UintptrOption) IsDefined() bool {
 
 func (o *UintptrOption) SetSource(source string) {
 	o.Source = source
+}
+
+func (o *UintptrOption) GetSource() string {
+	return o.Source
 }
 
 func (o UintptrOption) GetValue() interface{} {

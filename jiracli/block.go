@@ -21,7 +21,6 @@ func (jc *JiraCli) CmdBlockRegistry() *CommandRegistryEntry {
 		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
 			Type: &jiradata.IssueLinkType{
-				// FIXME is this consitent across multiple jira installs?
 				Name: "Blocks",
 			},
 			InwardIssue:  &jiradata.IssueRef{},
@@ -44,6 +43,7 @@ func (jc *JiraCli) CmdBlockUsage(cmd *kingpin.CmdClause, opts *BlockOptions) err
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("comment", "Comment message when marking issue as blocker").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
@@ -67,7 +67,11 @@ func (jc *JiraCli) CmdBlock(opts *BlockOptions) error {
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Blocker, jc.Endpoint, opts.Blocker)
 
-	// FIXME implement browse
+	if opts.Browse {
+		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue}); err != nil {
+			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Blocker})
+		}
+	}
 
 	return nil
 }

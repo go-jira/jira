@@ -21,7 +21,6 @@ func (jc *JiraCli) CmdDupRegistry() *CommandRegistryEntry {
 		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
 			Type: &jiradata.IssueLinkType{
-				// FIXME is this consitent across multiple jira installs?
 				Name: "Duplicate",
 			},
 			InwardIssue:  &jiradata.IssueRef{},
@@ -44,6 +43,7 @@ func (jc *JiraCli) CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("comment", "Comment message when marking issue as duplicate").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
@@ -85,9 +85,14 @@ func (jc *JiraCli) CmdDup(opts *DupOptions) error {
 		}
 	}
 
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, jc.Endpoint, opts.InwardIssue.Key)
 
-	// FIXME implement browse
+	if opts.Browse {
+		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
+			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
+		}
+	}
 
 	return nil
 }
