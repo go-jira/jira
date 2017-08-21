@@ -25,10 +25,6 @@ type kingpinAppOrCommand interface {
 	GetCommand(string) *kingpin.CmdClause
 }
 
-// func NewCommand(app kingpinAppOrCommand, name string, entry *CommandRegistryEntry) *kingpin.CmdClause {
-// 	returnapp.Command(name, entry.Help)
-// }
-
 func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 	for _, command := range reg {
 		copy := command
@@ -62,34 +58,6 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 		)
 	}
 }
-
-// // CmdExportTemplates will export the default templates to the template directory.
-// func (c *Cli) CmdExportTemplates() error {
-// 	dir := c.opts["directory"].(string)
-// 	if err := mkdir(dir); err != nil {
-// 		return err
-// 	}
-
-// 	for name, template := range allTemplates {
-// 		if wanted, ok := c.opts["template"]; ok && wanted != name {
-// 			continue
-// 		}
-// 		templateFile := fmt.Sprintf("%s/%s", dir, name)
-// 		if _, err := os.Stat(templateFile); err == nil {
-// 			log.Warning("Skipping %s, already exists", templateFile)
-// 			continue
-// 		}
-// 		fh, err := os.OpenFile(templateFile, os.O_WRONLY|os.O_CREATE, 0644)
-// 		if err != nil {
-// 			log.Errorf("Failed to open %s for writing: %s", templateFile, err)
-// 			return err
-// 		}
-// 		defer fh.Close()
-// 		log.Noticef("Creating %s", templateFile)
-// 		fh.Write([]byte(template))
-// 	}
-// 	return nil
-// }
 
 // // CmdRequest will use the given uri to make a request and potentially send provided content.
 // func (c *Cli) CmdRequest(uri, content string) (err error) {

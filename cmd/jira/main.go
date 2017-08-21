@@ -241,6 +241,14 @@ func main() {
 			Command: "issuetypes",
 			Entry:   cli.CmdIssueTypesRegistry(),
 		},
+		jiracli.CommandRegistry{
+			Command: "export-templates",
+			Entry:   cli.CmdExportTemplatesRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "unexport-templates",
+			Entry:   cli.CmdUnexportTemplatesRegistry(),
+		},
 	}
 
 	cli.Register(app, registry)
@@ -259,7 +267,6 @@ func main() {
 	}
 
 	// Usage:
-	//   jira export-templates [-d DIR] [-t template]
 	//   jira (b|browse) ISSUE
 	//   jira request [-M METHOD] URI [DATA]
 	//   jira ISSUE
@@ -307,7 +314,6 @@ func main() {
 	// 	}
 
 	// 	jiraCommands := map[string]string{
-	// 		"export-templates": "export-templates",
 	// 		"browse":           "browse",
 	// 		"req":              "request",
 	// 		"request":          "request",
@@ -460,8 +466,6 @@ func main() {
 	// 		requireArgs(1)
 	// 		opts["browse"] = true
 	// 		err = c.Browse(args[0])
-	// 	case "export-templates":
-	// 		err = c.CmdExportTemplates()
 	// 	case "request":
 	// 		requireArgs(1)
 	// 		data := ""
