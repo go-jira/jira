@@ -271,8 +271,12 @@ func main() {
 		}
 		panic(jiracli.Exit{Code: 1})
 	})
-	_, err := app.Parse(os.Args[1:])
-	if err != nil {
-		log.Fatalf("%s", err)
+	if _, err := app.Parse(os.Args[1:]); err != nil {
+		ctx, _ := app.ParseContext(os.Args[1:])
+		if ctx != nil {
+			app.UsageForContext(ctx)
+		}
+		log.Errorf("Invalid Usage: %s", err)
+		panic(jiracli.Exit{Code: 1})
 	}
 }
