@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -17,7 +19,7 @@ type BlockOptions struct {
 func (jc *JiraCli) CmdBlockRegistry() *CommandRegistryEntry {
 	opts := BlockOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "edit",
+			Template: figtree.NewStringOption("edit"),
 		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
 			Type: &jiradata.IssueLinkType{
@@ -67,7 +69,7 @@ func (jc *JiraCli) CmdBlock(opts *BlockOptions) error {
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Blocker, jc.Endpoint, opts.Blocker)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue}); err != nil {
 			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Blocker})
 		}

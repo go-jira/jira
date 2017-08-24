@@ -1,6 +1,7 @@
 package jiracli
 
 import (
+	"github.com/coryb/figtree"
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -14,7 +15,7 @@ type ViewOptions struct {
 func (jc *JiraCli) CmdViewRegistry() *CommandRegistryEntry {
 	opts := ViewOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "view",
+			Template: figtree.NewStringOption("view"),
 		},
 	}
 
@@ -48,10 +49,10 @@ func (jc *JiraCli) CmdView(opts *ViewOptions) error {
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template, data, nil); err != nil {
+	if err := jc.runTemplate(opts.Template.Value, data, nil); err != nil {
 		return err
 	}
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil

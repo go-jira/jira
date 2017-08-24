@@ -55,7 +55,7 @@ func (jc *JiraCli) CmdLabelsRemove(opts *LabelsRemoveOptions) error {
 		return err
 	}
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil

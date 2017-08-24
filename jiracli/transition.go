@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/coryb/figtree"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -19,7 +21,7 @@ type TransitionOptions struct {
 func (jc *JiraCli) CmdTransitionRegistry(transition string) *CommandRegistryEntry {
 	opts := TransitionOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "transition",
+			Template: figtree.NewStringOption("transition"),
 		},
 		Transition: transition,
 		Overrides:  map[string]string{},
@@ -126,7 +128,7 @@ func (jc *JiraCli) CmdTransition(opts *TransitionOptions) error {
 	}
 	fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, jc.Endpoint, issueData.Key)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil

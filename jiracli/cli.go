@@ -36,12 +36,12 @@ type Exit struct {
 }
 
 type GlobalOptions struct {
-	Browse         bool   `json:"browse,omitempty" yaml:"browse,omitempty"`
-	Editor         string `json:"editor,omitempty" yaml:"editor,omitempty"`
-	SkipEditing    bool   `json:"noedit,omitempty" yaml:"noedit,omitempty"`
-	PasswordSource string `json:"password-source,omitempty" yaml:"password-source,omitempty"`
-	Template       string `json:"template,omitempty" yaml:"template,omitempty"`
-	User           string `json:"user,omitempty", yaml:"user,omitempty"`
+	Browse         figtree.BoolOption   `json:"browse,omitempty" yaml:"browse,omitempty"`
+	Editor         figtree.StringOption `json:"editor,omitempty" yaml:"editor,omitempty"`
+	SkipEditing    figtree.BoolOption   `json:"noedit,omitempty" yaml:"noedit,omitempty"`
+	PasswordSource figtree.StringOption `json:"password-source,omitempty" yaml:"password-source,omitempty"`
+	Template       figtree.StringOption `json:"template,omitempty" yaml:"template,omitempty"`
+	User           figtree.StringOption `json:"user,omitempty", yaml:"user,omitempty"`
 }
 
 type CommandRegistryEntry struct {
@@ -111,26 +111,29 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 func (jc *JiraCli) GlobalUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) error {
 	jc.LoadConfigs(cmd, opts)
 	cmd.PreAction(func(_ *kingpin.ParseContext) error {
+		os.Setenv("JIRA_OPERATION", cmd.FullCommand())
 		fig := figtree.NewFigTree()
 		fig.EnvPrefix = "JIRA"
 		// populate JiraCli fields if defined in configs (ie for Endpoint)
 		if err := fig.LoadAllConfigs(path.Join(jc.ConfigDir, "config.yml"), jc); err != nil {
 			return err
 		}
-		if opts.User == "" {
-			opts.User = os.Getenv("USER")
+		if opts.User.Value == "" {
+			opts.User = figtree.NewStringOption(os.Getenv("USER"))
 		}
 		return nil
 	})
 	cmd.Flag("endpoint", "URI to use for Jira").Short('e').StringVar(&jc.Endpoint)
-	cmd.Flag("user", "Login mame used for authentication with Jira service").Short('u').StringVar(&opts.User)
+	cmd.Flag("user", "Login mame used for authentication with Jira service").Short('u').SetValue(&opts.User)
 	return nil
 }
 
 func (jc *JiraCli) LoadConfigs(cmd *kingpin.CmdClause, opts interface{}) {
 	cmd.PreAction(func(_ *kingpin.ParseContext) error {
+		os.Setenv("JIRA_OPERATION", cmd.FullCommand())
 		fig := figtree.NewFigTree()
 		fig.EnvPrefix = "JIRA"
+		fig.Defaults = opts
 		// load command specific configs first
 		if err := fig.LoadAllConfigs(path.Join(jc.ConfigDir, strings.Join(strings.Fields(cmd.FullCommand()), "_")+".yml"), opts); err != nil {
 			return err
@@ -141,27 +144,27 @@ func (jc *JiraCli) LoadConfigs(cmd *kingpin.CmdClause, opts interface{}) {
 }
 
 func (jc *JiraCli) BrowseUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
-	cmd.Flag("browse", "Open issue(s) in browser after operation").Short('b').BoolVar(&opts.Browse)
+	cmd.Flag("browse", "Open issue(s) in browser after operation").Short('b').SetValue(&opts.Browse)
 }
 
 func (jc *JiraCli) EditorUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
-	cmd.Flag("editor", "Editor to use").StringVar(&opts.Editor)
+	cmd.Flag("editor", "Editor to use").SetValue(&opts.Editor)
 }
 
 func (jc *JiraCli) TemplateUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
-	cmd.Flag("template", "Template to use for output").Short('t').StringVar(&opts.Template)
+	cmd.Flag("template", "Template to use for output").Short('t').SetValue(&opts.Template)
 }
 
 func (o *GlobalOptions) editFile(fileName string) (changes bool, err error) {
 	var editor string
-	for _, ed := range []string{o.Editor, os.Getenv("JIRA_EDITOR"), os.Getenv("EDITOR"), "vim"} {
+	for _, ed := range []string{o.Editor.Value, os.Getenv("JIRA_EDITOR"), os.Getenv("EDITOR"), "vim"} {
 		if ed != "" {
 			editor = ed
 			break
 		}
 	}
 
-	if o.SkipEditing {
+	if o.SkipEditing.Value {
 		return false, nil
 	}
 
@@ -216,7 +219,7 @@ func (o *GlobalOptions) editFile(fileName string) (changes bool, err error) {
 }
 
 func (jc *JiraCli) editLoop(opts *GlobalOptions, input interface{}, output interface{}, submit func() error) error {
-	tmpFile, err := jc.tmpTemplate(opts.Template, input)
+	tmpFile, err := jc.tmpTemplate(opts.Template.Value, input)
 	if err != nil {
 		return err
 	}
@@ -240,7 +243,7 @@ func (jc *JiraCli) editLoop(opts *GlobalOptions, input interface{}, output inter
 	}
 
 	for {
-		if !opts.SkipEditing {
+		if !opts.SkipEditing.Value {
 			changes, err := opts.editFile(tmpFile)
 			if err != nil {
 				log.Error(err.Error())

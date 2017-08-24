@@ -1,6 +1,9 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
 type CreateMetaOptions struct {
 	GlobalOptions
@@ -11,7 +14,7 @@ type CreateMetaOptions struct {
 func (jc *JiraCli) CmdCreateMetaRegistry() *CommandRegistryEntry {
 	opts := CreateMetaOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "createmeta",
+			Template: figtree.NewStringOption("createmeta"),
 		},
 	}
 
@@ -45,5 +48,5 @@ func (jc *JiraCli) CmdCreateMeta(opts *CreateMetaOptions) error {
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, createMeta, nil)
+	return jc.runTemplate(opts.Template.Value, createMeta, nil)
 }

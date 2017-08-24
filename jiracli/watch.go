@@ -55,7 +55,7 @@ func (jc *JiraCli) CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) err
 // with the 'remove' flag)
 func (jc *JiraCli) CmdWatch(opts *WatchOptions) error {
 	if opts.Watcher == "" {
-		opts.Watcher = opts.User
+		opts.Watcher = opts.User.Value
 	}
 	if opts.Action == WatcherAdd {
 		if err := jc.IssueAddWatcher(opts.Issue, opts.Watcher); err != nil {
@@ -69,7 +69,7 @@ func (jc *JiraCli) CmdWatch(opts *WatchOptions) error {
 
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 

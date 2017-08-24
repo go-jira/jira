@@ -1,10 +1,13 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
 func (jc *JiraCli) CmdFieldsRegistry() *CommandRegistryEntry {
 	opts := GlobalOptions{
-		Template: "fields",
+		Template: figtree.NewStringOption("fields"),
 	}
 	return &CommandRegistryEntry{
 		"Prints all fields, both System and Custom",
@@ -25,5 +28,5 @@ func (jc *JiraCli) CmdFields(opts *GlobalOptions) error {
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, data, nil)
+	return jc.runTemplate(opts.Template.Value, data, nil)
 }

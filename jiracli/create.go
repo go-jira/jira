@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -18,7 +20,7 @@ type CreateOptions struct {
 func (jc *JiraCli) CmdCreateRegistry() *CommandRegistryEntry {
 	opts := CreateOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "create",
+			Template: figtree.NewStringOption("create"),
 		},
 		Overrides: map[string]string{},
 	}
@@ -41,7 +43,7 @@ func (jc *JiraCli) CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) e
 	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
-	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
+	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("project", "project to create issue in").Short('p').StringVar(&opts.Project)
 	cmd.Flag("issuetype", "issuetype in to create").Short('i').StringVar(&opts.IssueType)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
@@ -75,7 +77,7 @@ func (jc *JiraCli) CmdCreate(opts *CreateOptions) error {
 	}
 	input.Overrides["project"] = opts.Project
 	input.Overrides["issuetype"] = opts.IssueType
-	input.Overrides["user"] = opts.User
+	input.Overrides["user"] = opts.User.Value
 
 	var issueResp *jiradata.IssueCreateResponse
 	err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
@@ -88,7 +90,7 @@ func (jc *JiraCli) CmdCreate(opts *CreateOptions) error {
 
 	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, jc.Endpoint, issueResp.Key)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
 	}
 	return nil

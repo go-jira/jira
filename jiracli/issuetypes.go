@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -14,7 +16,7 @@ type IssueTypesOptions struct {
 func (jc *JiraCli) CmdIssueTypesRegistry() *CommandRegistryEntry {
 	opts := IssueTypesOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "issuetypes",
+			Template: figtree.NewStringOption("issuetypes"),
 		},
 	}
 
@@ -48,5 +50,5 @@ func (jc *JiraCli) CmdIssueTypes(opts *IssueTypesOptions) error {
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, data, nil)
+	return jc.runTemplate(opts.Template.Value, data, nil)
 }

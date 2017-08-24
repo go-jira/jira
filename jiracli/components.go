@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -14,7 +16,7 @@ type ComponentsOptions struct {
 func (jc *JiraCli) CmdComponentsRegistry() *CommandRegistryEntry {
 	opts := ComponentsOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "components",
+			Template: figtree.NewStringOption("components"),
 		},
 	}
 
@@ -48,5 +50,5 @@ func (jc *JiraCli) CmdComponents(opts *ComponentsOptions) error {
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, data, nil)
+	return jc.runTemplate(opts.Template.Value, data, nil)
 }

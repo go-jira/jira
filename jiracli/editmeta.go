@@ -1,6 +1,9 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
 type EditMetaOptions struct {
 	GlobalOptions
@@ -11,7 +14,7 @@ func (jc *JiraCli) CmdEditMetaRegistry() *CommandRegistryEntry {
 
 	opts := EditMetaOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "editmeta",
+			Template: figtree.NewStringOption("editmeta"),
 		},
 	}
 
@@ -42,10 +45,10 @@ func (jc *JiraCli) CmdEditMeta(opts *EditMetaOptions) error {
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template, editMeta, nil); err != nil {
+	if err := jc.runTemplate(opts.Template.Value, editMeta, nil); err != nil {
 		return err
 	}
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil

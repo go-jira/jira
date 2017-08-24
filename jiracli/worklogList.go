@@ -1,6 +1,9 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
 type WorklogListOptions struct {
 	GlobalOptions
@@ -10,7 +13,7 @@ type WorklogListOptions struct {
 func (jc *JiraCli) CmdWorklogListRegistry() *CommandRegistryEntry {
 	opts := WorklogListOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "worklogs",
+			Template: figtree.NewStringOption("worklogs"),
 		},
 	}
 	return &CommandRegistryEntry{
@@ -40,10 +43,10 @@ func (jc *JiraCli) CmdWorklogList(opts *WorklogListOptions) error {
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template, data, nil); err != nil {
+	if err := jc.runTemplate(opts.Template.Value, data, nil); err != nil {
 		return err
 	}
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil

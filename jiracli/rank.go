@@ -60,7 +60,7 @@ func (jc *JiraCli) CmdRank(opts *RankOptions) error {
 	fmt.Printf("OK %s %s/browse/%s\n", opts.First, jc.Endpoint, opts.First)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Second, jc.Endpoint, opts.Second)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.First}); err != nil {
 			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Second})
 		}

@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -19,7 +21,7 @@ type EditOptions struct {
 func (jc *JiraCli) CmdEditRegistry() *CommandRegistryEntry {
 	opts := EditOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "edit",
+			Template: figtree.NewStringOption("edit"),
 		},
 		Overrides: map[string]string{},
 	}
@@ -42,7 +44,7 @@ func (jc *JiraCli) CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error
 	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
-	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
+	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search to edit multiple issues").Short('q').StringVar(&opts.Query)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = flagValue(ctx, "comment")
@@ -84,7 +86,7 @@ func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
 		}
 		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 
-		if opts.Browse {
+		if opts.Browse.Value {
 			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 		}
 	}
@@ -111,7 +113,7 @@ func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
 		}
 		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, jc.Endpoint, issueData.Key)
 
-		if opts.Browse {
+		if opts.Browse.Value {
 			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueData.Key})
 		}
 	}

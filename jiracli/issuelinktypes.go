@@ -1,10 +1,13 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
 func (jc *JiraCli) CmdIssueLinkTypesRegistry() *CommandRegistryEntry {
 	opts := GlobalOptions{
-		Template: "issuelinktypes",
+		Template: figtree.NewStringOption("issuelinktypes"),
 	}
 
 	return &CommandRegistryEntry{
@@ -32,5 +35,5 @@ func (jc *JiraCli) CmdIssueLinkTypes(opts *GlobalOptions) error {
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, data, nil)
+	return jc.runTemplate(opts.Template.Value, data, nil)
 }

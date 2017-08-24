@@ -1,6 +1,7 @@
 package jiracli
 
 import (
+	"github.com/coryb/figtree"
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -13,7 +14,7 @@ type ListOptions struct {
 func (jc *JiraCli) CmdListRegistry() *CommandRegistryEntry {
 	opts := ListOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "list",
+			Template: figtree.NewStringOption("list"),
 		},
 		SearchOptions: jira.SearchOptions{
 			MaxResults:  500,
@@ -34,7 +35,9 @@ func (jc *JiraCli) CmdListRegistry() *CommandRegistryEntry {
 }
 
 func (jc *JiraCli) CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
+	log.Debugf("Configs: %#v", opts)
 	jc.LoadConfigs(cmd, opts)
+	log.Debugf("Configs: %#v", opts)
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
@@ -54,9 +57,10 @@ func (jc *JiraCli) CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error
 
 // List will query jira and send data to "list" template
 func (jc *JiraCli) CmdList(opts *ListOptions) error {
+	log.Debugf("Configs: %#v", opts)
 	data, err := jc.Search(opts)
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, data, nil)
+	return jc.runTemplate(opts.Template.Value, data, nil)
 }

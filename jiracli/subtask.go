@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -19,7 +21,7 @@ type SubtaskOptions struct {
 func (jc *JiraCli) CmdSubtaskRegistry() *CommandRegistryEntry {
 	opts := SubtaskOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "subtask",
+			Template: figtree.NewStringOption("subtask"),
 		},
 		IssueType: "Sub-task",
 		Overrides: map[string]string{},
@@ -43,7 +45,7 @@ func (jc *JiraCli) CmdSubtaskUsage(cmd *kingpin.CmdClause, opts *SubtaskOptions)
 	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
-	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
+	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("project", "project to subtask issue in").Short('p').StringVar(&opts.Project)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = flagValue(ctx, "comment")
@@ -91,7 +93,7 @@ func (jc *JiraCli) CmdSubtask(opts *SubtaskOptions) error {
 	}
 	input.Overrides["project"] = opts.Project
 	input.Overrides["issuetype"] = opts.IssueType
-	input.Overrides["user"] = opts.User
+	input.Overrides["user"] = opts.User.Value
 
 	var issueResp *jiradata.IssueCreateResponse
 	err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
@@ -104,7 +106,7 @@ func (jc *JiraCli) CmdSubtask(opts *SubtaskOptions) error {
 
 	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, jc.Endpoint, issueResp.Key)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
 	}
 	return nil

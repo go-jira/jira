@@ -12,21 +12,21 @@ import (
 
 func (o *GlobalOptions) ProvideAuthParams() *jiradata.AuthParams {
 	return &jiradata.AuthParams{
-		Username: o.User,
+		Username: o.User.Value,
 		Password: o.GetPass(),
 	}
 }
 
 func (o *GlobalOptions) GetPass() string {
 	passwd := ""
-	if o.PasswordSource != "" {
-		if o.PasswordSource == "keyring" {
+	if o.PasswordSource.Value != "" {
+		if o.PasswordSource.Value == "keyring" {
 			var err error
-			passwd, err = keyringGet(o.User)
+			passwd, err = keyringGet(o.User.Value)
 			if err != nil {
 				panic(err)
 			}
-		} else if o.PasswordSource == "pass" {
+		} else if o.PasswordSource.Value == "pass" {
 			if bin, err := exec.LookPath("pass"); err == nil {
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, fmt.Sprintf("GoJira/%s", o.User))
@@ -56,14 +56,14 @@ func (o *GlobalOptions) GetPass() string {
 }
 
 func (o *GlobalOptions) SetPass(passwd string) error {
-	if o.PasswordSource == "keyring" {
+	if o.PasswordSource.Value == "keyring" {
 		// save password in keychain so that it can be used for subsequent http requests
-		err := keyringSet(o.User, passwd)
+		err := keyringSet(o.User.Value, passwd)
 		if err != nil {
 			log.Errorf("Failed to set password in keyring: %s", err)
 			return err
 		}
-	} else if o.PasswordSource == "pass" {
+	} else if o.PasswordSource.Value == "pass" {
 		if bin, err := exec.LookPath("pass"); err == nil {
 			log.Debugf("using %s", bin)
 			passName := fmt.Sprintf("GoJira/%s", o.User)
@@ -84,7 +84,7 @@ func (o *GlobalOptions) SetPass(passwd string) error {
 				}
 			}
 		}
-	} else if o.PasswordSource != "" {
+	} else if o.PasswordSource.Value != "" {
 		return fmt.Errorf("Unknown password-source: %s", o.PasswordSource)
 	}
 	return nil

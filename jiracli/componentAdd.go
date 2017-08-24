@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -15,7 +17,7 @@ type ComponentAddOptions struct {
 func (jc *JiraCli) CmdComponentAddRegistry() *CommandRegistryEntry {
 	opts := ComponentAddOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "component-add",
+			Template: figtree.NewStringOption("component-add"),
 		},
 	}
 
@@ -36,7 +38,7 @@ func (jc *JiraCli) CmdComponentAddUsage(cmd *kingpin.CmdClause, opts *ComponentA
 	}
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
-	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
+	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("project", "project to create component in").Short('p').StringVar(&opts.Project)
 	cmd.Flag("name", "name of component").Short('n').StringVar(&opts.Name)
 	cmd.Flag("description", "description of component").Short('d').StringVar(&opts.Description)

@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -17,7 +19,7 @@ type DupOptions struct {
 func (jc *JiraCli) CmdDupRegistry() *CommandRegistryEntry {
 	opts := DupOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "edit",
+			Template: figtree.NewStringOption("edit"),
 		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
 			Type: &jiradata.IssueLinkType{
@@ -88,7 +90,7 @@ func (jc *JiraCli) CmdDup(opts *DupOptions) error {
 	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, jc.Endpoint, opts.InwardIssue.Key)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
 			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
 		}

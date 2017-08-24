@@ -1,6 +1,9 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
 type TransitionsOptions struct {
 	GlobalOptions
@@ -10,7 +13,7 @@ type TransitionsOptions struct {
 func (jc *JiraCli) CmdTransitionsRegistry(defaultTemplate string) *CommandRegistryEntry {
 	opts := TransitionsOptions{
 		GlobalOptions: GlobalOptions{
-			Template: defaultTemplate,
+			Template: figtree.NewStringOption(defaultTemplate),
 		},
 	}
 
@@ -41,10 +44,10 @@ func (jc *JiraCli) CmdTransitions(opts *TransitionsOptions) error {
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template, editMeta, nil); err != nil {
+	if err := jc.runTemplate(opts.Template.Value, editMeta, nil); err != nil {
 		return err
 	}
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil

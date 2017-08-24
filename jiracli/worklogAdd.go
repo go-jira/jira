@@ -1,6 +1,7 @@
 package jiracli
 
 import (
+	"github.com/coryb/figtree"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -14,7 +15,7 @@ type WorklogAddOptions struct {
 func (jc *JiraCli) CmdWorklogAddRegistry() *CommandRegistryEntry {
 	opts := WorklogAddOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "worklog",
+			Template: figtree.NewStringOption("worklog"),
 		},
 	}
 	return &CommandRegistryEntry{
@@ -35,7 +36,7 @@ func (jc *JiraCli) CmdWorklogAddUsage(cmd *kingpin.CmdClause, opts *WorklogAddOp
 	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
-	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
+	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("comment", "Comment message for worklog").Short('m').StringVar(&opts.Comment)
 	cmd.Flag("time-spent", "Time spent working on issue").Short('T').StringVar(&opts.TimeSpent)
 	cmd.Arg("ISSUE", "issue id to fetch worklogs").Required().StringVar(&opts.Issue)
@@ -53,7 +54,7 @@ func (jc *JiraCli) CmdWorklogAdd(opts *WorklogAddOptions) error {
 	if err != nil {
 		return err
 	}
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil

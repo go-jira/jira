@@ -15,9 +15,6 @@ type IssueLinkOptions struct {
 
 func (jc *JiraCli) CmdIssueLinkRegistry() *CommandRegistryEntry {
 	opts := IssueLinkOptions{
-		GlobalOptions: GlobalOptions{
-			Template: "edit",
-		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
 			Type:         &jiradata.IssueLinkType{},
 			InwardIssue:  &jiradata.IssueRef{},
@@ -64,7 +61,7 @@ func (jc *JiraCli) CmdIssueLink(opts *IssueLinkOptions) error {
 	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, jc.Endpoint, opts.InwardIssue.Key)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
 			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
 		}

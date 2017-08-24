@@ -8,7 +8,7 @@ func (jc *JiraCli) CmdTakeRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Assign issue to yourself",
 		func() error {
-			opts.Assignee = opts.User
+			opts.Assignee = opts.User.Value
 			return jc.CmdAssign(&opts)
 		},
 		func(cmd *kingpin.CmdClause) error {

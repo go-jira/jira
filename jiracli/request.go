@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -22,7 +23,7 @@ type RequestOptions struct {
 func (jc *JiraCli) CmdRequestRegistry() *CommandRegistryEntry {
 	opts := RequestOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "request",
+			Template: figtree.NewStringOption("request"),
 		},
 		Method: "GET",
 	}
@@ -85,5 +86,5 @@ func (jc *JiraCli) CmdRequest(opts *RequestOptions) error {
 		return fmt.Errorf("JSON Parse Error: %s from %q", err, content)
 	}
 
-	return jc.runTemplate(opts.Template, &data, nil)
+	return jc.runTemplate(opts.Template.Value, &data, nil)
 }

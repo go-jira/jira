@@ -3,6 +3,8 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -16,7 +18,7 @@ type CommentOptions struct {
 func (jc *JiraCli) CmdCommentRegistry() *CommandRegistryEntry {
 	opts := CommentOptions{
 		GlobalOptions: GlobalOptions{
-			Template: "comment",
+			Template: figtree.NewStringOption("comment"),
 		},
 		Overrides: map[string]string{},
 	}
@@ -65,7 +67,7 @@ func (jc *JiraCli) CmdComment(opts *CommentOptions) error {
 
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
 
-	if opts.Browse {
+	if opts.Browse.Value {
 		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 
