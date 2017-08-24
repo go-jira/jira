@@ -8,10 +8,10 @@ import (
 type ViewOptions struct {
 	GlobalOptions
 	jira.IssueOptions
+	Issue string
 }
 
 func (jc *JiraCli) CmdViewRegistry() *CommandRegistryEntry {
-	issue := ""
 	opts := ViewOptions{
 		GlobalOptions: GlobalOptions{
 			Template: "view",
@@ -21,31 +21,38 @@ func (jc *JiraCli) CmdViewRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Prints issue details",
 		func() error {
-			return jc.CmdView(issue, &opts)
+			return jc.CmdView(&opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdViewUsage(cmd, &issue, &opts)
+			return jc.CmdViewUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdViewUsage(cmd *kingpin.CmdClause, issue *string, opts *ViewOptions) error {
+func (jc *JiraCli) CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error {
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("expand", "field to expand for the issue").StringsVar(&opts.Expand)
 	cmd.Flag("field", "field to return for the issue").StringsVar(&opts.Fields)
 	cmd.Flag("property", "property to return for issue").StringsVar(&opts.Properties)
-	cmd.Arg("ISSUE", "issue id to view").Required().StringVar(issue)
+	cmd.Arg("ISSUE", "issue id to view").Required().StringVar(&opts.Issue)
 	return nil
 }
 
 // View will get issue data and send to "view" template
-func (jc *JiraCli) CmdView(issue string, opts *ViewOptions) error {
-	data, err := jc.GetIssue(issue, opts)
+func (jc *JiraCli) CmdView(opts *ViewOptions) error {
+	data, err := jc.GetIssue(opts.Issue, opts)
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, data, nil)
+	if err := jc.runTemplate(opts.Template, data, nil); err != nil {
+		return err
+	}
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
+	return nil
 }

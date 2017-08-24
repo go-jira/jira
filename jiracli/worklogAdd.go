@@ -32,6 +32,7 @@ func (jc *JiraCli) CmdWorklogAddUsage(cmd *kingpin.CmdClause, opts *WorklogAddOp
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.EditorUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("noedit", "Disable opening the editor").BoolVar(&opts.SkipEditing)
@@ -45,8 +46,15 @@ func (jc *JiraCli) CmdWorklogAddUsage(cmd *kingpin.CmdClause, opts *WorklogAddOp
 // It will spawn the editor (unless --noedit isused) and post edited YAML
 // content as JSON to the worklog endpoint
 func (jc *JiraCli) CmdWorklogAdd(opts *WorklogAddOptions) error {
-	return jc.editLoop(&opts.GlobalOptions, &opts.Worklog, &opts.Worklog, func() error {
+	err := jc.editLoop(&opts.GlobalOptions, &opts.Worklog, &opts.Worklog, func() error {
 		_, err := jc.AddIssueWorklog(opts.Issue, opts)
 		return err
 	})
+	if err != nil {
+		return err
+	}
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
+	return nil
 }

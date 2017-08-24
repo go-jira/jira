@@ -20,6 +20,7 @@ func (jc *JiraCli) CmdUnassignUsage(cmd *kingpin.CmdClause, opts *AssignOptions)
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue to unassign").Required().StringVar(&opts.Issue)
 	return nil
 }

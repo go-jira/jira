@@ -28,6 +28,7 @@ func (jc *JiraCli) CmdWorklogListUsage(cmd *kingpin.CmdClause, opts *WorklogList
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue id to fetch worklogs").Required().StringVar(&opts.Issue)
 	return nil
@@ -39,5 +40,11 @@ func (jc *JiraCli) CmdWorklogList(opts *WorklogListOptions) error {
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, data, nil)
+	if err := jc.runTemplate(opts.Template, data, nil); err != nil {
+		return err
+	}
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
+	return nil
 }

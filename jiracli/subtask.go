@@ -105,7 +105,7 @@ func (jc *JiraCli) CmdSubtask(opts *SubtaskOptions) error {
 	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, jc.Endpoint, issueResp.Key)
 
 	if opts.Browse {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
 	}
 	return nil
 }

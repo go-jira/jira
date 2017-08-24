@@ -2,37 +2,51 @@ package jiracli
 
 import kingpin "gopkg.in/alecthomas/kingpin.v2"
 
+type EditMetaOptions struct {
+	GlobalOptions
+	Issue string
+}
+
 func (jc *JiraCli) CmdEditMetaRegistry() *CommandRegistryEntry {
-	issue := ""
-	opts := GlobalOptions{
-		Template: "editmeta",
+
+	opts := EditMetaOptions{
+		GlobalOptions: GlobalOptions{
+			Template: "editmeta",
+		},
 	}
 
 	return &CommandRegistryEntry{
 		"View 'edit' metadata",
 		func() error {
-			return jc.CmdEditMeta(issue, &opts)
+			return jc.CmdEditMeta(&opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdEditMetaUsage(cmd, &issue, &opts)
+			return jc.CmdEditMetaUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdEditMetaUsage(cmd *kingpin.CmdClause, issue *string, opts *GlobalOptions) error {
-	if err := jc.GlobalUsage(cmd, opts); err != nil {
+func (jc *JiraCli) CmdEditMetaUsage(cmd *kingpin.CmdClause, opts *EditMetaOptions) error {
+	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.TemplateUsage(cmd, opts)
-	cmd.Arg("ISSUE", "edit metadata for issue id").Required().StringVar(issue)
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
+	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	cmd.Arg("ISSUE", "edit metadata for issue id").Required().StringVar(&opts.Issue)
 	return nil
 }
 
 // EditMeta will get issue edit metadata and send to "editmeta" template
-func (jc *JiraCli) CmdEditMeta(issue string, opts *GlobalOptions) error {
-	editMeta, err := jc.GetIssueEditMeta(issue)
+func (jc *JiraCli) CmdEditMeta(opts *EditMetaOptions) error {
+	editMeta, err := jc.GetIssueEditMeta(opts.Issue)
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, editMeta, nil)
+	if err := jc.runTemplate(opts.Template, editMeta, nil); err != nil {
+		return err
+	}
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
+	return nil
 }

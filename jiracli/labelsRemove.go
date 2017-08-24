@@ -30,6 +30,7 @@ func (jc *JiraCli) CmdLabelsRemoveUsage(cmd *kingpin.CmdClause, opts *LabelsRemo
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue id to modify labels").Required().StringVar(&opts.Issue)
 	cmd.Arg("LABEL", "label to remove from issue").Required().StringsVar(&opts.Labels)
 	return nil
@@ -54,5 +55,8 @@ func (jc *JiraCli) CmdLabelsRemove(opts *LabelsRemoveOptions) error {
 		return err
 	}
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
 	return nil
 }

@@ -15,7 +15,7 @@ func (jc *JiraCli) CmdListRegistry() *CommandRegistryEntry {
 		GlobalOptions: GlobalOptions{
 			Template: "list",
 		},
-		SearchOptions: SearchOptions{
+		SearchOptions: jira.SearchOptions{
 			MaxResults:  500,
 			QueryFields: "assignee,created,priority,reporter,status,summary,updated",
 			Sort:        "priority asc, key",

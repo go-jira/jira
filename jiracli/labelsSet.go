@@ -30,6 +30,7 @@ func (jc *JiraCli) CmdLabelsSetUsage(cmd *kingpin.CmdClause, opts *LabelsSetOpti
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue id to modify labels").Required().StringVar(&opts.Issue)
 	cmd.Arg("LABEL", "label to set on issue").Required().StringsVar(&opts.Labels)
 	return nil
@@ -47,10 +48,12 @@ func (jc *JiraCli) CmdLabelsSet(opts *LabelsSetOptions) error {
 		},
 	}
 
-	err := jc.EditIssue(opts.Issue, &issueUpdate)
-	if err != nil {
+	if err := jc.EditIssue(opts.Issue, &issueUpdate); err != nil {
 		return err
 	}
 	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
 	return nil
 }

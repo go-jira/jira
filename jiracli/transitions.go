@@ -29,6 +29,7 @@ func (jc *JiraCli) CmdTransitionsUsage(cmd *kingpin.CmdClause, opts *Transitions
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	jc.TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue to list valid transitions").Required().StringVar(&opts.Issue)
 	return nil
@@ -40,5 +41,11 @@ func (jc *JiraCli) CmdTransitions(opts *TransitionsOptions) error {
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template, editMeta, nil)
+	if err := jc.runTemplate(opts.Template, editMeta, nil); err != nil {
+		return err
+	}
+	if opts.Browse {
+		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+	}
+	return nil
 }

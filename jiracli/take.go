@@ -21,6 +21,7 @@ func (jc *JiraCli) CmdTakeUsage(cmd *kingpin.CmdClause, opts *AssignOptions) err
 	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
+	jc.BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue to assign").Required().StringVar(&opts.Issue)
 	return nil
 }
