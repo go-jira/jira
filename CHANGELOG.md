@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15 - 2017-08-25
+
+* merge in edit template changes from v1 branch [#105](https://github.com/Netflix-Skunkworks/go-jira/issues/105) [Cory Bennett] [[21dec2d](https://github.com/Netflix-Skunkworks/go-jira/commit/21dec2d)]
+* Handle keyring.ErrNotFound error instead of panicing. [Will Rouesnel] [[338cc4d](https://github.com/Netflix-Skunkworks/go-jira/commit/338cc4d)]
+* Use name field for fix version name value. Fixes [#89](https://github.com/Netflix-Skunkworks/go-jira/issues/89) [Bryan Baugher] [[fde82b2](https://github.com/Netflix-Skunkworks/go-jira/commit/fde82b2)]
+
 ## 0.1.14 - 2017-05-10
 
 * fix unsafe casting for --quiet flag [Cory Bennett] [[6f29f43](https://github.com/Netflix-Skunkworks/go-jira/commit/6f29f43)]
