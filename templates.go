@@ -90,19 +90,24 @@ update:
           {{ or .overrides.comment "" | indent 10 }}
 fields:
   summary: {{ or .overrides.summary .fields.summary }}
+{{- if and .meta.fields.components .meta.fields.components.allowedValues }}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
     - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
-    - name: {{ .name }}{{end}}{{end}}
+    - name: {{ .name }}{{end}}{{end}}{{end}}
+{{- if .meta.fields.assignee}}
   assignee:
-    name: {{ if .overrides.assignee }}{{.overrides.assignee}}{{else}}{{if .fields.assignee }}{{ .fields.assignee.name }}{{end}}{{end}}
+    name: {{ if .overrides.assignee }}{{.overrides.assignee}}{{else}}{{if .fields.assignee }}{{ .fields.assignee.name }}{{end}}{{end}}{{end}}
+{{- if .meta.fields.reporter}}
   reporter:
-    name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}
+    name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}{{end}}
+{{- if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range .fields.customfield_10110 }}
     - name: {{ .name }}{{end}}{{if .overrides.watcher}}
-    - name: {{ .overrides.watcher}}{{end}}
+    - name: {{ .overrides.watcher}}{{end}}{{end}}
+{{- if .meta.fields.priority }}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority .fields.priority.name }}
+    name: {{ or .overrides.priority .fields.priority.name }}{{end}}
   description: |~
     {{ or .overrides.description (or .fields.description "") | indent 4 }}
 # comments:
