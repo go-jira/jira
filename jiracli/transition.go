@@ -5,20 +5,22 @@ import (
 	"strings"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type TransitionOptions struct {
-	GlobalOptions
-	Overrides  map[string]string
-	Transition string
-	Issue      string
-	Resolution string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Overrides     map[string]string
+	Transition    string
+	Issue         string
+	Resolution    string
 }
 
-func (jc *JiraCli) CmdTransitionRegistry(transition string) *CommandRegistryEntry {
+func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition string) *CommandRegistryEntry {
 	opts := TransitionOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("transition"),
@@ -35,20 +37,21 @@ func (jc *JiraCli) CmdTransitionRegistry(transition string) *CommandRegistryEntr
 	return &CommandRegistryEntry{
 		help,
 		func() error {
-			return jc.CmdTransition(&opts)
+			return CmdTransition(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdTransitionUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdTransitionUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = flagValue(ctx, "comment")
 		return nil
@@ -62,13 +65,13 @@ func (jc *JiraCli) CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOp
 }
 
 // CmdTransition will move state of the given issue to the given transtion
-func (jc *JiraCli) CmdTransition(opts *TransitionOptions) error {
-	issueData, err := jc.GetIssue(opts.Issue, nil)
+func CmdTransition(o *oreo.Client, opts *TransitionOptions) error {
+	issueData, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, nil)
 	if err != nil {
 		return err
 	}
 
-	meta, err := jc.GetIssueTransitions(opts.Issue)
+	meta, err := jira.GetIssueTransitions(o, opts.Endpoint.Value, opts.Issue)
 	if err != nil {
 		return err
 	}
@@ -120,16 +123,16 @@ func (jc *JiraCli) CmdTransition(opts *TransitionOptions) error {
 		Transition: transMeta,
 		Overrides:  opts.Overrides,
 	}
-	err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-		return jc.TransitionIssue(opts.Issue, &issueUpdate)
+	err = editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
+		return jira.TransitionIssue(o, opts.Endpoint.Value, opts.Issue, &issueUpdate)
 	})
 	if err != nil {
 		return err
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, jc.Endpoint, issueData.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, opts.Endpoint.Value, issueData.Key)
 
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil
 }

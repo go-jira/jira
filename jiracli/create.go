@@ -4,20 +4,22 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type CreateOptions struct {
-	GlobalOptions
-	jiradata.IssueUpdate
-	Project   string
-	IssueType string
-	Overrides map[string]string
+	GlobalOptions        `yaml:",inline" figtree:",inline"`
+	jiradata.IssueUpdate `yaml:",inline" figtree:",inline"`
+	Project              string
+	IssueType            string
+	Overrides            map[string]string
 }
 
-func (jc *JiraCli) CmdCreateRegistry() *CommandRegistryEntry {
+func CmdCreateRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := CreateOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("create"),
@@ -28,21 +30,22 @@ func (jc *JiraCli) CmdCreateRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Create issue",
 		func() error {
-			return jc.CmdCreate(&opts)
+			return CmdCreate(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdCreateUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdCreateUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.EditorUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	EditorUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("project", "project to create issue in").Short('p').StringVar(&opts.Project)
 	cmd.Flag("issuetype", "issuetype in to create").Short('i').StringVar(&opts.IssueType)
@@ -56,16 +59,16 @@ func (jc *JiraCli) CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) e
 
 // CmdCreate sends the create-metadata to the "create" template for editing, then
 // will parse the edited document as YAML and submit the document to jira.
-func (jc *JiraCli) CmdCreate(opts *CreateOptions) error {
+func CmdCreate(o *oreo.Client, opts *CreateOptions) error {
 	type templateInput struct {
 		Meta      *jiradata.CreateMetaIssueType `yaml:"meta" json:"meta"`
 		Overrides map[string]string             `yaml:"overrides" json:"overrides"`
 	}
 
-	if err := jc.defaultIssueType(&opts.Project, &opts.IssueType); err != nil {
+	if err := defaultIssueType(o, opts.Endpoint.Value, &opts.Project, &opts.IssueType); err != nil {
 		return err
 	}
-	createMeta, err := jc.GetIssueCreateMetaIssueType(opts.Project, opts.IssueType)
+	createMeta, err := jira.GetIssueCreateMetaIssueType(o, opts.Endpoint.Value, opts.Project, opts.IssueType)
 	if err != nil {
 		return err
 	}
@@ -80,30 +83,30 @@ func (jc *JiraCli) CmdCreate(opts *CreateOptions) error {
 	input.Overrides["user"] = opts.User.Value
 
 	var issueResp *jiradata.IssueCreateResponse
-	err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-		issueResp, err = jc.CreateIssue(&issueUpdate)
+	err = editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
+		issueResp, err = jira.CreateIssue(o, opts.Endpoint.Value, &issueUpdate)
 		return err
 	})
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, jc.Endpoint, issueResp.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, opts.Endpoint.Value, issueResp.Key)
 
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
 	}
 	return nil
 }
 
-func (jc *JiraCli) defaultIssueType(project, issuetype *string) error {
+func defaultIssueType(o *oreo.Client, endpoint string, project, issuetype *string) error {
 	if project == nil || *project == "" {
 		return fmt.Errorf("Project undefined, please use --project argument or set the `project` config property")
 	}
 	if issuetype != nil && *issuetype != "" {
 		return nil
 	}
-	projectMeta, err := jc.GetIssueCreateMetaProject(*project)
+	projectMeta, err := jira.GetIssueCreateMetaProject(o, endpoint, *project)
 	if err != nil {
 		return err
 	}

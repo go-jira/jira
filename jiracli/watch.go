@@ -3,6 +3,10 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -14,13 +18,13 @@ const (
 )
 
 type WatchOptions struct {
-	GlobalOptions
-	Issue   string
-	Watcher string
-	Action  WatchAction
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Issue         string
+	Watcher       string
+	Action        WatchAction
 }
 
-func (jc *JiraCli) CmdWatchRegistry() *CommandRegistryEntry {
+func CmdWatchRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := WatchOptions{
 		GlobalOptions: GlobalOptions{},
 		Action:        WatcherAdd,
@@ -29,19 +33,20 @@ func (jc *JiraCli) CmdWatchRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Add/Remove watcher to issue",
 		func() error {
-			return jc.CmdWatch(&opts)
+			return CmdWatch(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdWatchUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdWatchUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("remove", "remove watcher from issue").Short('r').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Action = WatcherRemove
 		return nil
@@ -53,24 +58,24 @@ func (jc *JiraCli) CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) err
 
 // CmdWatch will add the given watcher to the issue (or remove the watcher
 // with the 'remove' flag)
-func (jc *JiraCli) CmdWatch(opts *WatchOptions) error {
+func CmdWatch(o *oreo.Client, opts *WatchOptions) error {
 	if opts.Watcher == "" {
 		opts.Watcher = opts.User.Value
 	}
 	if opts.Action == WatcherAdd {
-		if err := jc.IssueAddWatcher(opts.Issue, opts.Watcher); err != nil {
+		if err := jira.IssueAddWatcher(o, opts.Endpoint.Value, opts.Issue, opts.Watcher); err != nil {
 			return err
 		}
 	} else {
-		if err := jc.IssueRemoveWatcher(opts.Issue, opts.Watcher); err != nil {
+		if err := jira.IssueRemoveWatcher(o, opts.Endpoint.Value, opts.Issue, opts.Watcher); err != nil {
 			return err
 		}
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
 
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 
 	return nil

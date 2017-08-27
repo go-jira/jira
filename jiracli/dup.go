@@ -4,19 +4,21 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type DupOptions struct {
-	GlobalOptions
-	jiradata.LinkIssueRequest
-	Duplicate string
-	Issue     string
+	GlobalOptions             `yaml:",inline" figtree:",inline"`
+	jiradata.LinkIssueRequest `yaml:",inline" figtree:",inline"`
+	Duplicate                 string
+	Issue                     string
 }
 
-func (jc *JiraCli) CmdDupRegistry() *CommandRegistryEntry {
+func CmdDupRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := DupOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("edit"),
@@ -33,21 +35,22 @@ func (jc *JiraCli) CmdDupRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Mark issues as duplicate",
 		func() error {
-			return jc.CmdDup(&opts)
+			return CmdDup(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdDupUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdDupUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.EditorUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	EditorUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("comment", "Comment message when marking issue as duplicate").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Comment = &jiradata.Comment{
 			Body: flagValue(ctx, "comment"),
@@ -61,13 +64,13 @@ func (jc *JiraCli) CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
 
 // CmdDups will update the given issue as being a duplicate by the given dup issue
 // and will attempt to resolve the dup issue
-func (jc *JiraCli) CmdDup(opts *DupOptions) error {
-	if err := jc.LinkIssues(&opts.LinkIssueRequest); err != nil {
+func CmdDup(o *oreo.Client, opts *DupOptions) error {
+	if err := jira.LinkIssues(o, opts.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
 		return err
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, opts.Endpoint.Value, opts.OutwardIssue.Key)
 
-	meta, err := jc.GetIssueTransitions(opts.InwardIssue.Key)
+	meta, err := jira.GetIssueTransitions(o, opts.Endpoint.Value, opts.InwardIssue.Key)
 	if err != nil {
 		return err
 	}
@@ -77,7 +80,7 @@ func (jc *JiraCli) CmdDup(opts *DupOptions) error {
 			issueUpdate := jiradata.IssueUpdate{
 				Transition: transMeta,
 			}
-			if err = jc.TransitionIssue(opts.InwardIssue.Key, &issueUpdate); err != nil {
+			if err = jira.TransitionIssue(o, opts.Endpoint.Value, opts.InwardIssue.Key, &issueUpdate); err != nil {
 				return err
 			}
 			// if we just started the issue now we need to stop it
@@ -87,12 +90,12 @@ func (jc *JiraCli) CmdDup(opts *DupOptions) error {
 		}
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
-	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, jc.Endpoint, opts.InwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, opts.Endpoint.Value, opts.OutwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, opts.Endpoint.Value, opts.InwardIssue.Key)
 
 	if opts.Browse.Value {
-		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
-			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
+		if err := CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
+			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
 		}
 	}
 

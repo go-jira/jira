@@ -70,13 +70,17 @@ func (o *SearchOptions) ProvideSearchRequest() *jiradata.SearchRequest {
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/search-searchUsingSearchRequest
 func (j *Jira) Search(sp SearchProvider) (*jiradata.SearchResults, error) {
+	return Search(j.UA, j.Endpoint, sp)
+}
+
+func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.SearchResults, error) {
 	req := sp.ProvideSearchRequest()
 	encoded, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/search", j.Endpoint)
-	resp, err := j.UA.Post(uri, "application/json", bytes.NewBuffer(encoded))
+	uri := fmt.Sprintf("%s/rest/api/2/search", endpoint)
+	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
 	}

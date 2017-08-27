@@ -4,21 +4,23 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type SubtaskOptions struct {
-	GlobalOptions
-	jiradata.IssueUpdate
-	Project   string
-	IssueType string
-	Overrides map[string]string
-	Issue     string
+	GlobalOptions        `yaml:",inline" figtree:",inline"`
+	jiradata.IssueUpdate `yaml:",inline" figtree:",inline"`
+	Project              string
+	IssueType            string
+	Overrides            map[string]string
+	Issue                string
 }
 
-func (jc *JiraCli) CmdSubtaskRegistry() *CommandRegistryEntry {
+func CmdSubtaskRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := SubtaskOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("subtask"),
@@ -30,21 +32,22 @@ func (jc *JiraCli) CmdSubtaskRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Subtask issue",
 		func() error {
-			return jc.CmdSubtask(&opts)
+			return CmdSubtask(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdSubtaskUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdSubtaskUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdSubtaskUsage(cmd *kingpin.CmdClause, opts *SubtaskOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdSubtaskUsage(cmd *kingpin.CmdClause, opts *SubtaskOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.EditorUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	EditorUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("project", "project to subtask issue in").Short('p').StringVar(&opts.Project)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
@@ -58,14 +61,14 @@ func (jc *JiraCli) CmdSubtaskUsage(cmd *kingpin.CmdClause, opts *SubtaskOptions)
 
 // CmdSubtask sends the subtask-metadata to the "subtask" template for editing, then
 // will parse the edited document as YAML and submit the document to jira.
-func (jc *JiraCli) CmdSubtask(opts *SubtaskOptions) error {
+func CmdSubtask(o *oreo.Client, opts *SubtaskOptions) error {
 	type templateInput struct {
 		Meta      *jiradata.CreateMetaIssueType `yaml:"meta" json:"meta"`
 		Overrides map[string]string             `yaml:"overrides" json:"overrides"`
 		Parent    *jiradata.Issue               `yaml:"parent" json:"parent"`
 	}
 
-	parent, err := jc.GetIssue(opts.Issue, nil)
+	parent, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, nil)
 	if err != nil {
 		return err
 	}
@@ -80,7 +83,7 @@ func (jc *JiraCli) CmdSubtask(opts *SubtaskOptions) error {
 		return fmt.Errorf("Failed to find Project field in parent issue")
 	}
 
-	createMeta, err := jc.GetIssueCreateMetaIssueType(opts.Project, opts.IssueType)
+	createMeta, err := jira.GetIssueCreateMetaIssueType(o, opts.Endpoint.Value, opts.Project, opts.IssueType)
 	if err != nil {
 		return err
 	}
@@ -96,18 +99,18 @@ func (jc *JiraCli) CmdSubtask(opts *SubtaskOptions) error {
 	input.Overrides["user"] = opts.User.Value
 
 	var issueResp *jiradata.IssueCreateResponse
-	err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-		issueResp, err = jc.CreateIssue(&issueUpdate)
+	err = editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
+		issueResp, err = jira.CreateIssue(o, opts.Endpoint.Value, &issueUpdate)
 		return err
 	})
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, jc.Endpoint, issueResp.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, opts.Endpoint.Value, issueResp.Key)
 
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
 	}
 	return nil
 }

@@ -8,8 +8,12 @@ import (
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/field-getFields
 func (j *Jira) GetFields() ([]jiradata.Field, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/field", j.Endpoint)
-	resp, err := j.UA.GetJSON(uri)
+	return GetFields(j.UA, j.Endpoint)
+}
+
+func GetFields(ua HttpClient, endpoint string) ([]jiradata.Field, error) {
+	uri := fmt.Sprintf("%s/rest/api/2/field", endpoint)
+	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
 	}

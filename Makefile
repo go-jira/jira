@@ -40,7 +40,7 @@ LDFLAGS:=-X jira.VERSION=$(CURVER) -w
 ifneq ($(DEBUG),)
 	GOBUILD=go get -v github.com/mailgun/godebug && 
 else
-	GOBUILD=go build -v -ldflags "$(LDFLAGS) -s"
+	GOBUILD=go build -gcflags="-e -complete" -v -ldflags "$(LDFLAGS) -s"
 endif
 
 build:

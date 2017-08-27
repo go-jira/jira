@@ -17,9 +17,9 @@ imports:
   subpackages:
   - generic
 - name: github.com/coryb/figtree
-  version: 97f630386644abe852de0f4df3befd74bf0a5f9e
+  version: 405935ba249b758f31f4ca2132c4fed7702cc622
 - name: github.com/coryb/oreo
-  version: a99f8c323f9746fc5b576349f1ffee4af0bc5ff2
+  version: b59de1c7ff7fe9e084278487f69a07cb667de9b3
 - name: github.com/fatih/camelcase
   version: f6a740d52f961c60348ebb109adde9f4635d7540
 - name: github.com/guelfey/go.dbus

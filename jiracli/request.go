@@ -14,13 +14,13 @@ import (
 )
 
 type RequestOptions struct {
-	GlobalOptions
-	Method string
-	URI    string
-	Data   string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Method        string
+	URI           string
+	Data          string
 }
 
-func (jc *JiraCli) CmdRequestRegistry() *CommandRegistryEntry {
+func CmdRequestRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := RequestOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("request"),
@@ -31,16 +31,17 @@ func (jc *JiraCli) CmdRequestRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Open issue in requestr",
 		func() error {
-			return jc.CmdRequest(&opts)
+			return CmdRequest(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdRequestUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdRequestUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdRequestUsage(cmd *kingpin.CmdClause, opts *RequestOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdRequestUsage(cmd *kingpin.CmdClause, opts *RequestOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
 	cmd.Flag("method", "HTTP request method to use").Short('m').EnumVar(&opts.Method, "GET", "PUT", "POST", "DELETE")
@@ -51,10 +52,10 @@ func (jc *JiraCli) CmdRequestUsage(cmd *kingpin.CmdClause, opts *RequestOptions)
 }
 
 // CmdRequest open the default system requestr to the provided issue
-func (jc *JiraCli) CmdRequest(opts *RequestOptions) error {
+func CmdRequest(o *oreo.Client, opts *RequestOptions) error {
 	uri := opts.URI
 	if !strings.HasPrefix(uri, "http") {
-		uri = jc.Endpoint + uri
+		uri = opts.Endpoint.Value + uri
 	}
 
 	parsedURI, err := url.Parse(uri)
@@ -66,7 +67,7 @@ func (jc *JiraCli) CmdRequest(opts *RequestOptions) error {
 		builder = builder.WithJSON(opts.Data)
 	}
 
-	resp, err := jc.UA.Do(builder.Build())
+	resp, err := o.Do(builder.Build())
 	if err != nil {
 		return err
 	}
@@ -86,5 +87,5 @@ func (jc *JiraCli) CmdRequest(opts *RequestOptions) error {
 		return fmt.Errorf("JSON Parse Error: %s from %q", err, content)
 	}
 
-	return jc.runTemplate(opts.Template.Value, &data, nil)
+	return runTemplate(opts.Template.Value, &data, nil)
 }

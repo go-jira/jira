@@ -2,15 +2,17 @@ package jiracli
 
 import (
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type TransitionsOptions struct {
-	GlobalOptions
-	Issue string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Issue         string
 }
 
-func (jc *JiraCli) CmdTransitionsRegistry(defaultTemplate string) *CommandRegistryEntry {
+func CmdTransitionsRegistry(fig *figtree.FigTree, o *oreo.Client, defaultTemplate string) *CommandRegistryEntry {
 	opts := TransitionsOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption(defaultTemplate),
@@ -20,35 +22,36 @@ func (jc *JiraCli) CmdTransitionsRegistry(defaultTemplate string) *CommandRegist
 	return &CommandRegistryEntry{
 		"List valid issue transitions",
 		func() error {
-			return jc.CmdTransitions(&opts)
+			return CmdTransitions(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdTransitionsUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdTransitionsUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdTransitionsUsage(cmd *kingpin.CmdClause, opts *TransitionsOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdTransitionsUsage(cmd *kingpin.CmdClause, opts *TransitionsOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue to list valid transitions").Required().StringVar(&opts.Issue)
 	return nil
 }
 
 // Transitions will get issue edit metadata and send to "editmeta" template
-func (jc *JiraCli) CmdTransitions(opts *TransitionsOptions) error {
-	editMeta, err := jc.GetIssueTransitions(opts.Issue)
+func CmdTransitions(o *oreo.Client, opts *TransitionsOptions) error {
+	editMeta, err := jira.GetIssueTransitions(o, opts.Endpoint.Value, opts.Issue)
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template.Value, editMeta, nil); err != nil {
+	if err := runTemplate(opts.Template.Value, editMeta, nil); err != nil {
 		return err
 	}
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil
 }

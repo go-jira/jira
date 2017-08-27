@@ -14,13 +14,17 @@ type ComponentProvider interface {
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/component-createComponent
 func (j *Jira) CreateComponent(cp ComponentProvider) (*jiradata.Component, error) {
+	return CreateComponent(j.UA, j.Endpoint, cp)
+}
+
+func CreateComponent(ua HttpClient, endpoint string, cp ComponentProvider) (*jiradata.Component, error) {
 	req := cp.ProvideComponent()
 	encoded, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/component", j.Endpoint)
-	resp, err := j.UA.Post(uri, "application/json", bytes.NewBuffer(encoded))
+	uri := fmt.Sprintf("%s/rest/api/2/component", endpoint)
+	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
 	}

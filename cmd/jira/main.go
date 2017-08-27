@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime/debug"
 
+	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
@@ -63,205 +65,209 @@ func main() {
 		return nil
 	}).Counter()
 
-	cli := jiracli.New(".jira.d")
+	fig := figtree.NewFigTree()
+	fig.EnvPrefix = "JIRA"
+	fig.ConfigDir = ".jira.d"
+
+	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
 
 	registry := []jiracli.CommandRegistry{
 		jiracli.CommandRegistry{
 			Command: "login",
-			Entry:   cli.CmdLoginRegistry(),
+			Entry:   jiracli.CmdLoginRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "logout",
-			Entry:   cli.CmdLogoutRegistry(),
+			Entry:   jiracli.CmdLogoutRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "list",
 			Aliases: []string{"ls"},
-			Entry:   cli.CmdListRegistry(),
+			Entry:   jiracli.CmdListRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "view",
-			Entry:   cli.CmdViewRegistry(),
+			Entry:   jiracli.CmdViewRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "create",
-			Entry:   cli.CmdCreateRegistry(),
+			Entry:   jiracli.CmdCreateRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "edit",
-			Entry:   cli.CmdEditRegistry(),
+			Entry:   jiracli.CmdEditRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "comment",
-			Entry:   cli.CmdCommentRegistry(),
+			Entry:   jiracli.CmdCommentRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "worklog list",
-			Entry:   cli.CmdWorklogListRegistry(),
+			Entry:   jiracli.CmdWorklogListRegistry(fig, o),
 			Default: true,
 		},
 		jiracli.CommandRegistry{
 			Command: "worklog add",
-			Entry:   cli.CmdWorklogAddRegistry(),
+			Entry:   jiracli.CmdWorklogAddRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "fields",
-			Entry:   cli.CmdFieldsRegistry(),
+			Entry:   jiracli.CmdFieldsRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "createmeta",
-			Entry:   cli.CmdCreateMetaRegistry(),
+			Entry:   jiracli.CmdCreateMetaRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "editmeta",
-			Entry:   cli.CmdEditMetaRegistry(),
+			Entry:   jiracli.CmdEditMetaRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "subtask",
-			Entry:   cli.CmdSubtaskRegistry(),
+			Entry:   jiracli.CmdSubtaskRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "dup",
-			Entry:   cli.CmdDupRegistry(),
+			Entry:   jiracli.CmdDupRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "block",
-			Entry:   cli.CmdBlockRegistry(),
+			Entry:   jiracli.CmdBlockRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "issuelink",
-			Entry:   cli.CmdIssueLinkRegistry(),
+			Entry:   jiracli.CmdIssueLinkRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "issuelinktypes",
-			Entry:   cli.CmdIssueLinkTypesRegistry(),
+			Entry:   jiracli.CmdIssueLinkTypesRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "transition",
 			Aliases: []string{"trans"},
-			Entry:   cli.CmdTransitionRegistry(""),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, ""),
 		},
 		jiracli.CommandRegistry{
 			Command: "transitions",
-			Entry:   cli.CmdTransitionsRegistry("transitions"),
+			Entry:   jiracli.CmdTransitionsRegistry(fig, o, "transitions"),
 		},
 		jiracli.CommandRegistry{
 			Command: "transmeta",
-			Entry:   cli.CmdTransitionsRegistry("debug"),
+			Entry:   jiracli.CmdTransitionsRegistry(fig, o, "debug"),
 		},
 		jiracli.CommandRegistry{
 			Command: "close",
-			Entry:   cli.CmdTransitionRegistry("close"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "close"),
 		},
 		jiracli.CommandRegistry{
 			Command: "acknowledge",
 			Aliases: []string{"ack"},
-			Entry:   cli.CmdTransitionRegistry("acknowledge"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "acknowledge"),
 		},
 		jiracli.CommandRegistry{
 			Command: "reopen",
-			Entry:   cli.CmdTransitionRegistry("reopen"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "reopen"),
 		},
 		jiracli.CommandRegistry{
 			Command: "resolve",
-			Entry:   cli.CmdTransitionRegistry("resolve"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "resolve"),
 		},
 		jiracli.CommandRegistry{
 			Command: "start",
-			Entry:   cli.CmdTransitionRegistry("start"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "start"),
 		},
 		jiracli.CommandRegistry{
 			Command: "stop",
-			Entry:   cli.CmdTransitionRegistry("stop"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "stop"),
 		},
 		jiracli.CommandRegistry{
 			Command: "todo",
-			Entry:   cli.CmdTransitionRegistry("To Do"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "To Do"),
 		},
 		jiracli.CommandRegistry{
 			Command: "backlog",
-			Entry:   cli.CmdTransitionRegistry("Backlog"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "Backlog"),
 		},
 		jiracli.CommandRegistry{
 			Command: "done",
-			Entry:   cli.CmdTransitionRegistry("Done"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "Done"),
 		},
 		jiracli.CommandRegistry{
 			Command: "in-progress",
 			Aliases: []string{"prog", "progress"},
-			Entry:   cli.CmdTransitionRegistry("Progress"),
+			Entry:   jiracli.CmdTransitionRegistry(fig, o, "Progress"),
 		},
 		jiracli.CommandRegistry{
 			Command: "vote",
-			Entry:   cli.CmdVoteRegistry(),
+			Entry:   jiracli.CmdVoteRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "rank",
-			Entry:   cli.CmdRankRegistry(),
+			Entry:   jiracli.CmdRankRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "watch",
-			Entry:   cli.CmdWatchRegistry(),
+			Entry:   jiracli.CmdWatchRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "labels add",
-			Entry:   cli.CmdLabelsAddRegistry(),
+			Entry:   jiracli.CmdLabelsAddRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "labels set",
-			Entry:   cli.CmdLabelsAddRegistry(),
+			Entry:   jiracli.CmdLabelsAddRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "labels remove",
-			Entry:   cli.CmdLabelsAddRegistry(),
+			Entry:   jiracli.CmdLabelsAddRegistry(fig, o),
 			Aliases: []string{"rm"},
 		},
 		jiracli.CommandRegistry{
 			Command: "take",
-			Entry:   cli.CmdTakeRegistry(),
+			Entry:   jiracli.CmdTakeRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "assign",
-			Entry:   cli.CmdAssignRegistry(),
+			Entry:   jiracli.CmdAssignRegistry(fig, o),
 			Aliases: []string{"give"},
 		},
 		jiracli.CommandRegistry{
 			Command: "unassign",
-			Entry:   cli.CmdUnassignRegistry(),
+			Entry:   jiracli.CmdUnassignRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "component add",
-			Entry:   cli.CmdComponentAddRegistry(),
+			Entry:   jiracli.CmdComponentAddRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "components",
-			Entry:   cli.CmdComponentsRegistry(),
+			Entry:   jiracli.CmdComponentsRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "issuetypes",
-			Entry:   cli.CmdIssueTypesRegistry(),
+			Entry:   jiracli.CmdIssueTypesRegistry(fig, o),
 		},
 		jiracli.CommandRegistry{
 			Command: "export-templates",
-			Entry:   cli.CmdExportTemplatesRegistry(),
+			Entry:   jiracli.CmdExportTemplatesRegistry(fig),
 		},
 		jiracli.CommandRegistry{
 			Command: "unexport-templates",
-			Entry:   cli.CmdUnexportTemplatesRegistry(),
+			Entry:   jiracli.CmdUnexportTemplatesRegistry(fig),
 		},
 		jiracli.CommandRegistry{
 			Command: "browse",
-			Entry:   cli.CmdBrowseRegistry(),
+			Entry:   jiracli.CmdBrowseRegistry(fig),
 			Aliases: []string{"b"},
 		},
 		jiracli.CommandRegistry{
 			Command: "request",
-			Entry:   cli.CmdRequestRegistry(),
+			Entry:   jiracli.CmdRequestRegistry(fig, o),
 			Aliases: []string{"req"},
 		},
 	}
 
-	cli.Register(app, registry)
+	jiracli.Register(app, registry)
 
 	app.Terminate(func(status int) {
 		for _, arg := range os.Args {

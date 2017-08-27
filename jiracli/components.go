@@ -4,16 +4,18 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type ComponentsOptions struct {
-	GlobalOptions
-	Project string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Project       string
 }
 
-func (jc *JiraCli) CmdComponentsRegistry() *CommandRegistryEntry {
+func CmdComponentsRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := ComponentsOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("components"),
@@ -23,32 +25,33 @@ func (jc *JiraCli) CmdComponentsRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Show components for a project",
 		func() error {
-			return jc.CmdComponents(&opts)
+			return CmdComponents(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdComponentsUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdComponentsUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdComponentsUsage(cmd *kingpin.CmdClause, opts *ComponentsOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdComponentsUsage(cmd *kingpin.CmdClause, opts *ComponentsOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("project", "project to list components").Short('p').StringVar(&opts.Project)
 
 	return nil
 }
 
 // CmdComponents will get available components for project and send to the  "components" template
-func (jc *JiraCli) CmdComponents(opts *ComponentsOptions) error {
+func CmdComponents(o *oreo.Client, opts *ComponentsOptions) error {
 	if opts.Project == "" {
 		return fmt.Errorf("Project Required.")
 	}
-	data, err := jc.GetProjectComponents(opts.Project)
+	data, err := jira.GetProjectComponents(o, opts.Endpoint.Value, opts.Project)
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template.Value, data, nil)
+	return runTemplate(opts.Template.Value, data, nil)
 }

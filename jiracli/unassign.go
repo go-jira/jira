@@ -1,26 +1,31 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
-func (jc *JiraCli) CmdUnassignRegistry() *CommandRegistryEntry {
+func CmdUnassignRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := AssignOptions{}
 
 	return &CommandRegistryEntry{
 		"Unassign an issue",
 		func() error {
-			return jc.CmdAssign(&opts)
+			return CmdAssign(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdAssignUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdAssignUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdUnassignUsage(cmd *kingpin.CmdClause, opts *AssignOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdUnassignUsage(cmd *kingpin.CmdClause, opts *AssignOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue to unassign").Required().StringVar(&opts.Issue)
 	return nil
 }

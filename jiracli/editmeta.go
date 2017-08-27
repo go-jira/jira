@@ -2,15 +2,17 @@ package jiracli
 
 import (
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type EditMetaOptions struct {
-	GlobalOptions
-	Issue string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Issue         string
 }
 
-func (jc *JiraCli) CmdEditMetaRegistry() *CommandRegistryEntry {
+func CmdEditMetaRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 
 	opts := EditMetaOptions{
 		GlobalOptions: GlobalOptions{
@@ -21,35 +23,36 @@ func (jc *JiraCli) CmdEditMetaRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"View 'edit' metadata",
 		func() error {
-			return jc.CmdEditMeta(&opts)
+			return CmdEditMeta(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdEditMetaUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdEditMetaUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdEditMetaUsage(cmd *kingpin.CmdClause, opts *EditMetaOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdEditMetaUsage(cmd *kingpin.CmdClause, opts *EditMetaOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "edit metadata for issue id").Required().StringVar(&opts.Issue)
 	return nil
 }
 
 // EditMeta will get issue edit metadata and send to "editmeta" template
-func (jc *JiraCli) CmdEditMeta(opts *EditMetaOptions) error {
-	editMeta, err := jc.GetIssueEditMeta(opts.Issue)
+func CmdEditMeta(o *oreo.Client, opts *EditMetaOptions) error {
+	editMeta, err := jira.GetIssueEditMeta(o, opts.Endpoint.Value, opts.Issue)
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template.Value, editMeta, nil); err != nil {
+	if err := runTemplate(opts.Template.Value, editMeta, nil); err != nil {
 		return err
 	}
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil
 }

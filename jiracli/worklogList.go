@@ -2,15 +2,17 @@ package jiracli
 
 import (
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type WorklogListOptions struct {
-	GlobalOptions
-	Issue string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Issue         string
 }
 
-func (jc *JiraCli) CmdWorklogListRegistry() *CommandRegistryEntry {
+func CmdWorklogListRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := WorklogListOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("worklogs"),
@@ -19,35 +21,36 @@ func (jc *JiraCli) CmdWorklogListRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Prints the worklog data for given issue",
 		func() error {
-			return jc.CmdWorklogList(&opts)
+			return CmdWorklogList(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdWorklogListUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdWorklogListUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdWorklogListUsage(cmd *kingpin.CmdClause, opts *WorklogListOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdWorklogListUsage(cmd *kingpin.CmdClause, opts *WorklogListOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue id to fetch worklogs").Required().StringVar(&opts.Issue)
 	return nil
 }
 
 // // CmdWorklogList will get worklog data for given issue and sent to the "worklogs" template
-func (jc *JiraCli) CmdWorklogList(opts *WorklogListOptions) error {
-	data, err := jc.GetIssueWorklog(opts.Issue)
+func CmdWorklogList(o *oreo.Client, opts *WorklogListOptions) error {
+	data, err := jira.GetIssueWorklog(o, opts.Endpoint.Value, opts.Issue)
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template.Value, data, nil); err != nil {
+	if err := runTemplate(opts.Template.Value, data, nil); err != nil {
 		return err
 	}
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil
 }

@@ -2,31 +2,34 @@ package jiracli
 
 import (
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func (jc *JiraCli) CmdFieldsRegistry() *CommandRegistryEntry {
+func CmdFieldsRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := GlobalOptions{
 		Template: figtree.NewStringOption("fields"),
 	}
 	return &CommandRegistryEntry{
 		"Prints all fields, both System and Custom",
 		func() error {
-			return jc.CmdFields(&opts)
+			return CmdFields(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			err := jc.GlobalUsage(cmd, &opts)
-			jc.TemplateUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			err := GlobalUsage(cmd, &opts)
+			TemplateUsage(cmd, &opts)
 			return err
 		},
 	}
 }
 
 // Fields will send data from /rest/api/2/field API to "fields" template
-func (jc *JiraCli) CmdFields(opts *GlobalOptions) error {
-	data, err := jc.GetFields()
+func CmdFields(o *oreo.Client, opts *GlobalOptions) error {
+	data, err := jira.GetFields(o, opts.Endpoint.Value)
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template.Value, data, nil)
+	return runTemplate(opts.Template.Value, data, nil)
 }

@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"runtime"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 	"github.com/coryb/figtree"
 )
 
-func homedir() string {
+func Homedir() string {
 	if runtime.GOOS == "windows" {
 		return os.Getenv("USERPROFILE")
 	}
@@ -30,13 +29,8 @@ func findClosestParentPath(fileName string) (string, error) {
 	return "", errors.New(fmt.Sprintf("%s not found in parent directory hierarchy", fileName))
 }
 
-func (jc *JiraCli) tmpYml(tmpFilePrefix string) (*os.File, error) {
-	tmpdir := filepath.Join(homedir(), jc.ConfigDir, "tmp")
-	if err := os.MkdirAll(tmpdir, 0755); err != nil {
-		return nil, err
-	}
-
-	fh, err := ioutil.TempFile(tmpdir, tmpFilePrefix)
+func tmpYml(tmpFilePrefix string) (*os.File, error) {
+	fh, err := ioutil.TempFile("", tmpFilePrefix)
 	if err != nil {
 		return nil, err
 	}

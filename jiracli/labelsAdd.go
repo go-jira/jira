@@ -3,41 +3,46 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type LabelsAddOptions struct {
-	GlobalOptions
-	Issue  string
-	Labels []string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Issue         string
+	Labels        []string
 }
 
-func (jc *JiraCli) CmdLabelsAddRegistry() *CommandRegistryEntry {
+func CmdLabelsAddRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := LabelsAddOptions{}
 	return &CommandRegistryEntry{
 		"Add labels to an issue",
 		func() error {
-			return jc.CmdLabelsAdd(&opts)
+			return CmdLabelsAdd(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdLabelsAddUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdLabelsAddUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdLabelsAddUsage(cmd *kingpin.CmdClause, opts *LabelsAddOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdLabelsAddUsage(cmd *kingpin.CmdClause, opts *LabelsAddOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue id to modify labels").Required().StringVar(&opts.Issue)
 	cmd.Arg("LABEL", "label to add to issue").Required().StringsVar(&opts.Labels)
 	return nil
 }
 
 // CmdLabels will add labels on a given issue
-func (jc *JiraCli) CmdLabelsAdd(opts *LabelsAddOptions) error {
+func CmdLabelsAdd(o *oreo.Client, opts *LabelsAddOptions) error {
 	ops := jiradata.FieldOperations{}
 	for _, label := range opts.Labels {
 		ops = append(ops, jiradata.FieldOperation{
@@ -50,12 +55,12 @@ func (jc *JiraCli) CmdLabelsAdd(opts *LabelsAddOptions) error {
 		},
 	}
 
-	if err := jc.EditIssue(opts.Issue, &issueUpdate); err != nil {
+	if err := jira.EditIssue(o, opts.Endpoint.Value, opts.Issue, &issueUpdate); err != nil {
 		return err
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil
 }

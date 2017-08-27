@@ -7,17 +7,13 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path"
-	"path/filepath"
 	"reflect"
 	"strings"
 
 	"github.com/AlecAivazis/survey"
 	"github.com/coryb/figtree"
-	"github.com/coryb/oreo"
 	"github.com/jinzhu/copier"
 	shellquote "github.com/kballard/go-shellquote"
-	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 	yaml "gopkg.in/coryb/yaml.v2"
 	logging "gopkg.in/op/go-logging.v1"
@@ -25,11 +21,11 @@ import (
 
 var log = logging.MustGetLogger("jira")
 
-type JiraCli struct {
-	jira.Jira `yaml:",inline"`
-	ConfigDir string
-	oreoAgent *oreo.Client
-}
+// type JiraCli struct {
+// 	jira.Jira `yaml:",inline"`
+// 	ConfigDir string
+// 	oreoAgent *oreo.Client
+// }
 
 type Exit struct {
 	Code int
@@ -38,10 +34,11 @@ type Exit struct {
 type GlobalOptions struct {
 	Browse         figtree.BoolOption   `json:"browse,omitempty" yaml:"browse,omitempty"`
 	Editor         figtree.StringOption `json:"editor,omitempty" yaml:"editor,omitempty"`
+	Endpoint       figtree.StringOption `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
 	SkipEditing    figtree.BoolOption   `json:"noedit,omitempty" yaml:"noedit,omitempty"`
 	PasswordSource figtree.StringOption `json:"password-source,omitempty" yaml:"password-source,omitempty"`
 	Template       figtree.StringOption `json:"template,omitempty" yaml:"template,omitempty"`
-	User           figtree.StringOption `json:"user,omitempty", yaml:"user,omitempty"`
+	User           figtree.StringOption `json:"user,omitempty" yaml:"user,omitempty"`
 }
 
 type CommandRegistryEntry struct {
@@ -63,18 +60,18 @@ type kingpinAppOrCommand interface {
 	GetCommand(string) *kingpin.CmdClause
 }
 
-func New(configDir string) *JiraCli {
-	agent := oreo.New().WithCookieFile(filepath.Join(homedir(), configDir, "cookies.js"))
-	return &JiraCli{
-		ConfigDir: configDir,
-		Jira: jira.Jira{
-			UA: agent,
-		},
-		oreoAgent: agent,
-	}
-}
+// func New(configDir string) *JiraCli {
+// 	agent := oreo.New().WithCookieFile(filepath.Join(homedir(), configDir, "cookies.js"))
+// 	return &JiraCli{
+// 		ConfigDir: configDir,
+// 		Jira: jira.Jira{
+// 			UA: agent,
+// 		},
+// 		oreoAgent: agent,
+// 	}
+// }
 
-func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
+func Register(app *kingpin.Application, reg []CommandRegistry) {
 	for _, command := range reg {
 		copy := command
 		commandFields := strings.Fields(copy.Command)
@@ -108,50 +105,39 @@ func (jc *JiraCli) Register(app *kingpin.Application, reg []CommandRegistry) {
 	}
 }
 
-func (jc *JiraCli) GlobalUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) error {
-	jc.LoadConfigs(cmd, opts)
+func GlobalUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) error {
 	cmd.PreAction(func(_ *kingpin.ParseContext) error {
-		os.Setenv("JIRA_OPERATION", cmd.FullCommand())
-		fig := figtree.NewFigTree()
-		fig.EnvPrefix = "JIRA"
-		// populate JiraCli fields if defined in configs (ie for Endpoint)
-		if err := fig.LoadAllConfigs(path.Join(jc.ConfigDir, "config.yml"), jc); err != nil {
-			return err
-		}
 		if opts.User.Value == "" {
 			opts.User = figtree.NewStringOption(os.Getenv("USER"))
 		}
 		return nil
 	})
-	cmd.Flag("endpoint", "URI to use for Jira").Short('e').StringVar(&jc.Endpoint)
-	cmd.Flag("user", "Login mame used for authentication with Jira service").Short('u').SetValue(&opts.User)
+	cmd.Flag("endpoint", "Base URI to use for Jira").Short('e').SetValue(&opts.Endpoint)
+	cmd.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&opts.User)
 	return nil
 }
 
-func (jc *JiraCli) LoadConfigs(cmd *kingpin.CmdClause, opts interface{}) {
+func LoadConfigs(cmd *kingpin.CmdClause, fig *figtree.FigTree, opts interface{}) {
 	cmd.PreAction(func(_ *kingpin.ParseContext) error {
 		os.Setenv("JIRA_OPERATION", cmd.FullCommand())
-		fig := figtree.NewFigTree()
-		fig.EnvPrefix = "JIRA"
-		fig.Defaults = opts
 		// load command specific configs first
-		if err := fig.LoadAllConfigs(path.Join(jc.ConfigDir, strings.Join(strings.Fields(cmd.FullCommand()), "_")+".yml"), opts); err != nil {
+		if err := fig.LoadAllConfigs(strings.Join(strings.Fields(cmd.FullCommand()), "_")+".yml", opts); err != nil {
 			return err
 		}
 		// then load generic configs if not already populated above
-		return fig.LoadAllConfigs(path.Join(jc.ConfigDir, "config.yml"), opts)
+		return fig.LoadAllConfigs("config.yml", opts)
 	})
 }
 
-func (jc *JiraCli) BrowseUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
+func BrowseUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
 	cmd.Flag("browse", "Open issue(s) in browser after operation").Short('b').SetValue(&opts.Browse)
 }
 
-func (jc *JiraCli) EditorUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
+func EditorUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
 	cmd.Flag("editor", "Editor to use").SetValue(&opts.Editor)
 }
 
-func (jc *JiraCli) TemplateUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
+func TemplateUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
 	cmd.Flag("template", "Template to use for output").Short('t').SetValue(&opts.Template)
 }
 
@@ -218,8 +204,8 @@ func (o *GlobalOptions) editFile(fileName string) (changes bool, err error) {
 	return false, err
 }
 
-func (jc *JiraCli) editLoop(opts *GlobalOptions, input interface{}, output interface{}, submit func() error) error {
-	tmpFile, err := jc.tmpTemplate(opts.Template.Value, input)
+func editLoop(opts *GlobalOptions, input interface{}, output interface{}, submit func() error) error {
+	tmpFile, err := tmpTemplate(opts.Template.Value, input)
 	if err != nil {
 		return err
 	}

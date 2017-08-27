@@ -3,27 +3,31 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 	"github.com/mgutz/ansi"
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func (jc *JiraCli) CmdLogoutRegistry() *CommandRegistryEntry {
+func CmdLogoutRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := GlobalOptions{}
 	return &CommandRegistryEntry{
 		"Deactivate sesssion with Jira server",
 		func() error {
-			return jc.CmdLogout(&opts)
+			return CmdLogout(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.GlobalUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return GlobalUsage(cmd, &opts)
 		},
 	}
 }
 
 // CmdLogout will attempt to terminate an active Jira session
-func (jc *JiraCli) CmdLogout(opts *GlobalOptions) error {
-	jc.UA = jc.oreoAgent.WithoutRedirect().WithRetries(0)
-	err := jc.DeleteSession()
+func CmdLogout(o *oreo.Client, opts *GlobalOptions) error {
+	ua := o.WithoutRedirect().WithRetries(0)
+	err := jira.DeleteSession(ua, opts.Endpoint.Value)
 	if err == nil {
 		fmt.Println(ansi.Color("OK", "green"), "Terminated session for", opts.User)
 	} else {

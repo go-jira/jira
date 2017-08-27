@@ -28,7 +28,7 @@ func findTemplate(name string) ([]byte, error) {
 	return nil, nil
 }
 
-func (jc *JiraCli) getTemplate(name string) (string, error) {
+func getTemplate(name string) (string, error) {
 	if _, err := os.Stat(name); err == nil {
 		b, err := ioutil.ReadFile(name)
 		if err != nil {
@@ -48,18 +48,18 @@ func (jc *JiraCli) getTemplate(name string) (string, error) {
 	return "", fmt.Errorf("No Template found for %q", name)
 }
 
-func (jc *JiraCli) tmpTemplate(templateName string, data interface{}) (string, error) {
-	tmpFile, err := jc.tmpYml(templateName)
+func tmpTemplate(templateName string, data interface{}) (string, error) {
+	tmpFile, err := tmpYml(templateName)
 	if err != nil {
 		return "", err
 	}
 	defer tmpFile.Close()
-	return tmpFile.Name(), jc.runTemplate(templateName, data, tmpFile)
+	return tmpFile.Name(), runTemplate(templateName, data, tmpFile)
 }
 
-func (jc *JiraCli) runTemplate(templateName string, data interface{}, out io.Writer) error {
+func runTemplate(templateName string, data interface{}, out io.Writer) error {
 
-	templateContent, err := jc.getTemplate(templateName)
+	templateContent, err := getTemplate(templateName)
 	if err != nil {
 		return err
 	}

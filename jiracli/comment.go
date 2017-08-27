@@ -4,18 +4,20 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type CommentOptions struct {
-	GlobalOptions
-	Overrides map[string]string
-	Issue     string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Overrides     map[string]string
+	Issue         string
 }
 
-func (jc *JiraCli) CmdCommentRegistry() *CommandRegistryEntry {
+func CmdCommentRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := CommentOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("comment"),
@@ -26,21 +28,22 @@ func (jc *JiraCli) CmdCommentRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Add comment to issue",
 		func() error {
-			return jc.CmdComment(&opts)
+			return CmdComment(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdCommentUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdCommentUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdCommentUsage(cmd *kingpin.CmdClause, opts *CommentOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdCommentUsage(cmd *kingpin.CmdClause, opts *CommentOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.EditorUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	EditorUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = flagValue(ctx, "comment")
 		return nil
@@ -50,25 +53,25 @@ func (jc *JiraCli) CmdCommentUsage(cmd *kingpin.CmdClause, opts *CommentOptions)
 }
 
 // CmdComment will update issue with comment
-func (jc *JiraCli) CmdComment(opts *CommentOptions) error {
+func CmdComment(o *oreo.Client, opts *CommentOptions) error {
 	comment := jiradata.Comment{}
 	input := struct {
 		Overrides map[string]string
 	}{
 		opts.Overrides,
 	}
-	err := jc.editLoop(&opts.GlobalOptions, &input, &comment, func() error {
-		_, err := jc.IssueAddComment(opts.Issue, &comment)
+	err := editLoop(&opts.GlobalOptions, &input, &comment, func() error {
+		_, err := jira.IssueAddComment(o, opts.Endpoint.Value, opts.Issue, &comment)
 		return err
 	})
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
 
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 
 	return nil

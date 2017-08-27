@@ -3,17 +3,21 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type IssueLinkOptions struct {
-	GlobalOptions
-	jiradata.LinkIssueRequest
-	LinkType string
+	GlobalOptions             `yaml:",inline" figtree:",inline"`
+	jiradata.LinkIssueRequest `yaml:",inline" figtree:",inline"`
+	LinkType                  string
 }
 
-func (jc *JiraCli) CmdIssueLinkRegistry() *CommandRegistryEntry {
+func CmdIssueLinkRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := IssueLinkOptions{
 		LinkIssueRequest: jiradata.LinkIssueRequest{
 			Type:         &jiradata.IssueLinkType{},
@@ -24,21 +28,22 @@ func (jc *JiraCli) CmdIssueLinkRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Link two issues",
 		func() error {
-			return jc.CmdIssueLink(&opts)
+			return CmdIssueLink(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdIssueLinkUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdIssueLinkUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdIssueLinkUsage(cmd *kingpin.CmdClause, opts *IssueLinkOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdIssueLinkUsage(cmd *kingpin.CmdClause, opts *IssueLinkOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.EditorUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	EditorUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("comment", "Comment message when linking issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Comment = &jiradata.Comment{
 			Body: flagValue(ctx, "comment"),
@@ -53,17 +58,17 @@ func (jc *JiraCli) CmdIssueLinkUsage(cmd *kingpin.CmdClause, opts *IssueLinkOpti
 
 // CmdBlock will update the given issue as being a duplicate by the given dup issue
 // and will attempt to resolve the dup issue
-func (jc *JiraCli) CmdIssueLink(opts *IssueLinkOptions) error {
-	if err := jc.LinkIssues(&opts.LinkIssueRequest); err != nil {
+func CmdIssueLink(o *oreo.Client, opts *IssueLinkOptions) error {
+	if err := jira.LinkIssues(o, opts.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, jc.Endpoint, opts.InwardIssue.Key)
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, jc.Endpoint, opts.OutwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, opts.Endpoint.Value, opts.InwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, opts.Endpoint.Value, opts.OutwardIssue.Key)
 
 	if opts.Browse.Value {
-		if err := jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
-			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
+		if err := CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
+			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
 		}
 	}
 

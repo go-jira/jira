@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
@@ -11,14 +12,14 @@ import (
 )
 
 type EditOptions struct {
-	GlobalOptions
-	jiradata.IssueUpdate
-	jira.SearchOptions
-	Overrides map[string]string
-	Issue     string
+	GlobalOptions        `yaml:",inline" figtree:",inline"`
+	jiradata.IssueUpdate `yaml:",inline" figtree:",inline"`
+	jira.SearchOptions   `yaml:",inline" figtree:",inline"`
+	Overrides            map[string]string
+	Issue                string
 }
 
-func (jc *JiraCli) CmdEditRegistry() *CommandRegistryEntry {
+func CmdEditRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := EditOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("edit"),
@@ -29,21 +30,22 @@ func (jc *JiraCli) CmdEditRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Edit issue details",
 		func() error {
-			return jc.CmdEdit(&opts)
+			return CmdEdit(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdEditUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdEditUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.EditorUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	EditorUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search to edit multiple issues").Short('q').StringVar(&opts.Query)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
@@ -56,18 +58,18 @@ func (jc *JiraCli) CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error
 }
 
 // Edit will get issue data and send to "edit" template
-func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
+func CmdEdit(o *oreo.Client, opts *EditOptions) error {
 	type templateInput struct {
 		*jiradata.Issue `yaml:",inline"`
 		Meta            *jiradata.EditMeta `yaml:"meta" json:"meta"`
 		Overrides       map[string]string  `yaml:"overrides" json:"overrides"`
 	}
 	if opts.Issue != "" {
-		issueData, err := jc.GetIssue(opts.Issue, nil)
+		issueData, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, nil)
 		if err != nil {
 			return err
 		}
-		editMeta, err := jc.GetIssueEditMeta(opts.Issue)
+		editMeta, err := jira.GetIssueEditMeta(o, opts.Endpoint.Value, opts.Issue)
 		if err != nil {
 			return err
 		}
@@ -78,24 +80,24 @@ func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
 			Meta:      editMeta,
 			Overrides: opts.Overrides,
 		}
-		err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-			return jc.EditIssue(opts.Issue, &issueUpdate)
+		err = editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
+			return jira.EditIssue(o, opts.Endpoint.Value, opts.Issue, &issueUpdate)
 		})
 		if err != nil {
 			return err
 		}
-		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
 
 		if opts.Browse.Value {
-			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 		}
 	}
-	results, err := jc.Search(opts)
+	results, err := jira.Search(o, opts.Endpoint.Value, opts)
 	if err != nil {
 		return err
 	}
 	for _, issueData := range results.Issues {
-		editMeta, err := jc.GetIssueEditMeta(issueData.Key)
+		editMeta, err := jira.GetIssueEditMeta(o, opts.Endpoint.Value, issueData.Key)
 		if err != nil {
 			return err
 		}
@@ -105,16 +107,16 @@ func (jc *JiraCli) CmdEdit(opts *EditOptions) error {
 			Issue: issueData,
 			Meta:  editMeta,
 		}
-		err = jc.editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-			return jc.EditIssue(issueData.Key, &issueUpdate)
+		err = editLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
+			return jira.EditIssue(o, opts.Endpoint.Value, issueData.Key, &issueUpdate)
 		})
 		if err != nil {
 			return err
 		}
-		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, jc.Endpoint, issueData.Key)
+		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, opts.Endpoint.Value, issueData.Key)
 
 		if opts.Browse.Value {
-			return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueData.Key})
+			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueData.Key})
 		}
 	}
 	return nil

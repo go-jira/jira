@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -22,6 +23,7 @@ import (
 var log = logging.MustGetLogger("figtree")
 
 type FigTree struct {
+	ConfigDir string
 	Defaults  interface{}
 	EnvPrefix string
 	stop      bool
@@ -44,7 +46,10 @@ func LoadConfig(configFile string, options interface{}) error {
 func (f *FigTree) LoadAllConfigs(configFile string, options interface{}) error {
 	// reset from any previous config parsing runs
 	f.stop = false
-	// assert options is a pointer
+
+	if f.ConfigDir != "" {
+		configFile = path.Join(f.ConfigDir, configFile)
+	}
 
 	paths := FindParentPaths(configFile)
 	paths = append([]string{fmt.Sprintf("/etc/%s", configFile)}, paths...)

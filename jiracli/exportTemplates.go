@@ -5,6 +5,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/coryb/figtree"
+
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -13,23 +15,24 @@ type ExportTemplatesOptions struct {
 	Dir      string
 }
 
-func (jc *JiraCli) CmdExportTemplatesRegistry() *CommandRegistryEntry {
+func CmdExportTemplatesRegistry(fig *figtree.FigTree) *CommandRegistryEntry {
 	opts := ExportTemplatesOptions{
-		Dir: fmt.Sprintf("%s/.jira.d/templates", homedir()),
+		Dir: fmt.Sprintf("%s/.jira.d/templates", Homedir()),
 	}
 
 	return &CommandRegistryEntry{
 		"Export templates for customizations",
 		func() error {
-			return jc.CmdExportTemplates(&opts)
+			return CmdExportTemplates(&opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdExportTemplatesUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdExportTemplatesUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdExportTemplatesUsage(cmd *kingpin.CmdClause, opts *ExportTemplatesOptions) error {
+func CmdExportTemplatesUsage(cmd *kingpin.CmdClause, opts *ExportTemplatesOptions) error {
 	cmd.Flag("template", "Template to export").Short('t').StringVar(&opts.Template)
 	cmd.Flag("dir", "directory to write tempates to").Short('d').StringVar(&opts.Dir)
 
@@ -37,7 +40,7 @@ func (jc *JiraCli) CmdExportTemplatesUsage(cmd *kingpin.CmdClause, opts *ExportT
 }
 
 // CmdExportTemplates will export templates to directory
-func (jc *JiraCli) CmdExportTemplates(opts *ExportTemplatesOptions) error {
+func CmdExportTemplates(opts *ExportTemplatesOptions) error {
 	if err := os.MkdirAll(opts.Dir, 0755); err != nil {
 		return err
 	}

@@ -3,6 +3,10 @@ package jiracli
 import (
 	"fmt"
 
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -14,12 +18,12 @@ const (
 )
 
 type VoteOptions struct {
-	GlobalOptions
-	Issue  string
-	Action VoteAction
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Issue         string
+	Action        VoteAction
 }
 
-func (jc *JiraCli) CmdVoteRegistry() *CommandRegistryEntry {
+func CmdVoteRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := VoteOptions{
 		GlobalOptions: GlobalOptions{},
 		Action:        VoteUP,
@@ -28,19 +32,20 @@ func (jc *JiraCli) CmdVoteRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Vote up/down an issue",
 		func() error {
-			return jc.CmdVote(&opts)
+			return CmdVote(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdVoteUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdVoteUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdVoteUsage(cmd *kingpin.CmdClause, opts *VoteOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdVoteUsage(cmd *kingpin.CmdClause, opts *VoteOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("down", "downvote the issue").Short('d').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Action = VoteDown
 		return nil
@@ -50,20 +55,20 @@ func (jc *JiraCli) CmdVoteUsage(cmd *kingpin.CmdClause, opts *VoteOptions) error
 }
 
 // Vote will up/down vote an issue
-func (jc *JiraCli) CmdVote(opts *VoteOptions) error {
+func CmdVote(o *oreo.Client, opts *VoteOptions) error {
 	if opts.Action == VoteUP {
-		if err := jc.IssueAddVote(opts.Issue); err != nil {
+		if err := jira.IssueAddVote(o, opts.Endpoint.Value, opts.Issue); err != nil {
 			return err
 		}
 	} else {
-		if err := jc.IssueRemoveVote(opts.Issue); err != nil {
+		if err := jira.IssueRemoveVote(o, opts.Endpoint.Value, opts.Issue); err != nil {
 			return err
 		}
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, jc.Endpoint, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
 
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil
 }

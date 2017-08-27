@@ -1,27 +1,32 @@
 package jiracli
 
-import kingpin "gopkg.in/alecthomas/kingpin.v2"
+import (
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
 
-func (jc *JiraCli) CmdTakeRegistry() *CommandRegistryEntry {
+func CmdTakeRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := AssignOptions{}
 
 	return &CommandRegistryEntry{
 		"Assign issue to yourself",
 		func() error {
 			opts.Assignee = opts.User.Value
-			return jc.CmdAssign(&opts)
+			return CmdAssign(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdAssignUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdAssignUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdTakeUsage(cmd *kingpin.CmdClause, opts *AssignOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdTakeUsage(cmd *kingpin.CmdClause, opts *AssignOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
 	cmd.Arg("ISSUE", "issue to assign").Required().StringVar(&opts.Issue)
 	return nil
 }

@@ -2,17 +2,18 @@ package jiracli
 
 import (
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type ViewOptions struct {
-	GlobalOptions
-	jira.IssueOptions
-	Issue string
+	GlobalOptions     `yaml:",inline" figtree:",inline"`
+	jira.IssueOptions `yaml:",inline" figtree:",inline"`
+	Issue             string
 }
 
-func (jc *JiraCli) CmdViewRegistry() *CommandRegistryEntry {
+func CmdViewRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := ViewOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("view"),
@@ -22,20 +23,21 @@ func (jc *JiraCli) CmdViewRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Prints issue details",
 		func() error {
-			return jc.CmdView(&opts)
+			return CmdView(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdViewUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdViewUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.BrowseUsage(cmd, &opts.GlobalOptions)
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	BrowseUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("expand", "field to expand for the issue").StringsVar(&opts.Expand)
 	cmd.Flag("field", "field to return for the issue").StringsVar(&opts.Fields)
 	cmd.Flag("property", "property to return for issue").StringsVar(&opts.Properties)
@@ -44,16 +46,16 @@ func (jc *JiraCli) CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error
 }
 
 // View will get issue data and send to "view" template
-func (jc *JiraCli) CmdView(opts *ViewOptions) error {
-	data, err := jc.GetIssue(opts.Issue, opts)
+func CmdView(o *oreo.Client, opts *ViewOptions) error {
+	data, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, opts)
 	if err != nil {
 		return err
 	}
-	if err := jc.runTemplate(opts.Template.Value, data, nil); err != nil {
+	if err := runTemplate(opts.Template.Value, data, nil); err != nil {
 		return err
 	}
 	if opts.Browse.Value {
-		return jc.CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
 	}
 	return nil
 }

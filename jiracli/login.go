@@ -4,20 +4,23 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 	"github.com/mgutz/ansi"
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func (jc *JiraCli) CmdLoginRegistry() *CommandRegistryEntry {
+func CmdLoginRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := GlobalOptions{}
 	return &CommandRegistryEntry{
 		"Attempt to login into jira server",
 		func() error {
-			return jc.CmdLogin(&opts)
+			return CmdLogin(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.GlobalUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return GlobalUsage(cmd, &opts)
 		},
 	}
 }
@@ -41,15 +44,11 @@ func authCallback(req *http.Request, resp *http.Response) (*http.Response, error
 }
 
 // CmdLogin will attempt to login into jira server
-func (jc *JiraCli) CmdLogin(opts *GlobalOptions) error {
-	defer func(h jira.HttpClient) {
-		log.Debugf("Client: %#v", h)
-		jc.UA = h
-	}(jc.UA)
-	if session, err := jc.GetSession(); err != nil {
-		jc.UA = jc.oreoAgent.WithoutRedirect().WithRetries(0).WithPostCallback(authCallback)
+func CmdLogin(o *oreo.Client, opts *GlobalOptions) error {
+	if session, err := jira.GetSession(o, opts.Endpoint.Value); err != nil {
+		ua := o.WithoutRedirect().WithRetries(0).WithPostCallback(authCallback)
 		// No active session so try to create a new one
-		_, err := jc.NewSession(opts)
+		_, err := jira.NewSession(ua, opts.Endpoint.Value, opts)
 		if err != nil {
 			// reset password on failed session
 			opts.SetPass("")

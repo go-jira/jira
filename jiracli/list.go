@@ -2,6 +2,7 @@ package jiracli
 
 import (
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -11,7 +12,7 @@ type ListOptions struct {
 	jira.SearchOptions `yaml:",inline" figtree:",inline"`
 }
 
-func (jc *JiraCli) CmdListRegistry() *CommandRegistryEntry {
+func CmdListRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := ListOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("list"),
@@ -26,22 +27,20 @@ func (jc *JiraCli) CmdListRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Prints list of issues for given search criteria",
 		func() error {
-			return jc.CmdList(&opts)
+			return CmdList(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdListUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdListUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
-	log.Debugf("Configs: %#v", opts)
-	jc.LoadConfigs(cmd, opts)
-	log.Debugf("Configs: %#v", opts)
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("assignee", "User assigned the issue").Short('a').StringVar(&opts.Assignee)
 	cmd.Flag("component", "Component to search for").Short('c').StringVar(&opts.Component)
 	cmd.Flag("issuetype", "Issue type to search for").Short('i').StringVar(&opts.IssueType)
@@ -56,11 +55,10 @@ func (jc *JiraCli) CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error
 }
 
 // List will query jira and send data to "list" template
-func (jc *JiraCli) CmdList(opts *ListOptions) error {
-	log.Debugf("Configs: %#v", opts)
-	data, err := jc.Search(opts)
+func CmdList(o *oreo.Client, opts *ListOptions) error {
+	data, err := jira.Search(o, opts.Endpoint.Value, opts)
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template.Value, data, nil)
+	return runTemplate(opts.Template.Value, data, nil)
 }

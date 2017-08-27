@@ -4,16 +4,18 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type IssueTypesOptions struct {
-	GlobalOptions
-	Project string
+	GlobalOptions `yaml:",inline" figtree:",inline"`
+	Project       string
 }
 
-func (jc *JiraCli) CmdIssueTypesRegistry() *CommandRegistryEntry {
+func CmdIssueTypesRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := IssueTypesOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("issuetypes"),
@@ -23,32 +25,33 @@ func (jc *JiraCli) CmdIssueTypesRegistry() *CommandRegistryEntry {
 	return &CommandRegistryEntry{
 		"Show issue types for a project",
 		func() error {
-			return jc.CmdIssueTypes(&opts)
+			return CmdIssueTypes(o, &opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdIssueTypesUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdIssueTypesUsage(cmd, &opts)
 		},
 	}
 }
 
-func (jc *JiraCli) CmdIssueTypesUsage(cmd *kingpin.CmdClause, opts *IssueTypesOptions) error {
-	if err := jc.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
+func CmdIssueTypesUsage(cmd *kingpin.CmdClause, opts *IssueTypesOptions) error {
+	if err := GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
 		return err
 	}
-	jc.TemplateUsage(cmd, &opts.GlobalOptions)
+	TemplateUsage(cmd, &opts.GlobalOptions)
 	cmd.Flag("project", "project to list issueTypes").Short('p').StringVar(&opts.Project)
 
 	return nil
 }
 
 // CmdIssueTypes will get available issueTypes for project and send to the  "issueTypes" template
-func (jc *JiraCli) CmdIssueTypes(opts *IssueTypesOptions) error {
+func CmdIssueTypes(o *oreo.Client, opts *IssueTypesOptions) error {
 	if opts.Project == "" {
 		return fmt.Errorf("Project Required.")
 	}
-	data, err := jc.GetIssueCreateMetaProject(opts.Project)
+	data, err := jira.GetIssueCreateMetaProject(o, opts.Endpoint.Value, opts.Project)
 	if err != nil {
 		return err
 	}
-	return jc.runTemplate(opts.Template.Value, data, nil)
+	return runTemplate(opts.Template.Value, data, nil)
 }

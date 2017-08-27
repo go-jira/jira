@@ -322,7 +322,6 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 	if err != nil {
 		return nil, err
 	}
-
 	// log any cookies sent b/c they will not be present until
 	// afater we call the `Do` func
 	if log.IsEnabledFor(logging.DEBUG) && TraceRequestBody {
@@ -333,6 +332,11 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 				}
 			}
 		}
+	}
+
+	if log.IsEnabledFor(logging.DEBUG) && TraceResponseBody {
+		out, _ := httputil.DumpResponse(resp, true)
+		log.Debugf("Response: %s", out)
 	}
 
 	err = c.saveCookies(resp)

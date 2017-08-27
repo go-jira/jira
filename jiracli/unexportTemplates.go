@@ -7,27 +7,30 @@ import (
 	"os"
 	"path"
 
+	"github.com/coryb/figtree"
+
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func (jc *JiraCli) CmdUnexportTemplatesRegistry() *CommandRegistryEntry {
+func CmdUnexportTemplatesRegistry(fig *figtree.FigTree) *CommandRegistryEntry {
 	opts := ExportTemplatesOptions{
-		Dir: fmt.Sprintf("%s/.jira.d/templates", homedir()),
+		Dir: fmt.Sprintf("%s/.jira.d/templates", Homedir()),
 	}
 
 	return &CommandRegistryEntry{
 		"Remove unmodified exported templates",
 		func() error {
-			return jc.CmdUnexportTemplates(&opts)
+			return CmdUnexportTemplates(&opts)
 		},
 		func(cmd *kingpin.CmdClause) error {
-			return jc.CmdExportTemplatesUsage(cmd, &opts)
+			LoadConfigs(cmd, fig, &opts)
+			return CmdExportTemplatesUsage(cmd, &opts)
 		},
 	}
 }
 
 // CmdUnexportTemplates will remove unmodified templates from export directory
-func (jc *JiraCli) CmdUnexportTemplates(opts *ExportTemplatesOptions) error {
+func CmdUnexportTemplates(opts *ExportTemplatesOptions) error {
 	for name, template := range allTemplates {
 		if opts.Template != "" && opts.Template != name {
 			continue
