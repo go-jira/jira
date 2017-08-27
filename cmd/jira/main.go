@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime/debug"
@@ -70,6 +71,16 @@ func main() {
 	fig.ConfigDir = ".jira.d"
 
 	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
+	o = o.WithPostCallback(
+		func(req *http.Request, resp *http.Response) (*http.Response, error) {
+			if resp.Header.Get("X-Ausername") == "anonymous" {
+				// we are not logged in, so force login now by running the "login" command
+				app.Parse([]string{"login"})
+				return o.Do(req)
+			}
+			return resp, nil
+		},
+	)
 
 	registry := []jiracli.CommandRegistry{
 		jiracli.CommandRegistry{

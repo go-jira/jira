@@ -45,18 +45,23 @@ func authCallback(req *http.Request, resp *http.Response) (*http.Response, error
 
 // CmdLogin will attempt to login into jira server
 func CmdLogin(o *oreo.Client, opts *GlobalOptions) error {
-	if session, err := jira.GetSession(o, opts.Endpoint.Value); err != nil {
-		ua := o.WithoutRedirect().WithRetries(0).WithPostCallback(authCallback)
-		// No active session so try to create a new one
-		_, err := jira.NewSession(ua, opts.Endpoint.Value, opts)
-		if err != nil {
-			// reset password on failed session
-			opts.SetPass("")
-			return err
+	ua := o.WithoutRedirect().WithRetries(0).WithoutCallbacks().WithPostCallback(authCallback)
+	for {
+		if session, err := jira.GetSession(o, opts.Endpoint.Value); err != nil {
+			// No active session so try to create a new one
+			_, err := jira.NewSession(ua, opts.Endpoint.Value, opts)
+			if err != nil {
+				// reset password on failed session
+				opts.SetPass("")
+				log.Errorf("%s", err)
+				continue
+			}
+			fmt.Println(ansi.Color("OK", "green"), "New session for", opts.User)
+			break
+		} else {
+			fmt.Println(ansi.Color("OK", "green"), "Found session for", session.Name)
+			break
 		}
-		fmt.Println(ansi.Color("OK", "green"), "New session for", opts.User)
-	} else {
-		fmt.Println(ansi.Color("OK", "green"), "Found session for", session.Name)
 	}
 	return nil
 }

@@ -26,7 +26,7 @@ func CmdLogoutRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEnt
 
 // CmdLogout will attempt to terminate an active Jira session
 func CmdLogout(o *oreo.Client, opts *GlobalOptions) error {
-	ua := o.WithoutRedirect().WithRetries(0)
+	ua := o.WithoutRedirect().WithRetries(0).WithoutCallbacks()
 	err := jira.DeleteSession(ua, opts.Endpoint.Value)
 	if err == nil {
 		fmt.Println(ansi.Color("OK", "green"), "Terminated session for", opts.User)
