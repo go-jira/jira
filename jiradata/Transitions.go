@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -dir data -pkg jiradata -overwrite schemas/SearchResults.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/TransitionsMeta.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -31,33 +31,65 @@ package jiradata
 //             "type": "object",
 //             "properties": {
 //               "allowedValues": {
+//                 "title": "allowedValues",
 //                 "type": "array",
 //                 "items": {}
 //               },
 //               "autoCompleteUrl": {
+//                 "title": "autoCompleteUrl",
 //                 "type": "string"
 //               },
-//               "defaultValue": {},
+//               "defaultValue": {
+//                 "title": "defaultValue"
+//               },
 //               "hasDefaultValue": {
+//                 "title": "hasDefaultValue",
 //                 "type": "boolean"
 //               },
 //               "key": {
+//                 "title": "key",
 //                 "type": "string"
 //               },
 //               "name": {
+//                 "title": "name",
 //                 "type": "string"
 //               },
 //               "operations": {
+//                 "title": "operations",
 //                 "type": "array",
 //                 "items": {
 //                   "type": "string"
 //                 }
 //               },
 //               "required": {
+//                 "title": "required",
 //                 "type": "boolean"
 //               },
 //               "schema": {
-//                 "$ref": "#/definitions/json-type"
+//                 "title": "Json Type",
+//                 "type": "object",
+//                 "properties": {
+//                   "custom": {
+//                     "title": "custom",
+//                     "type": "string"
+//                   },
+//                   "customId": {
+//                     "title": "customId",
+//                     "type": "integer"
+//                   },
+//                   "items": {
+//                     "title": "items",
+//                     "type": "string"
+//                   },
+//                   "system": {
+//                     "title": "system",
+//                     "type": "string"
+//                   },
+//                   "type": {
+//                     "title": "type",
+//                     "type": "string"
+//                   }
+//                 }
 //               }
 //             }
 //           }

@@ -1,8 +1,6 @@
 package jiradata
 
-import (
-	"strings"
-)
+import "strings"
 
 // Error is needed to make ErrorCollection implement the error interface
 func (e ErrorCollection) Error() string {

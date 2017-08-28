@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -pkg jiradata -dir jiradata -overwrite schemas/IssueUpdate.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/TransitionsMeta.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -15,6 +15,10 @@ package jiradata
 //   "title": "Transition",
 //   "type": "object",
 //   "properties": {
+//     "expand": {
+//       "title": "expand",
+//       "type": "string"
+//     },
 //     "fields": {
 //       "title": "fields",
 //       "type": "object",
@@ -120,6 +124,10 @@ package jiradata
 //           "title": "name",
 //           "type": "string"
 //         },
+//         "self": {
+//           "title": "self",
+//           "type": "string"
+//         },
 //         "statusCategory": {
 //           "title": "Status Category",
 //           "type": "object",
@@ -139,6 +147,10 @@ package jiradata
 //             "name": {
 //               "title": "name",
 //               "type": "string"
+//             },
+//             "self": {
+//               "title": "self",
+//               "type": "string"
 //             }
 //           }
 //         },
@@ -151,6 +163,7 @@ package jiradata
 //   }
 // }
 type Transition struct {
+	Expand    string       `json:"expand,omitempty" yaml:"expand,omitempty"`
 	Fields    FieldMetaMap `json:"fields,omitempty" yaml:"fields,omitempty"`
 	HasScreen bool         `json:"hasScreen,omitempty" yaml:"hasScreen,omitempty"`
 	ID        string       `json:"id,omitempty" yaml:"id,omitempty"`

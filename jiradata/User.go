@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -dir data -pkg jiradata -overwrite schemas/SearchResults.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/WorklogWithPagination.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -16,15 +16,12 @@ package jiradata
 //   "type": "object",
 //   "properties": {
 //     "accountId": {
-//       "title": "accountId",
 //       "type": "string"
 //     },
 //     "active": {
-//       "title": "active",
 //       "type": "boolean"
 //     },
 //     "avatarUrls": {
-//       "title": "avatarUrls",
 //       "type": "object",
 //       "patternProperties": {
 //         ".+": {
@@ -33,27 +30,21 @@ package jiradata
 //       }
 //     },
 //     "displayName": {
-//       "title": "displayName",
 //       "type": "string"
 //     },
 //     "emailAddress": {
-//       "title": "emailAddress",
 //       "type": "string"
 //     },
 //     "key": {
-//       "title": "key",
 //       "type": "string"
 //     },
 //     "name": {
-//       "title": "name",
 //       "type": "string"
 //     },
 //     "self": {
-//       "title": "self",
 //       "type": "string"
 //     },
 //     "timeZone": {
-//       "title": "timeZone",
 //       "type": "string"
 //     }
 //   }

@@ -123,3 +123,7 @@ export JIRACLOUD=1
 prove:
 	chmod -R g-rwx,o-rwx $(GNUPGHOME)
 	OSHT_VERBOSE=1 prove -v 
+
+generate:
+	cd schemas && ./fetch-schemas.py
+	grep -h slipscheme jiradata/*.go | grep json | sort | uniq | awk -F\/\/ '{print $$2}' | while read cmd; do $$cmd; done

@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -pkg jiradata -overwrite ../schemas/TransitionsMeta.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/TransitionsMeta.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -47,6 +47,9 @@ package jiradata
 //                   "autoCompleteUrl": {
 //                     "title": "autoCompleteUrl",
 //                     "type": "string"
+//                   },
+//                   "defaultValue": {
+//                     "title": "defaultValue"
 //                   },
 //                   "hasDefaultValue": {
 //                     "title": "hasDefaultValue",

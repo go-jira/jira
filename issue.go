@@ -236,11 +236,11 @@ func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getCreateIssueMeta
-func (j *Jira) GetIssueCreateMetaIssueType(projectKey, issueTypeName string) (*jiradata.CreateMetaIssueType, error) {
+func (j *Jira) GetIssueCreateMetaIssueType(projectKey, issueTypeName string) (*jiradata.IssueType, error) {
 	return GetIssueCreateMetaIssueType(j.UA, j.Endpoint, projectKey, issueTypeName)
 }
 
-func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, issueTypeName string) (*jiradata.CreateMetaIssueType, error) {
+func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, issueTypeName string) (*jiradata.IssueType, error) {
 	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", endpoint, projectKey, issueTypeName)
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
@@ -256,7 +256,7 @@ func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, iss
 		}
 		for _, project := range results.Projects {
 			if project.Key == projectKey {
-				for _, issueType := range project.Issuetypes {
+				for _, issueType := range project.IssueTypes {
 					if issueType.Name == issueTypeName {
 						return issueType, nil
 					}

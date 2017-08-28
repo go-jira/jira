@@ -216,6 +216,14 @@ func (o ListBoolOption) String() string {
 	return fmt.Sprintf("%v", []BoolOption(o))
 }
 
+func (o ListBoolOption) Append(values ...bool) ListBoolOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewBoolOption(val))
+	}
+	return results
+}
+
 func (o ListBoolOption) Slice() []bool {
 	tmp := []bool{}
 	for _, elem := range o {
@@ -437,6 +445,14 @@ func (o ListByteOption) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListByteOption) String() string {
 	return fmt.Sprintf("%v", []ByteOption(o))
+}
+
+func (o ListByteOption) Append(values ...byte) ListByteOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewByteOption(val))
+	}
+	return results
 }
 
 func (o ListByteOption) Slice() []byte {
@@ -662,6 +678,14 @@ func (o ListComplex128Option) String() string {
 	return fmt.Sprintf("%v", []Complex128Option(o))
 }
 
+func (o ListComplex128Option) Append(values ...complex128) ListComplex128Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewComplex128Option(val))
+	}
+	return results
+}
+
 func (o ListComplex128Option) Slice() []complex128 {
 	tmp := []complex128{}
 	for _, elem := range o {
@@ -883,6 +907,14 @@ func (o ListComplex64Option) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListComplex64Option) String() string {
 	return fmt.Sprintf("%v", []Complex64Option(o))
+}
+
+func (o ListComplex64Option) Append(values ...complex64) ListComplex64Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewComplex64Option(val))
+	}
+	return results
 }
 
 func (o ListComplex64Option) Slice() []complex64 {
@@ -1108,6 +1140,14 @@ func (o ListErrorOption) String() string {
 	return fmt.Sprintf("%v", []ErrorOption(o))
 }
 
+func (o ListErrorOption) Append(values ...error) ListErrorOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewErrorOption(val))
+	}
+	return results
+}
+
 func (o ListErrorOption) Slice() []error {
 	tmp := []error{}
 	for _, elem := range o {
@@ -1329,6 +1369,14 @@ func (o ListFloat32Option) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListFloat32Option) String() string {
 	return fmt.Sprintf("%v", []Float32Option(o))
+}
+
+func (o ListFloat32Option) Append(values ...float32) ListFloat32Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewFloat32Option(val))
+	}
+	return results
 }
 
 func (o ListFloat32Option) Slice() []float32 {
@@ -1554,6 +1602,14 @@ func (o ListFloat64Option) String() string {
 	return fmt.Sprintf("%v", []Float64Option(o))
 }
 
+func (o ListFloat64Option) Append(values ...float64) ListFloat64Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewFloat64Option(val))
+	}
+	return results
+}
+
 func (o ListFloat64Option) Slice() []float64 {
 	tmp := []float64{}
 	for _, elem := range o {
@@ -1775,6 +1831,14 @@ func (o ListIntOption) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListIntOption) String() string {
 	return fmt.Sprintf("%v", []IntOption(o))
+}
+
+func (o ListIntOption) Append(values ...int) ListIntOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewIntOption(val))
+	}
+	return results
 }
 
 func (o ListIntOption) Slice() []int {
@@ -2000,6 +2064,14 @@ func (o ListInt16Option) String() string {
 	return fmt.Sprintf("%v", []Int16Option(o))
 }
 
+func (o ListInt16Option) Append(values ...int16) ListInt16Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewInt16Option(val))
+	}
+	return results
+}
+
 func (o ListInt16Option) Slice() []int16 {
 	tmp := []int16{}
 	for _, elem := range o {
@@ -2221,6 +2293,14 @@ func (o ListInt32Option) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListInt32Option) String() string {
 	return fmt.Sprintf("%v", []Int32Option(o))
+}
+
+func (o ListInt32Option) Append(values ...int32) ListInt32Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewInt32Option(val))
+	}
+	return results
 }
 
 func (o ListInt32Option) Slice() []int32 {
@@ -2446,6 +2526,14 @@ func (o ListInt64Option) String() string {
 	return fmt.Sprintf("%v", []Int64Option(o))
 }
 
+func (o ListInt64Option) Append(values ...int64) ListInt64Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewInt64Option(val))
+	}
+	return results
+}
+
 func (o ListInt64Option) Slice() []int64 {
 	tmp := []int64{}
 	for _, elem := range o {
@@ -2667,6 +2755,14 @@ func (o ListInt8Option) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListInt8Option) String() string {
 	return fmt.Sprintf("%v", []Int8Option(o))
+}
+
+func (o ListInt8Option) Append(values ...int8) ListInt8Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewInt8Option(val))
+	}
+	return results
 }
 
 func (o ListInt8Option) Slice() []int8 {
@@ -2892,6 +2988,14 @@ func (o ListRuneOption) String() string {
 	return fmt.Sprintf("%v", []RuneOption(o))
 }
 
+func (o ListRuneOption) Append(values ...rune) ListRuneOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewRuneOption(val))
+	}
+	return results
+}
+
 func (o ListRuneOption) Slice() []rune {
 	tmp := []rune{}
 	for _, elem := range o {
@@ -3113,6 +3217,14 @@ func (o ListStringOption) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListStringOption) String() string {
 	return fmt.Sprintf("%v", []StringOption(o))
+}
+
+func (o ListStringOption) Append(values ...string) ListStringOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewStringOption(val))
+	}
+	return results
 }
 
 func (o ListStringOption) Slice() []string {
@@ -3338,6 +3450,14 @@ func (o ListUintOption) String() string {
 	return fmt.Sprintf("%v", []UintOption(o))
 }
 
+func (o ListUintOption) Append(values ...uint) ListUintOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewUintOption(val))
+	}
+	return results
+}
+
 func (o ListUintOption) Slice() []uint {
 	tmp := []uint{}
 	for _, elem := range o {
@@ -3559,6 +3679,14 @@ func (o ListUint16Option) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListUint16Option) String() string {
 	return fmt.Sprintf("%v", []Uint16Option(o))
+}
+
+func (o ListUint16Option) Append(values ...uint16) ListUint16Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewUint16Option(val))
+	}
+	return results
 }
 
 func (o ListUint16Option) Slice() []uint16 {
@@ -3784,6 +3912,14 @@ func (o ListUint32Option) String() string {
 	return fmt.Sprintf("%v", []Uint32Option(o))
 }
 
+func (o ListUint32Option) Append(values ...uint32) ListUint32Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewUint32Option(val))
+	}
+	return results
+}
+
 func (o ListUint32Option) Slice() []uint32 {
 	tmp := []uint32{}
 	for _, elem := range o {
@@ -4005,6 +4141,14 @@ func (o ListUint64Option) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListUint64Option) String() string {
 	return fmt.Sprintf("%v", []Uint64Option(o))
+}
+
+func (o ListUint64Option) Append(values ...uint64) ListUint64Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewUint64Option(val))
+	}
+	return results
 }
 
 func (o ListUint64Option) Slice() []uint64 {
@@ -4230,6 +4374,14 @@ func (o ListUint8Option) String() string {
 	return fmt.Sprintf("%v", []Uint8Option(o))
 }
 
+func (o ListUint8Option) Append(values ...uint8) ListUint8Option {
+	results := o
+	for _, val := range values {
+		results = append(results, NewUint8Option(val))
+	}
+	return results
+}
+
 func (o ListUint8Option) Slice() []uint8 {
 	tmp := []uint8{}
 	for _, elem := range o {
@@ -4451,6 +4603,14 @@ func (o ListUintptrOption) IsCumulative() bool {
 // String is required for kingpin to generate usage with this datatype
 func (o ListUintptrOption) String() string {
 	return fmt.Sprintf("%v", []UintptrOption(o))
+}
+
+func (o ListUintptrOption) Append(values ...uintptr) ListUintptrOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewUintptrOption(val))
+	}
+	return results
 }
 
 func (o ListUintptrOption) Slice() []uintptr {

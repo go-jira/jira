@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -pkg jiradata -dir jiradata -overwrite schemas/IssueUpdate.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/TransitionsMeta.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -31,6 +31,10 @@ package jiradata
 //       "title": "name",
 //       "type": "string"
 //     },
+//     "self": {
+//       "title": "self",
+//       "type": "string"
+//     },
 //     "statusCategory": {
 //       "title": "Status Category",
 //       "type": "object",
@@ -50,6 +54,10 @@ package jiradata
 //         "name": {
 //           "title": "name",
 //           "type": "string"
+//         },
+//         "self": {
+//           "title": "self",
+//           "type": "string"
 //         }
 //       }
 //     },
@@ -64,6 +72,7 @@ type Status struct {
 	IconURL        string          `json:"iconUrl,omitempty" yaml:"iconUrl,omitempty"`
 	ID             string          `json:"id,omitempty" yaml:"id,omitempty"`
 	Name           string          `json:"name,omitempty" yaml:"name,omitempty"`
+	Self           string          `json:"self,omitempty" yaml:"self,omitempty"`
 	StatusCategory *StatusCategory `json:"statusCategory,omitempty" yaml:"statusCategory,omitempty"`
 	StatusColor    string          `json:"statusColor,omitempty" yaml:"statusColor,omitempty"`
 }

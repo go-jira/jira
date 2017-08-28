@@ -61,8 +61,8 @@ func CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) error {
 // will parse the edited document as YAML and submit the document to jira.
 func CmdCreate(o *oreo.Client, opts *CreateOptions) error {
 	type templateInput struct {
-		Meta      *jiradata.CreateMetaIssueType `yaml:"meta" json:"meta"`
-		Overrides map[string]string             `yaml:"overrides" json:"overrides"`
+		Meta      *jiradata.IssueType `yaml:"meta" json:"meta"`
+		Overrides map[string]string   `yaml:"overrides" json:"overrides"`
 	}
 
 	if err := defaultIssueType(o, opts.Endpoint.Value, &opts.Project, &opts.IssueType); err != nil {
@@ -113,7 +113,7 @@ func defaultIssueType(o *oreo.Client, endpoint string, project, issuetype *strin
 
 	issueTypes := map[string]bool{}
 
-	for _, issuetype := range projectMeta.Issuetypes {
+	for _, issuetype := range projectMeta.IssueTypes {
 		issueTypes[issuetype.Name] = true
 	}
 

@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -dir jiradata -pkg jiradata schemas/LinkIssueRequest.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/LinkIssueRequest.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////

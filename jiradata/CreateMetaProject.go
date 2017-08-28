@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -dir jiradata -pkg jiradata schemas/CreateMeta.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/CreateMeta.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ type CreateMetaProject struct {
 	AvatarUrls map[string]string `json:"avatarUrls,omitempty" yaml:"avatarUrls,omitempty"`
 	Expand     string            `json:"expand,omitempty" yaml:"expand,omitempty"`
 	ID         string            `json:"id,omitempty" yaml:"id,omitempty"`
-	Issuetypes Issuetypes        `json:"issuetypes,omitempty" yaml:"issuetypes,omitempty"`
+	IssueTypes IssueTypes        `json:"issuetypes,omitempty" yaml:"issuetypes,omitempty"`
 	Key        string            `json:"key,omitempty" yaml:"key,omitempty"`
 	Name       string            `json:"name,omitempty" yaml:"name,omitempty"`
 	Self       string            `json:"self,omitempty" yaml:"self,omitempty"`

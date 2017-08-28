@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -dir data -pkg jiradata -overwrite schemas/SearchResults.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/SearchResults.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ package jiradata
 type ChangeItem struct {
 	Field      string `json:"field,omitempty" yaml:"field,omitempty"`
 	FieldID    string `json:"fieldId,omitempty" yaml:"fieldId,omitempty"`
-	Fieldtype  string `json:"fieldtype,omitempty" yaml:"fieldtype,omitempty"`
+	FieldType  string `json:"fieldtype,omitempty" yaml:"fieldtype,omitempty"`
 	From       string `json:"from,omitempty" yaml:"from,omitempty"`
 	FromString string `json:"fromString,omitempty" yaml:"fromString,omitempty"`
 	To         string `json:"to,omitempty" yaml:"to,omitempty"`

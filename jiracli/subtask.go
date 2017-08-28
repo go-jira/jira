@@ -63,9 +63,9 @@ func CmdSubtaskUsage(cmd *kingpin.CmdClause, opts *SubtaskOptions) error {
 // will parse the edited document as YAML and submit the document to jira.
 func CmdSubtask(o *oreo.Client, opts *SubtaskOptions) error {
 	type templateInput struct {
-		Meta      *jiradata.CreateMetaIssueType `yaml:"meta" json:"meta"`
-		Overrides map[string]string             `yaml:"overrides" json:"overrides"`
-		Parent    *jiradata.Issue               `yaml:"parent" json:"parent"`
+		Meta      *jiradata.IssueType `yaml:"meta" json:"meta"`
+		Overrides map[string]string   `yaml:"overrides" json:"overrides"`
+		Parent    *jiradata.Issue     `yaml:"parent" json:"parent"`
 	}
 
 	parent, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, nil)

@@ -17,7 +17,7 @@ imports:
   subpackages:
   - generic
 - name: github.com/coryb/figtree
-  version: 405935ba249b758f31f4ca2132c4fed7702cc622
+  version: a2b3fe20e721fd0b946cb5d5c434d667c22b480e
 - name: github.com/coryb/oreo
   version: b59de1c7ff7fe9e084278487f69a07cb667de9b3
 - name: github.com/fatih/camelcase

@@ -5,17 +5,17 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -dir jiradata -pkg jiradata schemas/CreateMeta.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/Project.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
 
-// Issuetypes defined from schema:
+// IssueTypes defined from schema:
 // {
-//   "title": "issuetypes",
+//   "title": "issueTypes",
 //   "type": "array",
 //   "items": {
-//     "title": "Create Meta Issue Type",
+//     "title": "Issue Type",
 //     "type": "object",
 //     "properties": {
 //       "avatarId": {
@@ -25,83 +25,6 @@ package jiradata
 //       "description": {
 //         "title": "description",
 //         "type": "string"
-//       },
-//       "expand": {
-//         "title": "expand",
-//         "type": "string"
-//       },
-//       "fields": {
-//         "title": "fields",
-//         "type": "object",
-//         "patternProperties": {
-//           ".+": {
-//             "title": "Field Meta",
-//             "type": "object",
-//             "properties": {
-//               "allowedValues": {
-//                 "title": "allowedValues",
-//                 "type": "array",
-//                 "items": {}
-//               },
-//               "autoCompleteUrl": {
-//                 "title": "autoCompleteUrl",
-//                 "type": "string"
-//               },
-//               "defaultValue": {
-//                 "title": "defaultValue"
-//               },
-//               "hasDefaultValue": {
-//                 "title": "hasDefaultValue",
-//                 "type": "boolean"
-//               },
-//               "key": {
-//                 "title": "key",
-//                 "type": "string"
-//               },
-//               "name": {
-//                 "title": "name",
-//                 "type": "string"
-//               },
-//               "operations": {
-//                 "title": "operations",
-//                 "type": "array",
-//                 "items": {
-//                   "type": "string"
-//                 }
-//               },
-//               "required": {
-//                 "title": "required",
-//                 "type": "boolean"
-//               },
-//               "schema": {
-//                 "title": "Json Type",
-//                 "type": "object",
-//                 "properties": {
-//                   "custom": {
-//                     "title": "custom",
-//                     "type": "string"
-//                   },
-//                   "customId": {
-//                     "title": "customId",
-//                     "type": "integer"
-//                   },
-//                   "items": {
-//                     "title": "items",
-//                     "type": "string"
-//                   },
-//                   "system": {
-//                     "title": "system",
-//                     "type": "string"
-//                   },
-//                   "type": {
-//                     "title": "type",
-//                     "type": "string"
-//                   }
-//                 }
-//               }
-//             }
-//           }
-//         }
 //       },
 //       "iconUrl": {
 //         "title": "iconUrl",
@@ -126,4 +49,4 @@ package jiradata
 //     }
 //   }
 // }
-type Issuetypes []*CreateMetaIssueType
+type IssueTypes []*IssueType

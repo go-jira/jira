@@ -218,6 +218,14 @@ func (o ListRawTypeOption) String() string {
 	return fmt.Sprintf("%v", []RawTypeOption(o))
 }
 
+func (o ListRawTypeOption) Append(values ...RawType) ListRawTypeOption {
+	results := o
+	for _, val := range values {
+		results = append(results, NewRawTypeOption(val))
+	}
+	return results
+}
+
 func (o ListRawTypeOption) Slice() []RawType {
 	tmp := []RawType{}
 	for _, elem := range o {
