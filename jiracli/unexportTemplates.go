@@ -13,9 +13,7 @@ import (
 )
 
 func CmdUnexportTemplatesRegistry(fig *figtree.FigTree) *CommandRegistryEntry {
-	opts := ExportTemplatesOptions{
-		Dir: fmt.Sprintf("%s/.jira.d/templates", Homedir()),
-	}
+	opts := ExportTemplatesOptions{}
 
 	return &CommandRegistryEntry{
 		"Remove unmodified exported templates",
@@ -24,6 +22,10 @@ func CmdUnexportTemplatesRegistry(fig *figtree.FigTree) *CommandRegistryEntry {
 		},
 		func(cmd *kingpin.CmdClause) error {
 			LoadConfigs(cmd, fig, &opts)
+			if opts.Dir != "" {
+				opts.Dir = fmt.Sprintf("%s/.jira.d/templates", Homedir())
+			}
+
 			return CmdExportTemplatesUsage(cmd, &opts)
 		},
 	}

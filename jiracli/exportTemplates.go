@@ -11,14 +11,12 @@ import (
 )
 
 type ExportTemplatesOptions struct {
-	Template string
-	Dir      string
+	Template string `yaml:"template,omitempty" json:"template,omitempty"`
+	Dir      string `yaml:"dir,omitempty" json:"dir,omitempty"`
 }
 
 func CmdExportTemplatesRegistry(fig *figtree.FigTree) *CommandRegistryEntry {
-	opts := ExportTemplatesOptions{
-		Dir: fmt.Sprintf("%s/.jira.d/templates", Homedir()),
-	}
+	opts := ExportTemplatesOptions{}
 
 	return &CommandRegistryEntry{
 		"Export templates for customizations",
@@ -27,6 +25,9 @@ func CmdExportTemplatesRegistry(fig *figtree.FigTree) *CommandRegistryEntry {
 		},
 		func(cmd *kingpin.CmdClause) error {
 			LoadConfigs(cmd, fig, &opts)
+			if opts.Dir == "" {
+				opts.Dir = fmt.Sprintf("%s/.jira.d/templates", Homedir())
+			}
 			return CmdExportTemplatesUsage(cmd, &opts)
 		},
 	}

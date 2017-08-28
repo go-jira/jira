@@ -12,11 +12,11 @@ import (
 )
 
 type EditOptions struct {
-	GlobalOptions        `yaml:",inline" figtree:",inline"`
-	jiradata.IssueUpdate `yaml:",inline" figtree:",inline"`
-	jira.SearchOptions   `yaml:",inline" figtree:",inline"`
-	Overrides            map[string]string
-	Issue                string
+	GlobalOptions        `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.IssueUpdate `yaml:",inline" json:",inline" figtree:",inline"`
+	jira.SearchOptions   `yaml:",inline" json:",inline" figtree:",inline"`
+	Overrides            map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	Issue                string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdEditRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

@@ -12,16 +12,14 @@ import (
 )
 
 type RankOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	First         string
-	Second        string
-	Order         string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	First         string `yaml:"first,omitempty" json:"first,omitempty"`
+	Second        string `yaml:"second,omitempty" json:"second,omitempty"`
+	Order         string `yaml:"order,omitempty" json:"order,omitempty"`
 }
 
 func CmdRankRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
-	opts := RankOptions{
-		GlobalOptions: GlobalOptions{},
-	}
+	opts := RankOptions{}
 
 	return &CommandRegistryEntry{
 		"Mark issues as blocker",

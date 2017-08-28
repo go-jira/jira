@@ -8,19 +8,14 @@ import (
 )
 
 type ListOptions struct {
-	GlobalOptions      `yaml:",inline" figtree:",inline"`
-	jira.SearchOptions `yaml:",inline" figtree:",inline"`
+	GlobalOptions      `yaml:",inline" json:",inline" figtree:",inline"`
+	jira.SearchOptions `yaml:",inline" json:",inline" figtree:",inline"`
 }
 
 func CmdListRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
 	opts := ListOptions{
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("list"),
-		},
-		SearchOptions: jira.SearchOptions{
-			MaxResults:  500,
-			QueryFields: "assignee,created,priority,reporter,status,summary,updated",
-			Sort:        "priority asc, key",
 		},
 	}
 
@@ -31,6 +26,15 @@ func CmdListRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry
 		},
 		func(cmd *kingpin.CmdClause) error {
 			LoadConfigs(cmd, fig, &opts)
+			if opts.MaxResults == 0 {
+				opts.MaxResults = 500
+			}
+			if opts.QueryFields == "" {
+				opts.QueryFields = "assignee,created,priority,reporter,status,summary,updated"
+			}
+			if opts.Sort == "" {
+				opts.Sort = "priority asc, key"
+			}
 			return CmdListUsage(cmd, &opts)
 		},
 	}

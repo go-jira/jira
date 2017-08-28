@@ -8,7 +8,7 @@ import (
 )
 
 type CreateMetaOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
 	Project       string `yaml:"project,omitempty" json:"project,omitempty"`
 	IssueType     string `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
 }

@@ -12,8 +12,8 @@ import (
 )
 
 type ComponentAddOptions struct {
-	GlobalOptions      `yaml:",inline" figtree:",inline"`
-	jiradata.Component `yaml:",inline" figtree:",inline"`
+	GlobalOptions      `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.Component `yaml:",inline" json:",inline" figtree:",inline"`
 }
 
 func CmdComponentAddRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

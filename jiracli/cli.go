@@ -21,12 +21,6 @@ import (
 
 var log = logging.MustGetLogger("jira")
 
-// type JiraCli struct {
-// 	jira.Jira `yaml:",inline"`
-// 	ConfigDir string
-// 	oreoAgent *oreo.Client
-// }
-
 type Exit struct {
 	Code int
 }
@@ -59,17 +53,6 @@ type kingpinAppOrCommand interface {
 	Command(string, string) *kingpin.CmdClause
 	GetCommand(string) *kingpin.CmdClause
 }
-
-// func New(configDir string) *JiraCli {
-// 	agent := oreo.New().WithCookieFile(filepath.Join(homedir(), configDir, "cookies.js"))
-// 	return &JiraCli{
-// 		ConfigDir: configDir,
-// 		Jira: jira.Jira{
-// 			UA: agent,
-// 		},
-// 		oreoAgent: agent,
-// 	}
-// }
 
 func Register(app *kingpin.Application, reg []CommandRegistry) {
 	for _, command := range reg {

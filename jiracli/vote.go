@@ -18,9 +18,9 @@ const (
 )
 
 type VoteOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Issue         string
-	Action        VoteAction
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue         string     `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Action        VoteAction `yaml:"-" json:"-"`
 }
 
 func CmdVoteRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

@@ -12,9 +12,9 @@ import (
 )
 
 type IssueLinkOptions struct {
-	GlobalOptions             `yaml:",inline" figtree:",inline"`
-	jiradata.LinkIssueRequest `yaml:",inline" figtree:",inline"`
-	LinkType                  string
+	GlobalOptions             `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
+	LinkType                  string `yaml:"linktype,omitempty" json:"linktype,omitempty"`
 }
 
 func CmdIssueLinkRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

@@ -18,10 +18,10 @@ const (
 )
 
 type WatchOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Issue         string
-	Watcher       string
-	Action        WatchAction
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue         string      `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Watcher       string      `yaml:"watcher,omitempty" json:"watcher,omitempty"`
+	Action        WatchAction `yaml:"-" json:"-"`
 }
 
 func CmdWatchRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

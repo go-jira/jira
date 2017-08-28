@@ -12,9 +12,9 @@ import (
 )
 
 type LabelsAddOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Issue         string
-	Labels        []string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue         string   `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Labels        []string `yaml:"labels,omitempty" json:"labels,omitempty"`
 }
 
 func CmdLabelsAddRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

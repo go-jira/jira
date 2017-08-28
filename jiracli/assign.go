@@ -11,9 +11,9 @@ import (
 )
 
 type AssignOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Issue         string
-	Assignee      string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue         string `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Assignee      string `yaml:"assignee,omitempty" json:"assignee,omitempty"`
 }
 
 func CmdAssignRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

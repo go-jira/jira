@@ -12,9 +12,9 @@ import (
 )
 
 type CommentOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Overrides     map[string]string
-	Issue         string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Overrides     map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	Issue         string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdCommentRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

@@ -12,10 +12,10 @@ import (
 )
 
 type DupOptions struct {
-	GlobalOptions             `yaml:",inline" figtree:",inline"`
-	jiradata.LinkIssueRequest `yaml:",inline" figtree:",inline"`
-	Duplicate                 string
-	Issue                     string
+	GlobalOptions             `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
+	Duplicate                 string `yaml:"duplicate,omitempty" json:"duplicate,omitempty"`
+	Issue                     string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdDupRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

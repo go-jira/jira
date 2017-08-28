@@ -8,8 +8,8 @@ import (
 )
 
 type WorklogListOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Issue         string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue         string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdWorklogListRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

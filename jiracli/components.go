@@ -11,8 +11,8 @@ import (
 )
 
 type ComponentsOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Project       string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project       string `yaml:"project,omitempty" json:"project,omitempty"`
 }
 
 func CmdComponentsRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

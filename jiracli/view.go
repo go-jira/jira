@@ -8,9 +8,9 @@ import (
 )
 
 type ViewOptions struct {
-	GlobalOptions     `yaml:",inline" figtree:",inline"`
-	jira.IssueOptions `yaml:",inline" figtree:",inline"`
-	Issue             string
+	GlobalOptions     `yaml:",inline" json:",inline" figtree:",inline"`
+	jira.IssueOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue             string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdViewRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

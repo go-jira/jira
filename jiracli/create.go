@@ -12,11 +12,11 @@ import (
 )
 
 type CreateOptions struct {
-	GlobalOptions        `yaml:",inline" figtree:",inline"`
-	jiradata.IssueUpdate `yaml:",inline" figtree:",inline"`
-	Project              string
-	IssueType            string
-	Overrides            map[string]string
+	GlobalOptions        `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.IssueUpdate `yaml:",inline" json:",inline" figtree:",inline"`
+	Project              string            `yaml:"project,omitempty" json:"project,omitempty"`
+	IssueType            string            `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
+	Overrides            map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 }
 
 func CmdCreateRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {

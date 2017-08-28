@@ -13,11 +13,11 @@ import (
 )
 
 type TransitionOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Overrides     map[string]string
-	Transition    string
-	Issue         string
-	Resolution    string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Overrides     map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	Transition    string            `yaml:"transition,omitempty" json:"transition,omitempty"`
+	Issue         string            `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Resolution    string            `yaml:"resolution,omitempty" json:"resolution,omitempty"`
 }
 
 func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition string) *CommandRegistryEntry {
@@ -25,8 +25,7 @@ func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition stri
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("transition"),
 		},
-		Transition: transition,
-		Overrides:  map[string]string{},
+		Overrides: map[string]string{},
 	}
 
 	help := "Transition issue to given state"
@@ -41,6 +40,9 @@ func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition stri
 		},
 		func(cmd *kingpin.CmdClause) error {
 			LoadConfigs(cmd, fig, &opts)
+			if opts.Transition == "" {
+				opts.Transition = transition
+			}
 			return CmdTransitionUsage(cmd, &opts)
 		},
 	}

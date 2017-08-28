@@ -12,12 +12,12 @@ import (
 )
 
 type SubtaskOptions struct {
-	GlobalOptions        `yaml:",inline" figtree:",inline"`
-	jiradata.IssueUpdate `yaml:",inline" figtree:",inline"`
-	Project              string
-	IssueType            string
-	Overrides            map[string]string
-	Issue                string
+	GlobalOptions        `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.IssueUpdate `yaml:",inline" json:",inline" figtree:",inline"`
+	Project              string            `yaml:"project,omitempty" json:"project,omitempty"`
+	IssueType            string            `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
+	Overrides            map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	Issue                string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdSubtaskRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
@@ -25,7 +25,6 @@ func CmdSubtaskRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEn
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("subtask"),
 		},
-		IssueType: "Sub-task",
 		Overrides: map[string]string{},
 	}
 
@@ -36,6 +35,9 @@ func CmdSubtaskRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEn
 		},
 		func(cmd *kingpin.CmdClause) error {
 			LoadConfigs(cmd, fig, &opts)
+			if opts.IssueType == "" {
+				opts.IssueType = "Sub-task"
+			}
 			return CmdSubtaskUsage(cmd, &opts)
 		},
 	}

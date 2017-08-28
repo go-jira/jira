@@ -14,10 +14,10 @@ import (
 )
 
 type RequestOptions struct {
-	GlobalOptions `yaml:",inline" figtree:",inline"`
-	Method        string
-	URI           string
-	Data          string
+	GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Method        string `yaml:"method,omitempty" json:"method,omitempty"`
+	URI           string `yaml:"uri,omitempty" json:"uri,omitempty"`
+	Data          string `yaml:"data,omitempty" json:"data,omitempty"`
 }
 
 func CmdRequestRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
@@ -25,7 +25,6 @@ func CmdRequestRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEn
 		GlobalOptions: GlobalOptions{
 			Template: figtree.NewStringOption("request"),
 		},
-		Method: "GET",
 	}
 
 	return &CommandRegistryEntry{
@@ -35,6 +34,9 @@ func CmdRequestRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEn
 		},
 		func(cmd *kingpin.CmdClause) error {
 			LoadConfigs(cmd, fig, &opts)
+			if opts.Method == "" {
+				opts.Method = "GET"
+			}
 			return CmdRequestUsage(cmd, &opts)
 		},
 	}

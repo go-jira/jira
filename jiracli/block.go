@@ -12,10 +12,10 @@ import (
 )
 
 type BlockOptions struct {
-	GlobalOptions             `yaml:",inline" figtree:",inline"`
-	jiradata.LinkIssueRequest `yaml:",inline" figtree:",inline"`
-	Blocker                   string
-	Issue                     string
+	GlobalOptions             `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
+	Blocker                   string `yaml:"blocker,omitempty" json:"blocker,omitempty"`
+	Issue                     string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdBlockRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
