@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"syscall"
 	"text/template"
@@ -69,10 +70,16 @@ func TemplateProcessor() *template.Template {
 		},
 		"termWidth": func() int {
 			w, _, err := terminal.GetSize(syscall.Stdout)
-			if err != nil {
-				return 80
+			if err == nil {
+				return w
 			}
-			return w
+			if os.Getenv("COLUMNS") != "" {
+				w, err = strconv.Atoi(os.Getenv("COLUMNS"))
+			}
+			if err == nil {
+				return w
+			}
+			return 120
 		},
 		"sub": func(a, b int) int {
 			return a - b
