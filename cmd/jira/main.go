@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime/debug"
 
 	"github.com/coryb/figtree"
@@ -305,6 +306,15 @@ func main() {
 		}
 		panic(jiracli.Exit{Code: 1})
 	})
+	if len(os.Args) > 1 {
+		// if first arg matches ISSUE-123 pattern then we assume it is a 'view' operation
+		if ok, err := regexp.MatchString("^[A-Z]+-[0-9]+$", os.Args[1]); err != nil {
+			log.Errorf("Invalid Regex: %s", err)
+		} else if ok {
+			// insert "view" at i=1 (2nd position)
+			os.Args = append(os.Args[:1], append([]string{"view"}, os.Args[1:]...)...)
+		}
+	}
 	if _, err := app.Parse(os.Args[1:]); err != nil {
 		ctx, _ := app.ParseContext(os.Args[1:])
 		if ctx != nil {
