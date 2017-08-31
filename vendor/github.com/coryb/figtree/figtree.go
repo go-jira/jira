@@ -357,7 +357,26 @@ func (f *FigTree) populateEnv(data interface{}) {
 	if options.Kind() == reflect.Ptr {
 		options = reflect.ValueOf(options.Elem().Interface())
 	}
-	if options.Kind() == reflect.Struct {
+	if options.Kind() == reflect.Map {
+		for _, key := range options.MapKeys() {
+			if strKey, ok := key.Interface().(string); ok {
+				// first chunk up string so that `foo-bar` becomes ["foo", "bar"]
+				parts := strings.FieldsFunc(strKey, func(r rune) bool {
+					return !unicode.IsLetter(r) && !unicode.IsNumber(r)
+				})
+				// now for each chunk split again on camelcase so ["fooBar", "baz"]
+				// becomes ["foo", "Bar", "baz"]
+				allParts := []string{}
+				for _, part := range parts {
+					allParts = append(allParts, camelcase.Split(part)...)
+				}
+
+				name := strings.Join(allParts, "_")
+				envName := fmt.Sprintf("%s_%s", f.EnvPrefix, strings.ToUpper(name))
+				os.Setenv(envName, fmt.Sprintf("%v", options.MapIndex(key).Interface()))
+			}
+		}
+	} else if options.Kind() == reflect.Struct {
 		for i := 0; i < options.NumField(); i++ {
 			structField := options.Type().Field(i)
 			// PkgPath is empty for upper case (exported) field names.

@@ -8,6 +8,7 @@ import (
 	"runtime/debug"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/kingpeon"
 	"github.com/coryb/oreo"
 
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
@@ -279,6 +280,22 @@ func main() {
 	}
 
 	jiracli.Register(app, registry)
+
+	// register custom commands
+	data := struct {
+		CustomCommands kingpeon.DynamicCommands `yaml:"custom-commands" json":custom-commands"`
+	}{}
+
+	if err := fig.LoadAllConfigs("config.yml", &data); err != nil {
+		log.Errorf("%s", err)
+		panic(jiracli.Exit{Code: 1})
+	}
+
+	if len(data.CustomCommands) > 0 {
+		tmp := map[string]interface{}{}
+		fig.LoadAllConfigs("config.yml", &tmp)
+		kingpeon.RegisterDynamicCommands(app, data.CustomCommands, jiracli.TemplateProcessor())
+	}
 
 	app.Terminate(func(status int) {
 		for _, arg := range os.Args {
