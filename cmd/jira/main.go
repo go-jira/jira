@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime/debug"
+	"strconv"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/kingpeon"
@@ -31,6 +32,14 @@ func handleExit() {
 			fmt.Fprintf(os.Stderr, "%s\n%s", e, debug.Stack())
 			os.Exit(1)
 		}
+	}
+}
+
+func increaseLogLevel(verbosity int) {
+	logging.SetLevel(logging.GetLevel("")+logging.Level(verbosity), "")
+	if logging.GetLevel("") > logging.DEBUG {
+		oreo.TraceRequestBody = true
+		oreo.TraceResponseBody = true
 	}
 }
 
@@ -59,14 +68,18 @@ func main() {
 		panic(jiracli.Exit{Code: 0})
 	})
 
+	var verbosity int
 	app.Flag("verbose", "Increase verbosity for debugging").Short('v').PreAction(func(_ *kingpin.ParseContext) error {
-		logging.SetLevel(logging.GetLevel("")+1, "")
-		if logging.GetLevel("") > logging.DEBUG {
-			oreo.TraceRequestBody = true
-			oreo.TraceResponseBody = true
-		}
+		os.Setenv("JIRA_DEBUG", fmt.Sprintf("%s", verbosity))
+		increaseLogLevel(1)
 		return nil
-	}).Counter()
+	}).CounterVar(&verbosity)
+
+	if os.Getenv("JIRA_DEBUG") != "" {
+		if verbosity, err := strconv.Atoi(os.Getenv("JIRA_DEBUG")); err == nil {
+			increaseLogLevel(verbosity)
+		}
+	}
 
 	fig := figtree.NewFigTree()
 	fig.EnvPrefix = "JIRA"
