@@ -1,5 +1,5 @@
-hash: 832776d030ce571aae3c187a399b4ebbf86d1b887f9d3779b29c1c2434cb30e6
-updated: 2017-08-20T22:37:55.734545077-05:00
+hash: 3e4ada7ae3922b18b3492a45f1f31cdaaf68fa708327ce9b4f9730c3f0b3ca90
+updated: 2017-08-30T18:15:39.909557691-07:00
 imports:
 - name: github.com/AlecAivazis/survey
   version: 73fd4d7829877a72e03dbb42f84ed383fbbc5fa0
@@ -17,7 +17,9 @@ imports:
   subpackages:
   - generic
 - name: github.com/coryb/figtree
-  version: a2b3fe20e721fd0b946cb5d5c434d667c22b480e
+  version: 48d3afc6118a0c353dc7d41ff77a3e0b75e14c07
+- name: github.com/coryb/kingpeon
+  version: 9b3d033f8a17e6b66af6123ec776bd93c19234cb
 - name: github.com/coryb/oreo
   version: b59de1c7ff7fe9e084278487f69a07cb667de9b3
 - name: github.com/fatih/camelcase
@@ -42,6 +44,10 @@ imports:
   version: 6de226b0d5f040ed85b88c82c381709b98277f3d
 - name: github.com/tmc/keyring
   version: 39227cc0349f1b69956c23aa1f679eefd17ebae0
+- name: golang.org/x/crypto
+  version: 7f7c0c2d75ebb4e32a21396ce36e87b6dadc91c9
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/sys
   version: e24f485414aeafb646f6fca458b0bf869c0880a1
   subpackages:

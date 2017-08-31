@@ -10,11 +10,12 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"syscall"
 	"text/template"
 
-	yaml "gopkg.in/coryb/yaml.v2"
-
 	"github.com/mgutz/ansi"
+	"golang.org/x/crypto/ssh/terminal"
+	yaml "gopkg.in/coryb/yaml.v2"
 )
 
 func findTemplate(name string) ([]byte, error) {
@@ -57,17 +58,7 @@ func tmpTemplate(templateName string, data interface{}) (string, error) {
 	return tmpFile.Name(), runTemplate(templateName, data, tmpFile)
 }
 
-func runTemplate(templateName string, data interface{}, out io.Writer) error {
-
-	templateContent, err := getTemplate(templateName)
-	if err != nil {
-		return err
-	}
-
-	if out == nil {
-		out = os.Stdout
-	}
-
+func TemplateProcessor() *template.Template {
 	funcs := map[string]interface{}{
 		"toJson": func(content interface{}) (string, error) {
 			bytes, err := json.MarshalIndent(content, "", "    ")
@@ -75,6 +66,16 @@ func runTemplate(templateName string, data interface{}, out io.Writer) error {
 				return "", err
 			}
 			return string(bytes), nil
+		},
+		"termWidth": func() int {
+			w, _, err := terminal.GetSize(syscall.Stdout)
+			if err != nil {
+				return 80
+			}
+			return w
+		},
+		"sub": func(a, b int) int {
+			return a - b
 		},
 		"append": func(more string, content interface{}) (string, error) {
 			switch value := content.(type) {
@@ -144,6 +145,19 @@ func runTemplate(templateName string, data interface{}, out io.Writer) error {
 			return dateFormat(format, content)
 		},
 	}
+	return template.New("gojira").Funcs(funcs)
+}
+
+func runTemplate(templateName string, data interface{}, out io.Writer) error {
+
+	templateContent, err := getTemplate(templateName)
+	if err != nil {
+		return err
+	}
+
+	if out == nil {
+		out = os.Stdout
+	}
 
 	// HACK HACK HACK: convert data formats to json for backwards compatibilty with templates
 	var rawData interface{}
@@ -162,12 +176,8 @@ func runTemplate(templateName string, data interface{}, out io.Writer) error {
 			return err
 		}
 	}
-	// rawData, err = yamlFixup(rawData)
-	// if err != nil {
-	// 	return err
-	// }
 
-	tmpl, err := template.New("template").Funcs(funcs).Parse(templateContent)
+	tmpl, err := TemplateProcessor().Parse(templateContent)
 	if err != nil {
 		return err
 	}
@@ -205,13 +215,14 @@ const defaultDebugTemplate = "{{ . | toJson}}\n"
 
 const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
 
-const defaultTableTemplate = `+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
-| {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf "%-55s" }} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
-+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+const defaultTableTemplate = `{{/* table template */ -}}{{$w := sub termWidth 92}}
++{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+| {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf (printf "%%-%ds" (sub $w 2)) }} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
++{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 {{ range .issues -}}
-  | {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev 55 | printf "%-55s" }} | {{.fields.priority.name | printf "%-12s" }} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned> {{end}} |
+  | {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev (sub $w 2) | printf (printf "%%-%ds" (sub $w 2)) }} | {{.fields.priority.name | printf "%-12s" }} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned>{{end}} |
 {{ end -}}
-+{{ "-" | rep 16 }}+{{ "-" | rep 57 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
++{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 `
 
 const defaultViewTemplate = `{{/* view template */ -}}
