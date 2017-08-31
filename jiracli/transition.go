@@ -31,6 +31,7 @@ func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition stri
 	help := "Transition issue to given state"
 	if transition == "" {
 		help = fmt.Sprintf("Transition issue to %s state", transition)
+		opts.SkipEditing = figtree.NewBoolOption(true)
 	}
 
 	return &CommandRegistryEntry{
@@ -54,6 +55,7 @@ func CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
 	}
 	BrowseUsage(cmd, &opts.GlobalOptions)
 	TemplateUsage(cmd, &opts.GlobalOptions)
+	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = flagValue(ctx, "comment")
 		return nil
