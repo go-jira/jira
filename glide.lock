@@ -21,7 +21,7 @@ imports:
 - name: github.com/coryb/kingpeon
   version: 9b3d033f8a17e6b66af6123ec776bd93c19234cb
 - name: github.com/coryb/oreo
-  version: b59de1c7ff7fe9e084278487f69a07cb667de9b3
+  version: 95687d61c95ee1522c1140e2af59b0c1846abfc1
 - name: github.com/fatih/camelcase
   version: f6a740d52f961c60348ebb109adde9f4635d7540
 - name: github.com/guelfey/go.dbus
