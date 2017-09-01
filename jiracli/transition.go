@@ -29,7 +29,7 @@ func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition stri
 	}
 
 	help := "Transition issue to given state"
-	if transition == "" {
+	if transition != "" {
 		help = fmt.Sprintf("Transition issue to %s state", transition)
 		opts.SkipEditing = figtree.NewBoolOption(true)
 	}
