@@ -2,6 +2,7 @@ package jiracli
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
@@ -9,6 +10,7 @@ import (
 	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
+	yaml "gopkg.in/coryb/yaml.v2"
 )
 
 type CreateOptions struct {
@@ -17,6 +19,7 @@ type CreateOptions struct {
 	Project              string            `yaml:"project,omitempty" json:"project,omitempty"`
 	IssueType            string            `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
 	Overrides            map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	SaveFile             string            `yaml:"savefile,omitempty" json:"savefile,omitempty"`
 }
 
 func CmdCreateRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
@@ -54,6 +57,7 @@ func CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) error {
 		return nil
 	}).String()
 	cmd.Flag("override", "Set issue property").Short('o').StringMapVar(&opts.Overrides)
+	cmd.Flag("saveFile", "Write issue as yaml to file").StringVar(&opts.SaveFile)
 	return nil
 }
 
@@ -92,6 +96,22 @@ func CmdCreate(o *oreo.Client, opts *CreateOptions) error {
 	}
 
 	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, opts.Endpoint.Value, issueResp.Key)
+
+	if opts.SaveFile != "" {
+		fh, err := os.Create(opts.SaveFile)
+		if err != nil {
+			return err
+		}
+		defer fh.Close()
+		out, err := yaml.Marshal(map[string]string{
+			"issue": issueResp.Key,
+			"link":  fmt.Sprintf("%s/browse/%s", opts.Endpoint.Value, issueResp.Key),
+		})
+		if err != nil {
+			return err
+		}
+		fh.Write(out)
+	}
 
 	if opts.Browse.Value {
 		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
