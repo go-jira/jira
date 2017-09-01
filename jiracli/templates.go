@@ -222,7 +222,8 @@ const defaultDebugTemplate = "{{ . | toJson}}\n"
 
 const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
 
-const defaultTableTemplate = `{{/* table template */ -}}{{$w := sub termWidth 92}}
+const defaultTableTemplate = `{{/* table template */ -}}
+{{$w := sub termWidth 92 -}}
 +{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 | {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf (printf "%%-%ds" (sub $w 2)) }} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
 +{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
