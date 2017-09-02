@@ -72,12 +72,12 @@ func CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
 func CmdTransition(o *oreo.Client, opts *TransitionOptions) error {
 	issueData, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, nil)
 	if err != nil {
-		return err
+		return cliError(err)
 	}
 
 	meta, err := jira.GetIssueTransitions(o, opts.Endpoint.Value, opts.Issue)
 	if err != nil {
-		return err
+		return cliError(err)
 	}
 	transMeta := meta.Transitions.Find(opts.Transition)
 
@@ -89,10 +89,10 @@ func CmdTransition(o *oreo.Client, opts *TransitionOptions) error {
 
 		if status, ok := issueData.Fields["status"].(map[string]interface{}); ok {
 			if name, ok := status["name"].(string); ok {
-				return fmt.Errorf("Invalid Transition %q from %q, Available: %s", opts.Transition, name, strings.Join(possible, ", "))
+				return cliError(fmt.Errorf("Invalid Transition %q from %q, Available: %s", opts.Transition, name, strings.Join(possible, ", ")))
 			}
 		}
-		return fmt.Errorf("No valid transition found matching %s", opts.Transition)
+		return cliError(fmt.Errorf("No valid transition found matching %s", opts.Transition))
 	}
 
 	// need to default the Resolution, usually Fixed works but sometime need Done
@@ -131,7 +131,7 @@ func CmdTransition(o *oreo.Client, opts *TransitionOptions) error {
 		return jira.TransitionIssue(o, opts.Endpoint.Value, opts.Issue, &issueUpdate)
 	})
 	if err != nil {
-		return err
+		return cliError(err)
 	}
 	fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, opts.Endpoint.Value, issueData.Key)
 
