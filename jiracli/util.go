@@ -50,7 +50,7 @@ func tmpYml(tmpFilePrefix string) (*os.File, error) {
 	return os.OpenFile(newFileName, os.O_RDWR|os.O_EXCL, 0600)
 }
 
-func flagValue(ctx *kingpin.ParseContext, name string) string {
+func FlagValue(ctx *kingpin.ParseContext, name string) string {
 	for _, elem := range ctx.Elements {
 		if flag, ok := elem.Clause.(*kingpin.FlagClause); ok {
 			if flag.Model().Name == name {

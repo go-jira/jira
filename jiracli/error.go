@@ -6,7 +6,7 @@ type Error struct {
 	error
 }
 
-func cliError(cause error) error {
+func CliError(cause error) error {
 	return &Error{
 		errors.WithStack(cause),
 	}

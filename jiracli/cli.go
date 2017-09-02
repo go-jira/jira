@@ -187,7 +187,7 @@ func (o *GlobalOptions) editFile(fileName string) (changes bool, err error) {
 	return false, err
 }
 
-func editLoop(opts *GlobalOptions, input interface{}, output interface{}, submit func() error) error {
+func EditLoop(opts *GlobalOptions, input interface{}, output interface{}, submit func() error) error {
 	tmpFile, err := tmpTemplate(opts.Template.Value, input)
 	if err != nil {
 		return err

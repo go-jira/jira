@@ -44,7 +44,7 @@ func getTemplate(name string) (string, error) {
 	} else if b != nil {
 		return string(b), nil
 	}
-	if s, ok := allTemplates[name]; ok {
+	if s, ok := AllTemplates[name]; ok {
 		return s, nil
 	}
 	return "", fmt.Errorf("No Template found for %q", name)
@@ -56,7 +56,7 @@ func tmpTemplate(templateName string, data interface{}) (string, error) {
 		return "", err
 	}
 	defer tmpFile.Close()
-	return tmpFile.Name(), runTemplate(templateName, data, tmpFile)
+	return tmpFile.Name(), RunTemplate(templateName, data, tmpFile)
 }
 
 func TemplateProcessor() *template.Template {
@@ -155,7 +155,7 @@ func TemplateProcessor() *template.Template {
 	return template.New("gojira").Funcs(funcs)
 }
 
-func runTemplate(templateName string, data interface{}, out io.Writer) error {
+func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 
 	templateContent, err := getTemplate(templateName)
 	if err != nil {
@@ -194,7 +194,7 @@ func runTemplate(templateName string, data interface{}, out io.Writer) error {
 	return nil
 }
 
-var allTemplates = map[string]string{
+var AllTemplates = map[string]string{
 	"component-add":  defaultComponentAddTemplate,
 	"debug":          defaultDebugTemplate,
 	"fields":         defaultDebugTemplate,
