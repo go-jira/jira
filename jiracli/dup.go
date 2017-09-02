@@ -90,7 +90,6 @@ func CmdDup(o *oreo.Client, opts *DupOptions) error {
 		}
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, opts.Endpoint.Value, opts.OutwardIssue.Key)
 	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, opts.Endpoint.Value, opts.InwardIssue.Key)
 
 	if opts.Browse.Value {
