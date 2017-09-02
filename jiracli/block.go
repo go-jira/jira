@@ -14,8 +14,6 @@ import (
 type BlockOptions struct {
 	GlobalOptions             `yaml:",inline" json:",inline" figtree:",inline"`
 	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
-	Blocker                   string `yaml:"blocker,omitempty" json:"blocker,omitempty"`
-	Issue                     string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
 func CmdBlockRegistry(fig *figtree.FigTree, o *oreo.Client) *CommandRegistryEntry {
@@ -69,12 +67,12 @@ func CmdBlock(o *oreo.Client, opts *BlockOptions) error {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Blocker, opts.Endpoint.Value, opts.Blocker)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, opts.Endpoint.Value, opts.InwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, opts.Endpoint.Value, opts.OutwardIssue.Key)
 
 	if opts.Browse.Value {
-		if err := CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue}); err != nil {
-			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Blocker})
+		if err := CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key}); err != nil {
+			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key})
 		}
 	}
 
