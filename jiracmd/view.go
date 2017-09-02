@@ -9,36 +9,33 @@ import (
 )
 
 type ViewOptions struct {
-	jiracli.GlobalOptions     `yaml:",inline" json:",inline" figtree:",inline"`
-	jira.IssueOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Issue             string `yaml:"issue,omitempty" json:"issue,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	jira.IssueOptions     `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdViewRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdViewRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := ViewOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("view"),
 		},
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"Prints issue details",
-		func() error {
-			return CmdView(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdViewUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdView(o, globals, &opts)
 		},
 	}
 }
 
 func CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("expand", "field to expand for the issue").StringsVar(&opts.Expand)
 	cmd.Flag("field", "field to return for the issue").StringsVar(&opts.Fields)
 	cmd.Flag("property", "property to return for issue").StringsVar(&opts.Properties)
@@ -47,8 +44,8 @@ func CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error {
 }
 
 // View will get issue data and send to "view" template
-func CmdView(o *oreo.Client, opts *ViewOptions) error {
-	data, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, opts)
+func CmdView(o *oreo.Client, globals *jiracli.GlobalOptions, opts *ViewOptions) error {
+	data, err := jira.GetIssue(o, globals.Endpoint.Value, opts.Issue, opts)
 	if err != nil {
 		return err
 	}
@@ -56,7 +53,7 @@ func CmdView(o *oreo.Client, opts *ViewOptions) error {
 		return err
 	}
 	if opts.Browse.Value {
-		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(globals, opts.Issue)
 	}
 	return nil
 }

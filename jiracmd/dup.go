@@ -13,15 +13,15 @@ import (
 )
 
 type DupOptions struct {
-	jiracli.GlobalOptions             `yaml:",inline" json:",inline" figtree:",inline"`
+	jiracli.CommonOptions     `yaml:",inline" json:",inline" figtree:",inline"`
 	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
 	Duplicate                 string `yaml:"duplicate,omitempty" json:"duplicate,omitempty"`
 	Issue                     string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdDupRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdDupRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := DupOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("edit"),
 		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
@@ -35,23 +35,20 @@ func CmdDupRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegist
 
 	return &jiracli.CommandRegistryEntry{
 		"Mark issues as duplicate",
-		func() error {
-			return CmdDup(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdDupUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdDup(o, globals, &opts)
 		},
 	}
 }
 
 func CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
-	jiracli.EditorUsage(cmd, &opts.GlobalOptions)
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	jiracli.EditorUsage(cmd, &opts.CommonOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("comment", "Comment message when marking issue as duplicate").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Comment = &jiradata.Comment{
 			Body: jiracli.FlagValue(ctx, "comment"),
@@ -65,13 +62,13 @@ func CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
 
 // CmdDups will update the given issue as being a duplicate by the given dup issue
 // and will attempt to resolve the dup issue
-func CmdDup(o *oreo.Client, opts *DupOptions) error {
-	if err := jira.LinkIssues(o, opts.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
+func CmdDup(o *oreo.Client, globals *jiracli.GlobalOptions, opts *DupOptions) error {
+	if err := jira.LinkIssues(o, globals.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
 		return err
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, opts.Endpoint.Value, opts.OutwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, globals.Endpoint.Value, opts.OutwardIssue.Key)
 
-	meta, err := jira.GetIssueTransitions(o, opts.Endpoint.Value, opts.InwardIssue.Key)
+	meta, err := jira.GetIssueTransitions(o, globals.Endpoint.Value, opts.InwardIssue.Key)
 	if err != nil {
 		return err
 	}
@@ -81,7 +78,7 @@ func CmdDup(o *oreo.Client, opts *DupOptions) error {
 			issueUpdate := jiradata.IssueUpdate{
 				Transition: transMeta,
 			}
-			if err = jira.TransitionIssue(o, opts.Endpoint.Value, opts.InwardIssue.Key, &issueUpdate); err != nil {
+			if err = jira.TransitionIssue(o, globals.Endpoint.Value, opts.InwardIssue.Key, &issueUpdate); err != nil {
 				return err
 			}
 			// if we just started the issue now we need to stop it
@@ -91,11 +88,11 @@ func CmdDup(o *oreo.Client, opts *DupOptions) error {
 		}
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, opts.Endpoint.Value, opts.InwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, globals.Endpoint.Value, opts.InwardIssue.Key)
 
 	if opts.Browse.Value {
-		if err := CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key}); err != nil {
-			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key})
+		if err := CmdBrowse(globals, opts.OutwardIssue.Key); err != nil {
+			return CmdBrowse(globals, opts.InwardIssue.Key)
 		}
 	}
 

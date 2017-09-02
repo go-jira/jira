@@ -9,36 +9,22 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-type BrowseOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
-}
-
-func CmdBrowseRegistry(fig *figtree.FigTree) *jiracli.CommandRegistryEntry {
-	opts := BrowseOptions{}
+func CmdBrowseRegistry() *jiracli.CommandRegistryEntry {
+	issue := ""
 
 	return &jiracli.CommandRegistryEntry{
 		"Open issue in browser",
-		func() error {
-			return CmdBrowse(&opts)
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
+			cmd.Arg("ISSUE", "Issue to browse to").Required().StringVar(&issue)
+			return nil
 		},
-		func(cmd *kingpin.CmdClause) error {
-			jiracli.LoadConfigs(cmd, fig, &opts)
-			return CmdBrowseUsage(cmd, &opts)
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdBrowse(globals, issue)
 		},
 	}
-}
-
-func CmdBrowseUsage(cmd *kingpin.CmdClause, opts *BrowseOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	cmd.Arg("ISSUE", "Issue to browse to").Required().StringVar(&opts.Issue)
-
-	return nil
 }
 
 // CmdBrowse open the default system browser to the provided issue
-func CmdBrowse(opts *BrowseOptions) error {
-	return browser.OpenURL(fmt.Sprintf("%s/browse/%s", opts.Endpoint.Value, opts.Issue))
+func CmdBrowse(globals *jiracli.GlobalOptions, issue string) error {
+	return browser.OpenURL(fmt.Sprintf("%s/browse/%s", globals.Endpoint.Value, issue))
 }

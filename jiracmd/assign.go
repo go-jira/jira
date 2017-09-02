@@ -5,38 +5,34 @@ import (
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
-
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 type AssignOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Issue         string `yaml:"issue,omitempty" json:"issue,omitempty"`
-	Assignee      string `yaml:"assignee,omitempty" json:"assignee,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Assignee              string `yaml:"assignee,omitempty" json:"assignee,omitempty"`
 }
 
-func CmdAssignRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdAssignRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := AssignOptions{}
 
 	return &jiracli.CommandRegistryEntry{
 		"Assign user to issue",
-		func() error {
-			return CmdAssign(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdAssignUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdAssign(o, globals, &opts)
 		},
 	}
 }
 
 func CmdAssignUsage(cmd *kingpin.CmdClause, opts *AssignOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("default", "use default user for assignee").PreAction(func(ctx *kingpin.ParseContext) error {
 		if jiracli.FlagValue(ctx, "default") == "true" {
 			opts.Assignee = "-1"
@@ -49,16 +45,16 @@ func CmdAssignUsage(cmd *kingpin.CmdClause, opts *AssignOptions) error {
 }
 
 // CmdAssign will assign an issue to a user
-func CmdAssign(o *oreo.Client, opts *AssignOptions) error {
-	err := jira.IssueAssign(o, opts.Endpoint.Value, opts.Issue, opts.Assignee)
+func CmdAssign(o *oreo.Client, globals *jiracli.GlobalOptions, opts *AssignOptions) error {
+	err := jira.IssueAssign(o, globals.Endpoint.Value, opts.Issue, opts.Assignee)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
 
 	if opts.Browse.Value {
-		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(globals, opts.Issue)
 	}
 
 	return nil

@@ -19,34 +19,31 @@ const (
 )
 
 type VoteOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Issue         string     `yaml:"issue,omitempty" json:"issue,omitempty"`
-	Action        VoteAction `yaml:"-" json:"-"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue                 string     `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Action                VoteAction `yaml:"-" json:"-"`
 }
 
-func CmdVoteRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdVoteRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := VoteOptions{
-		GlobalOptions: jiracli.GlobalOptions{},
+		CommonOptions: jiracli.CommonOptions{},
 		Action:        VoteUP,
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"Vote up/down an issue",
-		func() error {
-			return CmdVote(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdVoteUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdVote(o, globals, &opts)
 		},
 	}
 }
 
 func CmdVoteUsage(cmd *kingpin.CmdClause, opts *VoteOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("down", "downvote the issue").Short('d').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Action = VoteDown
 		return nil
@@ -56,20 +53,20 @@ func CmdVoteUsage(cmd *kingpin.CmdClause, opts *VoteOptions) error {
 }
 
 // Vote will up/down vote an issue
-func CmdVote(o *oreo.Client, opts *VoteOptions) error {
+func CmdVote(o *oreo.Client, globals *jiracli.GlobalOptions, opts *VoteOptions) error {
 	if opts.Action == VoteUP {
-		if err := jira.IssueAddVote(o, opts.Endpoint.Value, opts.Issue); err != nil {
+		if err := jira.IssueAddVote(o, globals.Endpoint.Value, opts.Issue); err != nil {
 			return err
 		}
 	} else {
-		if err := jira.IssueRemoveVote(o, opts.Endpoint.Value, opts.Issue); err != nil {
+		if err := jira.IssueRemoveVote(o, globals.Endpoint.Value, opts.Issue); err != nil {
 			return err
 		}
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
 
 	if opts.Browse.Value {
-		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(globals, opts.Issue)
 	}
 	return nil
 }

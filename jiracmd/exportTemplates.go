@@ -15,20 +15,20 @@ type ExportTemplatesOptions struct {
 	Dir      string `yaml:"dir,omitempty" json:"dir,omitempty"`
 }
 
-func CmdExportTemplatesRegistry(fig *figtree.FigTree) *jiracli.CommandRegistryEntry {
+func CmdExportTemplatesRegistry() *jiracli.CommandRegistryEntry {
 	opts := ExportTemplatesOptions{}
 
 	return &jiracli.CommandRegistryEntry{
 		"Export templates for customizations",
-		func() error {
-			return CmdExportTemplates(&opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			if opts.Dir == "" {
 				opts.Dir = fmt.Sprintf("%s/.jira.d/templates", jiracli.Homedir())
 			}
 			return CmdExportTemplatesUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdExportTemplates(&opts)
 		},
 	}
 }

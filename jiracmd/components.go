@@ -12,45 +12,42 @@ import (
 )
 
 type ComponentsOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Project       string `yaml:"project,omitempty" json:"project,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 }
 
-func CmdComponentsRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdComponentsRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := ComponentsOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("components"),
 		},
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"Show components for a project",
-		func() error {
-			return CmdComponents(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdComponentsUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdComponents(o, globals, &opts)
 		},
 	}
 }
 
 func CmdComponentsUsage(cmd *kingpin.CmdClause, opts *ComponentsOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("project", "project to list components").Short('p').StringVar(&opts.Project)
 
 	return nil
 }
 
 // CmdComponents will get available components for project and send to the  "components" template
-func CmdComponents(o *oreo.Client, opts *ComponentsOptions) error {
+func CmdComponents(o *oreo.Client, globals *jiracli.GlobalOptions, opts *ComponentsOptions) error {
 	if opts.Project == "" {
 		return fmt.Errorf("Project Required.")
 	}
-	data, err := jira.GetProjectComponents(o, opts.Endpoint.Value, opts.Project)
+	data, err := jira.GetProjectComponents(o, globals.Endpoint.Value, opts.Project)
 	if err != nil {
 		return err
 	}

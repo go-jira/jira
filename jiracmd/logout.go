@@ -11,28 +11,28 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdLogoutRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
-	opts := jiracli.GlobalOptions{}
+func CmdLogoutRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+	opts := jiracli.CommonOptions{}
 	return &jiracli.CommandRegistryEntry{
 		"Deactivate sesssion with Jira server",
-		func() error {
-			return CmdLogout(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			return jiracli.GlobalUsage(cmd, &opts)
+			return nil
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdLogout(o, globals, &opts)
 		},
 	}
 }
 
 // CmdLogout will attempt to terminate an active Jira session
-func CmdLogout(o *oreo.Client, opts *jiracli.GlobalOptions) error {
+func CmdLogout(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
 	ua := o.WithoutRedirect().WithRetries(0).WithoutCallbacks()
-	err := jira.DeleteSession(ua, opts.Endpoint.Value)
+	err := jira.DeleteSession(ua, globals.Endpoint.Value)
 	if err == nil {
-		fmt.Println(ansi.Color("OK", "green"), "Terminated session for", opts.User)
+		fmt.Println(ansi.Color("OK", "green"), "Terminated session for", globals.User)
 	} else {
-		fmt.Printf("%s Failed to terminate session for %s: %s", ansi.Color("ERROR", "red"), opts.User, err)
+		fmt.Printf("%s Failed to terminate session for %s: %s", ansi.Color("ERROR", "red"), globals.User, err)
 	}
 	return nil
 }

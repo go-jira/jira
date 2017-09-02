@@ -9,46 +9,43 @@ import (
 )
 
 type CreateMetaOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Project       string `yaml:"project,omitempty" json:"project,omitempty"`
-	IssueType     string `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
+	IssueType             string `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
 }
 
-func CmdCreateMetaRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdCreateMetaRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := CreateMetaOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("createmeta"),
 		},
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"View 'create' metadata",
-		func() error {
-			return CmdCreateMeta(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdCreateMetaUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdCreateMeta(o, globals, &opts)
 		},
 	}
 }
 
 func CmdCreateMetaUsage(cmd *kingpin.CmdClause, opts *CreateMetaOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("project", "project to fetch create metadata").Short('p').StringVar(&opts.Project)
 	cmd.Flag("issuetype", "issuetype in project to fetch create metadata").Short('i').StringVar(&opts.IssueType)
 	return nil
 }
 
 // Create will get issue create metadata and send to "createmeta" template
-func CmdCreateMeta(o *oreo.Client, opts *CreateMetaOptions) error {
-	if err := defaultIssueType(o, opts.Endpoint.Value, &opts.Project, &opts.IssueType); err != nil {
+func CmdCreateMeta(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateMetaOptions) error {
+	if err := defaultIssueType(o, globals.Endpoint.Value, &opts.Project, &opts.IssueType); err != nil {
 		return err
 	}
-	createMeta, err := jira.GetIssueCreateMetaIssueType(o, opts.Endpoint.Value, opts.Project, opts.IssueType)
+	createMeta, err := jira.GetIssueCreateMetaIssueType(o, globals.Endpoint.Value, opts.Project, opts.IssueType)
 	if err != nil {
 		return err
 	}

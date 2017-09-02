@@ -8,34 +8,31 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdIssueLinkTypesRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
-	opts := jiracli.GlobalOptions{
+func CmdIssueLinkTypesRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+	opts := jiracli.CommonOptions{
 		Template: figtree.NewStringOption("issuelinktypes"),
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"Show the issue link types",
-		func() error {
-			return CmdIssueLinkTypes(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdIssueLinkTypesUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdIssueLinkTypes(o, globals, &opts)
 		},
 	}
 }
 
-func CmdIssueLinkTypesUsage(cmd *kingpin.CmdClause, opts *jiracli.GlobalOptions) error {
-	if err := jiracli.GlobalUsage(cmd, opts); err != nil {
-		return err
-	}
+func CmdIssueLinkTypesUsage(cmd *kingpin.CmdClause, opts *jiracli.CommonOptions) error {
 	jiracli.TemplateUsage(cmd, opts)
 	return nil
 }
 
 // CmdIssueLinkTypes will get issue link type data and send to "issuelinktypes" template
-func CmdIssueLinkTypes(o *oreo.Client, opts *jiracli.GlobalOptions) error {
-	data, err := jira.GetIssueLinkTypes(o, opts.Endpoint.Value)
+func CmdIssueLinkTypes(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
+	data, err := jira.GetIssueLinkTypes(o, globals.Endpoint.Value)
 	if err != nil {
 		return err
 	}

@@ -26,19 +26,22 @@ type Exit struct {
 }
 
 type GlobalOptions struct {
-	Browse         figtree.BoolOption   `json:"browse,omitempty" yaml:"browse,omitempty"`
-	Editor         figtree.StringOption `json:"editor,omitempty" yaml:"editor,omitempty"`
 	Endpoint       figtree.StringOption `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
-	SkipEditing    figtree.BoolOption   `json:"noedit,omitempty" yaml:"noedit,omitempty"`
-	PasswordSource figtree.StringOption `json:"password-source,omitempty" yaml:"password-source,omitempty"`
-	Template       figtree.StringOption `json:"template,omitempty" yaml:"template,omitempty"`
 	User           figtree.StringOption `json:"user,omitempty" yaml:"user,omitempty"`
+	PasswordSource figtree.StringOption `json:"password-source,omitempty" yaml:"password-source,omitempty"`
+}
+
+type CommonOptions struct {
+	Browse      figtree.BoolOption   `json:"browse,omitempty" yaml:"browse,omitempty"`
+	Editor      figtree.StringOption `json:"editor,omitempty" yaml:"editor,omitempty"`
+	SkipEditing figtree.BoolOption   `json:"noedit,omitempty" yaml:"noedit,omitempty"`
+	Template    figtree.StringOption `json:"template,omitempty" yaml:"template,omitempty"`
 }
 
 type CommandRegistryEntry struct {
 	Help        string
-	ExecuteFunc func() error
-	UsageFunc   func(*kingpin.CmdClause) error
+	UsageFunc   func(*figtree.FigTree, *kingpin.CmdClause) error
+	ExecuteFunc func(*GlobalOptions) error
 }
 
 type CommandRegistry struct {
@@ -54,7 +57,13 @@ type kingpinAppOrCommand interface {
 	GetCommand(string) *kingpin.CmdClause
 }
 
-func Register(app *kingpin.Application, reg []CommandRegistry) {
+func Register(app *kingpin.Application, fig *figtree.FigTree, reg []CommandRegistry) {
+	globals := GlobalOptions{
+		User: figtree.NewStringOption(os.Getenv("USER")),
+	}
+	app.Flag("endpoint", "Base URI to use for Jira").Short('e').SetValue(&globals.Endpoint)
+	app.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&globals.User)
+
 	for _, command := range reg {
 		copy := command
 		commandFields := strings.Fields(copy.Command)
@@ -70,6 +79,8 @@ func Register(app *kingpin.Application, reg []CommandRegistry) {
 		}
 
 		cmd := appOrCmd.Command(commandFields[len(commandFields)-1], copy.Entry.Help)
+		LoadConfigs(cmd, fig, &globals)
+
 		for _, alias := range copy.Aliases {
 			cmd = cmd.Alias(alias)
 		}
@@ -77,27 +88,15 @@ func Register(app *kingpin.Application, reg []CommandRegistry) {
 			cmd = cmd.Default()
 		}
 		if copy.Entry.UsageFunc != nil {
-			copy.Entry.UsageFunc(cmd)
+			copy.Entry.UsageFunc(fig, cmd)
 		}
 
 		cmd.Action(
 			func(_ *kingpin.ParseContext) error {
-				return copy.Entry.ExecuteFunc()
+				return copy.Entry.ExecuteFunc(&globals)
 			},
 		)
 	}
-}
-
-func GlobalUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) error {
-	cmd.PreAction(func(_ *kingpin.ParseContext) error {
-		if opts.User.Value == "" {
-			opts.User = figtree.NewStringOption(os.Getenv("USER"))
-		}
-		return nil
-	})
-	cmd.Flag("endpoint", "Base URI to use for Jira").Short('e').SetValue(&opts.Endpoint)
-	cmd.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&opts.User)
-	return nil
 }
 
 func LoadConfigs(cmd *kingpin.CmdClause, fig *figtree.FigTree, opts interface{}) {
@@ -112,19 +111,19 @@ func LoadConfigs(cmd *kingpin.CmdClause, fig *figtree.FigTree, opts interface{})
 	})
 }
 
-func BrowseUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
+func BrowseUsage(cmd *kingpin.CmdClause, opts *CommonOptions) {
 	cmd.Flag("browse", "Open issue(s) in browser after operation").Short('b').SetValue(&opts.Browse)
 }
 
-func EditorUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
+func EditorUsage(cmd *kingpin.CmdClause, opts *CommonOptions) {
 	cmd.Flag("editor", "Editor to use").SetValue(&opts.Editor)
 }
 
-func TemplateUsage(cmd *kingpin.CmdClause, opts *GlobalOptions) {
+func TemplateUsage(cmd *kingpin.CmdClause, opts *CommonOptions) {
 	cmd.Flag("template", "Template to use for output").Short('t').SetValue(&opts.Template)
 }
 
-func (o *GlobalOptions) editFile(fileName string) (changes bool, err error) {
+func (o *CommonOptions) editFile(fileName string) (changes bool, err error) {
 	var editor string
 	for _, ed := range []string{o.Editor.Value, os.Getenv("JIRA_EDITOR"), os.Getenv("EDITOR"), "vim"} {
 		if ed != "" {
@@ -187,7 +186,7 @@ func (o *GlobalOptions) editFile(fileName string) (changes bool, err error) {
 	return false, err
 }
 
-func EditLoop(opts *GlobalOptions, input interface{}, output interface{}, submit func() error) error {
+func EditLoop(opts *CommonOptions, input interface{}, output interface{}, submit func() error) error {
 	tmpFile, err := tmpTemplate(opts.Template.Value, input)
 	if err != nil {
 		return err

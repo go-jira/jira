@@ -12,16 +12,16 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdLoginRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
-	opts := jiracli.GlobalOptions{}
+func CmdLoginRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+	opts := jiracli.CommonOptions{}
 	return &jiracli.CommandRegistryEntry{
 		"Attempt to login into jira server",
-		func() error {
-			return CmdLogin(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			return jiracli.GlobalUsage(cmd, &opts)
+			return nil
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdLogin(o, globals, &opts)
 		},
 	}
 }
@@ -45,19 +45,19 @@ func authCallback(req *http.Request, resp *http.Response) (*http.Response, error
 }
 
 // CmdLogin will attempt to login into jira server
-func CmdLogin(o *oreo.Client, opts *jiracli.GlobalOptions) error {
+func CmdLogin(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
 	ua := o.WithoutRedirect().WithRetries(0).WithoutCallbacks().WithPostCallback(authCallback)
 	for {
-		if session, err := jira.GetSession(o, opts.Endpoint.Value); err != nil {
+		if session, err := jira.GetSession(o, globals.Endpoint.Value); err != nil {
 			// No active session so try to create a new one
-			_, err := jira.NewSession(ua, opts.Endpoint.Value, opts)
+			_, err := jira.NewSession(ua, globals.Endpoint.Value, globals)
 			if err != nil {
 				// reset password on failed session
-				opts.SetPass("")
+				globals.SetPass("")
 				log.Errorf("%s", err)
 				continue
 			}
-			fmt.Println(ansi.Color("OK", "green"), "New session for", opts.User)
+			fmt.Println(ansi.Color("OK", "green"), "New session for", globals.User)
 			break
 		} else {
 			fmt.Println(ansi.Color("OK", "green"), "Found session for", session.Name)

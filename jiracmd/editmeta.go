@@ -9,43 +9,40 @@ import (
 )
 
 type EditMetaOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Issue         string `yaml:"issue,omitempty" json:"issue,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdEditMetaRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdEditMetaRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 
 	opts := EditMetaOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("editmeta"),
 		},
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"View 'edit' metadata",
-		func() error {
-			return CmdEditMeta(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdEditMetaUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdEditMeta(o, globals, &opts)
 		},
 	}
 }
 
 func CmdEditMetaUsage(cmd *kingpin.CmdClause, opts *EditMetaOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Arg("ISSUE", "edit metadata for issue id").Required().StringVar(&opts.Issue)
 	return nil
 }
 
 // EditMeta will get issue edit metadata and send to "editmeta" template
-func CmdEditMeta(o *oreo.Client, opts *EditMetaOptions) error {
-	editMeta, err := jira.GetIssueEditMeta(o, opts.Endpoint.Value, opts.Issue)
+func CmdEditMeta(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditMetaOptions) error {
+	editMeta, err := jira.GetIssueEditMeta(o, globals.Endpoint.Value, opts.Issue)
 	if err != nil {
 		return err
 	}
@@ -53,7 +50,7 @@ func CmdEditMeta(o *oreo.Client, opts *EditMetaOptions) error {
 		return err
 	}
 	if opts.Browse.Value {
-		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(globals, opts.Issue)
 	}
 	return nil
 }

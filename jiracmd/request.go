@@ -15,38 +15,35 @@ import (
 )
 
 type RequestOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
 	Method                string `yaml:"method,omitempty" json:"method,omitempty"`
 	URI                   string `yaml:"uri,omitempty" json:"uri,omitempty"`
 	Data                  string `yaml:"data,omitempty" json:"data,omitempty"`
 }
 
-func CmdRequestRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdRequestRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := RequestOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("request"),
 		},
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"Open issue in requestr",
-		func() error {
-			return CmdRequest(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			if opts.Method == "" {
 				opts.Method = "GET"
 			}
 			return CmdRequestUsage(cmd, &opts)
 		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdRequest(o, globals, &opts)
+		},
 	}
 }
 
 func CmdRequestUsage(cmd *kingpin.CmdClause, opts *RequestOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
 	cmd.Flag("method", "HTTP request method to use").Short('m').EnumVar(&opts.Method, "GET", "PUT", "POST", "DELETE")
 	cmd.Arg("API", "Path to Jira API (ie: /rest/api/2/issue)").Required().StringVar(&opts.URI)
 	cmd.Arg("JSON", "JSON Content to send to API").Required().StringVar(&opts.Data)
@@ -55,10 +52,10 @@ func CmdRequestUsage(cmd *kingpin.CmdClause, opts *RequestOptions) error {
 }
 
 // CmdRequest open the default system requestr to the provided issue
-func CmdRequest(o *oreo.Client, opts *RequestOptions) error {
+func CmdRequest(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RequestOptions) error {
 	uri := opts.URI
 	if !strings.HasPrefix(uri, "http") {
-		uri = opts.Endpoint.Value + uri
+		uri = globals.Endpoint.Value + uri
 	}
 
 	parsedURI, err := url.Parse(uri)

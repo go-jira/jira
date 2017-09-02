@@ -8,27 +8,26 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdFieldsRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
-	opts := jiracli.GlobalOptions{
+func CmdFieldsRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+	opts := jiracli.CommonOptions{
 		Template: figtree.NewStringOption("fields"),
 	}
 	return &jiracli.CommandRegistryEntry{
 		"Prints all fields, both System and Custom",
-		func() error {
-			return CmdFields(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			err := jiracli.GlobalUsage(cmd, &opts)
 			jiracli.TemplateUsage(cmd, &opts)
-			return err
+			return nil
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdFields(o, globals, &opts)
 		},
 	}
 }
 
 // Fields will send data from /rest/api/2/field API to "fields" template
-func CmdFields(o *oreo.Client, opts *jiracli.GlobalOptions) error {
-	data, err := jira.GetFields(o, opts.Endpoint.Value)
+func CmdFields(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
+	data, err := jira.GetFields(o, globals.Endpoint.Value)
 	if err != nil {
 		return err
 	}

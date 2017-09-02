@@ -13,16 +13,16 @@ import (
 )
 
 type EditOptions struct {
-	jiracli.GlobalOptions        `yaml:",inline" json:",inline" figtree:",inline"`
-	jiradata.IssueUpdate `yaml:",inline" json:",inline" figtree:",inline"`
-	jira.SearchOptions   `yaml:",inline" json:",inline" figtree:",inline"`
-	Overrides            map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
-	Issue                string            `yaml:"issue,omitempty" json:"issue,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.IssueUpdate  `yaml:",inline" json:",inline" figtree:",inline"`
+	jira.SearchOptions    `yaml:",inline" json:",inline" figtree:",inline"`
+	Overrides             map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdEditRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdEditRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := EditOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("edit"),
 		},
 		Overrides: map[string]string{},
@@ -30,23 +30,20 @@ func CmdEditRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegis
 
 	return &jiracli.CommandRegistryEntry{
 		"Edit issue details",
-		func() error {
-			return CmdEdit(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdEditUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdEdit(o, globals, &opts)
 		},
 	}
 }
 
 func CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
-	jiracli.EditorUsage(cmd, &opts.GlobalOptions)
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	jiracli.EditorUsage(cmd, &opts.CommonOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search to edit multiple issues").Short('q').StringVar(&opts.Query)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
@@ -59,18 +56,18 @@ func CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error {
 }
 
 // Edit will get issue data and send to "edit" template
-func CmdEdit(o *oreo.Client, opts *EditOptions) error {
+func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) error {
 	type templateInput struct {
 		*jiradata.Issue `yaml:",inline"`
 		Meta            *jiradata.EditMeta `yaml:"meta" json:"meta"`
 		Overrides       map[string]string  `yaml:"overrides" json:"overrides"`
 	}
 	if opts.Issue != "" {
-		issueData, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, nil)
+		issueData, err := jira.GetIssue(o, globals.Endpoint.Value, opts.Issue, nil)
 		if err != nil {
 			return err
 		}
-		editMeta, err := jira.GetIssueEditMeta(o, opts.Endpoint.Value, opts.Issue)
+		editMeta, err := jira.GetIssueEditMeta(o, globals.Endpoint.Value, opts.Issue)
 		if err != nil {
 			return err
 		}
@@ -81,24 +78,24 @@ func CmdEdit(o *oreo.Client, opts *EditOptions) error {
 			Meta:      editMeta,
 			Overrides: opts.Overrides,
 		}
-		err = jiracli.EditLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-			return jira.EditIssue(o, opts.Endpoint.Value, opts.Issue, &issueUpdate)
+		err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
+			return jira.EditIssue(o, globals.Endpoint.Value, opts.Issue, &issueUpdate)
 		})
 		if err != nil {
 			return err
 		}
-		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, opts.Endpoint.Value, opts.Issue)
+		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
 
 		if opts.Browse.Value {
-			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+			return CmdBrowse(globals, opts.Issue)
 		}
 	}
-	results, err := jira.Search(o, opts.Endpoint.Value, opts)
+	results, err := jira.Search(o, globals.Endpoint.Value, opts)
 	if err != nil {
 		return err
 	}
 	for _, issueData := range results.Issues {
-		editMeta, err := jira.GetIssueEditMeta(o, opts.Endpoint.Value, issueData.Key)
+		editMeta, err := jira.GetIssueEditMeta(o, globals.Endpoint.Value, issueData.Key)
 		if err != nil {
 			return err
 		}
@@ -108,16 +105,16 @@ func CmdEdit(o *oreo.Client, opts *EditOptions) error {
 			Issue: issueData,
 			Meta:  editMeta,
 		}
-		err = jiracli.EditLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-			return jira.EditIssue(o, opts.Endpoint.Value, issueData.Key, &issueUpdate)
+		err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
+			return jira.EditIssue(o, globals.Endpoint.Value, issueData.Key, &issueUpdate)
 		})
 		if err != nil {
 			return err
 		}
-		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, opts.Endpoint.Value, issueData.Key)
+		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, globals.Endpoint.Value, issueData.Key)
 
 		if opts.Browse.Value {
-			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueData.Key})
+			return CmdBrowse(globals, issueData.Key)
 		}
 	}
 	return nil

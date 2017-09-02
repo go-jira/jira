@@ -14,16 +14,16 @@ import (
 )
 
 type TransitionOptions struct {
-	jiracli.GlobalOptions `yaml:",inline" json:",inline" figtree:",inline"`
-	Overrides     map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
-	Transition    string            `yaml:"transition,omitempty" json:"transition,omitempty"`
-	Issue         string            `yaml:"issue,omitempty" json:"issue,omitempty"`
-	Resolution    string            `yaml:"resolution,omitempty" json:"resolution,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Overrides             map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	Transition            string            `yaml:"transition,omitempty" json:"transition,omitempty"`
+	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Resolution            string            `yaml:"resolution,omitempty" json:"resolution,omitempty"`
 }
 
-func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition string) *jiracli.CommandRegistryEntry {
+func CmdTransitionRegistry(o *oreo.Client, transition string) *jiracli.CommandRegistryEntry {
 	opts := TransitionOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("transition"),
 		},
 		Overrides: map[string]string{},
@@ -37,25 +37,22 @@ func CmdTransitionRegistry(fig *figtree.FigTree, o *oreo.Client, transition stri
 
 	return &jiracli.CommandRegistryEntry{
 		help,
-		func() error {
-			return CmdTransition(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			if opts.Transition == "" {
 				opts.Transition = transition
 			}
 			return CmdTransitionUsage(cmd, &opts)
 		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdTransition(o, globals, &opts)
+		},
 	}
 }
 
 func CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = jiracli.FlagValue(ctx, "comment")
@@ -70,13 +67,13 @@ func CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
 }
 
 // CmdTransition will move state of the given issue to the given transtion
-func CmdTransition(o *oreo.Client, opts *TransitionOptions) error {
-	issueData, err := jira.GetIssue(o, opts.Endpoint.Value, opts.Issue, nil)
+func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *TransitionOptions) error {
+	issueData, err := jira.GetIssue(o, globals.Endpoint.Value, opts.Issue, nil)
 	if err != nil {
 		return jiracli.CliError(err)
 	}
 
-	meta, err := jira.GetIssueTransitions(o, opts.Endpoint.Value, opts.Issue)
+	meta, err := jira.GetIssueTransitions(o, globals.Endpoint.Value, opts.Issue)
 	if err != nil {
 		return jiracli.CliError(err)
 	}
@@ -128,16 +125,16 @@ func CmdTransition(o *oreo.Client, opts *TransitionOptions) error {
 		Transition: transMeta,
 		Overrides:  opts.Overrides,
 	}
-	err = jiracli.EditLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-		return jira.TransitionIssue(o, opts.Endpoint.Value, opts.Issue, &issueUpdate)
+	err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
+		return jira.TransitionIssue(o, globals.Endpoint.Value, opts.Issue, &issueUpdate)
 	})
 	if err != nil {
 		return jiracli.CliError(err)
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, opts.Endpoint.Value, issueData.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, globals.Endpoint.Value, issueData.Key)
 
 	if opts.Browse.Value {
-		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.Issue})
+		return CmdBrowse(globals, opts.Issue)
 	}
 	return nil
 }

@@ -15,17 +15,17 @@ import (
 )
 
 type CreateOptions struct {
-	jiracli.GlobalOptions        `yaml:",inline" json:",inline" figtree:",inline"`
-	jiradata.IssueUpdate `yaml:",inline" json:",inline" figtree:",inline"`
-	Project              string            `yaml:"project,omitempty" json:"project,omitempty"`
-	IssueType            string            `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
-	Overrides            map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
-	SaveFile             string            `yaml:"savefile,omitempty" json:"savefile,omitempty"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	jiradata.IssueUpdate  `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string            `yaml:"project,omitempty" json:"project,omitempty"`
+	IssueType             string            `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
+	Overrides             map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
+	SaveFile              string            `yaml:"savefile,omitempty" json:"savefile,omitempty"`
 }
 
-func CmdCreateRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdCreateRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := CreateOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("create"),
 		},
 		Overrides: map[string]string{},
@@ -33,23 +33,20 @@ func CmdCreateRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandReg
 
 	return &jiracli.CommandRegistryEntry{
 		"Create issue",
-		func() error {
-			return CmdCreate(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdCreateUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdCreate(o, globals, &opts)
 		},
 	}
 }
 
 func CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
-	jiracli.EditorUsage(cmd, &opts.GlobalOptions)
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	jiracli.EditorUsage(cmd, &opts.CommonOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("project", "project to create issue in").Short('p').StringVar(&opts.Project)
 	cmd.Flag("issuetype", "issuetype in to create").Short('i').StringVar(&opts.IssueType)
@@ -64,16 +61,16 @@ func CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) error {
 
 // CmdCreate sends the create-metadata to the "create" template for editing, then
 // will parse the edited document as YAML and submit the document to jira.
-func CmdCreate(o *oreo.Client, opts *CreateOptions) error {
+func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptions) error {
 	type templateInput struct {
 		Meta      *jiradata.IssueType `yaml:"meta" json:"meta"`
 		Overrides map[string]string   `yaml:"overrides" json:"overrides"`
 	}
 
-	if err := defaultIssueType(o, opts.Endpoint.Value, &opts.Project, &opts.IssueType); err != nil {
+	if err := defaultIssueType(o, globals.Endpoint.Value, &opts.Project, &opts.IssueType); err != nil {
 		return err
 	}
-	createMeta, err := jira.GetIssueCreateMetaIssueType(o, opts.Endpoint.Value, opts.Project, opts.IssueType)
+	createMeta, err := jira.GetIssueCreateMetaIssueType(o, globals.Endpoint.Value, opts.Project, opts.IssueType)
 	if err != nil {
 		return err
 	}
@@ -85,18 +82,18 @@ func CmdCreate(o *oreo.Client, opts *CreateOptions) error {
 	}
 	input.Overrides["project"] = opts.Project
 	input.Overrides["issuetype"] = opts.IssueType
-	input.Overrides["user"] = opts.User.Value
+	input.Overrides["user"] = globals.User.Value
 
 	var issueResp *jiradata.IssueCreateResponse
-	err = jiracli.EditLoop(&opts.GlobalOptions, &input, &issueUpdate, func() error {
-		issueResp, err = jira.CreateIssue(o, opts.Endpoint.Value, &issueUpdate)
+	err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
+		issueResp, err = jira.CreateIssue(o, globals.Endpoint.Value, &issueUpdate)
 		return err
 	})
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, opts.Endpoint.Value, issueResp.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, globals.Endpoint.Value, issueResp.Key)
 
 	if opts.SaveFile != "" {
 		fh, err := os.Create(opts.SaveFile)
@@ -106,7 +103,7 @@ func CmdCreate(o *oreo.Client, opts *CreateOptions) error {
 		defer fh.Close()
 		out, err := yaml.Marshal(map[string]string{
 			"issue": issueResp.Key,
-			"link":  fmt.Sprintf("%s/browse/%s", opts.Endpoint.Value, issueResp.Key),
+			"link":  fmt.Sprintf("%s/browse/%s", globals.Endpoint.Value, issueResp.Key),
 		})
 		if err != nil {
 			return err
@@ -115,7 +112,7 @@ func CmdCreate(o *oreo.Client, opts *CreateOptions) error {
 	}
 
 	if opts.Browse.Value {
-		return CmdBrowse(&BrowseOptions{opts.GlobalOptions, issueResp.Key})
+		return CmdBrowse(globals, issueResp.Key)
 	}
 	return nil
 }

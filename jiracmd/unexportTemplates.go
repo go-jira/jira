@@ -12,21 +12,21 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdUnexportTemplatesRegistry(fig *figtree.FigTree) *jiracli.CommandRegistryEntry {
+func CmdUnexportTemplatesRegistry() *jiracli.CommandRegistryEntry {
 	opts := ExportTemplatesOptions{}
 
 	return &jiracli.CommandRegistryEntry{
 		"Remove unmodified exported templates",
-		func() error {
-			return CmdUnexportTemplates(&opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			if opts.Dir != "" {
 				opts.Dir = fmt.Sprintf("%s/.jira.d/templates", jiracli.Homedir())
 			}
 
 			return CmdExportTemplatesUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdUnexportTemplates(&opts)
 		},
 	}
 }

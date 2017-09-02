@@ -13,13 +13,13 @@ import (
 )
 
 type BlockOptions struct {
-	jiracli.GlobalOptions             `yaml:",inline" json:",inline" figtree:",inline"`
+	jiracli.CommonOptions     `yaml:",inline" json:",inline" figtree:",inline"`
 	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
 }
 
-func CmdBlockRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdBlockRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := BlockOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("edit"),
 		},
 		LinkIssueRequest: jiradata.LinkIssueRequest{
@@ -33,23 +33,20 @@ func CmdBlockRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegi
 
 	return &jiracli.CommandRegistryEntry{
 		"Mark issues as blocker",
-		func() error {
-			return CmdBlock(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdBlockUsage(cmd, &opts)
+		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdBlock(o, globals, &opts)
 		},
 	}
 }
 
 func CmdBlockUsage(cmd *kingpin.CmdClause, opts *BlockOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.BrowseUsage(cmd, &opts.GlobalOptions)
-	jiracli.EditorUsage(cmd, &opts.GlobalOptions)
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	jiracli.EditorUsage(cmd, &opts.CommonOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("comment", "Comment message when marking issue as blocker").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Comment = &jiradata.Comment{
 			Body: jiracli.FlagValue(ctx, "comment"),
@@ -63,17 +60,17 @@ func CmdBlockUsage(cmd *kingpin.CmdClause, opts *BlockOptions) error {
 
 // CmdBlock will update the given issue as being a duplicate by the given dup issue
 // and will attempt to resolve the dup issue
-func CmdBlock(o *oreo.Client, opts *BlockOptions) error {
-	if err := jira.LinkIssues(o, opts.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
+func CmdBlock(o *oreo.Client, globals *jiracli.GlobalOptions, opts *BlockOptions) error {
+	if err := jira.LinkIssues(o, globals.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, opts.Endpoint.Value, opts.InwardIssue.Key)
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, opts.Endpoint.Value, opts.OutwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, globals.Endpoint.Value, opts.InwardIssue.Key)
+	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, globals.Endpoint.Value, opts.OutwardIssue.Key)
 
 	if opts.Browse.Value {
-		if err := CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.InwardIssue.Key}); err != nil {
-			return CmdBrowse(&BrowseOptions{opts.GlobalOptions, opts.OutwardIssue.Key})
+		if err := CmdBrowse(globals, opts.InwardIssue.Key); err != nil {
+			return CmdBrowse(globals, opts.OutwardIssue.Key)
 		}
 	}
 

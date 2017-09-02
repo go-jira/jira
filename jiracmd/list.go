@@ -9,23 +9,20 @@ import (
 )
 
 type ListOptions struct {
-	jiracli.GlobalOptions      `yaml:",inline" json:",inline" figtree:",inline"`
-	jira.SearchOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	jira.SearchOptions    `yaml:",inline" json:",inline" figtree:",inline"`
 }
 
-func CmdListRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdListRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 	opts := ListOptions{
-		GlobalOptions: jiracli.GlobalOptions{
+		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("list"),
 		},
 	}
 
 	return &jiracli.CommandRegistryEntry{
 		"Prints list of issues for given search criteria",
-		func() error {
-			return CmdList(o, &opts)
-		},
-		func(cmd *kingpin.CmdClause) error {
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			if opts.MaxResults == 0 {
 				opts.MaxResults = 500
@@ -38,14 +35,14 @@ func CmdListRegistry(fig *figtree.FigTree, o *oreo.Client) *jiracli.CommandRegis
 			}
 			return CmdListUsage(cmd, &opts)
 		},
+		func(globals *jiracli.GlobalOptions) error {
+			return CmdList(o, globals, &opts)
+		},
 	}
 }
 
 func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
-	if err := jiracli.GlobalUsage(cmd, &opts.GlobalOptions); err != nil {
-		return err
-	}
-	jiracli.TemplateUsage(cmd, &opts.GlobalOptions)
+	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("assignee", "User assigned the issue").Short('a').StringVar(&opts.Assignee)
 	cmd.Flag("component", "Component to search for").Short('c').StringVar(&opts.Component)
 	cmd.Flag("issuetype", "Issue type to search for").Short('i').StringVar(&opts.IssueType)
@@ -60,8 +57,8 @@ func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
 }
 
 // List will query jira and send data to "list" template
-func CmdList(o *oreo.Client, opts *ListOptions) error {
-	data, err := jira.Search(o, opts.Endpoint.Value, opts)
+func CmdList(o *oreo.Client, globals *jiracli.GlobalOptions, opts *ListOptions) error {
+	data, err := jira.Search(o, globals.Endpoint.Value, opts)
 	if err != nil {
 		return err
 	}
