@@ -87,7 +87,7 @@ func main() {
 	fig.ConfigDir = ".jira.d"
 
 	if err := os.MkdirAll(filepath.Join(jiracli.Homedir(), fig.ConfigDir), 0755); err != nil {
-		fmt.Errorf("%s", err)
+		log.Errorf("%s", err)
 		panic(jiracli.Exit{Code: 1})
 	}
 
