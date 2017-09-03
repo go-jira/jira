@@ -5,13 +5,12 @@ before_install:
 language: go
 go_import_path: gopkg.in/Netflix-Skunkworks/go-jira.v1
 go:
-  - 1.6
+  - 1.8
 
 matrix:
   fast_finish: true
   
 script:
   - make vet
-  - make lint
   - make
   - make prove 2>&1 
