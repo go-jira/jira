@@ -1,7 +1,7 @@
 #!/bin/bash
 eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
-jira="../jira --project KANBAN"
+jira="../jira"
 export JIRA_LOG_FORMAT="%{level:-5s} %{message}"
 
 ENDPOINT="http://localhost:8080"
@@ -12,7 +12,7 @@ fi
 PLAN 86
 
 # cleanup from previous failed test executions
-($jira ls | awk -F: '{print $1}' | while read issue; do ../jira done $issue; done) | sed 's/^/# CLEANUP: /g'
+($jira ls --project KANBAN | awk -F: '{print $1}' | while read issue; do ../jira done $issue; done) | sed 's/^/# CLEANUP: /g'
 
 # reset login
 RUNS $jira logout
@@ -21,7 +21,7 @@ echo "gojira123" | RUNS $jira login
 ###############################################################################
 ## Create an issue
 ###############################################################################
-RUNS $jira create -o summary=summary -o description=description --noedit --saveFile issue.props
+RUNS $jira create --project KANBAN -o summary=summary -o description=description --noedit --saveFile issue.props
 issue=$(awk '/issue/{print $2}' issue.props)
 
 DIFF <<EOF
@@ -52,7 +52,7 @@ EOF
 ## List all issues, should be just the one we created
 ###############################################################################
 
-RUNS $jira ls
+RUNS $jira ls --project KANBAN
 DIFF <<EOF
 $(printf %-12s $issue:) summary
 EOF
@@ -63,7 +63,7 @@ EOF
 
 NRUNS $jira close $issue
 EDIFF <<EOF
-ERROR Invalid Transition 'close', Available: Backlog, Selected for Development, In Progress, Done
+ERROR Invalid Transition "close" from "Backlog", Available: Backlog, Selected for Development, In Progress, Done
 EOF
 
 ###############################################################################
@@ -79,7 +79,7 @@ EOF
 ## Verify there are no unresolved issues
 ###############################################################################
 
-RUNS $jira ls
+RUNS $jira ls --project KANBAN
 DIFF <<EOF
 EOF
 
@@ -87,13 +87,13 @@ EOF
 ## Setup 2 more issues so we can test duping
 ###############################################################################
 
-RUNS $jira create -o summary=summary -o description=description --noedit --saveFile issue.props
+RUNS $jira create --project KANBAN -o summary=summary -o description=description --noedit --saveFile issue.props
 issue=$(awk '/issue/{print $2}' issue.props)
 DIFF <<EOF
 OK $issue $ENDPOINT/browse/$issue
 EOF
 
-RUNS $jira create -o summary=dup -o description=dup --noedit --saveFile issue.props
+RUNS $jira create --project KANBAN -o summary=dup -o description=dup --noedit --saveFile issue.props
 dup=$(awk '/issue/{print $2}' issue.props)
 DIFF <<EOF
 OK $dup $ENDPOINT/browse/$dup
@@ -105,7 +105,7 @@ EOF
 ## that issue should be resolved
 ###############################################################################
 
-RUNS $jira $dup dups $issue --noedit
+RUNS $jira dup $dup $issue
 DIFF <<EOF
 OK $issue $ENDPOINT/browse/$issue
 OK $dup $ENDPOINT/browse/$dup
@@ -133,7 +133,7 @@ EOF
 ## We should see only one unresolved issue, the Dup should be resolved
 ###############################################################################
 
-RUNS $jira ls
+RUNS $jira ls --project KANBAN
 DIFF <<EOF
 $(printf %-12s $issue:) summary
 EOF
@@ -142,7 +142,7 @@ EOF
 ## Setup for testing blocking issues
 ###############################################################################
 
-RUNS $jira create -o summary=blocks -o description=blocks --noedit --saveFile issue.props
+RUNS $jira create --project KANBAN -o summary=blocks -o description=blocks --noedit --saveFile issue.props
 blocker=$(awk '/issue/{print $2}' issue.props)
 DIFF <<EOF
 OK $blocker $ENDPOINT/browse/$blocker
@@ -152,9 +152,10 @@ EOF
 ## Set blocker and verify it shows up when viewing the main issue
 ###############################################################################
 
-RUNS $jira $blocker blocks $issue
+RUNS $jira block $blocker $issue
 DIFF <<EOF
 OK $issue $ENDPOINT/browse/$issue
+OK $blocker $ENDPOINT/browse/$blocker
 EOF
 
 RUNS $jira $issue
@@ -179,7 +180,7 @@ EOF
 ## Both issues are unresolved now
 ###############################################################################
 
-RUNS $jira ls
+RUNS $jira ls --project KANBAN
 DIFF <<EOF
 $(printf %-12s $issue:) summary
 $(printf %-12s $blocker:) blocks
@@ -279,7 +280,7 @@ EOF
 
 NRUNS $jira todo $blocker
 DIFF <<EOF
-ERROR Invalid Transition 'To Do', Available: Backlog, Selected for Development, In Progress, Done
+ERROR Invalid Transition "To Do" from "In Progress", Available: Backlog, Selected for Development, In Progress, Done
 EOF
 
 ###############################################################################
@@ -297,7 +298,7 @@ EOF
 
 NRUNS $jira trans "review" $blocker --noedit
 DIFF <<EOF
-ERROR Invalid Transition 'review', Available: Backlog, Selected for Development, In Progress, Done
+ERROR Invalid Transition "review" from "Backlog", Available: Backlog, Selected for Development, In Progress, Done
 EOF
 
 ###############################################################################
@@ -385,7 +386,7 @@ EOF
 ## Verify we can add labels to an issue
 ###############################################################################
 
-RUNS $jira add labels $blocker test-label another-label
+RUNS $jira labels add $blocker test-label another-label
 DIFF <<EOF
 OK $blocker $ENDPOINT/browse/$blocker
 EOF
@@ -413,7 +414,7 @@ EOF
 ## Verify we can remove a label
 ###############################################################################
 
-RUNS $jira remove labels $blocker another-label
+RUNS $jira labels remove $blocker another-label
 DIFF <<EOF
 OK $blocker $ENDPOINT/browse/$blocker
 EOF
@@ -441,7 +442,7 @@ EOF
 ## Verify we can replace the labels with a new set
 ###############################################################################
 
-RUNS $jira set labels $blocker more-label better-label
+RUNS $jira labels set $blocker more-label better-label
 DIFF <<EOF
 OK $blocker $ENDPOINT/browse/$blocker
 EOF

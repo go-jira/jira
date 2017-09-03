@@ -5,6 +5,7 @@ import (
 	"github.com/coryb/oreo"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -44,7 +45,9 @@ func CmdWorklogList(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Worklo
 	if err != nil {
 		return err
 	}
-	if err := jiracli.RunTemplate(opts.Template.Value, data, nil); err != nil {
+	if err := jiracli.RunTemplate(opts.Template.Value, struct {
+		Worklogs *jiradata.Worklogs `json:"worklogs,omitempty" yaml:"worklogs,omitempty"`
+	}{data}, nil); err != nil {
 		return err
 	}
 	if opts.Browse.Value {
