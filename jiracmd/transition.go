@@ -66,6 +66,21 @@ func CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
 	return nil
 }
 
+func defaultResolution(transMeta *jiradata.Transition) string {
+	if resField, ok := transMeta.Fields["resolution"]; ok {
+		for _, allowedValueRaw := range resField.AllowedValues {
+			if allowedValue, ok := allowedValueRaw.(map[string]interface{}); ok {
+				if allowedValue["name"] == "Fixed" {
+					return "Fixed"
+				} else if allowedValue["name"] == "Done" {
+					return "Done"
+				}
+			}
+		}
+	}
+	return ""
+}
+
 // CmdTransition will move state of the given issue to the given transtion
 func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *TransitionOptions) error {
 	issueData, err := jira.GetIssue(o, globals.Endpoint.Value, opts.Issue, nil)
