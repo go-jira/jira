@@ -1,6 +1,8 @@
 package jiracmd
 
 import (
+	"fmt"
+
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
@@ -55,6 +57,7 @@ func CmdWorklogAdd(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Worklog
 	if err != nil {
 		return err
 	}
+	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
 	if opts.Browse.Value {
 		return CmdBrowse(globals, opts.Issue)
 	}
