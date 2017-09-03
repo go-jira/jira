@@ -44,7 +44,7 @@ func CmdRequestRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 }
 
 func CmdRequestUsage(cmd *kingpin.CmdClause, opts *RequestOptions) error {
-	cmd.Flag("method", "HTTP request method to use").Short('m').EnumVar(&opts.Method, "GET", "PUT", "POST", "DELETE")
+	cmd.Flag("method", "HTTP request method to use").Short('M').EnumVar(&opts.Method, "GET", "PUT", "POST", "DELETE")
 	cmd.Arg("API", "Path to Jira API (ie: /rest/api/2/issue)").Required().StringVar(&opts.URI)
 	cmd.Arg("JSON", "JSON Content to send to API").StringVar(&opts.Data)
 
