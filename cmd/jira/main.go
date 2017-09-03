@@ -320,15 +320,24 @@ func main() {
 		}
 		panic(jiracli.Exit{Code: 1})
 	})
-	if len(os.Args) > 1 {
-		// if first arg matches ISSUE-123 pattern then we assume it is a 'view' operation
-		if ok, err := regexp.MatchString("^[A-Z]+-[0-9]+$", os.Args[1]); err != nil {
-			log.Errorf("Invalid Regex: %s", err)
-		} else if ok {
-			// insert "view" at i=1 (2nd position)
-			os.Args = append(os.Args[:1], append([]string{"view"}, os.Args[1:]...)...)
+
+	// checking for default usage of `jira ISSUE-123` but need to allow
+	// for global options first like: `jira --user mothra ISSUE-123`
+	ctx, _ := app.ParseContext(os.Args[1:])
+	if ctx != nil {
+		if ctx.SelectedCommand == nil {
+			next := ctx.Next()
+			if next != nil {
+				if ok, err := regexp.MatchString("^[A-Z]+-[0-9]+$", next.Value); err != nil {
+					log.Errorf("Invalid Regex: %s", err)
+				} else if ok {
+					// insert "view" at i=1 (2nd position)
+					os.Args = append(os.Args[:1], append([]string{"view"}, os.Args[1:]...)...)
+				}
+			}
 		}
 	}
+
 	if _, err := app.Parse(os.Args[1:]); err != nil {
 		if _, ok := err.(*jiracli.Error); ok {
 			log.Errorf("%s", err)
