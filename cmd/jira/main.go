@@ -86,6 +86,11 @@ func main() {
 	fig.EnvPrefix = "JIRA"
 	fig.ConfigDir = ".jira.d"
 
+	if err := os.MkdirAll(filepath.Join(jiracli.Homedir(), fig.ConfigDir), 0755); err != nil {
+		fmt.Errorf("%s", err)
+		panic(jiracli.Exit{Code: 1})
+	}
+
 	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
 	o = o.WithPostCallback(
 		func(req *http.Request, resp *http.Response) (*http.Response, error) {
