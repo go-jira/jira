@@ -42,6 +42,7 @@ func CmdCommentUsage(cmd *kingpin.CmdClause, opts *CommentOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.EditorUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
+	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = jiracli.FlagValue(ctx, "comment")
 		return nil
@@ -54,7 +55,7 @@ func CmdCommentUsage(cmd *kingpin.CmdClause, opts *CommentOptions) error {
 func CmdComment(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CommentOptions) error {
 	comment := jiradata.Comment{}
 	input := struct {
-		Overrides map[string]string
+		Overrides map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	}{
 		opts.Overrides,
 	}
