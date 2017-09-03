@@ -242,11 +242,11 @@ func main() {
 		},
 		jiracli.CommandRegistry{
 			Command: "labels set",
-			Entry:   jiracmd.CmdLabelsAddRegistry(o),
+			Entry:   jiracmd.CmdLabelsSetRegistry(o),
 		},
 		jiracli.CommandRegistry{
 			Command: "labels remove",
-			Entry:   jiracmd.CmdLabelsAddRegistry(o),
+			Entry:   jiracmd.CmdLabelsRemoveRegistry(o),
 			Aliases: []string{"rm"},
 		},
 		jiracli.CommandRegistry{
