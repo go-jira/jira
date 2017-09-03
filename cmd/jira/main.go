@@ -71,7 +71,7 @@ func main() {
 
 	var verbosity int
 	app.Flag("verbose", "Increase verbosity for debugging").Short('v').PreAction(func(_ *kingpin.ParseContext) error {
-		os.Setenv("JIRA_DEBUG", fmt.Sprintf("%s", verbosity))
+		os.Setenv("JIRA_DEBUG", fmt.Sprintf("%d", verbosity))
 		increaseLogLevel(1)
 		return nil
 	}).CounterVar(&verbosity)
@@ -298,7 +298,7 @@ func main() {
 
 	// register custom commands
 	data := struct {
-		CustomCommands kingpeon.DynamicCommands `yaml:"custom-commands" json":custom-commands"`
+		CustomCommands kingpeon.DynamicCommands `yaml:"custom-commands" json:"custom-commands"`
 	}{}
 
 	if err := fig.LoadAllConfigs("config.yml", &data); err != nil {

@@ -51,14 +51,18 @@ debug:
 
 vet:
 	@go vet .
-	@go vet ./data
-	@go vet ./main
+	@go vet ./jiracli
+	@go vet ./jiracmd
+	@go vet ./jiradata
+	@go vet ./cmd/jira
 
 lint:
 	@go get github.com/golang/lint/golint
-	@./bin/golint .
-	@./bin/golint ./data
-	@./bin/golint ./main
+	@golint .
+	@golint ./jiracli
+	@golint ./jiracmd
+	@golint ./jiradata
+	@golint ./cmd/jira
 
 cross-setup:
 	for p in $(PLATFORMS); do \
