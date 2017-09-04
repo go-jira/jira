@@ -94,7 +94,8 @@ func main() {
 	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
 	o = o.WithPostCallback(
 		func(req *http.Request, resp *http.Response) (*http.Response, error) {
-			if resp.Header.Get("X-Ausername") == "anonymous" {
+			authUser := resp.Header.Get("X-Ausername")
+			if authUser == "" || authUser == "anonymous" {
 				// we are not logged in, so force login now by running the "login" command
 				app.Parse([]string{"login"})
 				return o.Do(req)
