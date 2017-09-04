@@ -44,13 +44,17 @@ func (o *GlobalOptions) GetPass() string {
 	if passwd != "" {
 		return passwd
 	}
-	survey.AskOne(
+	err := survey.AskOne(
 		&survey.Password{
 			Message: fmt.Sprintf("Jira Password [%s]: ", o.User),
 		},
 		&passwd,
 		nil,
 	)
+	if err != nil {
+		log.Errorf("%s", err)
+		panic(Exit{Code: 1})
+	}
 	o.SetPass(passwd)
 	return passwd
 }
