@@ -61,6 +61,8 @@ func CmdComponentAdd(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Compo
 		return err
 	}
 
-	fmt.Printf("OK %s %s\n", component.Project, component.Name)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s\n", component.Project, component.Name)
+	}
 	return nil
 }

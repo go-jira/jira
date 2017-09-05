@@ -66,7 +66,9 @@ func CmdDup(o *oreo.Client, globals *jiracli.GlobalOptions, opts *DupOptions) er
 	if err := jira.LinkIssues(o, globals.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
 		return err
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, globals.Endpoint.Value, opts.OutwardIssue.Key)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, globals.Endpoint.Value, opts.OutwardIssue.Key)
+	}
 
 	meta, err := jira.GetIssueTransitions(o, globals.Endpoint.Value, opts.InwardIssue.Key)
 	if err != nil {
@@ -100,7 +102,9 @@ func CmdDup(o *oreo.Client, globals *jiracli.GlobalOptions, opts *DupOptions) er
 		}
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, globals.Endpoint.Value, opts.InwardIssue.Key)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, globals.Endpoint.Value, opts.InwardIssue.Key)
+	}
 
 	if opts.Browse.Value {
 		if err := CmdBrowse(globals, opts.OutwardIssue.Key); err != nil {

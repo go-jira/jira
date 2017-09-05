@@ -107,7 +107,9 @@ func CmdSubtask(o *oreo.Client, globals *jiracli.GlobalOptions, opts *SubtaskOpt
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, globals.Endpoint.Value, issueResp.Key)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, globals.Endpoint.Value, issueResp.Key)
+	}
 
 	if opts.Browse.Value {
 		return CmdBrowse(globals, issueResp.Key)

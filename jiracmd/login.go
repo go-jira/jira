@@ -57,10 +57,14 @@ func CmdLogin(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.Comm
 				log.Errorf("%s", err)
 				continue
 			}
-			fmt.Println(ansi.Color("OK", "green"), "New session for", globals.User)
+			if !globals.Quiet.Value {
+				fmt.Println(ansi.Color("OK", "green"), "New session for", globals.User)
+			}
 			break
 		} else {
-			fmt.Println(ansi.Color("OK", "green"), "Found session for", session.Name)
+			if !globals.Quiet.Value {
+				fmt.Println(ansi.Color("OK", "green"), "Found session for", session.Name)
+			}
 			break
 		}
 	}

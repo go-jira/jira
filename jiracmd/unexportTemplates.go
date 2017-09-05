@@ -27,13 +27,13 @@ func CmdUnexportTemplatesRegistry() *jiracli.CommandRegistryEntry {
 			return CmdExportTemplatesUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
-			return CmdUnexportTemplates(&opts)
+			return CmdUnexportTemplates(globals, &opts)
 		},
 	}
 }
 
 // CmdUnexportTemplates will remove unmodified templates from export directory
-func CmdUnexportTemplates(opts *ExportTemplatesOptions) error {
+func CmdUnexportTemplates(globals *jiracli.GlobalOptions, opts *ExportTemplatesOptions) error {
 	for name, template := range jiracli.AllTemplates {
 		if opts.Template != "" && opts.Template != name {
 			continue
@@ -49,10 +49,14 @@ func CmdUnexportTemplates(opts *ExportTemplatesOptions) error {
 			return err
 		}
 		if bytes.Compare([]byte(template), contents) == 0 {
-			log.Warning("Removing %s, template identical to default", templateFile)
+			if !globals.Quiet.Value {
+				log.Notice("Removing %s, template identical to default", templateFile)
+			}
 			os.Remove(templateFile)
 		} else {
-			log.Warning("Skipping %s, found customizations to template", templateFile)
+			if !globals.Quiet.Value {
+				log.Notice("Skipping %s, found customizations to template", templateFile)
+			}
 		}
 	}
 	return nil

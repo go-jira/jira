@@ -78,7 +78,9 @@ func CmdRequest(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RequestOpt
 		return err
 	}
 	if len(content) == 0 {
-		fmt.Println("No Content")
+		if !globals.Quiet.Value {
+			fmt.Println("No content in response")
+		}
 		return nil
 	}
 	var data interface{}

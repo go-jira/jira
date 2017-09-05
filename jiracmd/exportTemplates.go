@@ -29,7 +29,7 @@ func CmdExportTemplatesRegistry() *jiracli.CommandRegistryEntry {
 			return CmdExportTemplatesUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
-			return CmdExportTemplates(&opts)
+			return CmdExportTemplates(globals, &opts)
 		},
 	}
 }
@@ -42,7 +42,7 @@ func CmdExportTemplatesUsage(cmd *kingpin.CmdClause, opts *ExportTemplatesOption
 }
 
 // CmdExportTemplates will export templates to directory
-func CmdExportTemplates(opts *ExportTemplatesOptions) error {
+func CmdExportTemplates(globals *jiracli.GlobalOptions, opts *ExportTemplatesOptions) error {
 	if err := os.MkdirAll(opts.Dir, 0755); err != nil {
 		return err
 	}
@@ -62,7 +62,9 @@ func CmdExportTemplates(opts *ExportTemplatesOptions) error {
 			return err
 		}
 		defer fh.Close()
-		log.Noticef("Creating %s", templateFile)
+		if !globals.Quiet.Value {
+			log.Noticef("Creating %s", templateFile)
+		}
 		fh.Write([]byte(template))
 	}
 	return nil

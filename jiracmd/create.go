@@ -93,7 +93,9 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, globals.Endpoint.Value, issueResp.Key)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, globals.Endpoint.Value, issueResp.Key)
+	}
 
 	if opts.SaveFile != "" {
 		fh, err := os.Create(opts.SaveFile)

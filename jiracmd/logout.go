@@ -30,7 +30,9 @@ func CmdLogout(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.Com
 	ua := o.WithoutRedirect().WithRetries(0).WithoutCallbacks()
 	err := jira.DeleteSession(ua, globals.Endpoint.Value)
 	if err == nil {
-		fmt.Println(ansi.Color("OK", "green"), "Terminated session for", globals.User)
+		if !globals.Quiet.Value {
+			fmt.Println(ansi.Color("OK", "green"), "Terminated session for", globals.User)
+		}
 	} else {
 		fmt.Printf("%s Failed to terminate session for %s: %s", ansi.Color("ERROR", "red"), globals.User, err)
 	}

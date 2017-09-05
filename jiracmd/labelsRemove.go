@@ -57,7 +57,9 @@ func CmdLabelsRemove(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Label
 	if err != nil {
 		return err
 	}
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
+	}
 	if opts.Browse.Value {
 		return CmdBrowse(globals, opts.Issue)
 	}

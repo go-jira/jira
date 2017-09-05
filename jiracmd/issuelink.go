@@ -61,8 +61,10 @@ func CmdIssueLink(o *oreo.Client, globals *jiracli.GlobalOptions, opts *IssueLin
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, globals.Endpoint.Value, opts.InwardIssue.Key)
-	fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, globals.Endpoint.Value, opts.OutwardIssue.Key)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, globals.Endpoint.Value, opts.InwardIssue.Key)
+		fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, globals.Endpoint.Value, opts.OutwardIssue.Key)
+	}
 
 	if opts.Browse.Value {
 		if err := CmdBrowse(globals, opts.OutwardIssue.Key); err != nil {

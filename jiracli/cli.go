@@ -29,18 +29,19 @@ type Exit struct {
 }
 
 type GlobalOptions struct {
-	Endpoint       figtree.StringOption `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
-	User           figtree.StringOption `json:"user,omitempty" yaml:"user,omitempty"`
-	PasswordSource figtree.StringOption `json:"password-source,omitempty" yaml:"password-source,omitempty"`
-	UnixProxy      figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
+	Endpoint       figtree.StringOption `yaml:"endpoint,omitempty" json:"endpoint,omitempty"`
 	Insecure       figtree.BoolOption   `yaml:"insecure,omitempty" json:"insecure,omitempty"`
+	PasswordSource figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
+	Quiet          figtree.BoolOption   `yaml:"quiet,omitempty" json:"quiet,omitempty"`
+	UnixProxy      figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
+	User           figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
 }
 
 type CommonOptions struct {
-	Browse      figtree.BoolOption   `json:"browse,omitempty" yaml:"browse,omitempty"`
-	Editor      figtree.StringOption `json:"editor,omitempty" yaml:"editor,omitempty"`
-	SkipEditing figtree.BoolOption   `json:"noedit,omitempty" yaml:"noedit,omitempty"`
-	Template    figtree.StringOption `json:"template,omitempty" yaml:"template,omitempty"`
+	Browse      figtree.BoolOption   `yaml:"browse,omitempty" json:"browse,omitempty"`
+	Editor      figtree.StringOption `yaml:"editor,omitempty" json:"editor,omitempty"`
+	SkipEditing figtree.BoolOption   `yaml:"noedit,omitempty" json:"noedit,omitempty"`
+	Template    figtree.StringOption `yaml:"template,omitempty" json:"template,omitempty"`
 }
 
 type CommandRegistryEntry struct {
@@ -67,9 +68,10 @@ func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, re
 		User: figtree.NewStringOption(os.Getenv("USER")),
 	}
 	app.Flag("endpoint", "Base URI to use for Jira").Short('e').SetValue(&globals.Endpoint)
-	app.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&globals.User)
-	app.Flag("unixproxy", "Path for a unix-socket proxy").SetValue(&globals.UnixProxy)
 	app.Flag("insecure", "Disable TLS certificate verification").Short('k').SetValue(&globals.Insecure)
+	app.Flag("quiet", "Suppress output to console").Short('Q').SetValue(&globals.Quiet)
+	app.Flag("unixproxy", "Path for a unix-socket proxy").SetValue(&globals.UnixProxy)
+	app.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&globals.User)
 
 	app.PreAction(func(_ *kingpin.ParseContext) error {
 		if globals.Insecure.Value {

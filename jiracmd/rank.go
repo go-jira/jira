@@ -58,8 +58,10 @@ func CmdRank(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RankOptions) 
 		return err
 	}
 
-	fmt.Printf("OK %s %s/browse/%s\n", opts.First, globals.Endpoint.Value, opts.First)
-	fmt.Printf("OK %s %s/browse/%s\n", opts.Second, globals.Endpoint.Value, opts.Second)
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", opts.First, globals.Endpoint.Value, opts.First)
+		fmt.Printf("OK %s %s/browse/%s\n", opts.Second, globals.Endpoint.Value, opts.Second)
+	}
 
 	if opts.Browse.Value {
 		if err := CmdBrowse(globals, opts.First); err != nil {
