@@ -89,6 +89,27 @@ func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, re
 		return nil
 	})
 
+	o = o.WithPostCallback(
+		func(req *http.Request, resp *http.Response) (*http.Response, error) {
+			authUser := resp.Header.Get("X-Ausername")
+			if authUser == "" || authUser == "anonymous" {
+				// preserve the --quiet value, we need to temporarily disable it so
+				// the normal login output is surpressed
+				defer func(quiet bool) {
+					globals.Quiet.Value = quiet
+				}(globals.Quiet.Value)
+				globals.Quiet.Value = true
+
+				// we are not logged in, so force login now by running the "login" command
+				app.Parse([]string{"login"})
+
+				// rerun the original request
+				return o.Do(req)
+			}
+			return resp, nil
+		},
+	)
+
 	for _, command := range reg {
 		copy := command
 		commandFields := strings.Fields(copy.Command)

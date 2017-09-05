@@ -1,14 +1,5 @@
-#!/bin/sh
-cat <<EOF
 config:
   stop: true
 password-source: pass
-EOF
-
-if [ -z "$JIRACLOUD" ]; then
-    echo endpoint: http://localhost:8080
-    echo user: gojira
-else
-    echo endpoint: https://go-jira.atlassian.net
-    echo user: gojira
-fi    
+endpoint: https://go-jira.atlassian.net
+user: gojira

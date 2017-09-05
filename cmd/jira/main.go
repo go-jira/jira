@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -92,17 +91,6 @@ func main() {
 	}
 
 	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
-	o = o.WithPostCallback(
-		func(req *http.Request, resp *http.Response) (*http.Response, error) {
-			authUser := resp.Header.Get("X-Ausername")
-			if authUser == "" || authUser == "anonymous" {
-				// we are not logged in, so force login now by running the "login" command
-				app.Parse([]string{"login"})
-				return o.Do(req)
-			}
-			return resp, nil
-		},
-	)
 
 	registry := []jiracli.CommandRegistry{
 		jiracli.CommandRegistry{
