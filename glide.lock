@@ -19,7 +19,7 @@ imports:
 - name: github.com/coryb/figtree
   version: 48d3afc6118a0c353dc7d41ff77a3e0b75e14c07
 - name: github.com/coryb/kingpeon
-  version: 9b3d033f8a17e6b66af6123ec776bd93c19234cb
+  version: 3ca9749293339b932167921f92ce7a55207ad34e
 - name: github.com/coryb/oreo
   version: 95687d61c95ee1522c1140e2af59b0c1846abfc1
 - name: github.com/fatih/camelcase

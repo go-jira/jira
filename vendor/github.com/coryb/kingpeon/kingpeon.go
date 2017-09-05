@@ -88,7 +88,8 @@ func doRegisterDynamicCommands(run runner, app *kingpin.Application, commands Dy
 			cmd = cmd.Hidden()
 		}
 
-		for _, opt := range command.Options {
+		for _, realOpt := range command.Options {
+			opt := realOpt // copy
 			cmdFlag := cmd.Flag(opt.Name, opt.Help)
 			if opt.Short != "" {
 				cmdFlag.Short(rune(opt.Short[0]))
@@ -339,7 +340,8 @@ func doRegisterDynamicCommands(run runner, app *kingpin.Application, commands Dy
 			}
 		}
 
-		for _, arg := range command.Args {
+		for _, realArg := range command.Args {
+			arg := realArg // copy
 			cmdArg := cmd.Arg(arg.Name, arg.Help)
 			if arg.Required {
 				cmdArg.Required()
