@@ -18,7 +18,7 @@ type LabelsSetOptions struct {
 	Labels                []string `yaml:"labels,omitempty" json:"labels,omitempty"`
 }
 
-func CmdLabelsSetRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdLabelsSetRegistry() *jiracli.CommandRegistryEntry {
 	opts := LabelsSetOptions{}
 	return &jiracli.CommandRegistryEntry{
 		"Set labels on an issue",
@@ -26,7 +26,7 @@ func CmdLabelsSetRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdLabelsSetUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdLabelsSet(o, globals, &opts)
 		},
 	}

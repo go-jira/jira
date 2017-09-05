@@ -21,7 +21,7 @@ type TransitionOptions struct {
 	Resolution            string            `yaml:"resolution,omitempty" json:"resolution,omitempty"`
 }
 
-func CmdTransitionRegistry(o *oreo.Client, transition string) *jiracli.CommandRegistryEntry {
+func CmdTransitionRegistry(transition string) *jiracli.CommandRegistryEntry {
 	opts := TransitionOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("transition"),
@@ -44,7 +44,7 @@ func CmdTransitionRegistry(o *oreo.Client, transition string) *jiracli.CommandRe
 			}
 			return CmdTransitionUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdTransition(o, globals, &opts)
 		},
 	}

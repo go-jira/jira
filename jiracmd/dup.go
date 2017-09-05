@@ -19,7 +19,7 @@ type DupOptions struct {
 	Issue                     string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdDupRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdDupRegistry() *jiracli.CommandRegistryEntry {
 	opts := DupOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("edit"),
@@ -39,7 +39,7 @@ func CmdDupRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdDupUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdDup(o, globals, &opts)
 		},
 	}

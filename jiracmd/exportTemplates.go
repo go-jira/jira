@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -27,7 +28,7 @@ func CmdExportTemplatesRegistry() *jiracli.CommandRegistryEntry {
 			}
 			return CmdExportTemplatesUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdExportTemplates(&opts)
 		},
 	}

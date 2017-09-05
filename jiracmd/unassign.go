@@ -7,7 +7,7 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdUnassignRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdUnassignRegistry() *jiracli.CommandRegistryEntry {
 	opts := AssignOptions{}
 
 	return &jiracli.CommandRegistryEntry{
@@ -16,7 +16,7 @@ func CmdUnassignRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdAssignUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdAssign(o, globals, &opts)
 		},
 	}

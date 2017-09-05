@@ -24,7 +24,7 @@ type VoteOptions struct {
 	Action                VoteAction `yaml:"-" json:"-"`
 }
 
-func CmdVoteRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdVoteRegistry() *jiracli.CommandRegistryEntry {
 	opts := VoteOptions{
 		CommonOptions: jiracli.CommonOptions{},
 		Action:        VoteUP,
@@ -36,7 +36,7 @@ func CmdVoteRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdVoteUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdVote(o, globals, &opts)
 		},
 	}

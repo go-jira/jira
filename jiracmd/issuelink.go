@@ -18,7 +18,7 @@ type IssueLinkOptions struct {
 	LinkType                  string `yaml:"linktype,omitempty" json:"linktype,omitempty"`
 }
 
-func CmdIssueLinkRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdIssueLinkRegistry() *jiracli.CommandRegistryEntry {
 	opts := IssueLinkOptions{
 		LinkIssueRequest: jiradata.LinkIssueRequest{
 			Type:         &jiradata.IssueLinkType{},
@@ -32,7 +32,7 @@ func CmdIssueLinkRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdIssueLinkUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdIssueLink(o, globals, &opts)
 		},
 	}

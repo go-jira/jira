@@ -21,7 +21,7 @@ type SubtaskOptions struct {
 	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdSubtaskRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdSubtaskRegistry() *jiracli.CommandRegistryEntry {
 	opts := SubtaskOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("subtask"),
@@ -38,7 +38,7 @@ func CmdSubtaskRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			}
 			return CmdSubtaskUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdSubtask(o, globals, &opts)
 		},
 	}

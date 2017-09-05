@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 	"github.com/pkg/browser"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -18,7 +19,7 @@ func CmdBrowseRegistry() *jiracli.CommandRegistryEntry {
 			cmd.Arg("ISSUE", "Issue to browse to").Required().StringVar(&issue)
 			return nil
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdBrowse(globals, issue)
 		},
 	}

@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-type Transport struct {
+type transport struct {
 	shadow *http.Transport
 }
 
-func NewUnixProxyTransport(path string) *Transport {
+func newUnixProxyTransport(path string) *transport {
 	dial := func(network, addr string) (net.Conn, error) {
 		return net.Dial("unix", path)
 	}
@@ -25,14 +25,14 @@ func NewUnixProxyTransport(path string) *Transport {
 		ExpectContinueTimeout: 10 * time.Second,
 	}
 
-	return &Transport{shadow}
+	return &transport{shadow}
 }
 
-func UnixProxy(path string) *Transport {
-	return NewUnixProxyTransport(os.ExpandEnv(path))
+func unixProxy(path string) *transport {
+	return newUnixProxyTransport(os.ExpandEnv(path))
 }
 
-func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req2 := *req
 	url2 := *req.URL
 	req2.URL = &url2

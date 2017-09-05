@@ -25,7 +25,7 @@ type WatchOptions struct {
 	Action                WatchAction `yaml:"-" json:"-"`
 }
 
-func CmdWatchRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdWatchRegistry() *jiracli.CommandRegistryEntry {
 	opts := WatchOptions{
 		CommonOptions: jiracli.CommonOptions{},
 		Action:        WatcherAdd,
@@ -37,7 +37,7 @@ func CmdWatchRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdWatchUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdWatch(o, globals, &opts)
 		},
 	}

@@ -17,7 +17,7 @@ type WorklogAddOptions struct {
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdWorklogAddRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdWorklogAddRegistry() *jiracli.CommandRegistryEntry {
 	opts := WorklogAddOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("worklog"),
@@ -29,7 +29,7 @@ func CmdWorklogAddRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdWorklogAddUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdWorklogAdd(o, globals, &opts)
 		},
 	}

@@ -18,7 +18,7 @@ type LabelsRemoveOptions struct {
 	Labels                []string `yaml:"labels,omitempty" json:"labels,omitempty"`
 }
 
-func CmdLabelsRemoveRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdLabelsRemoveRegistry() *jiracli.CommandRegistryEntry {
 	opts := LabelsRemoveOptions{}
 	return &jiracli.CommandRegistryEntry{
 		"Remove labels from an issue",
@@ -26,7 +26,7 @@ func CmdLabelsRemoveRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdLabelsRemoveUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdLabelsRemove(o, globals, &opts)
 		},
 	}

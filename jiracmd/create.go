@@ -23,7 +23,7 @@ type CreateOptions struct {
 	SaveFile              string            `yaml:"savefile,omitempty" json:"savefile,omitempty"`
 }
 
-func CmdCreateRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdCreateRegistry() *jiracli.CommandRegistryEntry {
 	opts := CreateOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("create"),
@@ -37,7 +37,7 @@ func CmdCreateRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdCreateUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdCreate(o, globals, &opts)
 		},
 	}

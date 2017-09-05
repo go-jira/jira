@@ -14,7 +14,7 @@ type ViewOptions struct {
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdViewRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdViewRegistry() *jiracli.CommandRegistryEntry {
 	opts := ViewOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("view"),
@@ -27,7 +27,7 @@ func CmdViewRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdViewUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdView(o, globals, &opts)
 		},
 	}

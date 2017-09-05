@@ -18,7 +18,7 @@ type CommentOptions struct {
 	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdCommentRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdCommentRegistry() *jiracli.CommandRegistryEntry {
 	opts := CommentOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("comment"),
@@ -32,7 +32,7 @@ func CmdCommentRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdCommentUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdComment(o, globals, &opts)
 		},
 	}

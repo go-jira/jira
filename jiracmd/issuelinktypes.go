@@ -8,7 +8,7 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdIssueLinkTypesRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdIssueLinkTypesRegistry() *jiracli.CommandRegistryEntry {
 	opts := jiracli.CommonOptions{
 		Template: figtree.NewStringOption("issuelinktypes"),
 	}
@@ -19,7 +19,7 @@ func CmdIssueLinkTypesRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdIssueLinkTypesUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdIssueLinkTypes(o, globals, &opts)
 		},
 	}

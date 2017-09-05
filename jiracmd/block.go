@@ -17,7 +17,7 @@ type BlockOptions struct {
 	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
 }
 
-func CmdBlockRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdBlockRegistry() *jiracli.CommandRegistryEntry {
 	opts := BlockOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("edit"),
@@ -37,7 +37,7 @@ func CmdBlockRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdBlockUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdBlock(o, globals, &opts)
 		},
 	}

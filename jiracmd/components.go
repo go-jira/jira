@@ -16,7 +16,7 @@ type ComponentsOptions struct {
 	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 }
 
-func CmdComponentsRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdComponentsRegistry() *jiracli.CommandRegistryEntry {
 	opts := ComponentsOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("components"),
@@ -29,7 +29,7 @@ func CmdComponentsRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdComponentsUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdComponents(o, globals, &opts)
 		},
 	}

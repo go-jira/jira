@@ -21,7 +21,7 @@ type RequestOptions struct {
 	Data                  string `yaml:"data,omitempty" json:"data,omitempty"`
 }
 
-func CmdRequestRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdRequestRegistry() *jiracli.CommandRegistryEntry {
 	opts := RequestOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("request"),
@@ -37,7 +37,7 @@ func CmdRequestRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			}
 			return CmdRequestUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdRequest(o, globals, &opts)
 		},
 	}

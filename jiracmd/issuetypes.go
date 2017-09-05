@@ -16,7 +16,7 @@ type IssueTypesOptions struct {
 	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 }
 
-func CmdIssueTypesRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdIssueTypesRegistry() *jiracli.CommandRegistryEntry {
 	opts := IssueTypesOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("issuetypes"),
@@ -29,7 +29,7 @@ func CmdIssueTypesRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdIssueTypesUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdIssueTypes(o, globals, &opts)
 		},
 	}

@@ -11,7 +11,7 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdLogoutRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdLogoutRegistry() *jiracli.CommandRegistryEntry {
 	opts := jiracli.CommonOptions{}
 	return &jiracli.CommandRegistryEntry{
 		"Deactivate sesssion with Jira server",
@@ -19,7 +19,7 @@ func CmdLogoutRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return nil
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdLogout(o, globals, &opts)
 		},
 	}

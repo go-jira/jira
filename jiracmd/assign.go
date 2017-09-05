@@ -16,7 +16,7 @@ type AssignOptions struct {
 	Assignee              string `yaml:"assignee,omitempty" json:"assignee,omitempty"`
 }
 
-func CmdAssignRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdAssignRegistry() *jiracli.CommandRegistryEntry {
 	opts := AssignOptions{}
 
 	return &jiracli.CommandRegistryEntry{
@@ -25,7 +25,7 @@ func CmdAssignRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdAssignUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdAssign(o, globals, &opts)
 		},
 	}

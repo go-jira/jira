@@ -13,7 +13,7 @@ type ListOptions struct {
 	jira.SearchOptions    `yaml:",inline" json:",inline" figtree:",inline"`
 }
 
-func CmdListRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdListRegistry() *jiracli.CommandRegistryEntry {
 	opts := ListOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("list"),
@@ -35,7 +35,7 @@ func CmdListRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			}
 			return CmdListUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdList(o, globals, &opts)
 		},
 	}

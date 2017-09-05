@@ -12,7 +12,7 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdLoginRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdLoginRegistry() *jiracli.CommandRegistryEntry {
 	opts := jiracli.CommonOptions{}
 	return &jiracli.CommandRegistryEntry{
 		"Attempt to login into jira server",
@@ -20,7 +20,7 @@ func CmdLoginRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return nil
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdLogin(o, globals, &opts)
 		},
 	}

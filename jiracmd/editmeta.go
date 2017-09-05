@@ -13,7 +13,7 @@ type EditMetaOptions struct {
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdEditMetaRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdEditMetaRegistry() *jiracli.CommandRegistryEntry {
 
 	opts := EditMetaOptions{
 		CommonOptions: jiracli.CommonOptions{
@@ -27,7 +27,7 @@ func CmdEditMetaRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdEditMetaUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdEditMeta(o, globals, &opts)
 		},
 	}

@@ -17,7 +17,7 @@ type ComponentAddOptions struct {
 	jiradata.Component    `yaml:",inline" json:",inline" figtree:",inline"`
 }
 
-func CmdComponentAddRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdComponentAddRegistry() *jiracli.CommandRegistryEntry {
 	opts := ComponentAddOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("component-add"),
@@ -30,7 +30,7 @@ func CmdComponentAddRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdComponentAddUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdComponentAdd(o, globals, &opts)
 		},
 	}

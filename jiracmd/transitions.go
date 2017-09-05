@@ -13,7 +13,7 @@ type TransitionsOptions struct {
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdTransitionsRegistry(o *oreo.Client, defaultTemplate string) *jiracli.CommandRegistryEntry {
+func CmdTransitionsRegistry(defaultTemplate string) *jiracli.CommandRegistryEntry {
 	opts := TransitionsOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption(defaultTemplate),
@@ -26,7 +26,7 @@ func CmdTransitionsRegistry(o *oreo.Client, defaultTemplate string) *jiracli.Com
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdTransitionsUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdTransitions(o, globals, &opts)
 		},
 	}

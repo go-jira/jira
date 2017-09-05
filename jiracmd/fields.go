@@ -8,7 +8,7 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
-func CmdFieldsRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdFieldsRegistry() *jiracli.CommandRegistryEntry {
 	opts := jiracli.CommonOptions{
 		Template: figtree.NewStringOption("fields"),
 	}
@@ -19,7 +19,7 @@ func CmdFieldsRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.TemplateUsage(cmd, &opts)
 			return nil
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdFields(o, globals, &opts)
 		},
 	}

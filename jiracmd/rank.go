@@ -19,7 +19,7 @@ type RankOptions struct {
 	Order                 string `yaml:"order,omitempty" json:"order,omitempty"`
 }
 
-func CmdRankRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdRankRegistry() *jiracli.CommandRegistryEntry {
 	opts := RankOptions{}
 
 	return &jiracli.CommandRegistryEntry{
@@ -28,7 +28,7 @@ func CmdRankRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdRankUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdRank(o, globals, &opts)
 		},
 	}

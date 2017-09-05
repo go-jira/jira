@@ -20,7 +20,7 @@ type EditOptions struct {
 	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
-func CmdEditRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdEditRegistry() *jiracli.CommandRegistryEntry {
 	opts := EditOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("edit"),
@@ -34,7 +34,7 @@ func CmdEditRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdEditUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdEdit(o, globals, &opts)
 		},
 	}

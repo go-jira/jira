@@ -2,9 +2,11 @@ package jiracli
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"reflect"
@@ -12,6 +14,7 @@ import (
 
 	"github.com/AlecAivazis/survey"
 	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
 	"github.com/jinzhu/copier"
 	shellquote "github.com/kballard/go-shellquote"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -29,6 +32,8 @@ type GlobalOptions struct {
 	Endpoint       figtree.StringOption `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
 	User           figtree.StringOption `json:"user,omitempty" yaml:"user,omitempty"`
 	PasswordSource figtree.StringOption `json:"password-source,omitempty" yaml:"password-source,omitempty"`
+	UnixProxy      figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
+	Insecure       figtree.BoolOption   `yaml:"insecure,omitempty" json:"insecure,omitempty"`
 }
 
 type CommonOptions struct {
@@ -41,7 +46,7 @@ type CommonOptions struct {
 type CommandRegistryEntry struct {
 	Help        string
 	UsageFunc   func(*figtree.FigTree, *kingpin.CmdClause) error
-	ExecuteFunc func(*GlobalOptions) error
+	ExecuteFunc func(*oreo.Client, *GlobalOptions) error
 }
 
 type CommandRegistry struct {
@@ -57,12 +62,30 @@ type kingpinAppOrCommand interface {
 	GetCommand(string) *kingpin.CmdClause
 }
 
-func Register(app *kingpin.Application, fig *figtree.FigTree, reg []CommandRegistry) {
+func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, reg []CommandRegistry) {
 	globals := GlobalOptions{
 		User: figtree.NewStringOption(os.Getenv("USER")),
 	}
 	app.Flag("endpoint", "Base URI to use for Jira").Short('e').SetValue(&globals.Endpoint)
 	app.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&globals.User)
+	app.Flag("unixproxy", "Path for a unix-socket proxy").SetValue(&globals.UnixProxy)
+	app.Flag("insecure", "Disable TLS certificate verification").Short('k').SetValue(&globals.Insecure)
+
+	app.PreAction(func(_ *kingpin.ParseContext) error {
+		if globals.Insecure.Value {
+			transport := &http.Transport{
+				Proxy: http.ProxyFromEnvironment,
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: true,
+				},
+			}
+			o = o.WithTransport(transport)
+		}
+		if globals.UnixProxy.Value != "" {
+			o = o.WithTransport(unixProxy(globals.UnixProxy.Value))
+		}
+		return nil
+	})
 
 	for _, command := range reg {
 		copy := command
@@ -93,7 +116,7 @@ func Register(app *kingpin.Application, fig *figtree.FigTree, reg []CommandRegis
 
 		cmd.Action(
 			func(_ *kingpin.ParseContext) error {
-				return copy.Entry.ExecuteFunc(&globals)
+				return copy.Entry.ExecuteFunc(o, &globals)
 			},
 		)
 	}

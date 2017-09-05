@@ -14,7 +14,7 @@ type CreateMetaOptions struct {
 	IssueType             string `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
 }
 
-func CmdCreateMetaRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
+func CmdCreateMetaRegistry() *jiracli.CommandRegistryEntry {
 	opts := CreateMetaOptions{
 		CommonOptions: jiracli.CommonOptions{
 			Template: figtree.NewStringOption("createmeta"),
@@ -27,7 +27,7 @@ func CmdCreateMetaRegistry(o *oreo.Client) *jiracli.CommandRegistryEntry {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdCreateMetaUsage(cmd, &opts)
 		},
-		func(globals *jiracli.GlobalOptions) error {
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdCreateMeta(o, globals, &opts)
 		},
 	}
