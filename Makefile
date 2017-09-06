@@ -90,7 +90,7 @@ version:
 	@echo $(CURVER)
 
 clean:
-	rm -rf pkg dist bin src ./$(NAME)
+	rm -rf ./$(NAME)
 
 export GNUPGHOME=$(CWD)/t/.gnupg
 export PASSWORD_STORE_DIR=$(CWD)/t/.password-store
