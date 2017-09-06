@@ -22,7 +22,8 @@ go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
 
 ## v1 vs v0 changes
 
-* **Golang library import** For the new version of go-jira you should use:
+###### **Golang library import**
+For the new version of go-jira you should use:
 ```
 import "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 ```
@@ -32,7 +33,8 @@ If you have code that depends on the old apis, you can still use them with this 
 import "gopkg.in/Netflix-Skunkworks/go-jira.v0"
 ```
 
-* **Configs per command**.  Instead of requiring a exectuable template to get configs for a given command now you can create a config to be applied to a command.  So if you want to use `template: table` by default for yor `jira list` you can now do:
+###### **Configs per command**
+Instead of requiring a exectuable template to get configs for a given command now you can create a config to be applied to a command.  So if you want to use `template: table` by default for yor `jira list` you can now do:
 ```
 $ cat $HOME/.jira.d/list.yml
 template: table
@@ -47,7 +49,8 @@ case $JIRA_OPERATION in
 esac
 ```
 
-* **Custom Commands**.  Now you can create your own custom commands to do common operations with jira.  Please see the details **Custom Commands** section below for more details.  If you want to create a command `jira mine` that lists all the issues assigned to you now you can modify your `.jira.d/config.yml` file to add a `custom-commands` section like this:
+###### **Custom Commands**
+Now you can create your own custom commands to do common operations with jira.  Please see the details **Custom Commands** section below for more details.  If you want to create a command `jira mine` that lists all the issues assigned to you now you can modify your `.jira.d/config.yml` file to add a `custom-commands` section like this:
 ```
 custom-commands:
   - name: mine
@@ -71,7 +74,8 @@ Flags:
   -k, --insecure             Disable TLS certificate verification
 ```
 
-* **Incompatible command changes**: Unfortunately during the rewrite between v0 and v1 there were some changes necessary that broke backwards compatibility with existing commands.  Specifically the `dups`, `blocks`, `add worklog` and `add|remove|set labels` commands have had the command word swapped around:
+###### **Incompatible command changes**
+Unfortunately during the rewrite between v0 and v1 there were some changes necessary that broke backwards compatibility with existing commands.  Specifically the `dups`, `blocks`, `add worklog` and `add|remove|set labels` commands have had the command word swapped around:
   * `jira DUPLICATE dups ISSUE` => `jira dup DUPLICATE ISSUE`
   * `jira BLOCKER blocks ISSUE` => `jira block BLOCKER ISSUE`
   * `jira add worklog` => `jira worklog add`
@@ -79,7 +83,8 @@ Flags:
   * `jira remove labels` => `jira labels remove`
   * `jira set labels` => `jira labels set`
 
-* **Login process change**.  Previously `jira` used attempt to get a `JSESSION` cookies by authenticating with the webservice standard GUI login process.  This has been especially problematic as users need to authenticate with various credential providers (google auth, etc).  We now attempt to authenticate via the [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login).  This may be problematic for users if admins have locked down the session-login api, so we might have to bring back the error-prone Basic-Auth approach.  For users that are unable to authenticate via `jira` hopefully someone in your organization can provide me with details on a process for you to authenticate and we can try to update `jira`.
+###### **Login process change**
+Previously `jira` used attempt to get a `JSESSION` cookies by authenticating with the webservice standard GUI login process.  This has been especially problematic as users need to authenticate with various credential providers (google auth, etc).  We now attempt to authenticate via the [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login).  This may be problematic for users if admins have locked down the session-login api, so we might have to bring back the error-prone Basic-Auth approach.  For users that are unable to authenticate via `jira` hopefully someone in your organization can provide me with details on a process for you to authenticate and we can try to update `jira`.
 
 ## Configuration
 
