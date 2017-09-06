@@ -68,7 +68,7 @@ func TemplateProcessor() *template.Template {
 			return string(bytes), nil
 		},
 		"termWidth": func() int {
-			w, _, err := terminal.GetSize(int(os.Stdin.Fd()))
+			w, _, err := terminal.GetSize(int(os.Stdout.Fd()))
 			if err == nil {
 				return w
 			}
