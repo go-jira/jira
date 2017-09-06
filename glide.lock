@@ -1,7 +1,7 @@
 hash: 3e4ada7ae3922b18b3492a45f1f31cdaaf68fa708327ce9b4f9730c3f0b3ca90
 updated: 2017-08-30T18:15:39.909557691-07:00
 imports:
-- name: github.com/AlecAivazis/survey
+- name: gopkg.in/AlecAivazis/survey.v1
   version: 73fd4d7829877a72e03dbb42f84ed383fbbc5fa0
   subpackages:
   - core

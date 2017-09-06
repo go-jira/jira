@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/AlecAivazis/survey"
+	"gopkg.in/AlecAivazis/survey.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 

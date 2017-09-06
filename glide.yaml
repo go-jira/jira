@@ -11,7 +11,7 @@ import:
   version: ^2.2.4
 - package: gopkg.in/op/go-logging.v1
   version: ^1.0.0
-- package: github.com/AlecAivazis/survey
+- package: gopkg.in/AlecAivazis/survey.v1
   version: ^1.2.4
 - package: github.com/tmc/keyring
 - package: github.com/kballard/go-shellquote

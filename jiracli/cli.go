@@ -12,11 +12,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/AlecAivazis/survey"
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 	"github.com/jinzhu/copier"
 	shellquote "github.com/kballard/go-shellquote"
+	"gopkg.in/AlecAivazis/survey.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 	yaml "gopkg.in/coryb/yaml.v2"
 	logging "gopkg.in/op/go-logging.v1"
