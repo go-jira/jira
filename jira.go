@@ -7,7 +7,7 @@ import (
 
 var log = logging.MustGetLogger("jira")
 
-const VERSION = "1.0.1"
+const VERSION = "1.0.2"
 
 type Jira struct {
 	Endpoint string     `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
