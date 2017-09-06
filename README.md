@@ -22,6 +22,16 @@ go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
 
 ## v1 vs v0 changes
 
+* **Golang library import** For the new version of go-jira you should use:
+```
+import "gopkg.in/Netflix-Skunkworks/go-jira.v1"
+```
+
+If you have code that depends on the old apis, you can still use them with this import:
+```
+import "gopkg.in/Netflix-Skunkworks/go-jira.v0"
+```
+
 * **Configs per command**.  Instead of requiring a exectuable template to get configs for a given command now you can create a config to be applied to a command.  So if you want to use `template: table` by default for yor `jira list` you can now do:
 ```
 $ cat $HOME/.jira.d/list.yml
