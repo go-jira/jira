@@ -11,7 +11,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"syscall"
 	"text/template"
 
 	"github.com/mgutz/ansi"
@@ -69,7 +68,7 @@ func TemplateProcessor() *template.Template {
 			return string(bytes), nil
 		},
 		"termWidth": func() int {
-			w, _, err := terminal.GetSize(syscall.Stdout)
+			w, _, err := terminal.GetSize(int(os.Stdin.Fd()))
 			if err == nil {
 				return w
 			}
