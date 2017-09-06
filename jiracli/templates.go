@@ -285,7 +285,8 @@ update:
         body: |~
           {{ or .overrides.comment "" | indent 10 }}
 fields:
-  summary: {{ or .overrides.summary .fields.summary }}
+  summary: >-
+    {{ or .overrides.summary .fields.summary }}
 {{- if and .meta.fields.components .meta.fields.components.allowedValues }}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
     - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
@@ -334,7 +335,8 @@ fields:
     key: {{ or .overrides.project "" }}
   issuetype:
     name: {{ or .overrides.issuetype "" }}
-  summary: {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+  summary: >-
+    {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
@@ -354,7 +356,8 @@ const defaultSubtaskTemplate = `{{/* create subtask template */ -}}
 fields:
   project:
     key: {{ .parent.fields.project.key }}
-  summary: {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+  summary: >-
+    {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
@@ -428,7 +431,8 @@ fields:
     name: {{if .overrides.resolution}}{{.overrides.resolution}}{{else if .fields.resolution}}{{.fields.resolution.name}}{{else}}{{or .overrides.defaultResolution "Fixed"}}{{end}}
 {{- end -}}
 {{if .meta.fields.summary}}
-  summary: {{or .overrides.summary .fields.summary}}
+  summary: >-
+    {{or .overrides.summary .fields.summary}}
 {{- end -}}
 {{if .meta.fields.versions.allowedValues}}
   versions: # Values: {{ range .meta.fields.versions.allowedValues }}{{.name}}, {{end}}{{if .overrides.versions}}{{ range (split "," .overrides.versions)}}
