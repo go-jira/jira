@@ -1,9 +1,5 @@
-#!/bin/sh
-echo password-source: pass
-if [ -z "$JIRACLOUD" ]; then
-    echo endpoint: http://localhost:8080
-    echo user: gojira
-else
-    echo endpoint: https://go-jira.atlassian.net
-    echo user: gojira@example.com
-fi    
+config:
+  stop: true
+password-source: pass
+endpoint: https://go-jira.atlassian.net
+user: gojira

@@ -1,0 +1,289 @@
+dynamic-commands:
+  - name: echo
+    help: echo stuff
+    script: |-
+      echo {{if not options.newline}}-n {{end}}hello {{args.WORD}}
+    args:
+      - name: WORD
+        default: world
+    options:
+      - name: newline
+        type: BOOL
+        default: true
+  - name: test bool arg
+    help: test bool arg
+    script: |-
+      echo {{args.BOOL}}
+    args:
+      - name: BOOL
+        type: BOOL
+        required: true
+  - name: test bool opt
+    help: test bool opt
+    script: |-
+      echo {{options.BOOL}}
+    options:
+      - name: BOOL
+        type: BOOL
+        required: true
+  - name: test counter arg
+    help: test counter arg
+    script: |-
+      echo {{args.COUNTER}}
+    args:
+      - name: COUNTER
+        type: COUNTER
+        required: true
+  - name: test counter opt
+    help: test counter opt
+    script: |-
+      echo {{options.COUNTER}}
+    options:
+      - name: COUNTER
+        type: COUNTER
+        required: true
+  - name: test enum arg
+    help: test enum arg
+    script: |-
+      echo {{args.ENUM}}
+    args:
+      - name: ENUM
+        type: ENUM
+        enum:
+          - foo
+          - bar
+        required: true
+  - name: test enum opt
+    help: test enum opt
+    script: |-
+      echo {{options.ENUM}}
+    options:
+      - name: ENUM
+        type: ENUM
+        enum:
+          - foo
+          - bar
+        required: true
+  - name: test float32 arg
+    help: test float32 arg
+    script: |-
+      echo {{args.FLOAT32}}
+    args:
+      - name: FLOAT32
+        type: FLOAT32
+        required: true
+  - name: test float32 opt
+    help: test float32 opt
+    script: |-
+      echo {{options.FLOAT32}}
+    options:
+      - name: FLOAT32
+        type: FLOAT32
+        required: true
+  - name: test float64 arg
+    help: test float64 arg
+    script: |-
+      echo {{args.FLOAT64}}
+    args:
+      - name: FLOAT64
+        type: FLOAT64
+        required: true
+  - name: test float64 opt
+    help: test float64 opt
+    script: |-
+      echo {{options.FLOAT64}}
+    options:
+      - name: FLOAT64
+        type: FLOAT64
+        required: true
+  - name: test int8 arg
+    help: test int8 arg
+    script: |-
+      echo {{args.INT8}}
+    args:
+      - name: INT8
+        type: INT8
+        required: true
+  - name: test int8 opt
+    help: test int8 opt
+    script: |-
+      echo {{options.INT8}}
+    options:
+      - name: INT8
+        type: INT8
+        required: true
+  - name: test int16 arg
+    help: test int16 arg
+    script: |-
+      echo {{args.INT16}}
+    args:
+      - name: INT16
+        type: INT16
+        required: true
+  - name: test int16 opt
+    help: test int16 opt
+    script: |-
+      echo {{options.INT16}}
+    options:
+      - name: INT16
+        type: INT16
+        required: true
+  - name: test int32 arg
+    help: test int32 arg
+    script: |-
+      echo {{args.INT32}}
+    args:
+      - name: INT32
+        type: INT32
+        required: true
+  - name: test int32 opt
+    help: test int32 opt
+    script: |-
+      echo {{options.INT32}}
+    options:
+      - name: INT32
+        type: INT32
+        required: true
+  - name: test int64 arg
+    help: test int64 arg
+    script: |-
+      echo {{args.INT64}}
+    args:
+      - name: INT64
+        type: INT64
+        required: true
+  - name: test int64 opt
+    help: test int64 opt
+    script: |-
+      echo {{options.INT64}}
+    options:
+      - name: INT64
+        type: INT64
+        required: true
+  - name: test int arg
+    help: test int arg
+    script: |-
+      echo {{args.INT}}
+    args:
+      - name: INT
+        type: INT
+        required: true
+  - name: test int opt
+    help: test int opt
+    script: |-
+      echo {{options.INT}}
+    options:
+      - name: INT
+        type: INT
+        required: true
+  - name: test string arg
+    help: test string arg
+    script: |-
+      echo {{args.STRING}}
+    args:
+      - name: STRING
+        required: true
+  - name: test string opt
+    help: test string opt
+    script: |-
+      echo {{options.STRING}}
+    options:
+      - name: STRING
+        required: true
+  - name: test stringmap arg
+    help: test stringmap arg
+    script: |-
+      echo {{range $key, $val := args.STRINGMAP}}[{{$key}}: {{$val}}]{{end}}
+    args:
+      - name: STRINGMAP
+        type: STRINGMAP
+        required: true
+  - name: test stringmap opt
+    help: test stringmap opt
+    script: |-
+      echo {{range $key, $val := options.STRINGMAP}}[{{$key}}: {{$val}}]{{end}}
+    options:
+      - name: STRINGMAP
+        type: STRINGMAP
+        required: true
+  - name: test uint8 arg
+    help: test uint8 arg
+    script: |-
+      echo {{args.UINT8}}
+    args:
+      - name: UINT8
+        type: UINT8
+        required: true
+  - name: test uint8 opt
+    help: test uint8 opt
+    script: |-
+      echo {{options.UINT8}}
+    options:
+      - name: UINT8
+        type: UINT8
+        required: true
+  - name: test uint16 arg
+    help: test uint16 arg
+    script: |-
+      echo {{args.UINT16}}
+    args:
+      - name: UINT16
+        type: UINT16
+        required: true
+  - name: test uint16 opt
+    help: test uint16 opt
+    script: |-
+      echo {{options.UINT16}}
+    options:
+      - name: UINT16
+        type: UINT16
+        required: true
+  - name: test uint32 arg
+    help: test uint32 arg
+    script: |-
+      echo {{args.UINT32}}
+    args:
+      - name: UINT32
+        type: UINT32
+        required: true
+  - name: test uint32 opt
+    help: test uint32 opt
+    script: |-
+      echo {{options.UINT32}}
+    options:
+      - name: UINT32
+        type: UINT32
+        required: true
+  - name: test uint64 arg
+    help: test uint64 arg
+    script: |-
+      echo {{args.UINT64}}
+    args:
+      - name: UINT64
+        type: UINT64
+        required: true
+  - name: test uint64 opt
+    help: test uint64 opt
+    script: |-
+      echo {{options.UINT64}}
+    options:
+      - name: UINT64
+        type: UINT64
+        required: true
+  - name: test uint arg
+    help: test uint arg
+    script: |-
+      echo {{args.UINT}}
+    args:
+      - name: UINT
+        type: UINT
+        required: true
+  - name: test uint opt
+    help: test uint opt
+    script: |-
+      echo {{options.UINT}}
+    options:
+      - name: UINT
+        type: UINT
+        required: true
+      

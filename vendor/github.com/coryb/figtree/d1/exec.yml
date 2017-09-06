@@ -1,0 +1,13 @@
+#!/bin/bash
+cat <<EOM
+str1: d1str1val1
+arr1:
+  - d1arr1val1
+  - d1arr1val2
+map1:
+  key0: d1map1val0
+  key1: d1map1val1
+int1: 111
+float1: 1.11
+bool1: true
+EOM

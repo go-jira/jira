@@ -1,0 +1,64 @@
+package jiracmd
+
+import (
+	"fmt"
+
+	"github.com/coryb/figtree"
+	"github.com/coryb/oreo"
+
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
+)
+
+type LabelsSetOptions struct {
+	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Issue                 string   `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Labels                []string `yaml:"labels,omitempty" json:"labels,omitempty"`
+}
+
+func CmdLabelsSetRegistry() *jiracli.CommandRegistryEntry {
+	opts := LabelsSetOptions{}
+	return &jiracli.CommandRegistryEntry{
+		"Set labels on an issue",
+		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
+			jiracli.LoadConfigs(cmd, fig, &opts)
+			return CmdLabelsSetUsage(cmd, &opts)
+		},
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			return CmdLabelsSet(o, globals, &opts)
+		},
+	}
+}
+
+func CmdLabelsSetUsage(cmd *kingpin.CmdClause, opts *LabelsSetOptions) error {
+	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
+	cmd.Arg("ISSUE", "issue id to modify labels").Required().StringVar(&opts.Issue)
+	cmd.Arg("LABEL", "label to set on issue").Required().StringsVar(&opts.Labels)
+	return nil
+}
+
+// CmdLabels will set labels on a given issue
+func CmdLabelsSet(o *oreo.Client, globals *jiracli.GlobalOptions, opts *LabelsSetOptions) error {
+	issueUpdate := jiradata.IssueUpdate{
+		Update: jiradata.FieldOperationsMap{
+			"labels": jiradata.FieldOperations{
+				jiradata.FieldOperation{
+					"set": opts.Labels,
+				},
+			},
+		},
+	}
+
+	if err := jira.EditIssue(o, globals.Endpoint.Value, opts.Issue, &issueUpdate); err != nil {
+		return err
+	}
+	if !globals.Quiet.Value {
+		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
+	}
+	if opts.Browse.Value {
+		return CmdBrowse(globals, opts.Issue)
+	}
+	return nil
+}

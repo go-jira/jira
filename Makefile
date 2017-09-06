@@ -28,8 +28,6 @@ else
 	BIN ?= $(GOBIN)$(SEP)$(NAME)
 endif
 
-export GOPATH=$(CWD)
-
 DIST=$(CWD)$(SEP)dist
 
 GOBIN ?= $(CWD)
@@ -40,32 +38,31 @@ LDFLAGS:=-X jira.VERSION=$(CURVER) -w
 # use make DEBUG=1 and you can get a debuggable golang binary
 # see https://github.com/mailgun/godebug
 ifneq ($(DEBUG),)
-	GOBUILD=go get -v github.com/mailgun/godebug && ./bin/godebug build
+	GOBUILD=go get -v github.com/mailgun/godebug && 
 else
-	GOBUILD=go build -v -ldflags "$(LDFLAGS) -s"
+	GOBUILD=go build -gcflags="-e -complete" -v -ldflags "$(LDFLAGS) -s"
 endif
 
-build: src/gopkg.in/Netflix-Skunkworks/go-jira.v0
-	$(GOBUILD) -o '$(BIN)' main/main.go
+build:
+	$(GOBUILD) -o '$(BIN)' cmd/jira/main.go
 
 debug:
-	$(MAKE) DEBUG=1
-
-src/%:
-	mkdir -p $(@D)
-	test -L $@ || ln -sf '../../..' $@
-	go get -v $* $*/main
+	go build -v -o '$(BIN)' cmd/jira/main.go
 
 vet:
 	@go vet .
-	@go vet ./data
-	@go vet ./main
+	@go vet ./jiracli
+	@go vet ./jiracmd
+	@go vet ./jiradata
+	@go vet ./cmd/jira
 
 lint:
 	@go get github.com/golang/lint/golint
-	@./bin/golint .
-	@./bin/golint ./data
-	@./bin/golint ./main
+	@golint .
+	@golint ./jiracli
+	@golint ./jiracmd
+	@golint ./jiradata
+	@golint ./cmd/jira
 
 cross-setup:
 	for p in $(PLATFORMS); do \
@@ -130,3 +127,7 @@ export JIRACLOUD=1
 prove:
 	chmod -R g-rwx,o-rwx $(GNUPGHOME)
 	OSHT_VERBOSE=1 prove -v 
+
+generate:
+	cd schemas && ./fetch-schemas.py
+	grep -h slipscheme jiradata/*.go | grep json | sort | uniq | awk -F\/\/ '{print $$2}' | while read cmd; do $$cmd; done

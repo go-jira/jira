@@ -1,0 +1,22 @@
+hash: 36198c10af5880bbc485f4e52d35f5d97a2b3765e1b04a06a057a4496f5502b6
+updated: 2017-06-20T14:10:57.557488284-07:00
+imports:
+- name: github.com/sethgrid/pester
+  version: 8053687f99650573b28fb75cddf3f295082704d7
+- name: github.com/theckman/go-flock
+  version: 6de226b0d5f040ed85b88c82c381709b98277f3d
+- name: gopkg.in/op/go-logging.v1
+  version: b2cb9fa56473e98db8caba80237377e83fe44db5
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert

@@ -1,0 +1,10 @@
+str1: d3str1val1
+arr1:
+  - d3arr1val1
+  - d3arr1val2
+map1:
+  key2: d3map1val2
+  key3: d3map1val3
+int1: 333
+float1: 3.33
+bool1: true
