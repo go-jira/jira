@@ -1,19 +1,3 @@
-PLATFORMS= \
-	freebsd/amd64 \
-	linux/386 \
-	linux/amd64 \
-	windows/386 \
-	windows/amd64 \
-	darwin/amd64 \
-	$(NULL)
-
-	# freebsd-386 \
-	# freebsd-arm \
-	# linux-arm \
-	# openbsd-386 \
-	# openbsd-amd64 \
-	# darwin-386
-
 NAME=jira
 
 OS=$(shell uname -s)
@@ -53,11 +37,11 @@ lint:
 	@golint ./jiradata
 	@golint ./cmd/jira
 
-all: 
-	docker pull karalabe/xgo-latest
+all:
+	go get -u github.com/karalabe/xgo
 	rm -rf dist
 	mkdir -p dist
-	docker run --rm -e EXT_GOPATH=/gopath -v $$(pwd):/gopath/src/gopkg.in/Netflix-Skunkworks/go-jira.v1 -e TARGETS="$(PLATFORMS)" -v $$(pwd)/dist:/build karalabe/xgo-latest gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
+	xgo --targets="freebsd/amd64,linux/386,linux/amd64,windows/386,windows/amd64,darwin/amd64" -dest ./dist -ldflags="-w -s" ./cmd/jira
 
 install:
 	${MAKE} GOBIN=$$HOME/bin build
@@ -66,7 +50,7 @@ NEWVER ?= $(shell echo $(CURVER) | awk -F. '{print $$1"."$$2"."$$3+1}')
 TODAY  := $(shell date +%Y-%m-%d)
 
 changes:
-	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^v$(CURVER) HEAD *.go jiracli/*.go jiradata/*.go jiracmd/*.go cmd/*/*.go | grep -vE 'gofmt|go fmt'
+	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^v$(CURVER) HEAD *.go jiracli/*.go jiradata/*.go jiracmd/*.go cmd/*/*.go glide.* | grep -vE 'gofmt|go fmt|version bump'
 
 update-changelog:
 	@echo "# Changelog" > CHANGELOG.md.new; \
@@ -83,6 +67,7 @@ update-changelog:
 
 release:
 	git commit -m "Updated Changelog" CHANGELOG.md; \
+    git commit -m "version bump" jira.go
 	git tag v$(NEWVER)
 	git push --tags
 

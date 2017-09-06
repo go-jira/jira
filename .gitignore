@@ -2,3 +2,4 @@ jira
 schemas/*.json
 t/.gnupg/random_seed
 t/issue.props
+dist
