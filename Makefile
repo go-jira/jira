@@ -36,7 +36,7 @@ CURVER ?= $(patsubst v%,%,$(shell [ -d .git ] && git describe --abbrev=0 --tags 
 LDFLAGS:= -w
 
 build:
-	go build -gcflags="-e -complete" -v -ldflags "$(LDFLAGS) -s" -o '$(BIN)' cmd/jira/main.go
+	go build -gcflags="-e" -v -ldflags "$(LDFLAGS) -s" -o '$(BIN)' cmd/jira/main.go
 
 vet:
 	@go vet .

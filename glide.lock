@@ -1,11 +1,6 @@
-hash: 3e4ada7ae3922b18b3492a45f1f31cdaaf68fa708327ce9b4f9730c3f0b3ca90
-updated: 2017-08-30T18:15:39.909557691-07:00
+hash: 4c3ae9c9421b17aae9987ea9566cac7d0a789750bb77c8d235b7be163aec8cae
+updated: 2017-09-06T11:32:06.307462177-07:00
 imports:
-- name: gopkg.in/AlecAivazis/survey.v1
-  version: 73fd4d7829877a72e03dbb42f84ed383fbbc5fa0
-  subpackages:
-  - core
-  - terminal
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
   subpackages:
@@ -27,39 +22,43 @@ imports:
 - name: github.com/guelfey/go.dbus
   version: f6a3a2366cc39b8479cadc499d3c735fb10fbdda
 - name: github.com/jinzhu/copier
-  version: 8bfca8a02a0ce12119cdc4974143c834ca589257
+  version: 32e0d0db1dcd4373fb9eb0f9d727b1fe1a723e54
 - name: github.com/kballard/go-shellquote
-  version: d8ec1a69a250a17bb0e419c386eac1f3711dc142
+  version: cd60e84ee657ff3dc51de0b4f55dd299a3e136f2
+- name: github.com/mattn/go-colorable
+  version: ad5389df28cdac544c99bd7b9161a0b5b6ca9d1b
 - name: github.com/mattn/go-isatty
-  version: 57fdcb988a5c543893cc61bce354a6e24ab70022
+  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 - name: github.com/mgutz/ansi
-  version: c286dcecd19ff979eeb73ea444e479b903f2cfcb
+  version: 9520e82c474b0a04dd04f8a40959027271bab992
 - name: github.com/pkg/browser
   version: c90ca0c84f15f81c982e32665bffd8d7aac8f097
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
 - name: github.com/sethgrid/pester
-  version: 8053687f99650573b28fb75cddf3f295082704d7
+  version: a86a2d88f4dc3c7dbf3a6a6bbbfb095690b834b6
 - name: github.com/theckman/go-flock
   version: 6de226b0d5f040ed85b88c82c381709b98277f3d
 - name: github.com/tmc/keyring
-  version: 39227cc0349f1b69956c23aa1f679eefd17ebae0
+  version: 06e6283d50adc5f8fcdb3cdf33ee1244d4400ae1
 - name: golang.org/x/crypto
-  version: 7f7c0c2d75ebb4e32a21396ce36e87b6dadc91c9
+  version: 81e90905daefcd6fd217b62423c0908922eadb30
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: e24f485414aeafb646f6fca458b0bf869c0880a1
+  version: 9aade4d3a3b7e6d876cd3823ad20ec45fc035402
   subpackages:
   - unix
+  - windows
+- name: gopkg.in/AlecAivazis/survey.v1
+  version: 9d910423e24aa6d7c7950160658c295e0734c7e0
+  subpackages:
+  - core
+  - terminal
 - name: gopkg.in/alecthomas/kingpin.v2
   version: 1087e65c9441605df944fb12c33f0fe7072d18ca
 - name: gopkg.in/coryb/yaml.v2
   version: fb7cb9628c6e3bdd76c29fb91798d51a09832470
 - name: gopkg.in/op/go-logging.v1
   version: b2cb9fa56473e98db8caba80237377e83fe44db5
-testImports:
-- name: github.com/stretchr/testify
-  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
-  subpackages:
-  - assert
+testImports: []

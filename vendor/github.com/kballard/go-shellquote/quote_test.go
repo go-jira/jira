@@ -27,4 +27,5 @@ var simpleJoinTest = []struct {
 	{[]string{"one", "", "three"}, "one '' three"},
 	{[]string{"some(parentheses)"}, "some\\(parentheses\\)"},
 	{[]string{"$some_ot~her_)spe!cial_*_characters"}, "\\$some_ot~her_\\)spe\\!cial_\\*_characters"},
+	{[]string{"' "}, "\\'' '"},
 }

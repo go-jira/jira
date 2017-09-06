@@ -102,6 +102,23 @@ func main() {
 		log.Printf("POST :%d %s\n\n", port, resp.Status)
 	}
 
+	log.Println("> pester.Post with retries to non-existant url")
+	{
+		client := pester.New()
+		client.MaxRetries = 3
+		client.KeepLog = true
+
+		_, err := client.Post("http://localhost:9001", "application/json", strings.NewReader(`{"json":true}`))
+		if err == nil {
+			log.Printf("expected to error after max retries of 3")
+		}
+
+		if len(client.ErrLog) != 3 {
+			log.Fatalf("expected 3 error logs, got %d: %v", len(client.ErrLog), client.ErrLog)
+		}
+		log.Printf("POST: %v\n\n", err)
+	}
+
 	log.Println("> pester.Head with defaults")
 	{ // use the pester.Head drop in replacement
 		resp, err := pester.Head(fmt.Sprintf("http://localhost:%d", port))

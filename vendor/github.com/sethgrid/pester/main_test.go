@@ -1,4 +1,4 @@
-package pester_test
+package pester
 
 import (
 	"fmt"
@@ -13,14 +13,13 @@ import (
 
 	"net/http"
 	"net/http/cookiejar"
-
-	"github.com/sethgrid/pester"
+	"errors"
 )
 
 func TestConcurrentRequests(t *testing.T) {
 	t.Parallel()
 
-	c := pester.New()
+	c := New()
 	c.Concurrency = 3
 	c.KeepLog = true
 
@@ -43,7 +42,7 @@ func TestConcurrentRequests(t *testing.T) {
 func TestConcurrent2Retry0(t *testing.T) {
 	t.Parallel()
 
-	c := pester.New()
+	c := New()
 	c.Concurrency = 2
 	c.MaxRetries = 0
 	c.KeepLog = true
@@ -67,7 +66,7 @@ func TestConcurrent2Retry0(t *testing.T) {
 func TestDefaultBackoff(t *testing.T) {
 	t.Parallel()
 
-	c := pester.New()
+	c := New()
 	c.KeepLog = true
 
 	nonExistantURL := "http://localhost:9000/foo"
@@ -102,10 +101,90 @@ func TestDefaultBackoff(t *testing.T) {
 
 }
 
+func TestFormatError(t *testing.T) {
+	t.Parallel()
+	err := errors.New("Get http://localhost:9000/foo: dial tcp 127.0.0.1:9000: getsockopt: connection refused")
+	expected := "1491271979 Get [GET] http://localhost:9000/foo request-0 retry-2 error: "+ err.Error()+"\n"
+
+	e := ErrEntry{
+		Time: time.Unix(1491271979, 0),
+		Method: "Get",
+		URL: "http://localhost:9000/foo",
+		Verb: http.MethodGet,
+		Request: 0,
+		Retry: 2,
+		Attempt: 1,
+		Err: err,
+	}
+
+	c := New()
+	formatted := c.FormatError(e)
+	if strings.Compare(expected, formatted) != 0 {
+		t.Errorf("\nExpected:\n%s\nGot:\n%s", expected, formatted)
+	}
+}
+
+func TestCustomLogHook(t *testing.T) {
+	t.Parallel()
+
+	expectedRetries := 5
+	errorLines := []ErrEntry{}
+
+	c := New()
+	//c.KeepLog = true
+	c.MaxRetries = expectedRetries
+	c.Backoff = func(_ int) time.Duration {
+		return 10 * time.Microsecond
+	}
+
+	c.LogHook = func(e ErrEntry) {
+		errorLines = append(errorLines, e)
+	}
+
+	nonExistantURL := "http://localhost:9000/foo"
+
+	_, err := c.Get(nonExistantURL)
+	if err == nil {
+		t.Fatal("expected to get an error")
+	}
+	c.Wait()
+
+	// in the event of an error, let's see what the logs were
+	if expectedRetries != len(errorLines) {
+		t.Errorf("Expected %d lines to be emitted. Got %d", expectedRetries, errorLines)
+	}
+}
+
+func TestDefaultLogHook(t *testing.T) {
+	t.Parallel()
+
+	errorLines := 0
+
+	c := New()
+	//c.KeepLog = true
+	c.MaxRetries = 5
+	c.Backoff = func(_ int) time.Duration {
+		return 10 * time.Microsecond
+	}
+
+	nonExistantURL := "http://localhost:9000/foo"
+
+	_, err := c.Get(nonExistantURL)
+	if err == nil {
+		t.Fatal("expected to get an error")
+	}
+	c.Wait()
+
+	// in the event of an error, let's see what the logs were
+	if errorLines != 0 {
+		t.Errorf("Expected 0 lines to be emitted. Got %d", errorLines)
+	}
+}
+
 func TestLinearJitterBackoff(t *testing.T) {
 	t.Parallel()
-	c := pester.New()
-	c.Backoff = pester.LinearJitterBackoff
+	c := New()
+	c.Backoff = LinearJitterBackoff
 	c.KeepLog = true
 
 	nonExistantURL := "http://localhost:9000/foo"
@@ -142,9 +221,9 @@ func TestLinearJitterBackoff(t *testing.T) {
 func TestExponentialBackoff(t *testing.T) {
 	t.Parallel()
 
-	c := pester.New()
+	c := New()
 	c.MaxRetries = 4
-	c.Backoff = pester.ExponentialBackoff
+	c.Backoff = ExponentialBackoff
 	c.KeepLog = true
 
 	nonExistantURL := "http://localhost:9000/foo"
@@ -193,7 +272,7 @@ func TestCookiesJarPersistence(t *testing.T) {
 		t.Fatal("Cannot create cookiejar", err)
 	}
 
-	c := pester.New()
+	c := New()
 	c.Jar = jar
 
 	url := fmt.Sprintf("http://localhost:%d", port)
@@ -221,7 +300,7 @@ func TestEmbeddedClientTimeout(t *testing.T) {
 	hc := http.DefaultClient
 	hc.Timeout = clientTimeout
 
-	c := pester.NewExtendedClient(hc)
+	c := NewExtendedClient(hc)
 	_, err = c.Get(fmt.Sprintf("http://localhost:%d/", port))
 	if err == nil {
 		t.Error("expected a timeout error, did not get it")
@@ -230,7 +309,7 @@ func TestEmbeddedClientTimeout(t *testing.T) {
 
 func TestConcurrentRequestsNotRacyAndDontLeak_FailedRequest(t *testing.T) {
 	goroStart := runtime.NumGoroutine()
-	c := pester.New()
+	c := New()
 	port, err := cookieServer()
 	if err != nil {
 		t.Fatalf("unable to start server %v", err)
@@ -270,14 +349,14 @@ func TestConcurrentRequestsNotRacyAndDontLeak_FailedRequest(t *testing.T) {
 	// give background goroutines time to clean up
 	<-time.After(1000 * time.Millisecond)
 	goroEnd := runtime.NumGoroutine()
-	if goroStart != goroEnd {
+	if goroStart < goroEnd {
 		t.Errorf("got %d running goroutines, want %d", goroEnd, goroStart)
 	}
 }
 
 func TestConcurrentRequestsNotRacyAndDontLeak_SuccessfulRequest(t *testing.T) {
 	goroStart := runtime.NumGoroutine()
-	c := pester.New()
+	c := New()
 	nonExistantURL := "http://localhost:9000/foo"
 	conc := 5
 	errCh := make(chan error, conc)
@@ -311,9 +390,9 @@ func TestConcurrentRequestsNotRacyAndDontLeak_SuccessfulRequest(t *testing.T) {
 	wg.Wait()
 
 	// give background goroutines time to clean up
-	<-time.After(250 * time.Millisecond)
+	<-time.After(1000 * time.Millisecond)
 	goroEnd := runtime.NumGoroutine()
-	if goroStart != goroEnd {
+	if goroStart < goroEnd {
 		t.Errorf("got %d running goroutines, want %d", goroEnd, goroStart)
 	}
 }
@@ -343,7 +422,13 @@ func cookieServer() (int, error) {
 			log.Fatalf("slow-server error %v", err)
 		}
 	}()
-	port, err := strconv.Atoi(strings.Replace(l.Addr().String(), "[::]:", "", 1))
+
+	var port int
+	_, sport, err := net.SplitHostPort(l.Addr().String())
+	if err == nil {
+		port, err = strconv.Atoi(sport)
+	}
+
 	if err != nil {
 		return -1, fmt.Errorf("unable to determine port %v", err)
 	}
@@ -365,9 +450,16 @@ func timeoutServer(timeout time.Duration) (int, error) {
 			log.Fatalf("slow-server error %v", err)
 		}
 	}()
-	port, err := strconv.Atoi(strings.Replace(l.Addr().String(), "[::]:", "", 1))
+
+	var port int
+	_, sport, err := net.SplitHostPort(l.Addr().String())
+	if err == nil {
+		port, err = strconv.Atoi(sport)
+	}
+
 	if err != nil {
 		return -1, fmt.Errorf("unable to determine port %v", err)
 	}
+
 	return port, nil
 }
