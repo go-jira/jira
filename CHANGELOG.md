@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2 - 2017-09-06
+
+* update dependencies [Cory Bennett] [[aa876cd](https://github.com/Netflix-Skunkworks/go-jira/commit/aa876cd)]
+* update for github.com/AlecAivazis/survey => gopkg.in/AlecAivazis/survey.v1 package [Cory Bennett] [[9453179](https://github.com/Netflix-Skunkworks/go-jira/commit/9453179)]
+* use stdout to determin output terminal size [Cory Bennett] [[4d79af4](https://github.com/Netflix-Skunkworks/go-jira/commit/4d79af4)]
+
 ## 1.0.1 - 2017-09-06
 
 * [[#13](https://github.com/Netflix-Skunkworks/go-jira/issues/13)] change default input syntax to not require escaping for special characters [Cory Bennett] [[1106558](https://github.com/Netflix-Skunkworks/go-jira/commit/1106558)]
