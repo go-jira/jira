@@ -21,7 +21,13 @@ import (
 
 var (
 	log           = logging.MustGetLogger("jira")
-	defaultFormat = "%{color}%{time:2006-01-02T15:04:05.000Z07:00} %{level:-5s} [%{shortfile}]%{color:reset} %{message}"
+	defaultFormat = func() string {
+		format := os.Getenv("JIRA_LOG_FORMAT")
+		if format != "" {
+			return format
+		}
+		return "%{color}%{level:-5s}%{color:reset} %{message}"
+	}()
 )
 
 func handleExit() {
