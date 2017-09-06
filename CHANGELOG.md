@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 - 2017-09-06
+
+* [[#13](https://github.com/Netflix-Skunkworks/go-jira/issues/13)] change default input syntax to not require escaping for special characters [Cory Bennett] [[1106558](https://github.com/Netflix-Skunkworks/go-jira/commit/1106558)]
+
 ## 1.0.0 - 2017-09-05
 
 * fix build for windows [Cory Bennett] [[1b854da](https://github.com/Netflix-Skunkworks/go-jira/commit/1b854da)]
