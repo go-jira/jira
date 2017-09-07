@@ -267,6 +267,7 @@ custom-commands:
 
 * `jira mine` for listing issues assigned to you
 ```
+custom-commands:
   - name: mine
     help: display issues assigned to me
     script: |-
@@ -280,6 +281,7 @@ custom-commands:
 ```
 * `jira sprint` for listing issues in your current sprint
 ```
+custom-commands:
   - name: sprint
     help: display issues for active sprint
     script: |-
