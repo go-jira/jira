@@ -2,6 +2,7 @@
 eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira=../jira
+. env.sh
 
 SKIP test -n "$JIRACLOUD" # using Jira Cloud at go-jira.atlassian.net
 

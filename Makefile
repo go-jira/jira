@@ -77,10 +77,6 @@ version:
 clean:
 	rm -rf ./$(NAME)
 
-export GNUPGHOME=$(CWD)/t/.gnupg
-export PASSWORD_STORE_DIR=$(CWD)/t/.password-store
-export JIRACLOUD=1
-
 prove:
 	chmod -R g-rwx,o-rwx $(GNUPGHOME)
 	OSHT_VERBOSE=1 prove -v 

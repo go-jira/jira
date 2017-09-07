@@ -2,12 +2,7 @@
 eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira="../jira"
-export JIRA_LOG_FORMAT="%{level:-5s} %{message}"
-
-ENDPOINT="http://localhost:8080"
-if [ -n "$JIRACLOUD" ]; then
-    ENDPOINT="https://go-jira.atlassian.net"
-fi
+. env.sh
 
 PLAN 82
 
