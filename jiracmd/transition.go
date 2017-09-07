@@ -133,6 +133,15 @@ func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Transit
 		Overrides  map[string]string    `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	}
 
+	if _, ok := transMeta.Fields["comment"]; !ok && opts.Overrides["comment"] != "" {
+		comment := jiradata.Comment{
+			Body: opts.Overrides["comment"],
+		}
+		if _, err := jira.IssueAddComment(o, globals.Endpoint.Value, opts.Issue, &comment); err != nil {
+			return err
+		}
+	}
+
 	issueUpdate := jiradata.IssueUpdate{}
 	input := templateInput{
 		Issue:      issueData,
