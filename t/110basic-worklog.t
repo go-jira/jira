@@ -2,12 +2,7 @@
 eval "$(curl -q -s https://raw.githubusercontent.com/coryb/osht/master/osht.sh)"
 cd $(dirname $0)
 jira="../jira"
-export JIRA_LOG_FORMAT="%{level:-5s} %{message}"
-
-ENDPOINT="http://localhost:8080"
-if [ -n "$JIRACLOUD" ]; then
-    ENDPOINT="https://go-jira.atlassian.net"
-fi
+. env.sh
 
 PLAN 8
 
@@ -31,7 +26,7 @@ EOF
 ###############################################################################
 ## Add a worklog to an issue
 ###############################################################################
-RUNS $jira worklog add $issue --comment "work is hard" --time-spent "1h 12m" --noedit
+RUNS $jira worklog add $issue --comment "work is hard" --time-spent "1h 12m" -S "2017-01-29T09:17:00.000-0500" --noedit
 DIFF <<EOF
 OK $issue $ENDPOINT/browse/$issue
 EOF
@@ -43,6 +38,7 @@ RUNS $jira worklog $issue
 DIFF <<EOF
 - # gojira, a minute ago
   comment: work is hard
+  started: 2017-01-29T06:17:00.000-0800
   timeSpent: 1h 12m
 
 EOF

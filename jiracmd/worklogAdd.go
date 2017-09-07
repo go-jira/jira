@@ -42,6 +42,7 @@ func CmdWorklogAddUsage(cmd *kingpin.CmdClause, opts *WorklogAddOptions) error {
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("comment", "Comment message for worklog").Short('m').StringVar(&opts.Comment)
 	cmd.Flag("time-spent", "Time spent working on issue").Short('T').StringVar(&opts.TimeSpent)
+	cmd.Flag("started", "Time you started work").Short('S').StringVar(&opts.Started)
 	cmd.Arg("ISSUE", "issue id to fetch worklogs").Required().StringVar(&opts.Issue)
 	return nil
 }

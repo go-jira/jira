@@ -449,12 +449,13 @@ const defaultWorklogTemplate = `{{/* worklog template */ -}}
 comment: |~
   {{ or .comment "" }}
 timeSpent: {{ or .timeSpent "" }}
-started:
+started: {{ or .started "" }}
 `
 
 const defaultWorklogsTemplate = `{{/* worklogs template */ -}}
 {{ range .worklogs }}- # {{.author.name}}, {{.created | age}} ago
   comment: {{ or .comment "" }}
+  started: {{ .started }}
   timeSpent: {{ .timeSpent }}
 
 {{end}}`
