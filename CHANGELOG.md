@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3 - 2017-09-06
+
+* [[#66](https://github.com/Netflix-Skunkworks/go-jira/issues/66)] add --started option to `jira worklog add` to change the start time for worklog [Cory Bennett] [[e6faee1](https://github.com/Netflix-Skunkworks/go-jira/commit/e6faee1)]
+* [[#45](https://github.com/Netflix-Skunkworks/go-jira/issues/45)] automatically add comment to issue even if transition does not support comment updates during transtion [Cory Bennett] [[c4be59c](https://github.com/Netflix-Skunkworks/go-jira/commit/c4be59c)]
+
 ## 1.0.2 - 2017-09-06
 
 * update dependencies [Cory Bennett] [[aa876cd](https://github.com/Netflix-Skunkworks/go-jira/commit/aa876cd)]
