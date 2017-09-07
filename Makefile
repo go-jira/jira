@@ -78,7 +78,7 @@ clean:
 	rm -rf ./$(NAME)
 
 prove:
-	chmod -R g-rwx,o-rwx $(GNUPGHOME)
+	chmod -R g-rwx,o-rwx $(CWD)/t/.gnupg
 	OSHT_VERBOSE=1 prove -v 
 
 generate:
