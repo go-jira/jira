@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 - 2017-09-08
+
+* update deps for kingpeon update use os.exec instead of syscall.exec for windows [Cory Bennett] [[86b963b](https://github.com/Netflix-Skunkworks/go-jira/commit/86b963b)]
+
 ## 1.0.3 - 2017-09-06
 
 * [[#66](https://github.com/Netflix-Skunkworks/go-jira/issues/66)] add --started option to `jira worklog add` to change the start time for worklog [Cory Bennett] [[e6faee1](https://github.com/Netflix-Skunkworks/go-jira/commit/e6faee1)]
