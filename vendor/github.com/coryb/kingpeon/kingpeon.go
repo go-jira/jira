@@ -58,10 +58,10 @@ func lookupCommand(app *kingpin.Application, command *DynamicCommand) *kingpin.C
 }
 
 func RegisterDynamicCommands(app *kingpin.Application, commands DynamicCommands, t *template.Template) error {
-	return doRegisterDynamicCommands(syscall.Exec, app, commands, t)
+	return RegisterDynamicCommandsWithRunner(syscall.Exec, app, commands, t)
 }
 
-func doRegisterDynamicCommands(run runner, app *kingpin.Application, commands DynamicCommands, t *template.Template) error {
+func RegisterDynamicCommandsWithRunner(run runner, app *kingpin.Application, commands DynamicCommands, t *template.Template) error {
 	args := map[string]interface{}{}
 	opts := map[string]interface{}{}
 

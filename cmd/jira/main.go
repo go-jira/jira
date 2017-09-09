@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"runtime/debug"
 	"strconv"
+	"syscall"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/kingpeon"
@@ -307,9 +310,21 @@ func main() {
 	}
 
 	if len(data.CustomCommands) > 0 {
+		runner := syscall.Exec
+		if runtime.GOOS == "windows" {
+			runner = func(binary string, cmd []string, env []string) error {
+				command := exec.Command(binary, cmd[1:]...)
+				command.Stdin = os.Stdin
+				command.Stdout = os.Stdout
+				command.Stderr = os.Stderr
+				command.Env = env
+				return command.Run()
+			}
+		}
+
 		tmp := map[string]interface{}{}
 		fig.LoadAllConfigs("config.yml", &tmp)
-		kingpeon.RegisterDynamicCommands(app, data.CustomCommands, jiracli.TemplateProcessor())
+		kingpeon.RegisterDynamicCommandsWithRunner(runner, app, data.CustomCommands, jiracli.TemplateProcessor())
 	}
 
 	app.Terminate(func(status int) {

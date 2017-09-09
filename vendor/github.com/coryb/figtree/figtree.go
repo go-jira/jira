@@ -78,8 +78,41 @@ func (f *FigTree) LoadAllConfigs(configFile string, options interface{}) error {
 	return nil
 }
 
-func (f *FigTree) LoadConfig(file string, options interface{}) (err error) {
+func (f *FigTree) LoadConfigBytes(config []byte, source string, options interface{}) (err error) {
 	f.populateEnv(options)
+
+	m := &merger{sourceFile: source}
+	type tmpOpts struct {
+		Config ConfigOptions
+	}
+
+	tmp := reflect.New(reflect.ValueOf(options).Elem().Type()).Interface()
+	// look for config settings first
+	err = yaml.Unmarshal(config, m)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Unable to parse %s", source))
+	}
+
+	// then parse document into requested struct
+	err = yaml.Unmarshal(config, tmp)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Unable to parse %s", source))
+	}
+
+	m.setSource(reflect.ValueOf(tmp))
+	m.mergeStructs(
+		reflect.ValueOf(options),
+		reflect.ValueOf(tmp),
+	)
+	if m.Config.Stop {
+		f.stop = true
+		return nil
+	}
+	f.populateEnv(options)
+	return nil
+}
+
+func (f *FigTree) LoadConfig(file string, options interface{}) (err error) {
 	basePath, err := os.Getwd()
 	if err != nil {
 		return err
@@ -89,29 +122,12 @@ func (f *FigTree) LoadConfig(file string, options interface{}) (err error) {
 	if err != nil {
 		rel = file
 	}
-	m := &merger{sourceFile: rel}
-	type tmpOpts struct {
-		Config ConfigOptions
-	}
 
 	if stat, err := os.Stat(file); err == nil {
-		tmp := reflect.New(reflect.ValueOf(options).Elem().Type()).Interface()
 		if stat.Mode()&0111 == 0 {
 			log.Debugf("Loading config %s", file)
-			// first parse out any config processing option
 			if data, err := ioutil.ReadFile(file); err == nil {
-				err := yaml.Unmarshal(data, m)
-				if err != nil {
-					return errors.Wrap(err, fmt.Sprintf("Unable to parse %s", file))
-				}
-
-				err = yaml.Unmarshal(data, tmp)
-				if err != nil {
-					return errors.Wrap(err, fmt.Sprintf("Unable to parse %s", file))
-				}
-				// if reflect.ValueOf(tmp).Kind() == reflect.Map {
-				// 	tmp, _ = util.YamlFixup(tmp)
-				// }
+				return f.LoadConfigBytes(data, rel, options)
 			}
 		} else {
 			log.Debugf("Found Executable Config file: %s", file)
@@ -123,26 +139,8 @@ func (f *FigTree) LoadConfig(file string, options interface{}) (err error) {
 			if err := cmd.Run(); err != nil {
 				return errors.Wrap(err, fmt.Sprintf("%s is exectuable, but it failed to execute:\n%s", file, cmd.Stderr))
 			}
-			// first parse out any config processing option
-			err := yaml.Unmarshal(stdout.Bytes(), m)
-			if err != nil {
-				return errors.Wrap(err, fmt.Sprintf("Unable to parse %s", file))
-			}
-			err = yaml.Unmarshal(stdout.Bytes(), tmp)
-			if err != nil {
-				return errors.Wrap(err, fmt.Sprintf("Failed to parse STDOUT from executable config file %s", file))
-			}
+			return f.LoadConfigBytes(stdout.Bytes(), rel, options)
 		}
-		m.setSource(reflect.ValueOf(tmp))
-		m.mergeStructs(
-			reflect.ValueOf(options),
-			reflect.ValueOf(tmp),
-		)
-		if m.Config.Stop {
-			f.stop = true
-			return nil
-		}
-		f.populateEnv(options)
 	}
 	return nil
 }

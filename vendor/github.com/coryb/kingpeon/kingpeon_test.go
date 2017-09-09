@@ -32,7 +32,7 @@ func TestRegisterDynamicCommands(t *testing.T) {
 		return nil
 	}
 
-	err = doRegisterDynamicCommands(run, app, data.DynamicCommands, tmpl)
+	err = RegisterDynamicCommandsWithRunner(run, app, data.DynamicCommands, tmpl)
 	assert.Nil(t, err)
 
 	expectedShell = "echo hello world"
