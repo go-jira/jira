@@ -56,7 +56,7 @@ custom-commands:
   - name: mine
     help: display issues assigned to me
     script: |-
-      jira list --query "resolution = unresolved and assignee=currentuser() ORDER BY created"
+      {{jira}} list --query "resolution = unresolved and assignee=currentuser() ORDER BY created"
 ```
 Then the next time you run `jira help` you will see your usage:
 ```
@@ -273,10 +273,10 @@ custom-commands:
     script: |-
       if [ -n "$JIRA_PROJECT" ]; then
           # if `project: ...` configured just list the issues for current project
-          jira list --template table --query "resolution = unresolved and assignee=currentuser() and project = $JIRA_PROJECT ORDER BY priority asc, created"
+          {{jira}} list --template table --query "resolution = unresolved and assignee=currentuser() and project = $JIRA_PROJECT ORDER BY priority asc, created"
       else
           # otherwise list issues for all project
-          jira list --template table --query "resolution = unresolved and assignee=currentuser() ORDER BY priority asc, created"
+          {{jira}} list --template table --query "resolution = unresolved and assignee=currentuser() ORDER BY priority asc, created"
       fi
 ```
 * `jira sprint` for listing issues in your current sprint
@@ -287,7 +287,7 @@ custom-commands:
     script: |-
       if [ -n "$JIRA_PROJECT" ]; then
           # if `project: ...` configured just list the issues for current project
-          jira list --template table --query "sprint in openSprints() and type != epic and resolution = unresolved and project=$JIRA_PROJECT ORDER BY rank asc, created"
+          {{jira}} list --template table --query "sprint in openSprints() and type != epic and resolution = unresolved and project=$JIRA_PROJECT ORDER BY rank asc, created"
       else
           # otherwise list issues for all project
           echo "\"project: ...\" configuration missing from .jira.d/config.yml"
