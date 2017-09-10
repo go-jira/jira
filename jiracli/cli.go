@@ -42,7 +42,7 @@ type CommonOptions struct {
 	Browse       figtree.BoolOption   `yaml:"browse,omitempty" json:"browse,omitempty"`
 	Editor       figtree.StringOption `yaml:"editor,omitempty" json:"editor,omitempty"`
 	JsonQuery    figtree.StringOption `yaml:"jq,omitempty" json:"jq,omitempty"`
-	JsonQueryRaw figtree.BoolOption   `yaml:"jq-raw,omitempty" json":jq-raw,omitempty"`
+	JsonQueryRaw figtree.BoolOption   `yaml:"jq-raw,omitempty" json:"jq-raw,omitempty"`
 	SkipEditing  figtree.BoolOption   `yaml:"noedit,omitempty" json:"noedit,omitempty"`
 	Template     figtree.StringOption `yaml:"template,omitempty" json:"template,omitempty"`
 }
