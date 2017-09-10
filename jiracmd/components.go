@@ -37,6 +37,7 @@ func CmdComponentsRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdComponentsUsage(cmd *kingpin.CmdClause, opts *ComponentsOptions) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
+	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("project", "project to list components").Short('p').StringVar(&opts.Project)
 
 	return nil
@@ -51,5 +52,5 @@ func CmdComponents(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Compone
 	if err != nil {
 		return err
 	}
-	return jiracli.RunTemplate(opts.Template.Value, data, nil)
+	return opts.PrintTemplate(data)
 }

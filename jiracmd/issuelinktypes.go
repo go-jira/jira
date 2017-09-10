@@ -27,6 +27,7 @@ func CmdIssueLinkTypesRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdIssueLinkTypesUsage(cmd *kingpin.CmdClause, opts *jiracli.CommonOptions) error {
 	jiracli.TemplateUsage(cmd, opts)
+	jiracli.JsonQueryUsage(cmd, opts)
 	return nil
 }
 
@@ -36,5 +37,5 @@ func CmdIssueLinkTypes(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jir
 	if err != nil {
 		return err
 	}
-	return jiracli.RunTemplate(opts.Template.Value, data, nil)
+	return opts.PrintTemplate(data)
 }

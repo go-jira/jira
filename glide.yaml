@@ -20,3 +20,4 @@ import:
 - package: gopkg.in/coryb/yaml.v2
 - package: gopkg.in/op/go-logging.v1
   version: ^1.0.0
+- package: github.com/savaki/jq

@@ -35,6 +35,7 @@ func CmdWorklogListRegistry() *jiracli.CommandRegistryEntry {
 func CmdWorklogListUsage(cmd *kingpin.CmdClause, opts *WorklogListOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
+	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Arg("ISSUE", "issue id to fetch worklogs").Required().StringVar(&opts.Issue)
 	return nil
 }
@@ -45,9 +46,9 @@ func CmdWorklogList(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Worklo
 	if err != nil {
 		return err
 	}
-	if err := jiracli.RunTemplate(opts.Template.Value, struct {
+	if err := opts.PrintTemplate(struct {
 		Worklogs *jiradata.Worklogs `json:"worklogs,omitempty" yaml:"worklogs,omitempty"`
-	}{data}, nil); err != nil {
+	}{data}); err != nil {
 		return err
 	}
 	if opts.Browse.Value {

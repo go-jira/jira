@@ -35,6 +35,8 @@ func CmdRequestRegistry() *jiracli.CommandRegistryEntry {
 			if opts.Method == "" {
 				opts.Method = "GET"
 			}
+			jiracli.TemplateUsage(cmd, &opts.CommonOptions)
+			jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
 			return CmdRequestUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
@@ -89,5 +91,5 @@ func CmdRequest(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RequestOpt
 		return fmt.Errorf("JSON Parse Error: %s from %q", err, content)
 	}
 
-	return jiracli.RunTemplate(opts.Template.Value, &data, nil)
+	return opts.PrintTemplate(&data)
 }

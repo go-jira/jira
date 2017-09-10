@@ -35,6 +35,7 @@ func CmdTransitionsRegistry(defaultTemplate string) *jiracli.CommandRegistryEntr
 func CmdTransitionsUsage(cmd *kingpin.CmdClause, opts *TransitionsOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
+	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Arg("ISSUE", "issue to list valid transitions").Required().StringVar(&opts.Issue)
 	return nil
 }
@@ -45,7 +46,7 @@ func CmdTransitions(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Transi
 	if err != nil {
 		return err
 	}
-	if err := jiracli.RunTemplate(opts.Template.Value, editMeta, nil); err != nil {
+	if err := opts.PrintTemplate(editMeta); err != nil {
 		return err
 	}
 	if opts.Browse.Value {

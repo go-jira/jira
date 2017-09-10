@@ -37,6 +37,7 @@ func CmdIssueTypesRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdIssueTypesUsage(cmd *kingpin.CmdClause, opts *IssueTypesOptions) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
+	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("project", "project to list issueTypes").Short('p').StringVar(&opts.Project)
 
 	return nil
@@ -51,5 +52,5 @@ func CmdIssueTypes(o *oreo.Client, globals *jiracli.GlobalOptions, opts *IssueTy
 	if err != nil {
 		return err
 	}
-	return jiracli.RunTemplate(opts.Template.Value, data, nil)
+	return opts.PrintTemplate(data)
 }

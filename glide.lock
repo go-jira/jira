@@ -1,5 +1,5 @@
-hash: 4c3ae9c9421b17aae9987ea9566cac7d0a789750bb77c8d235b7be163aec8cae
-updated: 2017-09-09T17:13:22.172913984-07:00
+hash: b59fc2a2254d65db0a41057ab55bb571318587e7e4692309a41c912b1526880e
+updated: 2017-09-09T18:33:57.161504692-07:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -35,6 +35,8 @@ imports:
   version: c90ca0c84f15f81c982e32665bffd8d7aac8f097
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/savaki/jq
+  version: 0e6baecebbf8a24a6590d3fc8232165008d6e5d8
 - name: github.com/sethgrid/pester
   version: a86a2d88f4dc3c7dbf3a6a6bbbfb095690b834b6
 - name: github.com/theckman/go-flock

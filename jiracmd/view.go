@@ -36,6 +36,7 @@ func CmdViewRegistry() *jiracli.CommandRegistryEntry {
 func CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
+	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("expand", "field to expand for the issue").StringsVar(&opts.Expand)
 	cmd.Flag("field", "field to return for the issue").StringsVar(&opts.Fields)
 	cmd.Flag("property", "property to return for issue").StringsVar(&opts.Properties)
@@ -49,7 +50,7 @@ func CmdView(o *oreo.Client, globals *jiracli.GlobalOptions, opts *ViewOptions) 
 	if err != nil {
 		return err
 	}
-	if err := jiracli.RunTemplate(opts.Template.Value, data, nil); err != nil {
+	if err := opts.PrintTemplate(data); err != nil {
 		return err
 	}
 	if opts.Browse.Value {

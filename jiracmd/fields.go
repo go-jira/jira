@@ -17,6 +17,7 @@ func CmdFieldsRegistry() *jiracli.CommandRegistryEntry {
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			jiracli.TemplateUsage(cmd, &opts)
+			jiracli.JsonQueryUsage(cmd, &opts)
 			return nil
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
@@ -31,5 +32,5 @@ func CmdFields(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.Com
 	if err != nil {
 		return err
 	}
-	return jiracli.RunTemplate(opts.Template.Value, data, nil)
+	return opts.PrintTemplate(data)
 }
