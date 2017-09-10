@@ -104,11 +104,11 @@ func (f *FigTree) LoadConfigBytes(config []byte, source string, options interfac
 		reflect.ValueOf(options),
 		reflect.ValueOf(tmp),
 	)
+	f.populateEnv(options)
 	if m.Config.Stop {
 		f.stop = true
 		return nil
 	}
-	f.populateEnv(options)
 	return nil
 }
 
@@ -350,6 +350,60 @@ Outer:
 	return ov
 }
 
+func (f *FigTree) formatEnvName(name string) string {
+	name = fmt.Sprintf("%s_%s", f.EnvPrefix, strings.ToUpper(name))
+
+	return strings.Map(func(r rune) rune {
+		if unicode.IsDigit(r) || unicode.IsLetter(r) {
+			return r
+		}
+		return '_'
+	}, name)
+}
+
+func (f *FigTree) formatEnvValue(value reflect.Value) (string, bool) {
+	switch t := value.Interface().(type) {
+	case string:
+		return t, true
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
+		return fmt.Sprintf("%v", t), true
+	default:
+		switch value.Kind() {
+		case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
+			if value.IsNil() {
+				return "", false
+			}
+		}
+		if t == nil {
+			return "", false
+		}
+		type definable interface {
+			IsDefined() bool
+		}
+		if def, ok := t.(definable); ok {
+			// skip fields that are not defined
+			if !def.IsDefined() {
+				return "", false
+			}
+		}
+		type gettable interface {
+			GetValue() interface{}
+		}
+		if get, ok := t.(gettable); ok {
+			return fmt.Sprintf("%v", get.GetValue()), true
+		} else {
+			if b, err := json.Marshal(t); err == nil {
+				val := strings.TrimSpace(string(b))
+				if val == "null" {
+					return "", true
+				}
+				return val, true
+			}
+		}
+	}
+	return "", false
+}
+
 func (f *FigTree) populateEnv(data interface{}) {
 	options := reflect.ValueOf(data)
 	if options.Kind() == reflect.Ptr {
@@ -370,8 +424,11 @@ func (f *FigTree) populateEnv(data interface{}) {
 				}
 
 				name := strings.Join(allParts, "_")
-				envName := fmt.Sprintf("%s_%s", f.EnvPrefix, strings.ToUpper(name))
-				os.Setenv(envName, fmt.Sprintf("%v", options.MapIndex(key).Interface()))
+				envName := f.formatEnvName(name)
+				val, ok := f.formatEnvValue(options.MapIndex(key))
+				if ok {
+					os.Setenv(envName, val)
+				}
 			}
 		}
 	} else if options.Kind() == reflect.Struct {
@@ -400,54 +457,11 @@ func (f *FigTree) populateEnv(data interface{}) {
 				}
 			}
 
-			envName := fmt.Sprintf("%s_%s", f.EnvPrefix, strings.ToUpper(name))
-
-			envName = strings.Map(func(r rune) rune {
-				if unicode.IsDigit(r) || unicode.IsLetter(r) {
-					return r
-				}
-				return '_'
-			}, envName)
-			var val string
-			switch t := options.Field(i).Interface().(type) {
-			case string:
-				val = t
-			case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool:
-				val = fmt.Sprintf("%v", t)
-			default:
-				switch options.Field(i).Kind() {
-				case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
-					if options.Field(i).IsNil() {
-						continue
-					}
-				}
-				if t == nil {
-					continue
-				}
-				type definable interface {
-					IsDefined() bool
-				}
-				if def, ok := t.(definable); ok {
-					// skip fields that are not defined
-					if !def.IsDefined() {
-						continue
-					}
-				}
-				type gettable interface {
-					GetValue() interface{}
-				}
-				if get, ok := t.(gettable); ok {
-					val = fmt.Sprintf("%v", get.GetValue())
-				} else {
-					if b, err := json.Marshal(t); err == nil {
-						val = strings.TrimSpace(string(b))
-						if val == "null" {
-							val = ""
-						}
-					}
-				}
+			envName := f.formatEnvName(name)
+			val, ok := f.formatEnvValue(options.Field(i))
+			if ok {
+				os.Setenv(envName, val)
 			}
-			os.Setenv(envName, val)
 		}
 	}
 }

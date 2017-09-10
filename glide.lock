@@ -1,5 +1,5 @@
 hash: 4c3ae9c9421b17aae9987ea9566cac7d0a789750bb77c8d235b7be163aec8cae
-updated: 2017-09-08T18:47:08.390962401-07:00
+updated: 2017-09-09T17:13:22.172913984-07:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -12,7 +12,7 @@ imports:
   subpackages:
   - generic
 - name: github.com/coryb/figtree
-  version: 4429db55820d818320f5af8971ef8401baaf3d21
+  version: 86e7c859d0326621c45ba7be2c32e3b3ae203213
 - name: github.com/coryb/kingpeon
   version: 64b561ae2d0f895b94719c486bed798f4236a4b3
 - name: github.com/coryb/oreo
@@ -42,11 +42,11 @@ imports:
 - name: github.com/tmc/keyring
   version: 06e6283d50adc5f8fcdb3cdf33ee1244d4400ae1
 - name: golang.org/x/crypto
-  version: 81e90905daefcd6fd217b62423c0908922eadb30
+  version: 9ba3862cf6a5452ae579de98f9364dd2e544844c
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: 5513e650ab47a692d3a036d49be8fa52ddd09b65
+  version: a5054c7c1385fd50d9394475365355a87a7873ec
   subpackages:
   - unix
   - windows
