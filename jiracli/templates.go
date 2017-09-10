@@ -60,6 +60,9 @@ func tmpTemplate(templateName string, data interface{}) (string, error) {
 
 func TemplateProcessor() *template.Template {
 	funcs := map[string]interface{}{
+		"jira": func() string {
+			return os.Args[0]
+		},
 		"toJson": func(content interface{}) (string, error) {
 			bytes, err := json.MarshalIndent(content, "", "    ")
 			if err != nil {
