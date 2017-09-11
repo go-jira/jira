@@ -50,7 +50,7 @@ NEWVER ?= $(shell echo $(CURVER) | awk -F. '{print $$1"."$$2"."$$3+1}')
 TODAY  := $(shell date +%Y-%m-%d)
 
 changes:
-	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^v$(CURVER) HEAD *.go jiracli/*.go jiradata/*.go jiracmd/*.go cmd/*/*.go glide.* | grep -vE 'gofmt|go fmt|version bump'
+	@git log --pretty=format:"* %s [%cn] [%h]" --no-merges ^v$(CURVER) HEAD *.go jiracli/*.go jiradata/*.go jiracmd/*.go cmd/*/*.go *.lock | grep -vE 'gofmt|go fmt|version bump'
 
 update-changelog:
 	@echo "# Changelog" > CHANGELOG.md.new; \
