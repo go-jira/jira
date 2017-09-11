@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5 - 2017-09-11
+
+* use --gjq for GJson Query to filter json response data [Cory Bennett] [[608e586](https://github.com/Netflix-Skunkworks/go-jira/commit/608e586)]
+* fix field tag syntax [Cory Bennett] [[2c552ac](https://github.com/Netflix-Skunkworks/go-jira/commit/2c552ac)]
+* add '{{jira}}' template macro to refer to path of currently running jira command [Cory Bennett] [[941824d](https://github.com/Netflix-Skunkworks/go-jira/commit/941824d)]
+
 ## 1.0.4 - 2017-09-08
 
 * update deps for kingpeon update use os.exec instead of syscall.exec for windows [Cory Bennett] [[86b963b](https://github.com/Netflix-Skunkworks/go-jira/commit/86b963b)]
