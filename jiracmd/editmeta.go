@@ -36,7 +36,7 @@ func CmdEditMetaRegistry() *jiracli.CommandRegistryEntry {
 func CmdEditMetaUsage(cmd *kingpin.CmdClause, opts *EditMetaOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Arg("ISSUE", "edit metadata for issue id").Required().StringVar(&opts.Issue)
 	return nil
 }

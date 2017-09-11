@@ -35,7 +35,7 @@ func CmdTransitionsRegistry(defaultTemplate string) *jiracli.CommandRegistryEntr
 func CmdTransitionsUsage(cmd *kingpin.CmdClause, opts *TransitionsOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Arg("ISSUE", "issue to list valid transitions").Required().StringVar(&opts.Issue)
 	return nil
 }

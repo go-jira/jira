@@ -37,7 +37,7 @@ func CmdIssueTypesRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdIssueTypesUsage(cmd *kingpin.CmdClause, opts *IssueTypesOptions) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("project", "project to list issueTypes").Short('p').StringVar(&opts.Project)
 
 	return nil

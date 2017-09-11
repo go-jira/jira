@@ -16,7 +16,7 @@ import (
 	"github.com/coryb/oreo"
 	"github.com/jinzhu/copier"
 	shellquote "github.com/kballard/go-shellquote"
-	"github.com/savaki/jq"
+	"github.com/tidwall/gjson"
 	"gopkg.in/AlecAivazis/survey.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 	yaml "gopkg.in/coryb/yaml.v2"
@@ -39,12 +39,11 @@ type GlobalOptions struct {
 }
 
 type CommonOptions struct {
-	Browse       figtree.BoolOption   `yaml:"browse,omitempty" json:"browse,omitempty"`
-	Editor       figtree.StringOption `yaml:"editor,omitempty" json:"editor,omitempty"`
-	JsonQuery    figtree.StringOption `yaml:"jq,omitempty" json:"jq,omitempty"`
-	JsonQueryRaw figtree.BoolOption   `yaml:"jq-raw,omitempty" json:"jq-raw,omitempty"`
-	SkipEditing  figtree.BoolOption   `yaml:"noedit,omitempty" json:"noedit,omitempty"`
-	Template     figtree.StringOption `yaml:"template,omitempty" json:"template,omitempty"`
+	Browse      figtree.BoolOption   `yaml:"browse,omitempty" json:"browse,omitempty"`
+	Editor      figtree.StringOption `yaml:"editor,omitempty" json:"editor,omitempty"`
+	GJsonQuery  figtree.StringOption `yaml:"gjq,omitempty" json:"gjq,omitempty"`
+	SkipEditing figtree.BoolOption   `yaml:"noedit,omitempty" json:"noedit,omitempty"`
+	Template    figtree.StringOption `yaml:"template,omitempty" json:"template,omitempty"`
 }
 
 type CommandRegistryEntry struct {
@@ -172,27 +171,16 @@ func TemplateUsage(cmd *kingpin.CmdClause, opts *CommonOptions) {
 	cmd.Flag("template", "Template to use for output").Short('t').SetValue(&opts.Template)
 }
 
-func JsonQueryUsage(cmd *kingpin.CmdClause, opts *CommonOptions) {
-	cmd.Flag("jq", "JSON Query to filter output").SetValue(&opts.JsonQuery)
-	cmd.Flag("raw", "Return unquoted raw data from JSON Query").Hidden().SetValue(&opts.JsonQueryRaw)
+func GJsonQueryUsage(cmd *kingpin.CmdClause, opts *CommonOptions) {
+	cmd.Flag("gjq", "GJSON Query to filter output, see https://goo.gl/iaYwJ5").SetValue(&opts.GJsonQuery)
 }
 
 func (o *CommonOptions) PrintTemplate(data interface{}) error {
-	if o.JsonQuery.Value != "" {
+	if o.GJsonQuery.Value != "" {
 		buf := bytes.NewBufferString("")
 		RunTemplate("json", data, buf)
-		op, err := jq.Parse(o.JsonQuery.Value)
-		if err != nil {
-			return err
-		}
-		value, err := op.Apply(buf.Bytes())
-		if err != nil {
-			return err
-		}
-		if o.JsonQueryRaw.Value {
-			value = []byte(strings.TrimPrefix(strings.TrimSuffix(string(value), "\""), "\""))
-		}
-		_, err = os.Stdout.Write(value)
+		results := gjson.GetBytes(buf.Bytes(), o.GJsonQuery.Value)
+		_, err := os.Stdout.Write([]byte(results.String()))
 		os.Stdout.Write([]byte{'\n'})
 		return err
 	}

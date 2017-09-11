@@ -37,7 +37,7 @@ func CmdComponentsRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdComponentsUsage(cmd *kingpin.CmdClause, opts *ComponentsOptions) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("project", "project to list components").Short('p').StringVar(&opts.Project)
 
 	return nil

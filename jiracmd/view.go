@@ -36,7 +36,7 @@ func CmdViewRegistry() *jiracli.CommandRegistryEntry {
 func CmdViewUsage(cmd *kingpin.CmdClause, opts *ViewOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("expand", "field to expand for the issue").StringsVar(&opts.Expand)
 	cmd.Flag("field", "field to return for the issue").StringsVar(&opts.Fields)
 	cmd.Flag("property", "property to return for issue").StringsVar(&opts.Properties)

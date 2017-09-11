@@ -35,7 +35,7 @@ func CmdWorklogListRegistry() *jiracli.CommandRegistryEntry {
 func CmdWorklogListUsage(cmd *kingpin.CmdClause, opts *WorklogListOptions) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Arg("ISSUE", "issue id to fetch worklogs").Required().StringVar(&opts.Issue)
 	return nil
 }

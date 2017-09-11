@@ -36,7 +36,7 @@ func CmdRequestRegistry() *jiracli.CommandRegistryEntry {
 				opts.Method = "GET"
 			}
 			jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-			jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+			jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 			return CmdRequestUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {

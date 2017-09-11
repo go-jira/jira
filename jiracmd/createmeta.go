@@ -35,7 +35,7 @@ func CmdCreateMetaRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdCreateMetaUsage(cmd *kingpin.CmdClause, opts *CreateMetaOptions) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("project", "project to fetch create metadata").Short('p').StringVar(&opts.Project)
 	cmd.Flag("issuetype", "issuetype in project to fetch create metadata").Short('i').StringVar(&opts.IssueType)
 	return nil

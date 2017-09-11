@@ -27,7 +27,7 @@ func CmdIssueLinkTypesRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdIssueLinkTypesUsage(cmd *kingpin.CmdClause, opts *jiracli.CommonOptions) error {
 	jiracli.TemplateUsage(cmd, opts)
-	jiracli.JsonQueryUsage(cmd, opts)
+	jiracli.GJsonQueryUsage(cmd, opts)
 	return nil
 }
 

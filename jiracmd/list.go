@@ -43,7 +43,7 @@ func CmdListRegistry() *jiracli.CommandRegistryEntry {
 
 func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
-	jiracli.JsonQueryUsage(cmd, &opts.CommonOptions)
+	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("assignee", "User assigned the issue").Short('a').StringVar(&opts.Assignee)
 	cmd.Flag("component", "Component to search for").Short('c').StringVar(&opts.Component)
 	cmd.Flag("issuetype", "Issue type to search for").Short('i').StringVar(&opts.IssueType)
