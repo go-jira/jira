@@ -52,7 +52,7 @@ func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions, fig *figtree.FigTre
 	cmd.Flag("issuetype", "Issue type to search for").Short('i').StringVar(&opts.IssueType)
 	cmd.Flag("limit", "Maximum number of results to return in search").Short('l').IntVar(&opts.MaxResults)
 	cmd.Flag("project", "Project to search for").Short('p').StringVar(&opts.Project)
-	cmd.Flag("named-query", "The name of a query in the `queries` configuration").Short('n').Action(func(ctx *kingpin.ParseContext) error {
+	cmd.Flag("named-query", "The name of a query in the `queries` configuration").Short('n').PreAction(func(ctx *kingpin.ParseContext) error {
 		name := jiracli.FlagValue(ctx, "named-query")
 		if query, ok := opts.Queries[name]; ok && query != "" {
 			var err error

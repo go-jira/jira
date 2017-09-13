@@ -46,7 +46,7 @@ func CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions, fig *figtree.FigTre
 	jiracli.EditorUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
-	cmd.Flag("named-query", "The name of a query in the `queries` configuration").Short('n').Action(func(ctx *kingpin.ParseContext) error {
+	cmd.Flag("named-query", "The name of a query in the `queries` configuration").Short('n').PreAction(func(ctx *kingpin.ParseContext) error {
 		name := jiracli.FlagValue(ctx, "named-query")
 		if query, ok := opts.Queries[name]; ok && query != "" {
 			var err error

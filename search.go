@@ -14,17 +14,17 @@ type SearchProvider interface {
 }
 
 type SearchOptions struct {
-	Assignee    string
-	Query       string
-	QueryFields string
-	Project     string
-	Component   string
-	IssueType   string
-	Watcher     string
-	Reporter    string
-	Status      string
-	Sort        string
-	MaxResults  int
+	Assignee    string `yaml:"assignee,omitempty" json:"assignee,omitempty"`
+	Query       string `yaml:"query,omitempty" json:"query,omitempty"`
+	QueryFields string `yaml:"query-fields,omitempty" json:"query-fields,omitempty"`
+	Project     string `yaml:"project,omitempty" json:"project,omitempty"`
+	Component   string `yaml:"component,omitempty" json:"component,omitempty"`
+	IssueType   string `yaml:"issue-type,omitempty" json:"issue-type,omitempty"`
+	Watcher     string `yaml:"watcher,omitempty" json:"watcher,omitempty"`
+	Reporter    string `yaml:"reporter,omitempty" json:"reporter,omitempty"`
+	Status      string `yaml:"status,omitempty" json:"status,omitempty"`
+	Sort        string `yaml:"sort,omitempty" json:"sort,omitempty"`
+	MaxResults  int    `yaml:"max-results,omitempty" json:"max-results,omitempty"`
 }
 
 func (o *SearchOptions) ProvideSearchRequest() *jiradata.SearchRequest {
