@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.6 - 2017-09-13
+
+* tweaks for templates in named queries to work better [Cory Bennett] [[00cba79](https://github.com/Netflix-Skunkworks/go-jira/commit/00cba79)]
+* [[#99](https://github.com/Netflix-Skunkworks/go-jira/issues/99)] add support for named queries to be stored in configs [Cory Bennett] [[fb43753](https://github.com/Netflix-Skunkworks/go-jira/commit/fb43753)]
+* [[#98](https://github.com/Netflix-Skunkworks/go-jira/issues/98)] add `--status` option for JQL filter on status with `list` command [Cory Bennett] [[5da04c1](https://github.com/Netflix-Skunkworks/go-jira/commit/5da04c1)]
+
 ## 1.0.5 - 2017-09-11
 
 * use --gjq for GJson Query to filter json response data [Cory Bennett] [[608e586](https://github.com/Netflix-Skunkworks/go-jira/commit/608e586)]
