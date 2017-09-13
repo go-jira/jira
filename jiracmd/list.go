@@ -52,6 +52,7 @@ func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search").Short('q').StringVar(&opts.Query)
 	cmd.Flag("queryfields", "Fields that are used in \"list\" template").Short('f').StringVar(&opts.QueryFields)
 	cmd.Flag("reporter", "Reporter to search for").Short('r').StringVar(&opts.Reporter)
+	cmd.Flag("status", "Filter on issue status").Short('S').StringVar(&opts.Status)
 	cmd.Flag("sort", "Sort order to return").Short('s').StringVar(&opts.Sort)
 	cmd.Flag("watcher", "Watcher to search for").Short('w').StringVar(&opts.Watcher)
 	return nil

@@ -22,6 +22,7 @@ type SearchOptions struct {
 	IssueType   string
 	Watcher     string
 	Reporter    string
+	Status      string
 	Sort        string
 	MaxResults  int
 }
@@ -48,6 +49,9 @@ func (o *SearchOptions) ProvideSearchRequest() *jiradata.SearchRequest {
 		}
 		if o.Reporter != "" {
 			qbuff.WriteString(fmt.Sprintf(" AND reporter = '%s'", o.Reporter))
+		}
+		if o.Status != "" {
+			qbuff.WriteString(fmt.Sprintf(" AND status = '%s'", o.Status))
 		}
 		if o.Sort != "" {
 			qbuff.WriteString(fmt.Sprintf(" ORDER BY %s", o.Sort))
