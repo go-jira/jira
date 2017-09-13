@@ -23,7 +23,7 @@
   branch = "master"
   name = "github.com/coryb/figtree"
   packages = ["."]
-  revision = "86e7c859d0326621c45ba7be2c32e3b3ae203213"
+  revision = "c7d8fbf1d7746b5864b8262fabffec813b5a43fa"
 
 [[projects]]
   branch = "master"

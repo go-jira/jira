@@ -81,6 +81,14 @@ func (f *FigTree) LoadAllConfigs(configFile string, options interface{}) error {
 func (f *FigTree) LoadConfigBytes(config []byte, source string, options interface{}) (err error) {
 	f.populateEnv(options)
 
+	defer func(mapType, iface reflect.Type) {
+		yaml.DefaultMapType = mapType
+		yaml.IfaceType = iface
+	}(yaml.DefaultMapType, yaml.IfaceType)
+
+	yaml.DefaultMapType = reflect.TypeOf(map[string]interface{}{})
+	yaml.IfaceType = yaml.DefaultMapType.Elem()
+
 	m := &merger{sourceFile: source}
 	type tmpOpts struct {
 		Config ConfigOptions

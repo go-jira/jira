@@ -3,3 +3,9 @@ config:
 password-source: pass
 endpoint: https://go-jira.atlassian.net
 user: admin
+
+queries:
+  todo: |-
+    resolution = unresolved {{if .project}}AND project = '{{.project}}'{{end}} AND status = 'To Do'
+  progress: |-
+    resolution = unresolved {{if .project}}AND project = '{{.project}}'{{end}} AND status = 'In Progress'

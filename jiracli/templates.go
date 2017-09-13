@@ -13,9 +13,11 @@ import (
 	"strings"
 	"text/template"
 
+	yaml "gopkg.in/coryb/yaml.v2"
+
+	"github.com/coryb/figtree"
 	"github.com/mgutz/ansi"
 	"golang.org/x/crypto/ssh/terminal"
-	yaml "gopkg.in/coryb/yaml.v2"
 )
 
 func findTemplate(name string) ([]byte, error) {
@@ -157,6 +159,48 @@ func TemplateProcessor() *template.Template {
 	return template.New("gojira").Funcs(funcs)
 }
 
+func ConfigTemplate(fig *figtree.FigTree, template, command string, opts interface{}) (string, error) {
+	tmp, err := translateOptions(opts)
+	if err != nil {
+		return "", err
+	}
+	fig.LoadAllConfigs(command+".yml", tmp)
+	fig.LoadAllConfigs("config.yml", tmp)
+
+	tmpl, err := TemplateProcessor().Parse(template)
+	if err != nil {
+		return "", err
+	}
+	buf := bytes.NewBufferString("")
+	if err := tmpl.Execute(buf, &tmp); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}
+
+func translateOptions(opts interface{}) (interface{}, error) {
+	// HACK HACK HACK: convert data formats to json for backwards compatibilty with templates
+	jsonData, err := json.Marshal(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func(mapType, iface reflect.Type) {
+		yaml.DefaultMapType = mapType
+		yaml.IfaceType = iface
+	}(yaml.DefaultMapType, yaml.IfaceType)
+
+	yaml.DefaultMapType = reflect.TypeOf(map[string]interface{}{})
+	yaml.IfaceType = yaml.DefaultMapType.Elem()
+
+	var rawData map[string]interface{}
+	if err := yaml.Unmarshal(jsonData, &rawData); err != nil {
+		return nil, err
+	}
+	return &rawData, nil
+
+}
+
 func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 
 	templateContent, err := getTemplate(templateName)
@@ -168,22 +212,9 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 		out = os.Stdout
 	}
 
-	// HACK HACK HACK: convert data formats to json for backwards compatibilty with templates
-	var rawData interface{}
-	if jsonData, err := json.Marshal(data); err != nil {
+	rawData, err := translateOptions(data)
+	if err != nil {
 		return err
-	} else {
-		defer func(mapType, iface reflect.Type) {
-			yaml.DefaultMapType = mapType
-			yaml.IfaceType = iface
-		}(yaml.DefaultMapType, yaml.IfaceType)
-
-		yaml.DefaultMapType = reflect.TypeOf(map[string]interface{}{})
-		yaml.IfaceType = yaml.DefaultMapType.Elem()
-
-		if err := yaml.Unmarshal(jsonData, &rawData); err != nil {
-			return err
-		}
 	}
 
 	tmpl, err := TemplateProcessor().Parse(templateContent)

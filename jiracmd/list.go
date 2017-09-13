@@ -1,6 +1,8 @@
 package jiracmd
 
 import (
+	"fmt"
+
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
@@ -11,6 +13,7 @@ import (
 type ListOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
 	jira.SearchOptions    `yaml:",inline" json:",inline" figtree:",inline"`
+	Queries               map[string]string `yaml:"queries,omitempty" json:"queries,omitempty"`
 }
 
 func CmdListRegistry() *jiracli.CommandRegistryEntry {
@@ -33,7 +36,7 @@ func CmdListRegistry() *jiracli.CommandRegistryEntry {
 			if opts.Sort == "" {
 				opts.Sort = "priority asc, key"
 			}
-			return CmdListUsage(cmd, &opts)
+			return CmdListUsage(cmd, &opts, fig)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdList(o, globals, &opts)
@@ -41,7 +44,7 @@ func CmdListRegistry() *jiracli.CommandRegistryEntry {
 	}
 }
 
-func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
+func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions, fig *figtree.FigTree) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("assignee", "User assigned the issue").Short('a').StringVar(&opts.Assignee)
@@ -49,6 +52,15 @@ func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions) error {
 	cmd.Flag("issuetype", "Issue type to search for").Short('i').StringVar(&opts.IssueType)
 	cmd.Flag("limit", "Maximum number of results to return in search").Short('l').IntVar(&opts.MaxResults)
 	cmd.Flag("project", "Project to search for").Short('p').StringVar(&opts.Project)
+	cmd.Flag("named-query", "The name of a query in the `queries` configuration").Short('n').Action(func(ctx *kingpin.ParseContext) error {
+		name := jiracli.FlagValue(ctx, "named-query")
+		if query, ok := opts.Queries[name]; ok && query != "" {
+			var err error
+			opts.Query, err = jiracli.ConfigTemplate(fig, query, cmd.FullCommand(), opts)
+			return err
+		}
+		return fmt.Errorf("A valid named-query %q not found in `queries` configuration", name)
+	}).String()
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search").Short('q').StringVar(&opts.Query)
 	cmd.Flag("queryfields", "Fields that are used in \"list\" template").Short('f').StringVar(&opts.QueryFields)
 	cmd.Flag("reporter", "Reporter to search for").Short('r').StringVar(&opts.Reporter)

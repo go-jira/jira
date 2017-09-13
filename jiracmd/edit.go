@@ -18,6 +18,7 @@ type EditOptions struct {
 	jira.SearchOptions    `yaml:",inline" json:",inline" figtree:",inline"`
 	Overrides             map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Queries               map[string]string `yaml:"queries,omitempty" json:"queries,omitempty"`
 }
 
 func CmdEditRegistry() *jiracli.CommandRegistryEntry {
@@ -32,7 +33,7 @@ func CmdEditRegistry() *jiracli.CommandRegistryEntry {
 		"Edit issue details",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			return CmdEditUsage(cmd, &opts)
+			return CmdEditUsage(cmd, &opts, fig)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdEdit(o, globals, &opts)
@@ -40,11 +41,20 @@ func CmdEditRegistry() *jiracli.CommandRegistryEntry {
 	}
 }
 
-func CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions) error {
+func CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions, fig *figtree.FigTree) error {
 	jiracli.BrowseUsage(cmd, &opts.CommonOptions)
 	jiracli.EditorUsage(cmd, &opts.CommonOptions)
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
+	cmd.Flag("named-query", "The name of a query in the `queries` configuration").Short('n').Action(func(ctx *kingpin.ParseContext) error {
+		name := jiracli.FlagValue(ctx, "named-query")
+		if query, ok := opts.Queries[name]; ok && query != "" {
+			var err error
+			opts.Query, err = jiracli.ConfigTemplate(fig, query, cmd.FullCommand(), opts)
+			return err
+		}
+		return fmt.Errorf("A valid named-query %q not found in `queries` configuration", name)
+	}).String()
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search to edit multiple issues").Short('q').StringVar(&opts.Query)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = jiracli.FlagValue(ctx, "comment")
