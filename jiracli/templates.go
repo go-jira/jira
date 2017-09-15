@@ -193,7 +193,7 @@ func translateOptions(opts interface{}) (interface{}, error) {
 	yaml.DefaultMapType = reflect.TypeOf(map[string]interface{}{})
 	yaml.IfaceType = yaml.DefaultMapType.Elem()
 
-	var rawData map[string]interface{}
+	var rawData interface{}
 	if err := yaml.Unmarshal(jsonData, &rawData); err != nil {
 		return nil, err
 	}
@@ -236,6 +236,8 @@ var AllTemplates = map[string]string{
 	"debug":          defaultDebugTemplate,
 	"edit":           defaultEditTemplate,
 	"editmeta":       defaultDebugTemplate,
+	"epic-create":    defaultEpicCreateTemplate,
+	"epic-list":      defaultTableTemplate,
 	"fields":         defaultDebugTemplate,
 	"issuelinktypes": defaultDebugTemplate,
 	"issuetypes":     defaultIssuetypesTemplate,
@@ -386,6 +388,31 @@ fields:
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
     - name:{{end}}`
+
+const defaultEpicCreateTemplate = `{{/* epic create template */ -}}
+fields:
+  project:
+    key: {{ or .overrides.project "" }}
+  # Epic Name
+  customfield_10120: {{ or (index .overrides "epic-name") "" }}
+  summary: >-
+    {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+  priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
+    name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
+    - name: {{ . }}{{end}}{{end}}
+  description: |~
+    {{ or .overrides.description "" | indent 4 }}{{if .meta.fields.assignee}}
+  assignee:
+    name: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
+  reporter:
+    name: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
+  # watchers
+  customfield_10110: {{ range split "," (or .overrides.watchers "")}}
+    - name: {{.}}{{end}}
+    - name:{{end}}
+  issuetype:
+    name: Epic`
 
 const defaultSubtaskTemplate = `{{/* create subtask template */ -}}
 fields:

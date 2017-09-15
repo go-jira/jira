@@ -25,3 +25,7 @@ func (c *Comment) ProvideComment() *Comment {
 func (c *Component) ProvideComponent() *Component {
 	return c
 }
+
+func (e *EpicIssues) ProvideEpicIssues() *EpicIssues {
+	return e
+}

@@ -132,6 +132,24 @@ func main() {
 			Entry:   jiracmd.CmdCommentRegistry(),
 		},
 		jiracli.CommandRegistry{
+			Command: "epic create",
+			Entry:   jiracmd.CmdEpicCreateRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "epic list",
+			Entry:   jiracmd.CmdEpicListRegistry(),
+			Aliases: []string{"ls"},
+		},
+		jiracli.CommandRegistry{
+			Command: "epic add",
+			Entry:   jiracmd.CmdEpicAddRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "epic remove",
+			Entry:   jiracmd.CmdEpicRemoveRegistry(),
+			Aliases: []string{"rm"},
+		},
+		jiracli.CommandRegistry{
 			Command: "worklog list",
 			Entry:   jiracmd.CmdWorklogListRegistry(),
 			Default: true,
@@ -338,7 +356,12 @@ func main() {
 
 	// checking for default usage of `jira ISSUE-123` but need to allow
 	// for global options first like: `jira --user mothra ISSUE-123`
-	ctx, _ := app.ParseContext(os.Args[1:])
+	ctx, err := app.ParseContext(os.Args[1:])
+	if err != nil && ctx == nil {
+		// This is an internal kingpin usage error, duplicate options/commands
+		log.Fatalf("error: %s, ctx: %v", err, ctx)
+	}
+
 	if ctx != nil {
 		if ctx.SelectedCommand == nil {
 			next := ctx.Next()
