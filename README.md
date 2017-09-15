@@ -429,14 +429,17 @@ Commands:
     Prints list of issues for given search criteria
 
     -t, --template=TEMPLATE        Template to use for output
+        --gjq=GJQ                  GJSON Query to filter output, see https://goo.gl/iaYwJ5
     -a, --assignee=ASSIGNEE        User assigned the issue
     -c, --component=COMPONENT      Component to search for
     -i, --issuetype=ISSUETYPE      Issue type to search for
     -l, --limit=LIMIT              Maximum number of results to return in search
     -p, --project=PROJECT          Project to search for
+    -n, --named-query=NAMED-QUERY  The name of a query in the `queries` configuration
     -q, --query=QUERY              Jira Query Language (JQL) expression for the search
     -f, --queryfields=QUERYFIELDS  Fields that are used in "list" template
     -r, --reporter=REPORTER        Reporter to search for
+    -S, --status=STATUS            Filter on issue status
     -s, --sort=SORT                Sort order to return
     -w, --watcher=WATCHER          Watcher to search for
 
@@ -445,6 +448,7 @@ Commands:
 
     -b, --browse                 Open issue(s) in browser after operation
     -t, --template=TEMPLATE      Template to use for output
+        --gjq=GJQ                GJSON Query to filter output, see https://goo.gl/iaYwJ5
         --expand=EXPAND ...      field to expand for the issue
         --field=FIELD ...        field to return for the issue
         --property=PROPERTY ...  property to return for issue
@@ -465,13 +469,14 @@ Commands:
   edit [<flags>] [<ISSUE>]
     Edit issue details
 
-    -b, --browse                 Open issue(s) in browser after operation
-        --editor=EDITOR          Editor to use
-    -t, --template=TEMPLATE      Template to use for output
-        --noedit                 Disable opening the editor
-    -q, --query=QUERY            Jira Query Language (JQL) expression for the search to edit multiple issues
-    -m, --comment=COMMENT        Comment message for issue
-    -o, --override=OVERRIDE ...  Set issue property
+    -b, --browse                   Open issue(s) in browser after operation
+        --editor=EDITOR            Editor to use
+    -t, --template=TEMPLATE        Template to use for output
+        --noedit                   Disable opening the editor
+    -n, --named-query=NAMED-QUERY  The name of a query in the `queries` configuration
+    -q, --query=QUERY              Jira Query Language (JQL) expression for the search to edit multiple issues
+    -m, --comment=COMMENT          Comment message for issue
+    -o, --override=OVERRIDE ...    Set issue property
 
   comment [<flags>] [<ISSUE>]
     Add comment to issue
@@ -482,11 +487,51 @@ Commands:
         --noedit             Disable opening the editor
     -m, --comment=COMMENT    Comment message for issue
 
+  epic create [<flags>]
+    Create Epic
+
+    -b, --browse                 Open issue(s) in browser after operation
+        --editor=EDITOR          Editor to use
+    -t, --template=TEMPLATE      Template to use for output
+        --noedit                 Disable opening the editor
+    -p, --project=PROJECT        project to create epic in
+    -n, --epic-name=EPIC-NAME    Epic Name
+    -m, --comment=COMMENT        Comment message for epic
+    -o, --override=OVERRIDE ...  Set epic property
+        --saveFile=SAVEFILE      Write epic as yaml to file
+
+  epic list [<flags>] <EPIC>
+    Prints list of issues for an epic with optional search criteria
+
+    -t, --template=TEMPLATE        Template to use for output
+        --gjq=GJQ                  GJSON Query to filter output, see https://goo.gl/iaYwJ5
+    -a, --assignee=ASSIGNEE        User assigned the issue
+    -c, --component=COMPONENT      Component to search for
+    -i, --issuetype=ISSUETYPE      Issue type to search for
+    -l, --limit=LIMIT              Maximum number of results to return in search
+    -p, --project=PROJECT          Project to search for
+    -n, --named-query=NAMED-QUERY  The name of a query in the `queries` configuration
+    -q, --query=QUERY              Jira Query Language (JQL) expression for the search
+    -f, --queryfields=QUERYFIELDS  Fields that are used in "list" template
+    -r, --reporter=REPORTER        Reporter to search for
+    -S, --status=STATUS            Filter on issue status
+    -s, --sort=SORT                Sort order to return
+    -w, --watcher=WATCHER          Watcher to search for
+
+  epic add <EPIC> <ISSUE>...
+    Add issues to Epic
+
+
+  epic remove <ISSUE>...
+    Remove issues from Epic
+
+
   worklog list [<flags>] <ISSUE>
     Prints the worklog data for given issue
 
     -b, --browse             Open issue(s) in browser after operation
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
 
   worklog add [<flags>] <ISSUE>
     Add a worklog to an issue
@@ -497,16 +542,19 @@ Commands:
         --noedit                 Disable opening the editor
     -m, --comment=COMMENT        Comment message for worklog
     -T, --time-spent=TIME-SPENT  Time spent working on issue
+    -S, --started=STARTED        Time you started work
 
   fields [<flags>]
     Prints all fields, both System and Custom
 
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
 
   createmeta [<flags>]
     View 'create' metadata
 
     -t, --template=TEMPLATE    Template to use for output
+        --gjq=GJQ              GJSON Query to filter output, see https://goo.gl/iaYwJ5
     -p, --project=PROJECT      project to fetch create metadata
     -i, --issuetype=ISSUETYPE  issuetype in project to fetch create metadata
 
@@ -515,6 +563,7 @@ Commands:
 
     -b, --browse             Open issue(s) in browser after operation
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
 
   subtask [<flags>] [<ISSUE>]
     Subtask issue
@@ -555,6 +604,7 @@ Commands:
     Show the issue link types
 
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
 
   transition [<flags>] <TRANSITION> <ISSUE>
     Transition issue to given state
@@ -570,12 +620,14 @@ Commands:
 
     -b, --browse             Open issue(s) in browser after operation
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
 
   transmeta [<flags>] <ISSUE>
     List valid issue transitions
 
     -b, --browse             Open issue(s) in browser after operation
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
 
   close [<flags>] <ISSUE>
     Transition issue to close state
@@ -732,12 +784,14 @@ Commands:
     Show components for a project
 
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
     -p, --project=PROJECT    project to list components
 
   issuetypes [<flags>]
     Show issue types for a project
 
     -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
     -p, --project=PROJECT    project to list issueTypes
 
   export-templates [<flags>]
@@ -759,5 +813,7 @@ Commands:
   request [<flags>] <API> [<JSON>]
     Open issue in requestr
 
-    -M, --method=METHOD  HTTP request method to use
+    -t, --template=TEMPLATE  Template to use for output
+        --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
+    -M, --method=METHOD      HTTP request method to use
 ```
