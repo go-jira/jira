@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7 - 2017-09-15
+
+* [[#87](https://github.com/Netflix-Skunkworks/go-jira/issues/87)] add various commands for interacting with epics [Cory Bennett] [[893454f](https://github.com/Netflix-Skunkworks/go-jira/commit/893454f)]
+
 ## 1.0.6 - 2017-09-13
 
 * tweaks for templates in named queries to work better [Cory Bennett] [[00cba79](https://github.com/Netflix-Skunkworks/go-jira/commit/00cba79)]
