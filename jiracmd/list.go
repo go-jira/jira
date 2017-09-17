@@ -31,7 +31,7 @@ func CmdListRegistry() *jiracli.CommandRegistryEntry {
 				opts.MaxResults = 500
 			}
 			if opts.QueryFields == "" {
-				opts.QueryFields = "assignee,created,priority,reporter,status,summary,updated"
+				opts.QueryFields = "assignee,created,priority,reporter,status,summary,updated,issuetype"
 			}
 			if opts.Sort == "" {
 				opts.Sort = "priority asc, key"

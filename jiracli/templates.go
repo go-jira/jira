@@ -261,14 +261,14 @@ const defaultDebugTemplate = "{{ . | toJson}}\n"
 const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
 
 const defaultTableTemplate = `{{/* table template */ -}}
-{{$w := sub termWidth 92 -}}
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
-| {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf (printf "%%-%ds" (sub $w 2)) }} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+{{$w := sub termWidth 107 -}}
++{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+| {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf (printf "%%-%ds" (sub $w 2)) }} | {{ "Type" | printf "%-12s"}} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
++{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 {{ range .issues -}}
-  | {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev (sub $w 2) | printf (printf "%%-%ds" (sub $w 2)) }} | {{.fields.priority.name | printf "%-12s" }} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned>{{end}} |
+  | {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev (sub $w 2) | printf (printf "%%-%ds" (sub $w 2)) }} | {{.fields.issuetype.name | printf "%-12s" }} | {{.fields.priority.name | printf "%-12s" }} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned>{{end}} |
 {{ end -}}
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
++{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 `
 const defaultAttachListTemplate = `{{/* table template */ -}}
 +{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
