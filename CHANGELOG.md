@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8 - 2017-09-17
+
+* [[#100](https://github.com/Netflix-Skunkworks/go-jira/issues/100)] add support for posting, fetching, listing and removing attachments [Cory Bennett] [[66eb7bf](https://github.com/Netflix-Skunkworks/go-jira/commit/66eb7bf)]
+
 ## 1.0.7 - 2017-09-15
 
 * [[#87](https://github.com/Netflix-Skunkworks/go-jira/issues/87)] add various commands for interacting with epics [Cory Bennett] [[893454f](https://github.com/Netflix-Skunkworks/go-jira/commit/893454f)]
