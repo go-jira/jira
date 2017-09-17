@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.9 - 2017-09-17
+
+* [[#102](https://github.com/Netflix-Skunkworks/go-jira/issues/102)] add issuetype into the default queryfields and add it to the default `table` list template [Cory Bennett] [[c9d8dfb](https://github.com/Netflix-Skunkworks/go-jira/commit/c9d8dfb)]
+
 ## 1.0.8 - 2017-09-17
 
 * [[#100](https://github.com/Netflix-Skunkworks/go-jira/issues/100)] add support for posting, fetching, listing and removing attachments [Cory Bennett] [[66eb7bf](https://github.com/Netflix-Skunkworks/go-jira/commit/66eb7bf)]
