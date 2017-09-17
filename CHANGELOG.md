@@ -2,6 +2,7 @@
 
 ## 1.0.9 - 2017-09-17
 
+* need issuetype to use the default list table template now [Cory Bennett] [[3e8b9bd](https://github.com/Netflix-Skunkworks/go-jira/commit/3e8b9bd)]
 * [[#102](https://github.com/Netflix-Skunkworks/go-jira/issues/102)] add issuetype into the default queryfields and add it to the default `table` list template [Cory Bennett] [[c9d8dfb](https://github.com/Netflix-Skunkworks/go-jira/commit/c9d8dfb)]
 
 ## 1.0.8 - 2017-09-17
