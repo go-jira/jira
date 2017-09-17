@@ -70,7 +70,7 @@ release:
 	echo '```' >> README.md
 	./jira --help-long >> README.md || true
 	echo '```' >> README.md
-	git diff --shortstat README.md | grep -v . || git commit -m "Updated Usage" README.md
+	git diff --exit-code --quiet README.md || git commit -m "Updated Usage" README.md
 	git commit -m "Updated Changelog" CHANGELOG.md
 	git commit -m "version bump" jira.go
 	git tag v$(NEWVER)
