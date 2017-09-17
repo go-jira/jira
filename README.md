@@ -794,6 +794,28 @@ Commands:
         --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
     -p, --project=PROJECT    project to list issueTypes
 
+  attach create [<flags>] <ISSUE> [<ATTACHMENT>]
+    Attach file to issue
+
+    -b, --browse             Open issue(s) in browser after operation
+        --saveFile=SAVEFILE  Write attachment information as yaml to file
+    -f, --filename=FILENAME  Filename to use for attachment
+
+  attach list [<flags>] <ISSUE>
+    Prints issue details
+
+    -b, --browse             Open issue(s) in browser after operation
+    -t, --template=TEMPLATE  Template to use for output
+
+  attach get [<flags>] [<ATTACHMENT-ID>]
+    Fetch attachment
+
+    -o, --output=OUTPUT  Write attachment to specified file name, '-' for stdout
+
+  attach remove [<ATTACHMENT-ID>]
+    Delete attachment
+
+
   export-templates [<flags>]
     Export templates for customizations
 
@@ -816,4 +838,6 @@ Commands:
     -t, --template=TEMPLATE  Template to use for output
         --gjq=GJQ            GJSON Query to filter output, see https://goo.gl/iaYwJ5
     -M, --method=METHOD      HTTP request method to use
+
+
 ```
