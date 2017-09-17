@@ -160,7 +160,8 @@ func TemplateProcessor() *template.Template {
 }
 
 func ConfigTemplate(fig *figtree.FigTree, template, command string, opts interface{}) (string, error) {
-	tmp, err := translateOptions(opts)
+	var tmp interface{}
+	err := ConvertType(opts, &tmp)
 	if err != nil {
 		return "", err
 	}
@@ -178,11 +179,11 @@ func ConfigTemplate(fig *figtree.FigTree, template, command string, opts interfa
 	return buf.String(), nil
 }
 
-func translateOptions(opts interface{}) (interface{}, error) {
+func ConvertType(input interface{}, output interface{}) error {
 	// HACK HACK HACK: convert data formats to json for backwards compatibilty with templates
-	jsonData, err := json.Marshal(opts)
+	jsonData, err := json.Marshal(input)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer func(mapType, iface reflect.Type) {
@@ -193,11 +194,10 @@ func translateOptions(opts interface{}) (interface{}, error) {
 	yaml.DefaultMapType = reflect.TypeOf(map[string]interface{}{})
 	yaml.IfaceType = yaml.DefaultMapType.Elem()
 
-	var rawData interface{}
-	if err := yaml.Unmarshal(jsonData, &rawData); err != nil {
-		return nil, err
+	if err := yaml.Unmarshal(jsonData, output); err != nil {
+		return err
 	}
-	return &rawData, nil
+	return nil
 
 }
 
@@ -212,7 +212,8 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 		out = os.Stdout
 	}
 
-	rawData, err := translateOptions(data)
+	var rawData interface{}
+	err = ConvertType(data, &rawData)
 	if err != nil {
 		return err
 	}
@@ -228,6 +229,7 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 }
 
 var AllTemplates = map[string]string{
+	"attach-list":    defaultAttachListTemplate,
 	"comment":        defaultCommentTemplate,
 	"component-add":  defaultComponentAddTemplate,
 	"components":     defaultComponentsTemplate,
@@ -267,6 +269,15 @@ const defaultTableTemplate = `{{/* table template */ -}}
   | {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev (sub $w 2) | printf (printf "%%-%ds" (sub $w 2)) }} | {{.fields.priority.name | printf "%-12s" }} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned>{{end}} |
 {{ end -}}
 +{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+`
+const defaultAttachListTemplate = `{{/* table template */ -}}
++{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+| {{printf "%-10s" "id"}} | {{printf "%-28s" "filename"}} | {{printf "%-10s" "bytes"}} | {{printf "%-12s" "user"}} | {{printf "%-12s" "created"}} |
++{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+{{range . -}}
+| {{.id | printf "%10d" }} | {{.filename | printf "%-28s"}} | {{.size | printf "%10d"}} | {{.author.name | printf "%-12s"}} | {{.created | age | printf "%-12s"}} |
+{{end -}}
++{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
 `
 
 const defaultViewTemplate = `{{/* view template */ -}}

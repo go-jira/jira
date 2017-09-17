@@ -296,6 +296,24 @@ func main() {
 			Entry:   jiracmd.CmdIssueTypesRegistry(),
 		},
 		jiracli.CommandRegistry{
+			Command: "attach create",
+			Entry:   jiracmd.CmdAttachCreateRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "attach list",
+			Entry:   jiracmd.CmdAttachListRegistry(),
+			Aliases: []string{"ls"},
+		},
+		jiracli.CommandRegistry{
+			Command: "attach get",
+			Entry:   jiracmd.CmdAttachGetRegistry(),
+		},
+		jiracli.CommandRegistry{
+			Command: "attach remove",
+			Entry:   jiracmd.CmdAttachRemoveRegistry(),
+			Aliases: []string{"rm"},
+		},
+		jiracli.CommandRegistry{
 			Command: "export-templates",
 			Entry:   jiracmd.CmdExportTemplatesRegistry(),
 		},

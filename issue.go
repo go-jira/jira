@@ -4,7 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/url"
 	"strings"
+
+	"github.com/coryb/oreo"
 
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
@@ -532,4 +537,51 @@ func IssueAssign(ua HttpClient, endpoint string, issue, name string) error {
 		return nil
 	}
 	return responseError(resp)
+}
+
+// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue/{issueIdOrKey}/attachments-addAttachment
+func (j *Jira) IssueAttachFile(issue, filename string, contents io.Reader) (*jiradata.ListOfAttachment, error) {
+	return IssueAttachFile(j.UA, j.Endpoint, issue, filename, contents)
+}
+
+func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, contents io.Reader) (*jiradata.ListOfAttachment, error) {
+	var buf bytes.Buffer
+	w := multipart.NewWriter(&buf)
+	formFile, err := w.CreateFormFile("file", filename)
+	if err != nil {
+		return nil, err
+	}
+	_, err = io.Copy(formFile, contents)
+	if err != nil {
+		return nil, err
+	}
+
+	uri, err := url.Parse(fmt.Sprintf("%s/rest/api/2/issue/%s/attachments", endpoint, issue))
+	req := oreo.RequestBuilder(uri).WithMethod("POST").WithHeader(
+		"X-Atlassian-Token", "no-check",
+	).WithHeader(
+		"Accept", "application/json",
+	).WithContentType(w.FormDataContentType()).WithBody(&buf).Build()
+	w.Close()
+
+	resp, err := ua.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		// FIXME move this to a test, and run go tests as part of our regression
+		if false {
+			// this is because schema is wrong, defaults to type `int`, so we manually change it
+			// to `string`.  If the jiradata is regenerated we need to manually make the change
+			// again.
+			log.Debugf("Assert Attachment.ID is a string, rather than int: %v", &jiradata.Attachment{
+				ID: jiradata.IntOrString(0),
+			})
+		}
+		results := jiradata.ListOfAttachment{}
+		return &results, readJSON(resp.Body, &results)
+	}
+	return nil, responseError(resp)
 }

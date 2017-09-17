@@ -5,7 +5,7 @@ package jiradata
 // https://github.com/coryb/slipscheme
 //
 // Generated with command:
-// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/WorklogWithPagination.json
+// slipscheme -dir jiradata -pkg jiradata -overwrite schemas/ListofAttachment.json
 /////////////////////////////////////////////////////////////////////////
 //                            DO NOT EDIT                              //
 /////////////////////////////////////////////////////////////////////////
@@ -16,12 +16,42 @@ package jiradata
 //   "type": "object",
 //   "properties": {
 //     "accountId": {
+//       "title": "accountId",
 //       "type": "string"
 //     },
 //     "active": {
+//       "title": "active",
 //       "type": "boolean"
 //     },
+//     "applicationRoles": {
+//       "title": "Simple List Wrapper",
+//       "type": "object",
+//       "properties": {
+//         "items": {
+//           "type": "array",
+//           "items": {
+//             "title": "Group",
+//             "type": "object",
+//             "properties": {
+//               "name": {
+//                 "type": "string"
+//               },
+//               "self": {
+//                 "type": "string"
+//               }
+//             }
+//           }
+//         },
+//         "max-results": {
+//           "type": "integer"
+//         },
+//         "size": {
+//           "type": "integer"
+//         }
+//       }
+//     },
 //     "avatarUrls": {
+//       "title": "avatarUrls",
 //       "type": "object",
 //       "patternProperties": {
 //         ".+": {
@@ -30,33 +60,78 @@ package jiradata
 //       }
 //     },
 //     "displayName": {
+//       "title": "displayName",
 //       "type": "string"
 //     },
 //     "emailAddress": {
+//       "title": "emailAddress",
 //       "type": "string"
 //     },
+//     "expand": {
+//       "title": "expand",
+//       "type": "string"
+//     },
+//     "groups": {
+//       "title": "Simple List Wrapper",
+//       "type": "object",
+//       "properties": {
+//         "items": {
+//           "type": "array",
+//           "items": {
+//             "title": "Group",
+//             "type": "object",
+//             "properties": {
+//               "name": {
+//                 "type": "string"
+//               },
+//               "self": {
+//                 "type": "string"
+//               }
+//             }
+//           }
+//         },
+//         "max-results": {
+//           "type": "integer"
+//         },
+//         "size": {
+//           "type": "integer"
+//         }
+//       }
+//     },
 //     "key": {
+//       "title": "key",
+//       "type": "string"
+//     },
+//     "locale": {
+//       "title": "locale",
 //       "type": "string"
 //     },
 //     "name": {
+//       "title": "name",
 //       "type": "string"
 //     },
 //     "self": {
+//       "title": "self",
 //       "type": "string"
 //     },
 //     "timeZone": {
+//       "title": "timeZone",
 //       "type": "string"
 //     }
 //   }
 // }
 type User struct {
-	AccountID    string            `json:"accountId,omitempty" yaml:"accountId,omitempty"`
-	Active       bool              `json:"active,omitempty" yaml:"active,omitempty"`
-	AvatarUrls   map[string]string `json:"avatarUrls,omitempty" yaml:"avatarUrls,omitempty"`
-	DisplayName  string            `json:"displayName,omitempty" yaml:"displayName,omitempty"`
-	EmailAddress string            `json:"emailAddress,omitempty" yaml:"emailAddress,omitempty"`
-	Key          string            `json:"key,omitempty" yaml:"key,omitempty"`
-	Name         string            `json:"name,omitempty" yaml:"name,omitempty"`
-	Self         string            `json:"self,omitempty" yaml:"self,omitempty"`
-	TimeZone     string            `json:"timeZone,omitempty" yaml:"timeZone,omitempty"`
+	AccountID        string             `json:"accountId,omitempty" yaml:"accountId,omitempty"`
+	Active           bool               `json:"active,omitempty" yaml:"active,omitempty"`
+	ApplicationRoles *SimpleListWrapper `json:"applicationRoles,omitempty" yaml:"applicationRoles,omitempty"`
+	AvatarUrls       map[string]string  `json:"avatarUrls,omitempty" yaml:"avatarUrls,omitempty"`
+	DisplayName      string             `json:"displayName,omitempty" yaml:"displayName,omitempty"`
+	EmailAddress     string             `json:"emailAddress,omitempty" yaml:"emailAddress,omitempty"`
+	Expand           string             `json:"expand,omitempty" yaml:"expand,omitempty"`
+	Groups           *SimpleListWrapper `json:"groups,omitempty" yaml:"groups,omitempty"`
+	Key              string             `json:"key,omitempty" yaml:"key,omitempty"`
+	Locale           string             `json:"locale,omitempty" yaml:"locale,omitempty"`
+	Name             string             `json:"name,omitempty" yaml:"name,omitempty"`
+	Self             string             `json:"self,omitempty" yaml:"self,omitempty"`
+	TimeZone         string             `json:"timeZone,omitempty" yaml:"timeZone,omitempty"`
 }

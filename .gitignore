@@ -2,4 +2,9 @@ jira
 schemas/*.json
 t/.gnupg/random_seed
 t/issue.props
+t/attach.props
+t/garbage.bin
+t/attach1.txt
+t/binary.out
+t/foobar.bin
 dist
