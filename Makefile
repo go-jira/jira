@@ -68,7 +68,7 @@ update-changelog:
 release:
 	perl -pi -e 'undef $$/; s/\n```\nusage.*```//sg' README.md
 	echo '```' >> README.md
-	./jira --help-long >> README.md
+	./jira --help-long >> README.md || true
 	echo '```' >> README.md
 	git diff --shortstat README.md | grep -v . || git commit -m "Updated Usage" README.md
 	git commit -m "Updated Changelog" CHANGELOG.md
