@@ -5,7 +5,7 @@ import (
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
-
+	"gopkg.in/AlecAivazis/survey.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
@@ -106,7 +106,7 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 	if err != nil {
 		return err
 	}
-	for _, issueData := range results.Issues {
+	for i, issueData := range results.Issues {
 		editMeta, err := jira.GetIssueEditMeta(o, globals.Endpoint.Value, issueData.Key)
 		if err != nil {
 			return err
@@ -121,6 +121,23 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 		err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
 			return jira.EditIssue(o, globals.Endpoint.Value, issueData.Key, &issueUpdate)
 		})
+		if err == jiracli.EditLoopAbort {
+			if len(results.Issues) > i+1 {
+				var answer bool
+				survey.AskOne(
+					&survey.Confirm{
+						Message: fmt.Sprintf("Continue to edit next issue %s?", results.Issues[i+1].Key),
+						Default: true,
+					},
+					&answer,
+					nil,
+				)
+				if answer {
+					continue
+				}
+				panic(jiracli.Exit{1})
+			}
+		}
 		if err != nil {
 			return err
 		}

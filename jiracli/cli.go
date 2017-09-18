@@ -250,15 +250,17 @@ func (o *CommonOptions) editFile(fileName string) (changes bool, err error) {
 	return false, err
 }
 
+var EditLoopAbort = fmt.Errorf("Edit Loop aborted by request")
+
 func EditLoop(opts *CommonOptions, input interface{}, output interface{}, submit func() error) error {
 	tmpFile, err := tmpTemplate(opts.Template.Value, input)
 	if err != nil {
 		return err
 	}
 
-	confirm := func(msg string) (answer bool) {
+	confirm := func(dflt bool, msg string) (answer bool) {
 		survey.AskOne(
-			&survey.Confirm{Message: msg, Default: true},
+			&survey.Confirm{Message: msg, Default: dflt},
 			&answer,
 			nil,
 		)
@@ -279,14 +281,14 @@ func EditLoop(opts *CommonOptions, input interface{}, output interface{}, submit
 			changes, err := opts.editFile(tmpFile)
 			if err != nil {
 				log.Error(err.Error())
-				if confirm("Editor reported an error, edit again?") {
+				if confirm(true, "Editor reported an error, edit again?") {
 					continue
 				}
-				panic(Exit{Code: 1})
+				return EditLoopAbort
 			}
 			if !changes {
-				if !confirm("No changes detected, submit anyway?") {
-					panic(Exit{Code: 1})
+				if !confirm(false, "No changes detected, submit anyway?") {
+					return EditLoopAbort
 				}
 			}
 		}
@@ -319,35 +321,35 @@ func EditLoop(opts *CommonOptions, input interface{}, output interface{}, submit
 		var raw interface{}
 		if err := yaml.Unmarshal(data, &raw); err != nil {
 			log.Error(err.Error())
-			if confirm("Invalid YAML syntax, edit again?") {
+			if confirm(true, "Invalid YAML syntax, edit again?") {
 				continue
 			}
-			panic(Exit{Code: 1})
+			return EditLoopAbort
 		}
 		yamlFixup(&raw)
 		fixedYAML, err := yaml.Marshal(&raw)
 		if err != nil {
 			log.Error(err.Error())
-			if confirm("Invalid YAML syntax, edit again?") {
+			if confirm(true, "Invalid YAML syntax, edit again?") {
 				continue
 			}
-			panic(Exit{Code: 1})
+			return EditLoopAbort
 		}
 
 		if err := yaml.Unmarshal(fixedYAML, output); err != nil {
 			log.Error(err.Error())
-			if confirm("Invalid YAML syntax, edit again?") {
+			if confirm(true, "Invalid YAML syntax, edit again?") {
 				continue
 			}
-			panic(Exit{Code: 1})
+			return EditLoopAbort
 		}
 		// submit template
 		if err := submit(); err != nil {
 			log.Error(err.Error())
-			if confirm("Jira reported an error, edit again?") {
+			if confirm(true, "Jira reported an error, edit again?") {
 				continue
 			}
-			panic(Exit{Code: 1})
+			return EditLoopAbort
 		}
 		break
 	}
