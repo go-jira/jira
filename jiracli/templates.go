@@ -160,13 +160,13 @@ func TemplateProcessor() *template.Template {
 }
 
 func ConfigTemplate(fig *figtree.FigTree, template, command string, opts interface{}) (string, error) {
-	var tmp interface{}
+	var tmp map[string]interface{}
 	err := ConvertType(opts, &tmp)
 	if err != nil {
 		return "", err
 	}
-	fig.LoadAllConfigs(command+".yml", tmp)
-	fig.LoadAllConfigs("config.yml", tmp)
+	fig.LoadAllConfigs(command+".yml", &tmp)
+	fig.LoadAllConfigs("config.yml", &tmp)
 
 	tmpl, err := TemplateProcessor().Parse(template)
 	if err != nil {
