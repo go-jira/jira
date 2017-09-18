@@ -3,9 +3,9 @@
 [![GoDoc](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1?status.svg)](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Table of Contents
-=================
+### Table of Contents
 
+   * [Summary](#go-jira)
    * [Install](#install)
       * [Download](#download)
       * [Build](#build)
