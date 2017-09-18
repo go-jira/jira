@@ -3,6 +3,34 @@
 [![GoDoc](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1?status.svg)](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+Table of Contents
+=================
+
+   * [Install](#install)
+      * [Download](#download)
+      * [Build](#build)
+   * [v1 vs v0 changes](#v1-vs-v0-changes)
+               * [<strong>Golang library import</strong>](#golang-library-import)
+               * [<strong>Configs per command</strong>](#configs-per-command)
+               * [<strong>Custom Commands</strong>](#custom-commands)
+               * [<strong>Incompatible command changes</strong>](#incompatible-command-changes)
+               * [<strong>Login process change</strong>](#login-process-change)
+   * [Configuration](#configuration)
+      * [Dynamic Configuration](#dynamic-configuration)
+      * [Custom Commands](#custom-commands-1)
+            * [Commands](#commands)
+            * [Options](#options)
+            * [Arguments](#arguments)
+            * [Script Template](#script-template)
+            * [Examples](#examples)
+      * [Editing](#editing)
+      * [Templates](#templates)
+         * [Writing/Editing Templates](#writingediting-templates)
+      * [Authentication](#authentication)
+         * [keyring password source](#keyring-password-source)
+         * [pass password source](#pass-password-source)
+   * [Usage](#usage)
+
 # go-jira
 simple command line client for Atlassian's Jira service written in Go
 
