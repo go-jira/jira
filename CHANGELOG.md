@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.10 - 2017-09-18
+
+* clean up usage formatting, print aliases [Cory Bennett] [[9f433ac](https://github.com/Netflix-Skunkworks/go-jira/commit/9f433ac)]
+* fix edit [Cory Bennett] [[4c6b36c](https://github.com/Netflix-Skunkworks/go-jira/commit/4c6b36c)]
+* fix named query template expansion [Cory Bennett] [[a8eaa97](https://github.com/Netflix-Skunkworks/go-jira/commit/a8eaa97)]
+* fix usage message [Cory Bennett] [[cd3cfd8](https://github.com/Netflix-Skunkworks/go-jira/commit/cd3cfd8)]
+
 ## 1.0.9 - 2017-09-17
 
 * need issuetype to use the default list table template now [Cory Bennett] [[3e8b9bd](https://github.com/Netflix-Skunkworks/go-jira/commit/3e8b9bd)]
