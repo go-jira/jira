@@ -189,235 +189,60 @@ func main() {
 	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
 
 	registry := []jiracli.CommandRegistry{
-		jiracli.CommandRegistry{
-			Command: "acknowledge",
-			Aliases: []string{"ack"},
-			Entry:   jiracmd.CmdTransitionRegistry("acknowledge"),
-		},
-		jiracli.CommandRegistry{
-			Command: "assign",
-			Entry:   jiracmd.CmdAssignRegistry(),
-			Aliases: []string{"give"},
-		},
-		jiracli.CommandRegistry{
-			Command: "attach create",
-			Entry:   jiracmd.CmdAttachCreateRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "attach get",
-			Entry:   jiracmd.CmdAttachGetRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "attach list",
-			Entry:   jiracmd.CmdAttachListRegistry(),
-			Aliases: []string{"ls"},
-		},
-		jiracli.CommandRegistry{
-			Command: "attach remove",
-			Entry:   jiracmd.CmdAttachRemoveRegistry(),
-			Aliases: []string{"rm"},
-		},
-		jiracli.CommandRegistry{
-			Command: "backlog",
-			Entry:   jiracmd.CmdTransitionRegistry("Backlog"),
-		},
-		jiracli.CommandRegistry{
-			Command: "block",
-			Entry:   jiracmd.CmdBlockRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "browse",
-			Entry:   jiracmd.CmdBrowseRegistry(),
-			Aliases: []string{"b"},
-		},
-		jiracli.CommandRegistry{
-			Command: "close",
-			Entry:   jiracmd.CmdTransitionRegistry("close"),
-		},
-		jiracli.CommandRegistry{
-			Command: "comment",
-			Entry:   jiracmd.CmdCommentRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "component add",
-			Entry:   jiracmd.CmdComponentAddRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "components",
-			Entry:   jiracmd.CmdComponentsRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "create",
-			Entry:   jiracmd.CmdCreateRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "createmeta",
-			Entry:   jiracmd.CmdCreateMetaRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "done",
-			Entry:   jiracmd.CmdTransitionRegistry("Done"),
-		},
-		jiracli.CommandRegistry{
-			Command: "dup",
-			Entry:   jiracmd.CmdDupRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "edit",
-			Entry:   jiracmd.CmdEditRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "editmeta",
-			Entry:   jiracmd.CmdEditMetaRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "epic add",
-			Entry:   jiracmd.CmdEpicAddRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "epic create",
-			Entry:   jiracmd.CmdEpicCreateRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "epic list",
-			Entry:   jiracmd.CmdEpicListRegistry(),
-			Aliases: []string{"ls"},
-		},
-		jiracli.CommandRegistry{
-			Command: "epic remove",
-			Entry:   jiracmd.CmdEpicRemoveRegistry(),
-			Aliases: []string{"rm"},
-		},
-		jiracli.CommandRegistry{
-			Command: "export-templates",
-			Entry:   jiracmd.CmdExportTemplatesRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "fields",
-			Entry:   jiracmd.CmdFieldsRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "in-progress",
-			Aliases: []string{"prog", "progress"},
-			Entry:   jiracmd.CmdTransitionRegistry("Progress"),
-		},
-		jiracli.CommandRegistry{
-			Command: "issuelink",
-			Entry:   jiracmd.CmdIssueLinkRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "issuelinktypes",
-			Entry:   jiracmd.CmdIssueLinkTypesRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "issuetypes",
-			Entry:   jiracmd.CmdIssueTypesRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "labels add",
-			Entry:   jiracmd.CmdLabelsAddRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "labels remove",
-			Entry:   jiracmd.CmdLabelsRemoveRegistry(),
-			Aliases: []string{"rm"},
-		},
-		jiracli.CommandRegistry{
-			Command: "labels set",
-			Entry:   jiracmd.CmdLabelsSetRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "list",
-			Aliases: []string{"ls"},
-			Entry:   jiracmd.CmdListRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "login",
-			Entry:   jiracmd.CmdLoginRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "logout",
-			Entry:   jiracmd.CmdLogoutRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "rank",
-			Entry:   jiracmd.CmdRankRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "reopen",
-			Entry:   jiracmd.CmdTransitionRegistry("reopen"),
-		},
-		jiracli.CommandRegistry{
-			Command: "request",
-			Entry:   jiracmd.CmdRequestRegistry(),
-			Aliases: []string{"req"},
-		},
-		jiracli.CommandRegistry{
-			Command: "resolve",
-			Entry:   jiracmd.CmdTransitionRegistry("resolve"),
-		},
-		jiracli.CommandRegistry{
-			Command: "start",
-			Entry:   jiracmd.CmdTransitionRegistry("start"),
-		},
-		jiracli.CommandRegistry{
-			Command: "stop",
-			Entry:   jiracmd.CmdTransitionRegistry("stop"),
-		},
-		jiracli.CommandRegistry{
-			Command: "subtask",
-			Entry:   jiracmd.CmdSubtaskRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "take",
-			Entry:   jiracmd.CmdTakeRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "todo",
-			Entry:   jiracmd.CmdTransitionRegistry("To Do"),
-		},
-		jiracli.CommandRegistry{
-			Command: "transition",
-			Aliases: []string{"trans"},
-			Entry:   jiracmd.CmdTransitionRegistry(""),
-		},
-		jiracli.CommandRegistry{
-			Command: "transitions",
-			Entry:   jiracmd.CmdTransitionsRegistry("transitions"),
-		},
-		jiracli.CommandRegistry{
-			Command: "transmeta",
-			Entry:   jiracmd.CmdTransitionsRegistry("debug"),
-		},
-		jiracli.CommandRegistry{
-			Command: "unassign",
-			Entry:   jiracmd.CmdUnassignRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "unexport-templates",
-			Entry:   jiracmd.CmdUnexportTemplatesRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "view",
-			Entry:   jiracmd.CmdViewRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "vote",
-			Entry:   jiracmd.CmdVoteRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "watch",
-			Entry:   jiracmd.CmdWatchRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "worklog add",
-			Entry:   jiracmd.CmdWorklogAddRegistry(),
-		},
-		jiracli.CommandRegistry{
-			Command: "worklog list",
-			Entry:   jiracmd.CmdWorklogListRegistry(),
-			Default: true,
-		},
+		{Command: "acknowledge", Entry: jiracmd.CmdTransitionRegistry("acknowledge"), Aliases: []string{"ack"}},
+		{Command: "assign", Entry: jiracmd.CmdAssignRegistry(), Aliases: []string{"give"}},
+		{Command: "attach create", Entry: jiracmd.CmdAttachCreateRegistry()},
+		{Command: "attach get", Entry: jiracmd.CmdAttachGetRegistry()},
+		{Command: "attach list", Entry: jiracmd.CmdAttachListRegistry(), Aliases: []string{"ls"}},
+		{Command: "attach remove", Entry: jiracmd.CmdAttachRemoveRegistry(), Aliases: []string{"rm"}},
+		{Command: "backlog", Entry: jiracmd.CmdTransitionRegistry("Backlog")},
+		{Command: "block", Entry: jiracmd.CmdBlockRegistry()},
+		{Command: "browse", Entry: jiracmd.CmdBrowseRegistry(), Aliases: []string{"b"}},
+		{Command: "close", Entry: jiracmd.CmdTransitionRegistry("close")},
+		{Command: "comment", Entry: jiracmd.CmdCommentRegistry()},
+		{Command: "component add", Entry: jiracmd.CmdComponentAddRegistry()},
+		{Command: "components", Entry: jiracmd.CmdComponentsRegistry()},
+		{Command: "create", Entry: jiracmd.CmdCreateRegistry()},
+		{Command: "createmeta", Entry: jiracmd.CmdCreateMetaRegistry()},
+		{Command: "done", Entry: jiracmd.CmdTransitionRegistry("Done")},
+		{Command: "dup", Entry: jiracmd.CmdDupRegistry()},
+		{Command: "edit", Entry: jiracmd.CmdEditRegistry()},
+		{Command: "editmeta", Entry: jiracmd.CmdEditMetaRegistry()},
+		{Command: "epic add", Entry: jiracmd.CmdEpicAddRegistry()},
+		{Command: "epic create", Entry: jiracmd.CmdEpicCreateRegistry()},
+		{Command: "epic list", Entry: jiracmd.CmdEpicListRegistry(), Aliases: []string{"ls"}},
+		{Command: "epic remove", Entry: jiracmd.CmdEpicRemoveRegistry(), Aliases: []string{"rm"}},
+		{Command: "export-templates", Entry: jiracmd.CmdExportTemplatesRegistry()},
+		{Command: "fields", Entry: jiracmd.CmdFieldsRegistry()},
+		{Command: "in-progress", Entry: jiracmd.CmdTransitionRegistry("Progress"), Aliases: []string{"prog", "progress"}},
+		{Command: "issuelink", Entry: jiracmd.CmdIssueLinkRegistry()},
+		{Command: "issuelinktypes", Entry: jiracmd.CmdIssueLinkTypesRegistry()},
+		{Command: "issuetypes", Entry: jiracmd.CmdIssueTypesRegistry()},
+		{Command: "labels add", Entry: jiracmd.CmdLabelsAddRegistry()},
+		{Command: "labels remove", Entry: jiracmd.CmdLabelsRemoveRegistry(), Aliases: []string{"rm"}},
+		{Command: "labels set", Entry: jiracmd.CmdLabelsSetRegistry()},
+		{Command: "list", Entry: jiracmd.CmdListRegistry(), Aliases: []string{"ls"}},
+		{Command: "login", Entry: jiracmd.CmdLoginRegistry()},
+		{Command: "logout", Entry: jiracmd.CmdLogoutRegistry()},
+		{Command: "rank", Entry: jiracmd.CmdRankRegistry()},
+		{Command: "reopen", Entry: jiracmd.CmdTransitionRegistry("reopen")},
+		{Command: "request", Entry: jiracmd.CmdRequestRegistry(), Aliases: []string{"req"}},
+		{Command: "resolve", Entry: jiracmd.CmdTransitionRegistry("resolve")},
+		{Command: "start", Entry: jiracmd.CmdTransitionRegistry("start")},
+		{Command: "stop", Entry: jiracmd.CmdTransitionRegistry("stop")},
+		{Command: "subtask", Entry: jiracmd.CmdSubtaskRegistry()},
+		{Command: "take", Entry: jiracmd.CmdTakeRegistry()},
+		{Command: "todo", Entry: jiracmd.CmdTransitionRegistry("To Do")},
+		{Command: "transition", Entry: jiracmd.CmdTransitionRegistry(""), Aliases: []string{"trans"}},
+		{Command: "transitions", Entry: jiracmd.CmdTransitionsRegistry("transitions")},
+		{Command: "transmeta", Entry: jiracmd.CmdTransitionsRegistry("debug")},
+		{Command: "unassign", Entry: jiracmd.CmdUnassignRegistry()},
+		{Command: "unexport-templates", Entry: jiracmd.CmdUnexportTemplatesRegistry()},
+		{Command: "view", Entry: jiracmd.CmdViewRegistry()},
+		{Command: "vote", Entry: jiracmd.CmdVoteRegistry()},
+		{Command: "watch", Entry: jiracmd.CmdWatchRegistry()},
+		{Command: "worklog add", Entry: jiracmd.CmdWorklogAddRegistry()},
+		{Command: "worklog list", Entry: jiracmd.CmdWorklogListRegistry(), Default: true},
 	}
 
 	jiracli.Register(app, o, fig, registry)
