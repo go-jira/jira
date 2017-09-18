@@ -4,7 +4,7 @@ cd $(dirname $0)
 jira="../jira"
 . env.sh
 
-PLAN 88
+PLAN 94
 
 # reset login
 RUNS $jira logout
@@ -71,6 +71,45 @@ DIFF <<EOF
 +----------------+------------------------------------------+--------------+--------------+--------------+------------+--------------+--------------+
 | $(printf %-14s $issue) | summary                                  | Bug          | Medium       | To Do        | a minute   | gojira       | gojira       |
 +----------------+------------------------------------------+--------------+--------------+--------------+------------+--------------+--------------+
+EOF
+
+###############################################################################
+## Edit an issue
+###############################################################################
+RUNS $jira edit $issue -m "edit comment" --override priority=High --noedit
+DIFF <<EOF
+OK $issue $ENDPOINT/browse/$issue
+EOF
+
+###############################################################################
+## Edit multiple issues with query
+###############################################################################
+RUNS $jira edit -m "bulk edit comment" --override priority=High --noedit --query "resolution = unresolved AND project = 'BASIC' AND status = 'To Do'"
+DIFF <<EOF
+OK $issue $ENDPOINT/browse/$issue
+EOF
+
+RUNS $jira $issue
+DIFF <<EOF
+issue: $issue
+created: a minute ago
+status: To Do
+summary: summary
+project: BASIC
+issuetype: Bug
+assignee: gojira
+reporter: gojira
+priority: High
+votes: 0
+description: |
+  description
+
+comments:
+  - | # gojira, a minute ago
+    edit comment
+  - | # gojira, a minute ago
+    bulk edit comment
+
 EOF
 
 ###############################################################################

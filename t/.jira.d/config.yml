@@ -7,7 +7,7 @@ user: gojira
 project: BASIC
 
 queries:
-  todo: |
+  todo: >-
     resolution = unresolved {{if .project}}AND project = '{{.project}}'{{end}} AND status = 'To Do'
 
 custom-commands:
