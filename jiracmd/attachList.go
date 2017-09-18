@@ -24,7 +24,7 @@ func CmdAttachListRegistry() *jiracli.CommandRegistryEntry {
 	}
 
 	return &jiracli.CommandRegistryEntry{
-		"Prints issue details",
+		"Prints attachment details for issue",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return CmdAttachListUsage(cmd, &opts)
