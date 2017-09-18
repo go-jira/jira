@@ -4,7 +4,7 @@ cd $(dirname $0)
 jira="../jira"
 . env.sh
 
-PLAN 86
+PLAN 88
 
 # reset login
 RUNS $jira logout
@@ -48,6 +48,14 @@ EOF
 ###############################################################################
 
 RUNS $jira ls --project BASIC
+DIFF <<EOF
+$(printf %-12s $issue:) summary
+EOF
+
+###############################################################################
+## List issues using a named query
+###############################################################################
+RUNS $jira ls --project BASIC -n todo
 DIFF <<EOF
 $(printf %-12s $issue:) summary
 EOF
