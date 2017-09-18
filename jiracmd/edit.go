@@ -100,6 +100,7 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 		if opts.Browse.Value {
 			return CmdBrowse(globals, opts.Issue)
 		}
+		return nil
 	}
 	results, err := jira.Search(o, globals.Endpoint.Value, opts)
 	if err != nil {
@@ -113,8 +114,9 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 
 		issueUpdate := jiradata.IssueUpdate{}
 		input := templateInput{
-			Issue: issueData,
-			Meta:  editMeta,
+			Issue:     issueData,
+			Meta:      editMeta,
+			Overrides: opts.Overrides,
 		}
 		err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
 			return jira.EditIssue(o, globals.Endpoint.Value, issueData.Key, &issueUpdate)
