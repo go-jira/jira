@@ -33,6 +33,9 @@ func CmdEditRegistry() *jiracli.CommandRegistryEntry {
 		"Edit issue details",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
+			if opts.QueryFields == "" {
+				opts.QueryFields = "assignee,created,priority,reporter,status,summary,updated,issuetype,comments,description,votes,created,customfield_10110,components"
+			}
 			return CmdEditUsage(cmd, &opts, fig)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {

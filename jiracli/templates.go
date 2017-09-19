@@ -326,7 +326,7 @@ comments:
 {{end -}}
 `
 const defaultEditTemplate = `{{/* edit template */ -}}
-# issue: {{ .key }}
+# issue: {{ .key }} - created: {{ .fields.created | age}} ago
 update:
   comment:
     - add: 
@@ -354,7 +354,8 @@ fields:
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority .fields.priority.name "" }}{{end}}
   description: |~
-    {{ or .overrides.description (or .fields.description "") | indent 4 }}
+    {{ or .overrides.description .fields.description "" | indent 4 }}
+# votes: {{ .fields.votes.votes }}
 # comments:
 # {{ range .fields.comment.comments }}  - | # {{.author.name}}, {{.created | age}} ago
 #     {{ or .body "" | indent 4 | comment}}
