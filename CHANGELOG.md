@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.11 - 2017-09-26
+
+* [[#115](https://github.com/Netflix-Skunkworks/go-jira/issues/115)] fix transition template for description [Cory Bennett] [[986cc78](https://github.com/Netflix-Skunkworks/go-jira/commit/986cc78)]
+* update edit command to set queryFields on search to match what is used in template [Cory Bennett] [[3913726](https://github.com/Netflix-Skunkworks/go-jira/commit/3913726)]
+* fix edit with query loop, allow continuation when not submitting previous issue [Cory Bennett] [[0ba8aa0](https://github.com/Netflix-Skunkworks/go-jira/commit/0ba8aa0)]
+* fix edit when priority is not set [Cory Bennett] [[098eb99](https://github.com/Netflix-Skunkworks/go-jira/commit/098eb99)]
+* flatten CommandRegistry list to make it more readable [Cory Bennett] [[2ddaed2](https://github.com/Netflix-Skunkworks/go-jira/commit/2ddaed2)]
+
 ## 1.0.10 - 2017-09-18
 
 * clean up usage formatting, print aliases [Cory Bennett] [[9f433ac](https://github.com/Netflix-Skunkworks/go-jira/commit/9f433ac)]
