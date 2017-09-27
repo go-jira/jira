@@ -41,7 +41,7 @@ all:
 	go get -u github.com/karalabe/xgo
 	rm -rf dist
 	mkdir -p dist
-	xgo --targets="freebsd/amd64,linux/386,linux/amd64,windows/386,windows/amd64,darwin/amd64" -dest ./dist -ldflags="-w -s" ./cmd/jira
+	xgo --go 1.9.0 --targets="freebsd/amd64,linux/386,linux/amd64,windows/386,windows/amd64,darwin/amd64" -dest ./dist -ldflags="-w -s" ./cmd/jira
 
 install:
 	${MAKE} GOBIN=$$HOME/bin build

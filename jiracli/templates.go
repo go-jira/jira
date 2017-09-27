@@ -474,7 +474,8 @@ fields:
     - name: {{ .name }}{{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.description}}
-  description: {{or .overrides.description .fields.description }}
+  description: |~
+    {{ or .fields.description "" | indent 4 }}
 {{- end -}}
 {{if .meta.fields.fixVersions -}}
   {{if .meta.fields.fixVersions.allowedValues}}
