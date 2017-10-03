@@ -65,6 +65,14 @@ func TemplateProcessor() *template.Template {
 		"jira": func() string {
 			return os.Args[0]
 		},
+		"env": func() map[string]string {
+			out := map[string]string{}
+			for _, env := range os.Environ() {
+				kv := strings.SplitN(env, "=", 2)
+				out[kv[0]] = kv[1]
+			}
+			return out
+		},
 		"toJson": func(content interface{}) (string, error) {
 			bytes, err := json.MarshalIndent(content, "", "    ")
 			if err != nil {
