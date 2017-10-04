@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.12 - 2017-10-04
+
+* add `{{env.VARNAME}}` template support to allow use of env vars [Cory Bennett] [[4d74554](https://github.com/Netflix-Skunkworks/go-jira/commit/4d74554)]
+
 ## 1.0.11 - 2017-09-26
 
 * [[#115](https://github.com/Netflix-Skunkworks/go-jira/issues/115)] fix transition template for description [Cory Bennett] [[986cc78](https://github.com/Netflix-Skunkworks/go-jira/commit/986cc78)]
