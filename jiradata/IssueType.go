@@ -46,11 +46,12 @@ package jiradata
 //   }
 // }
 type IssueType struct {
-	AvatarID    int    `json:"avatarId,omitempty" yaml:"avatarId,omitempty"`
-	Description string `json:"description,omitempty" yaml:"description,omitempty"`
-	IconURL     string `json:"iconUrl,omitempty" yaml:"iconUrl,omitempty"`
-	ID          string `json:"id,omitempty" yaml:"id,omitempty"`
-	Name        string `json:"name,omitempty" yaml:"name,omitempty"`
-	Self        string `json:"self,omitempty" yaml:"self,omitempty"`
-	Subtask     bool   `json:"subtask,omitempty" yaml:"subtask,omitempty"`
+	AvatarID    int          `json:"avatarId,omitempty" yaml:"avatarId,omitempty"`
+	Description string       `json:"description,omitempty" yaml:"description,omitempty"`
+	IconURL     string       `json:"iconUrl,omitempty" yaml:"iconUrl,omitempty"`
+	ID          string       `json:"id,omitempty" yaml:"id,omitempty"`
+	Name        string       `json:"name,omitempty" yaml:"name,omitempty"`
+	Self        string       `json:"self,omitempty" yaml:"self,omitempty"`
+	Subtask     bool         `json:"subtask,omitempty" yaml:"subtask,omitempty"`
+	Fields      FieldMetaMap `json:"fields,omitempty" yaml:"fields,omitempty"`
 }
