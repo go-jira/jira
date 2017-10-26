@@ -246,7 +246,7 @@ func (j *Jira) GetIssueCreateMetaIssueType(projectKey, issueTypeName string) (*j
 }
 
 func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, issueTypeName string) (*jiradata.IssueType, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", endpoint, projectKey, issueTypeName)
+	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", endpoint, projectKey, url.QueryEscape(issueTypeName))
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
