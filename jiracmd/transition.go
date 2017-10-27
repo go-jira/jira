@@ -63,6 +63,7 @@ func CmdTransitionUsage(cmd *kingpin.CmdClause, opts *TransitionOptions) error {
 		cmd.Arg("TRANSITION", "State to transition issue to").Required().StringVar(&opts.Transition)
 	}
 	cmd.Arg("ISSUE", "issue to transition").Required().StringVar(&opts.Issue)
+	cmd.Flag("resolution", "Set resolution on transition").StringVar(&opts.Resolution)
 	return nil
 }
 
