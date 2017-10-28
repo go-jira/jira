@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"reflect"
 	"strconv"
 	"strings"
@@ -130,6 +131,10 @@ func TemplateProcessor() *template.Template {
 		},
 		"color": func(color string) string {
 			return ansi.ColorCode(color)
+		},
+		"regReplace": func(search string, replace string, content string) string {
+			re := regexp.MustCompile(search)
+			return re.ReplaceAllString(content, replace)
 		},
 		"split": func(sep string, content string) []string {
 			return strings.Split(content, sep)
