@@ -14,7 +14,7 @@ import (
 func CmdLogoutRegistry() *jiracli.CommandRegistryEntry {
 	opts := jiracli.CommonOptions{}
 	return &jiracli.CommandRegistryEntry{
-		"Deactivate sesssion with Jira server",
+		"Deactivate session with Jira server",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
 			return nil
