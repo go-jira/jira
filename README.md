@@ -473,7 +473,7 @@ Commands:
   labels set:          Set labels on an issue
   list:                Prints list of issues for given search criteria
   login:               Attempt to login into jira server
-  logout:              Deactivate sesssion with Jira server
+  logout:              Deactivate session with Jira server
   rank:                Mark issues as blocker
   reopen:              Transition issue to reopen state
   request:             Open issue in requestr
