@@ -39,12 +39,12 @@ func CmdTransitionRegistry(transition string) *jiracli.CommandRegistryEntry {
 		help,
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			return CmdTransitionUsage(cmd, &opts)
-		},
-		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			if opts.Transition == "" {
 				opts.Transition = transition
 			}
+			return CmdTransitionUsage(cmd, &opts)
+		},
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdTransition(o, globals, &opts)
 		},
 	}
