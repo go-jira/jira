@@ -2,6 +2,7 @@
 
 ## 1.0.13 - 2017-10-28
 
+* fix transition command [Cory Bennett] [[9597f9b](https://github.com/Netflix-Skunkworks/go-jira/commit/9597f9b)]
 * fix default values to load after parsing configs [Cory Bennett] [[c9b5054](https://github.com/Netflix-Skunkworks/go-jira/commit/c9b5054)]
 * add test to make sure IssueType.Fields does not disappear on regeneration [Cory Bennett] [[3966def](https://github.com/Netflix-Skunkworks/go-jira/commit/3966def)]
 * add tests for validating changes to auto-generated jiradata files [Cory Bennett] [[41d1a7c](https://github.com/Netflix-Skunkworks/go-jira/commit/41d1a7c)]
