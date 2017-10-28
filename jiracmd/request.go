@@ -32,14 +32,14 @@ func CmdRequestRegistry() *jiracli.CommandRegistryEntry {
 		"Open issue in requestr",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			if opts.Method == "" {
-				opts.Method = "GET"
-			}
 			jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 			jiracli.GJsonQueryUsage(cmd, &opts.CommonOptions)
 			return CmdRequestUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			if opts.Method == "" {
+				opts.Method = "GET"
+			}
 			return CmdRequest(o, globals, &opts)
 		},
 	}

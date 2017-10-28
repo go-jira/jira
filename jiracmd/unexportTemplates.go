@@ -20,13 +20,12 @@ func CmdUnexportTemplatesRegistry() *jiracli.CommandRegistryEntry {
 		"Remove unmodified exported templates",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			if opts.Dir != "" {
-				opts.Dir = fmt.Sprintf("%s/.jira.d/templates", jiracli.Homedir())
-			}
-
 			return CmdExportTemplatesUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			if opts.Dir != "" {
+				opts.Dir = fmt.Sprintf("%s/.jira.d/templates", jiracli.Homedir())
+			}
 			return CmdUnexportTemplates(globals, &opts)
 		},
 	}

@@ -27,6 +27,9 @@ func CmdListRegistry() *jiracli.CommandRegistryEntry {
 		"Prints list of issues for given search criteria",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
+			return CmdListUsage(cmd, &opts, fig)
+		},
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			if opts.MaxResults == 0 {
 				opts.MaxResults = 500
 			}
@@ -36,9 +39,6 @@ func CmdListRegistry() *jiracli.CommandRegistryEntry {
 			if opts.Sort == "" {
 				opts.Sort = "priority asc, key"
 			}
-			return CmdListUsage(cmd, &opts, fig)
-		},
-		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdList(o, globals, &opts)
 		},
 	}

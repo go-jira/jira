@@ -26,6 +26,9 @@ func CmdEpicListRegistry() *jiracli.CommandRegistryEntry {
 		"Prints list of issues for an epic with optional search criteria",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
+			return CmdEpicListUsage(cmd, &opts, fig)
+		},
+		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			if opts.MaxResults == 0 {
 				opts.MaxResults = 500
 			}
@@ -35,9 +38,6 @@ func CmdEpicListRegistry() *jiracli.CommandRegistryEntry {
 			if opts.Sort == "" {
 				opts.Sort = "priority asc, key"
 			}
-			return CmdEpicListUsage(cmd, &opts, fig)
-		},
-		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
 			return CmdEpicList(o, globals, &opts)
 		},
 	}

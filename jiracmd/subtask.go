@@ -33,12 +33,12 @@ func CmdSubtaskRegistry() *jiracli.CommandRegistryEntry {
 		"Subtask issue",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
 			jiracli.LoadConfigs(cmd, fig, &opts)
-			if opts.IssueType == "" {
-				opts.IssueType = "Sub-task"
-			}
 			return CmdSubtaskUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			if opts.IssueType == "" {
+				opts.IssueType = "Sub-task"
+			}
 			return CmdSubtask(o, globals, &opts)
 		},
 	}
