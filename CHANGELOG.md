@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.13 - 2017-10-28
+
+* fix default values to load after parsing configs [Cory Bennett] [[c9b5054](https://github.com/Netflix-Skunkworks/go-jira/commit/c9b5054)]
+* add test to make sure IssueType.Fields does not disappear on regeneration [Cory Bennett] [[3966def](https://github.com/Netflix-Skunkworks/go-jira/commit/3966def)]
+* add tests for validating changes to auto-generated jiradata files [Cory Bennett] [[41d1a7c](https://github.com/Netflix-Skunkworks/go-jira/commit/41d1a7c)]
+* Fix typo in 'logout' command help [Cory Bennett] [[9000777](https://github.com/Netflix-Skunkworks/go-jira/commit/9000777)]
+* Add URL escaping to an additional issuetype call [Cory Bennett] [[7bfa241](https://github.com/Netflix-Skunkworks/go-jira/commit/7bfa241)]
+* Add --resolution option [Cory Bennett] [[e6600cf](https://github.com/Netflix-Skunkworks/go-jira/commit/e6600cf)]
+* Create Metadata Not Populated Correctly [Dillon Buchanan] [[093c510](https://github.com/Netflix-Skunkworks/go-jira/commit/093c510)]
+* add regexReplace template function [Dirk Heilig] [[d3e294e](https://github.com/Netflix-Skunkworks/go-jira/commit/d3e294e)]
+
 ## 1.0.12 - 2017-10-04
 
 * add `{{env.VARNAME}}` template support to allow use of env vars [Cory Bennett] [[4d74554](https://github.com/Netflix-Skunkworks/go-jira/commit/4d74554)]
