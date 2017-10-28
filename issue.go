@@ -571,15 +571,6 @@ func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, con
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		// FIXME move this to a test, and run go tests as part of our regression
-		if false {
-			// this is because schema is wrong, defaults to type `int`, so we manually change it
-			// to `string`.  If the jiradata is regenerated we need to manually make the change
-			// again.
-			log.Debugf("Assert Attachment.ID is a string, rather than int: %v", &jiradata.Attachment{
-				ID: jiradata.IntOrString(0),
-			})
-		}
 		results := jiradata.ListOfAttachment{}
 		return &results, readJSON(resp.Body, &results)
 	}
