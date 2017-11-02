@@ -35,6 +35,7 @@ type GlobalOptions struct {
 	PasswordSource figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
 	Quiet          figtree.BoolOption   `yaml:"quiet,omitempty" json:"quiet,omitempty"`
 	UnixProxy      figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
+	SocksProxy     figtree.StringOption `yaml:"socksproxy,omitempty" json:"socksproxy,omitempty"`
 	User           figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
 }
 
@@ -73,6 +74,7 @@ func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, re
 	app.Flag("insecure", "Disable TLS certificate verification").Short('k').SetValue(&globals.Insecure)
 	app.Flag("quiet", "Suppress output to console").Short('Q').SetValue(&globals.Quiet)
 	app.Flag("unixproxy", "Path for a unix-socket proxy").SetValue(&globals.UnixProxy)
+	app.Flag("socksproxy", "Address for a socks proxy").SetValue(&globals.SocksProxy)
 	app.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&globals.User)
 
 	app.PreAction(func(_ *kingpin.ParseContext) error {
@@ -87,6 +89,8 @@ func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, re
 		}
 		if globals.UnixProxy.Value != "" {
 			o = o.WithTransport(unixProxy(globals.UnixProxy.Value))
+		} else if globals.SocksProxy.Value != "" {
+			o = o.WithTransport(socksProxy(globals.SocksProxy.Value))
 		}
 		return nil
 	})
