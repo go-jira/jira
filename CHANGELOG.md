@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.14 - 2017-11-04
+
+* [[#131](https://github.com/Netflix-Skunkworks/go-jira/issues/131)] fix parsing global options before command execution (allow unixproxy/socksproxy to be set in config.yml) [Cory Bennett] [[042bc48](https://github.com/Netflix-Skunkworks/go-jira/commit/042bc48)]
+* add/update deps [Cory Bennett] [[a2e36e8](https://github.com/Netflix-Skunkworks/go-jira/commit/a2e36e8)]
+* add support for using socks proxy [onionjake] [[ff985f9](https://github.com/Netflix-Skunkworks/go-jira/commit/ff985f9)]
+
 ## 1.0.13 - 2017-10-28
 
 * fix transition command [Cory Bennett] [[9597f9b](https://github.com/Netflix-Skunkworks/go-jira/commit/9597f9b)]
