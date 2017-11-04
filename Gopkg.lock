@@ -38,6 +38,12 @@
   revision = "95687d61c95ee1522c1140e2af59b0c1846abfc1"
 
 [[projects]]
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
+  version = "v1.1.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/fatih/camelcase"
   packages = ["."]
@@ -92,10 +98,22 @@
   version = "v0.8.0"
 
 [[projects]]
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/sethgrid/pester"
   packages = ["."]
   revision = "a86a2d88f4dc3c7dbf3a6a6bbbfb095690b834b6"
+
+[[projects]]
+  name = "github.com/stretchr/testify"
+  packages = ["assert"]
+  revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
+  version = "v1.1.4"
 
 [[projects]]
   branch = "master"
@@ -126,6 +144,12 @@
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   revision = "9ba3862cf6a5452ae579de98f9364dd2e544844c"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["proxy"]
+  revision = "01c190206fbdffa42f334f4b2bf2220f50e64920"
 
 [[projects]]
   branch = "master"
@@ -160,6 +184,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1f4b97fcf898a5ef03af5e222686a09328b393e71797d21bf0c37b74d1e74a8e"
+  inputs-digest = "50016720a1e2509a915e4465a53ffa957f977d2145e831b81d946ef87f7a8f48"
   solver-name = "gps-cdcl"
   solver-version = 1
