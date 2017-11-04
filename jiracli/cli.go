@@ -77,24 +77,6 @@ func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, re
 	app.Flag("socksproxy", "Address for a socks proxy").SetValue(&globals.SocksProxy)
 	app.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&globals.User)
 
-	app.PreAction(func(_ *kingpin.ParseContext) error {
-		if globals.Insecure.Value {
-			transport := &http.Transport{
-				Proxy: http.ProxyFromEnvironment,
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: true,
-				},
-			}
-			o = o.WithTransport(transport)
-		}
-		if globals.UnixProxy.Value != "" {
-			o = o.WithTransport(unixProxy(globals.UnixProxy.Value))
-		} else if globals.SocksProxy.Value != "" {
-			o = o.WithTransport(socksProxy(globals.SocksProxy.Value))
-		}
-		return nil
-	})
-
 	o = o.WithPostCallback(
 		func(req *http.Request, resp *http.Response) (*http.Response, error) {
 			authUser := resp.Header.Get("X-Ausername")
@@ -132,6 +114,23 @@ func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, re
 
 		cmd := appOrCmd.Command(commandFields[len(commandFields)-1], copy.Entry.Help)
 		LoadConfigs(cmd, fig, &globals)
+		cmd.PreAction(func(_ *kingpin.ParseContext) error {
+			if globals.Insecure.Value {
+				transport := &http.Transport{
+					Proxy: http.ProxyFromEnvironment,
+					TLSClientConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
+				}
+				o = o.WithTransport(transport)
+			}
+			if globals.UnixProxy.Value != "" {
+				o = o.WithTransport(unixProxy(globals.UnixProxy.Value))
+			} else if globals.SocksProxy.Value != "" {
+				o = o.WithTransport(socksProxy(globals.SocksProxy.Value))
+			}
+			return nil
+		})
 
 		for _, alias := range copy.Aliases {
 			cmd = cmd.Alias(alias)
