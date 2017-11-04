@@ -428,13 +428,14 @@ usage: jira [<flags>] <command> [<args> ...]
 Jira Command Line Interface
 
 Global flags:
-      --help                 Show context-sensitive help (also try --help-long and --help-man).
-  -v, --verbose ...          Increase verbosity for debugging
-  -e, --endpoint=ENDPOINT    Base URI to use for Jira
-  -k, --insecure             Disable TLS certificate verification
-  -Q, --quiet                Suppress output to console
-      --unixproxy=UNIXPROXY  Path for a unix-socket proxy
-  -u, --user=USER            Login name used for authentication with Jira service
+      --help                   Show context-sensitive help (also try --help-long and --help-man).
+  -v, --verbose ...            Increase verbosity for debugging
+  -e, --endpoint=ENDPOINT      Base URI to use for Jira
+  -k, --insecure               Disable TLS certificate verification
+  -Q, --quiet                  Suppress output to console
+      --unixproxy=UNIXPROXY    Path for a unix-socket proxy
+      --socksproxy=SOCKSPROXY  Address for a socks proxy
+  -u, --user=USER              Login name used for authentication with Jira service
 
 Commands:
   help:                Show help.
