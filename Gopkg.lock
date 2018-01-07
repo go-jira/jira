@@ -29,7 +29,7 @@
   branch = "master"
   name = "github.com/coryb/kingpeon"
   packages = ["."]
-  revision = "64b561ae2d0f895b94719c486bed798f4236a4b3"
+  revision = "9a669f143f2e7454e80064c47365d139420a3fff"
 
 [[projects]]
   branch = "master"

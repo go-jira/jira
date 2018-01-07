@@ -22,7 +22,7 @@ func runDynamicCommand(run runner, dynamiccommand *DynamicCommand, t *template.T
 	if err != nil {
 		return err
 	}
-	err = t.Execute(buf, nil)
+	err = t.Execute(buf, dynamiccommand)
 	if err != nil {
 		return err
 	}
