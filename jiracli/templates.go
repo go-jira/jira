@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
@@ -17,6 +17,7 @@ import (
 	yaml "gopkg.in/coryb/yaml.v2"
 
 	"github.com/coryb/figtree"
+	shellquote "github.com/kballard/go-shellquote"
 	"github.com/mgutz/ansi"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -73,6 +74,16 @@ func TemplateProcessor() *template.Template {
 				out[kv[0]] = kv[1]
 			}
 			return out
+		},
+		"shellquote": func(content string) string {
+			return shellquote.Join(content)
+		},
+		"toMinJson": func(content interface{}) (string, error) {
+			bytes, err := json.Marshal(content)
+			if err != nil {
+				return "", err
+			}
+			return string(bytes), nil
 		},
 		"toJson": func(content interface{}) (string, error) {
 			bytes, err := json.MarshalIndent(content, "", "    ")
