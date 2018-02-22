@@ -17,7 +17,7 @@ type AuthOptions struct {
 	Password string
 }
 
-func (a *AuthOptions) AuthParams() *jiradata.AuthParams {
+func (a *AuthOptions) ProvideAuthParams() *jiradata.AuthParams {
 	return &jiradata.AuthParams{
 		Username: a.Username,
 		Password: a.Password,
