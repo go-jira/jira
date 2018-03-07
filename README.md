@@ -42,11 +42,23 @@ You can download one of the pre-built binaries for **go-jira** [here](https://gi
 
 ### Build
 
-You can build and install with [Go](https://golang.org/dl/):
+You can build and install the official repository with [Go](https://golang.org/dl/):
 
 ```
 go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
 ```
+This will checkout this repository into `$GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`, build, and install it.  
+
+Because golang likes fully qualified import paths, forking and contributing can be a bit tricky.
+
+If you want to tinker or hack on go-jira, the [easiest way to do so](http://code.openark.org/blog/development/forking-golang-repositories-on-github-and-managing-the-import-path) is to fork the repository and clone directly into the official path like this:
+
+`git clone https://github.com/YOUR_USER_NAME_HERE/go-jira $GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`
+
+From within that source dir you can build and install modifications from within that directory like:
+
+`go install ./...`  
+
 
 ## v1 vs v0 changes
 
