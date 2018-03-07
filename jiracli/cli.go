@@ -20,10 +20,7 @@ import (
 	"gopkg.in/AlecAivazis/survey.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 	yaml "gopkg.in/coryb/yaml.v2"
-	logging "gopkg.in/op/go-logging.v1"
 )
-
-var log = logging.MustGetLogger("jira")
 
 type Exit struct {
 	Code int
@@ -66,7 +63,13 @@ type kingpinAppOrCommand interface {
 	GetCommand(string) *kingpin.CmdClause
 }
 
-func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, reg []CommandRegistry) {
+var globalCommandRegistry = []CommandRegistry{}
+
+func RegisterCommand(regEntry CommandRegistry) {
+	globalCommandRegistry = append(globalCommandRegistry, regEntry)
+}
+
+func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 	globals := GlobalOptions{
 		User: figtree.NewStringOption(os.Getenv("USER")),
 	}
@@ -98,7 +101,7 @@ func Register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree, re
 		},
 	)
 
-	for _, command := range reg {
+	for _, command := range globalCommandRegistry {
 		copy := command
 		commandFields := strings.Fields(copy.Command)
 		var appOrCmd kingpinAppOrCommand = app
