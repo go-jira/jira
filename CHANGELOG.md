@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.15 - 2018-03-08
+
+* [[#147](https://github.com/Netflix-Skunkworks/go-jira/issues/147)] [[#148](https://github.com/Netflix-Skunkworks/go-jira/issues/148)] add support for api token based authentication [Cory Bennett] [[edb0662](https://github.com/Netflix-Skunkworks/go-jira/commit/edb0662)]
+* refactor to simplify main [Cory Bennett] [[43ebc84](https://github.com/Netflix-Skunkworks/go-jira/commit/43ebc84)] [[0d7c1a7](https://github.com/Netflix-Skunkworks/go-jira/commit/0d7c1a7)]
+* [[#145](https://github.com/Netflix-Skunkworks/go-jira/issues/145)] fix to match AuthProvider interface [Cory Bennett] [[80325a5](https://github.com/Netflix-Skunkworks/go-jira/commit/80325a5)]
+* [[#141](https://github.com/Netflix-Skunkworks/go-jira/issues/141)] better handling in responseError for non-json error responses [Cory Bennett] [[20a9666](https://github.com/Netflix-Skunkworks/go-jira/commit/20a9666)]
+* Update unexportTemplates.go [GitHub] [[6da9974](https://github.com/Netflix-Skunkworks/go-jira/commit/6da9974)]
+* [[#139](https://github.com/Netflix-Skunkworks/go-jira/issues/139)] add shellquote and toMinJson template functions [Cory Bennett] [[8c7ca38](https://github.com/Netflix-Skunkworks/go-jira/commit/8c7ca38)]
+* [[#137](https://github.com/Netflix-Skunkworks/go-jira/issues/137)] update kingpeon dep to allow access to dynamic command structure [Cory Bennett] [[425fa63](https://github.com/Netflix-Skunkworks/go-jira/commit/425fa63)]
+* field name is "comment" not "comments" [Cory Bennett] [[464742c](https://github.com/Netflix-Skunkworks/go-jira/commit/464742c)]
+
 ## 1.0.14 - 2017-11-04
 
 * [[#131](https://github.com/Netflix-Skunkworks/go-jira/issues/131)] fix parsing global options before command execution (allow unixproxy/socksproxy to be set in config.yml) [Cory Bennett] [[042bc48](https://github.com/Netflix-Skunkworks/go-jira/commit/042bc48)]
