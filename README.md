@@ -1,4 +1,4 @@
-g[![Join the chat at https://gitter.im/go-jira-cli/help](https://badges.gitter.im/go-jira-cli/help.svg)](https://gitter.im/go-jira-cli/help?utm_source=badge&utm_medium=badge&utm_content=badge)
+[![Join the chat at https://gitter.im/go-jira-cli/help](https://badges.gitter.im/go-jira-cli/help.svg)](https://gitter.im/go-jira-cli/help?utm_source=badge&utm_medium=badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/Netflix-Skunkworks/go-jira.svg?branch=master)](https://travis-ci.org/Netflix-Skunkworks/go-jira)
 [![GoDoc](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1?status.svg)](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -31,6 +31,7 @@ g[![Join the chat at https://gitter.im/go-jira-cli/help](https://badges.gitter.i
          * [keyring password source](#keyring-password-source)
          * [pass password source](#pass-password-source)
    * [Usage](#usage)
+       * [TAB completion](#setting-up-tab-completion)
 
 # go-jira
 simple command line client for Atlassian's Jira service written in Go
@@ -517,3 +518,16 @@ Commands:
   worklog list:        Prints the worklog data for given issue
 
 ```
+
+#### Setting up TAB completion
+
+Since go-jira is build with the "kingpin" golang command line library we supports bash/zsh shell completion automatically:
+
+ * <https://github.com/alecthomas/kingpin/tree/v2.2.5#bashzsh-shell-completion>
+
+For example, in bash, adding something along the lines of:
+
+  `eval "$(jira --completion-script-bash)"`
+
+to your bashrc, or .profile (assuming go-jira binary is already in your path) will cause jira to offer tab completion behavior.
+
