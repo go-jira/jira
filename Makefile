@@ -1,4 +1,5 @@
 NAME=jira
+GO?=go
 
 OS=$(shell uname -s)
 ifeq ($(filter CYGWIN%,$(OS)),$(OS))
@@ -20,17 +21,17 @@ CURVER ?= $(patsubst v%,%,$(shell [ -d .git ] && git describe --abbrev=0 --tags 
 LDFLAGS:= -w
 
 build:
-	go build -gcflags="-e" -v -ldflags "$(LDFLAGS) -s" -o '$(BIN)' cmd/jira/main.go
+	$(GO) build -gcflags="-e" -v -ldflags "$(LDFLAGS) -s" -o '$(BIN)' cmd/jira/main.go
 
 vet:
-	@go vet .
-	@go vet ./jiracli
-	@go vet ./jiracmd
-	@go vet ./jiradata
-	@go vet ./cmd/jira
+	@$(GO) vet .
+	@$(GO) vet ./jiracli
+	@$(GO) vet ./jiracmd
+	@$(GO) vet ./jiradata
+	@$(GO) vet ./cmd/jira
 
 lint:
-	@go get github.com/golang/lint/golint
+	@$(GO) get github.com/golang/lint/golint
 	@golint .
 	@golint ./jiracli
 	@golint ./jiracmd
@@ -38,7 +39,7 @@ lint:
 	@golint ./cmd/jira
 
 all:
-	go get -u github.com/karalabe/xgo
+	$(GO) get -u github.com/karalabe/xgo
 	rm -rf dist
 	mkdir -p dist
 	xgo --targets="freebsd/amd64,linux/386,linux/amd64,windows/386,windows/amd64,darwin/amd64" -dest ./dist -ldflags="-w -s" ./cmd/jira
