@@ -31,7 +31,7 @@
          * [keyring password source](#keyring-password-source)
          * [pass password source](#pass-password-source)
    * [Usage](#usage)
-       * [TAB completion](#tab-completion)
+       * [TAB completion](#setting-up-tab-completion)
 
 # go-jira
 simple command line client for Atlassian's Jira service written in Go
