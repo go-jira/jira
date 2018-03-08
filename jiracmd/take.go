@@ -17,7 +17,9 @@ func CmdTakeRegistry() *jiracli.CommandRegistryEntry {
 			return CmdAssignUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
-			opts.Assignee = globals.User.Value
+			if opts.Assignee == "" {
+				opts.Assignee = globals.User.Value
+			}
 			return CmdAssign(o, globals, &opts)
 		},
 	}

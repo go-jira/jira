@@ -3,6 +3,7 @@ package jiracli
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -27,13 +28,15 @@ type Exit struct {
 }
 
 type GlobalOptions struct {
-	Endpoint       figtree.StringOption `yaml:"endpoint,omitempty" json:"endpoint,omitempty"`
-	Insecure       figtree.BoolOption   `yaml:"insecure,omitempty" json:"insecure,omitempty"`
-	PasswordSource figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
-	Quiet          figtree.BoolOption   `yaml:"quiet,omitempty" json:"quiet,omitempty"`
-	UnixProxy      figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
-	SocksProxy     figtree.StringOption `yaml:"socksproxy,omitempty" json:"socksproxy,omitempty"`
-	User           figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
+	AuthenticationMethod figtree.StringOption `yaml:"authentication-method,omitempty" json:"authentication-method,omitempty"`
+	Endpoint             figtree.StringOption `yaml:"endpoint,omitempty" json:"endpoint,omitempty"`
+	Insecure             figtree.BoolOption   `yaml:"insecure,omitempty" json:"insecure,omitempty"`
+	Login                figtree.StringOption `yaml:"login,omitempty" json:"login,omitempty"`
+	PasswordSource       figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
+	Quiet                figtree.BoolOption   `yaml:"quiet,omitempty" json:"quiet,omitempty"`
+	SocksProxy           figtree.StringOption `yaml:"socksproxy,omitempty" json:"socksproxy,omitempty"`
+	UnixProxy            figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
+	User                 figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
 }
 
 type CommonOptions struct {
@@ -69,33 +72,56 @@ func RegisterCommand(regEntry CommandRegistry) {
 	globalCommandRegistry = append(globalCommandRegistry, regEntry)
 }
 
+func (o *GlobalOptions) AuthMethod() string {
+	if strings.Contains(o.Endpoint.Value, ".atlassian.net") && o.AuthenticationMethod.Source == "default" {
+		return "api-token"
+	}
+	return o.AuthenticationMethod.Value
+}
+
 func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 	globals := GlobalOptions{
-		User: figtree.NewStringOption(os.Getenv("USER")),
+		User:                 figtree.NewStringOption(os.Getenv("USER")),
+		AuthenticationMethod: figtree.NewStringOption("session"),
 	}
 	app.Flag("endpoint", "Base URI to use for Jira").Short('e').SetValue(&globals.Endpoint)
 	app.Flag("insecure", "Disable TLS certificate verification").Short('k').SetValue(&globals.Insecure)
 	app.Flag("quiet", "Suppress output to console").Short('Q').SetValue(&globals.Quiet)
 	app.Flag("unixproxy", "Path for a unix-socket proxy").SetValue(&globals.UnixProxy)
 	app.Flag("socksproxy", "Address for a socks proxy").SetValue(&globals.SocksProxy)
-	app.Flag("user", "Login name used for authentication with Jira service").Short('u').SetValue(&globals.User)
+	app.Flag("user", "user name used within the Jira service").Short('u').SetValue(&globals.User)
+	app.Flag("login", "login name that corresponds to the user used for authentication").SetValue(&globals.Login)
+
+	o = o.WithPreCallback(
+		func(req *http.Request) (*http.Request, error) {
+			if globals.AuthMethod() == "api-token" {
+				// need to set basic auth header with user@domain:api-token
+				token := globals.GetPass()
+				authHeader := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", globals.Login.Value, token))))
+				req.Header.Add("Authorization", authHeader)
+			}
+			return req, nil
+		},
+	)
 
 	o = o.WithPostCallback(
 		func(req *http.Request, resp *http.Response) (*http.Response, error) {
-			authUser := resp.Header.Get("X-Ausername")
-			if authUser == "" || authUser == "anonymous" {
-				// preserve the --quiet value, we need to temporarily disable it so
-				// the normal login output is surpressed
-				defer func(quiet bool) {
-					globals.Quiet.Value = quiet
-				}(globals.Quiet.Value)
-				globals.Quiet.Value = true
+			if globals.AuthMethod() == "session" {
+				authUser := resp.Header.Get("X-Ausername")
+				if authUser == "" || authUser == "anonymous" {
+					// preserve the --quiet value, we need to temporarily disable it so
+					// the normal login output is surpressed
+					defer func(quiet bool) {
+						globals.Quiet.Value = quiet
+					}(globals.Quiet.Value)
+					globals.Quiet.Value = true
 
-				// we are not logged in, so force login now by running the "login" command
-				app.Parse([]string{"login"})
+					// we are not logged in, so force login now by running the "login" command
+					app.Parse([]string{"login"})
 
-				// rerun the original request
-				return o.Do(req)
+					// rerun the original request
+					return o.Do(req)
+				}
 			}
 			return resp, nil
 		},
@@ -131,6 +157,12 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 				o = o.WithTransport(unixProxy(globals.UnixProxy.Value))
 			} else if globals.SocksProxy.Value != "" {
 				o = o.WithTransport(socksProxy(globals.SocksProxy.Value))
+			}
+			if globals.AuthMethod() == "api-token" {
+				o = o.WithCookieFile("")
+			}
+			if globals.Login.Value == "" {
+				globals.Login = globals.User
 			}
 			return nil
 		})

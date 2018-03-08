@@ -3,6 +3,7 @@ package jiracli
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -12,9 +13,21 @@ import (
 
 func (o *GlobalOptions) ProvideAuthParams() *jiradata.AuthParams {
 	return &jiradata.AuthParams{
-		Username: o.User.Value,
+		Username: o.Login.Value,
 		Password: o.GetPass(),
 	}
+}
+
+func (o *GlobalOptions) keyName() string {
+	user := o.Login.Value
+	if o.AuthMethod() == "api-token" {
+		user = "api-token:" + user
+	}
+
+	if o.PasswordSource.Value == "pass" {
+		return fmt.Sprintf("GoJira/%s", user)
+	}
+	return user
 }
 
 func (o *GlobalOptions) GetPass() string {
@@ -22,14 +35,14 @@ func (o *GlobalOptions) GetPass() string {
 	if o.PasswordSource.Value != "" {
 		if o.PasswordSource.Value == "keyring" {
 			var err error
-			passwd, err = keyringGet(o.User.Value)
+			passwd, err = keyringGet(o.keyName())
 			if err != nil {
 				panic(err)
 			}
 		} else if o.PasswordSource.Value == "pass" {
 			if bin, err := exec.LookPath("pass"); err == nil {
 				buf := bytes.NewBufferString("")
-				cmd := exec.Command(bin, fmt.Sprintf("GoJira/%s", o.User))
+				cmd := exec.Command(bin, o.keyName())
 				cmd.Stdout = buf
 				cmd.Stderr = buf
 				if err := cmd.Run(); err == nil {
@@ -44,9 +57,23 @@ func (o *GlobalOptions) GetPass() string {
 	if passwd != "" {
 		return passwd
 	}
+
+	if passwd = os.Getenv("JIRA_API_TOKEN"); passwd != "" && o.AuthMethod() == "api-token" {
+		return passwd
+	}
+
+	prompt := fmt.Sprintf("Jira Password [%s]: ", o.Login)
+	help := ""
+
+	if o.AuthMethod() == "api-token" {
+		prompt = fmt.Sprintf("Jira API-Token [%s]: ", o.Login)
+		help = "API Tokens may be required by your Jira service endpoint: https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/"
+	}
+
 	err := survey.AskOne(
 		&survey.Password{
-			Message: fmt.Sprintf("Jira Password [%s]: ", o.User),
+			Message: prompt,
+			Help:    help,
 		},
 		&passwd,
 		nil,
@@ -62,7 +89,7 @@ func (o *GlobalOptions) GetPass() string {
 func (o *GlobalOptions) SetPass(passwd string) error {
 	if o.PasswordSource.Value == "keyring" {
 		// save password in keychain so that it can be used for subsequent http requests
-		err := keyringSet(o.User.Value, passwd)
+		err := keyringSet(o.keyName(), passwd)
 		if err != nil {
 			log.Errorf("Failed to set password in keyring: %s", err)
 			return err
@@ -70,7 +97,7 @@ func (o *GlobalOptions) SetPass(passwd string) error {
 	} else if o.PasswordSource.Value == "pass" {
 		if bin, err := exec.LookPath("pass"); err == nil {
 			log.Debugf("using %s", bin)
-			passName := fmt.Sprintf("GoJira/%s", o.User)
+			passName := o.keyName()
 			if passwd != "" {
 				in := bytes.NewBufferString(fmt.Sprintf("%s\n%s\n", passwd, passwd))
 				out := bytes.NewBufferString("")

@@ -27,6 +27,7 @@
       * [Templates](#templates)
          * [Writing/Editing Templates](#writingediting-templates)
       * [Authentication](#authentication)
+         * [login vs user](#login-vs-user)
          * [keyring password source](#keyring-password-source)
          * [pass password source](#pass-password-source)
    * [Usage](#usage)
@@ -115,7 +116,7 @@ Flags:
 ```
 
 ###### **Incompatible command changes**
-Unfortunately during the rewrite between v0 and v1 there were some changes necessary that broke backwards compatibility with existing commands.  Specifically the `dups`, `blocks`, `add worklog` and `add|remove|set labels` commands have had the command word swapped around:
+Unfortunately during the rewrite between v0 and v1 there were some necessary changes that broke backwards compatibility with existing commands.  Specifically the `dups`, `blocks`, `add worklog` and `add|remove|set labels` commands have had the command word swapped around:
   * `jira DUPLICATE dups ISSUE` => `jira dup DUPLICATE ISSUE`
   * `jira BLOCKER blocks ISSUE` => `jira block BLOCKER ISSUE`
   * `jira add worklog` => `jira worklog add`
@@ -124,20 +125,17 @@ Unfortunately during the rewrite between v0 and v1 there were some changes neces
   * `jira set labels` => `jira labels set`
 
 ###### **Login process change**
+We have, once again, changed how login happens for Jira.  When authenticating against Atlassian Cloud Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  Please read [the Authentication section](#authentication) below for more information.
+
+If you use a privately hosted Jira service, you can chose to use the API Token method or continue using the session login api.  Please read [the Authentication section](#authentication) below for more information.  
+
 Previously `jira` used attempt to get a `JSESSION` cookies by authenticating with the webservice standard GUI login process.  This has been especially problematic as users need to authenticate with various credential providers (google auth, etc).  We now attempt to authenticate via the [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login).  This may be problematic for users if admins have locked down the session-login api, so we might have to bring back the error-prone Basic-Auth approach.  For users that are unable to authenticate via `jira` hopefully someone in your organization can provide me with details on a process for you to authenticate and we can try to update `jira`.
 
 ## Configuration
 
-**go-jira** uses a configuration hierarchy.  When loading the configuration from disk it will recursively look through
-all parent directories in your current path looking for a **.jira.d** directory.  If your current directory is not
-a child directory of your homedir, then your homedir will also be inspected for a **.jira.d** directory.  From all of **.jira.d** directories
-discovered **go-jira** will load a **&lt;command&gt;.yml** file (ie for `jira list` it will load `.jira.d/list.yml`) then it will merge in any properties from the **config.yml** if found.  The configuration properties found in a file closests to your current working directory
-will have precedence.  Properties overriden with command line options will have final precedence.
+**go-jira** uses a configuration hierarchy.  When loading the configuration from disk it will recursively look through all parent directories in your current path looking for a **.jira.d** directory.  If your current directory is not a child directory of your homedir, then your homedir will also be inspected for a **.jira.d** directory.  From all of **.jira.d** directories discovered **go-jira** will load a **&lt;command&gt;.yml** file (ie for `jira list` it will load `.jira.d/list.yml`) then it will merge in any properties from the **config.yml** if found.  The configuration properties found in a file closests to your current working directory will have precedence.  Properties overriden with command line options will have final precedence.
 
-The complicated configuration hierarchy is used because **go-jira** attempts to be context aware.  For example, if you are working on a "foo" project and
-you `cd` into your project workspace, wouldn't it be nice if `jira ls` automatically knew to list only issues related to the "foo" project?  Likewise when you
-`cd` to the "bar" project then `jira ls` should only list issues related to "bar" project.  You can do this with by creating a configuration under your project
-workspace at **./.jira.d/config.yml** that looks like:
+The complicated configuration hierarchy is used because **go-jira** attempts to be context aware.  For example, if you are working on a "foo" project and you `cd` into your project workspace, wouldn't it be nice if `jira ls` automatically knew to list only issues related to the "foo" project?  Likewise when you `cd` to the "bar" project then `jira ls` should only list issues related to "bar" project.  You can do this with by creating a configuration under your project workspace at **./.jira.d/config.yml** that looks like:
 
 ```
 project: foo
@@ -370,7 +368,18 @@ jira list -t debug
 
 ### Authentication
 
-By default `go-jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring` or `pass`.
+For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endoint ends in `.atlassian.net`.  If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass` service as documented below so that it can be programatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
+
+If your Jira service still allows you to use the Session based authention method then `jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring` or `pass`.
+
+#### User vs Login
+The Jira service has sometimes differing opinions about how a user is identified.  In other words the ID you login with might not be ID that the jira system recognized you as.  This matters when trying to identify a user via various Jira REST APIs (like issue assignment).  This is especially relevent when trying to authenticate with an API Token where the authentication user is usually an email address, but within the Jira system the user is identified by a user name.  To accomodate this `jira` now supports two different properties in the config file.  So when authentication using the API Tokens you will likely want something like this in your `$HOME/.jira.d/config.yml` file:
+```
+user: person
+login: person@example.com
+```
+
+You can also override these values on the command line with `jira --user person --login person@example.com`.  The `login` value will be used only for authentication purposes, the `user` value will be used when a user name is required for any Jira service API calls.
 
 #### keyring password source
 On OSX and Linux there are a few keyring providers that `go-jira` can use (via this [golang module](https://github.com/tmc/keyring)).  To integrate `go-jira` with a supported keyring just add this configuration to `$HOME/.jira.d/config.yml`:

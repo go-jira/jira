@@ -46,6 +46,11 @@ func authCallback(req *http.Request, resp *http.Response) (*http.Response, error
 
 // CmdLogin will attempt to login into jira server
 func CmdLogin(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
+	if globals.AuthMethod() == "api-token" {
+		log.Noticef("No need to login when using api-token authentication method")
+		return nil
+	}
+
 	ua := o.WithoutRedirect().WithRetries(0).WithoutCallbacks().WithPostCallback(authCallback)
 	for {
 		if session, err := jira.GetSession(o, globals.Endpoint.Value); err != nil {

@@ -245,7 +245,7 @@ EOF
 # reset login for mothra for voting
 ###############################################################################
 
-jira="$jira --user mothra"
+jira="$jira --user mothra --login mothra@corybennett.org"
 
 RUNS $jira logout
 RUNS $jira login

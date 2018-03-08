@@ -3,6 +3,7 @@ config:
 password-source: pass
 endpoint: https://go-jira.atlassian.net
 user: gojira
+login: gojira@corybennett.org
 
 project: BASIC
 
