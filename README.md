@@ -457,7 +457,8 @@ Global flags:
   -Q, --quiet                  Suppress output to console
       --unixproxy=UNIXPROXY    Path for a unix-socket proxy
       --socksproxy=SOCKSPROXY  Address for a socks proxy
-  -u, --user=USER              Login name used for authentication with Jira service
+  -u, --user=USER              user name used within the Jira service
+      --login=LOGIN            login name that corresponds to the user used for authentication
 
 Commands:
   help:                Show help.
