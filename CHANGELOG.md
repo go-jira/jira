@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.16 - 2018-04-01
+
+* [[#159](https://github.com/Netflix-Skunkworks/go-jira/issues/159)] fix `slice bounds out of range` error in `abbrev` template function [Cory Bennett] [[359bec2](https://github.com/Netflix-Skunkworks/go-jira/commit/359bec2)]
+* [[#158](https://github.com/Netflix-Skunkworks/go-jira/issues/158)] always print usage to stdout [Cory Bennett] [[79c83f6](https://github.com/Netflix-Skunkworks/go-jira/commit/79c83f6)]
+
 ## 1.0.15 - 2018-03-08
 
 * [[#147](https://github.com/Netflix-Skunkworks/go-jira/issues/147)] [[#148](https://github.com/Netflix-Skunkworks/go-jira/issues/148)] add support for api token based authentication [Cory Bennett] [[edb0662](https://github.com/Netflix-Skunkworks/go-jira/commit/edb0662)]
