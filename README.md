@@ -444,6 +444,19 @@ export GPG_TTY=$(tty)
 
 ## Usage
 
+
+#### Setting up TAB completion
+
+Since go-jira is build with the "kingpin" golang command line library we supports bash/zsh shell completion automatically:
+
+ * <https://github.com/alecthomas/kingpin/tree/v2.2.5#bashzsh-shell-completion>
+
+For example, in bash, adding something along the lines of:
+
+  `eval "$(jira --completion-script-bash)"`
+
+to your bashrc, or .profile (assuming go-jira binary is already in your path) will cause jira to offer tab completion behavior.
+
 ```
 usage: jira [<flags>] <command> [<args> ...]
 
@@ -519,16 +532,3 @@ Commands:
   worklog list:        Prints the worklog data for given issue
 
 ```
-
-#### Setting up TAB completion
-
-Since go-jira is build with the "kingpin" golang command line library we supports bash/zsh shell completion automatically:
-
- * <https://github.com/alecthomas/kingpin/tree/v2.2.5#bashzsh-shell-completion>
-
-For example, in bash, adding something along the lines of:
-
-  `eval "$(jira --completion-script-bash)"`
-
-to your bashrc, or .profile (assuming go-jira binary is already in your path) will cause jira to offer tab completion behavior.
-
