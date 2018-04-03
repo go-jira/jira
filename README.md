@@ -93,7 +93,7 @@ esac
 
 ###### **Custom Commands**
 Now you can create your own custom commands to do common operations with jira.  Please see the details **Custom Commands** section below for more details.  If you want to create a command `jira mine` that lists all the issues assigned to you now you can modify your `.jira.d/config.yml` file to add a `custom-commands` section like this:
-```
+```yaml
 custom-commands:
   - name: mine
     help: display issues assigned to me
@@ -138,7 +138,7 @@ Previously `jira` used attempt to get a `JSESSION` cookies by authenticating wit
 
 The complicated configuration hierarchy is used because **go-jira** attempts to be context aware.  For example, if you are working on a "foo" project and you `cd` into your project workspace, wouldn't it be nice if `jira ls` automatically knew to list only issues related to the "foo" project?  Likewise when you `cd` to the "bar" project then `jira ls` should only list issues related to "bar" project.  You can do this with by creating a configuration under your project workspace at **./.jira.d/config.yml** that looks like:
 
-```
+```yaml
 project: foo
 ```
 
@@ -186,7 +186,7 @@ esac
 
 ### Custom Commands
 You can now create custom commands for `jira` just by editing your `.jira.d/config.yml` config file.  These commands are effectively shell-scripts that can have documented options and arguments. The basic format is like:
-```
+```yaml
 custom-commands:
   - command1
   - command2
@@ -234,7 +234,7 @@ These are possible keys under the command `args` property:
 The `script` property is a template that whould produce `/bin/sh` compatible syntax after the template has been processed.  There are 2 key template functions `{{args}}` and `{{options}}` that return the parsed arguments and option flags as a map.  
 
 To demonstrate how you might use args and options here is a `custom-test` command:
-```
+```yaml
 custom-commands:
   - name: custom-test
     help: Testing the custom commands
@@ -285,7 +285,7 @@ COMMAND arg1 --abc short-non-default --day Tuesday more1 more2 more3
 ```
 
 The script has access to all the environment variables that are in your current environment plus those that `jira` will set.  `jira` sets environment variables for each config property it has parsed from `.jira.d/config.yml` or the command configs at `.jira.d/<command>.yml`.  It might be useful to see all environment variables that `jira` is producing, so here is a simple custom command to list them:
-```
+```yaml
 custom-commands:
   - name: env
     help: print the JIRA environment variables available to custom commands
@@ -294,7 +294,7 @@ custom-commands:
  ```
  
 You could use the environment variables automatically, so if your `.jira.d/config.yml` looks something like this:
-```
+```yaml
 project: PROJECT
 custom-commands:
   - name: print-project
@@ -305,7 +305,7 @@ custom-commands:
 ##### Examples
 
 * `jira mine` for listing issues assigned to you
-```
+```yaml
 custom-commands:
   - name: mine
     help: display issues assigned to me
@@ -319,7 +319,7 @@ custom-commands:
       fi
 ```
 * `jira sprint` for listing issues in your current sprint
-```
+```yaml
 custom-commands:
   - name: sprint
     help: display issues for active sprint
@@ -375,7 +375,7 @@ If your Jira service still allows you to use the Session based authention method
 
 #### User vs Login
 The Jira service has sometimes differing opinions about how a user is identified.  In other words the ID you login with might not be ID that the jira system recognized you as.  This matters when trying to identify a user via various Jira REST APIs (like issue assignment).  This is especially relevent when trying to authenticate with an API Token where the authentication user is usually an email address, but within the Jira system the user is identified by a user name.  To accomodate this `jira` now supports two different properties in the config file.  So when authentication using the API Tokens you will likely want something like this in your `$HOME/.jira.d/config.yml` file:
-```
+```yaml
 user: person
 login: person@example.com
 ```
