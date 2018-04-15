@@ -59,7 +59,8 @@ func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvid
 	if iqg != nil {
 		query = iqg.ProvideIssueQueryString()
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s%s", endpoint, issue, query)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue)
+	uri += query
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -84,7 +85,8 @@ func GetIssueWorklog(ua HttpClient, endpoint string, issue string) (*jiradata.Wo
 	maxResults := 100
 	worklogs := jiradata.Worklogs{}
 	for startAt < total {
-		uri := fmt.Sprintf("%s/rest/api/2/issue/%s/worklog?startAt=%d&maxResults=%d", endpoint, issue, startAt, maxResults)
+		uri := URLJoin(endpoint, "rest/api/2/issue", issue, "worklog")
+		uri += fmt.Sprintf("?startAt=%d&maxResults=%d", startAt, maxResults)
 		resp, err := ua.GetJSON(uri)
 		if err != nil {
 			return nil, err
@@ -124,7 +126,7 @@ func AddIssueWorklog(ua HttpClient, endpoint string, issue string, wp WorklogPro
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/worklog", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "worklog")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
@@ -144,7 +146,7 @@ func (j *Jira) GetIssueEditMeta(issue string) (*jiradata.EditMeta, error) {
 }
 
 func GetIssueEditMeta(ua HttpClient, endpoint string, issue string) (*jiradata.EditMeta, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/editmeta", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "editmeta")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -173,7 +175,7 @@ func EditIssue(ua HttpClient, endpoint string, issue string, iup IssueUpdateProv
 	if err != nil {
 		return err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue)
 	resp, err := ua.Put(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -197,7 +199,7 @@ func CreateIssue(ua HttpClient, endpoint string, iup IssueUpdateProvider) (*jira
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issue", endpoint)
+	uri := URLJoin(endpoint, "rest/api/2/issue")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
@@ -217,7 +219,8 @@ func (j *Jira) GetIssueCreateMetaProject(projectKey string) (*jiradata.CreateMet
 }
 
 func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string) (*jiradata.CreateMetaProject, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&expand=projects.issuetypes.fields", endpoint, projectKey)
+	uri := URLJoin(endpoint, "rest/api/2/issue/createmeta")
+	uri += fmt.Sprintf("?projectKeys=%s&expand=projects.issuetypes.fields", projectKey)
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -246,7 +249,8 @@ func (j *Jira) GetIssueCreateMetaIssueType(projectKey, issueTypeName string) (*j
 }
 
 func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, issueTypeName string) (*jiradata.IssueType, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/createmeta?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", endpoint, projectKey, url.QueryEscape(issueTypeName))
+	uri := URLJoin(endpoint, "rest/api/2/issue/createmeta")
+	uri += fmt.Sprintf("?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", projectKey, url.QueryEscape(issueTypeName))
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -288,7 +292,7 @@ func LinkIssues(ua HttpClient, endpoint string, lip LinkIssueProvider) error {
 	if err != nil {
 		return err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issueLink", endpoint)
+	uri := URLJoin(endpoint, "rest/api/2/issueLink")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -307,7 +311,8 @@ func (j *Jira) GetIssueTransitions(issue string) (*jiradata.TransitionsMeta, err
 }
 
 func GetIssueTransitions(ua HttpClient, endpoint string, issue string) (*jiradata.TransitionsMeta, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions?expand=transitions.fields", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "transitions")
+	uri += "?expand=transitions.fields"
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -332,7 +337,7 @@ func TransitionIssue(ua HttpClient, endpoint string, issue string, iup IssueUpda
 	if err != nil {
 		return err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/transitions", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "transitions")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -351,7 +356,7 @@ func (j *Jira) GetIssueLinkTypes() (*jiradata.IssueLinkTypes, error) {
 }
 
 func GetIssueLinkTypes(ua HttpClient, endpoint string) (*jiradata.IssueLinkTypes, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/issueLinkType", endpoint)
+	uri := URLJoin(endpoint, "rest/api/2/issueLinkType")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -375,7 +380,7 @@ func (j *Jira) IssueAddVote(issue string) error {
 }
 
 func IssueAddVote(ua HttpClient, endpoint string, issue string) error {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "votes")
 	resp, err := ua.Post(uri, "application/json", strings.NewReader("{}"))
 	if err != nil {
 		return err
@@ -394,7 +399,7 @@ func (j *Jira) IssueRemoveVote(issue string) error {
 }
 
 func IssueRemoveVote(ua HttpClient, endpoint string, issue string) error {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/votes", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "votes")
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err
@@ -422,7 +427,7 @@ func RankIssues(ua HttpClient, endpoint string, rrp RankRequestProvider) error {
 	if err != nil {
 		return err
 	}
-	uri := fmt.Sprintf("%s/rest/agile/1.0/issue/rank", endpoint)
+	uri := URLJoin(endpoint, "rest/agile/1.0/issue/rank")
 	resp, err := ua.Put(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -441,7 +446,7 @@ func (j *Jira) IssueAddWatcher(issue, user string) error {
 }
 
 func IssueAddWatcher(ua HttpClient, endpoint string, issue, user string) error {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "watchers")
 	resp, err := ua.Post(uri, "application/json", strings.NewReader(fmt.Sprintf("%q", user)))
 	if err != nil {
 		return err
@@ -460,7 +465,8 @@ func (j *Jira) IssueRemoveWatcher(issue, user string) error {
 }
 
 func IssueRemoveWatcher(ua HttpClient, endpoint string, issue, user string) error {
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/watchers?username=%s", endpoint, issue, user)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "watchers")
+	uri += fmt.Sprintf("?username=%s", user)
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err
@@ -488,7 +494,7 @@ func IssueAddComment(ua HttpClient, endpoint string, issue string, cp CommentPro
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/comment", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "comment")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
@@ -526,7 +532,7 @@ func IssueAssign(ua HttpClient, endpoint string, issue, name string) error {
 	if err != nil {
 		return err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/issue/%s/assignee", endpoint, issue)
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "assignee")
 	resp, err := ua.Put(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -556,7 +562,7 @@ func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, con
 		return nil, err
 	}
 
-	uri, err := url.Parse(fmt.Sprintf("%s/rest/api/2/issue/%s/attachments", endpoint, issue))
+	uri, err := url.Parse(URLJoin(endpoint, "rest/api/2/issue", issue, "attachments"))
 	req := oreo.RequestBuilder(uri).WithMethod("POST").WithHeader(
 		"X-Atlassian-Token", "no-check",
 	).WithHeader(

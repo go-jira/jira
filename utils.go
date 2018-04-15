@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
+	"path"
 )
 
 func readJSON(input io.Reader, data interface{}) error {
@@ -20,4 +22,14 @@ func readJSON(input io.Reader, data interface{}) error {
 		return fmt.Errorf("JSON Parse Error: %s from %q", err, content)
 	}
 	return nil
+}
+
+func URLJoin(endpoint string, paths ...string) string {
+	u, err := url.Parse(endpoint)
+	if err != nil {
+		panic(fmt.Errorf("Unable to parse endpoint: %s", endpoint))
+	}
+	paths = append([]string{u.Path}, paths...)
+	u.Path = path.Join(paths...)
+	return u.String()
 }

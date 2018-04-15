@@ -67,7 +67,7 @@ func CmdDup(o *oreo.Client, globals *jiracli.GlobalOptions, opts *DupOptions) er
 		return err
 	}
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", opts.OutwardIssue.Key, globals.Endpoint.Value, opts.OutwardIssue.Key)
+		fmt.Printf("OK %s %s\n", opts.OutwardIssue.Key, jira.URLJoin(globals.Endpoint.Value, "browse", opts.OutwardIssue.Key))
 	}
 
 	meta, err := jira.GetIssueTransitions(o, globals.Endpoint.Value, opts.InwardIssue.Key)
@@ -103,7 +103,7 @@ func CmdDup(o *oreo.Client, globals *jiracli.GlobalOptions, opts *DupOptions) er
 	}
 
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", opts.InwardIssue.Key, globals.Endpoint.Value, opts.InwardIssue.Key)
+		fmt.Printf("OK %s %s\n", opts.InwardIssue.Key, jira.URLJoin(globals.Endpoint.Value, "browse", opts.InwardIssue.Key))
 	}
 
 	if opts.Browse.Value {

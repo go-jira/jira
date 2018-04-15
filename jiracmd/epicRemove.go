@@ -43,7 +43,7 @@ func CmdEpicRemove(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EpicRem
 
 	if !globals.Quiet.Value {
 		for _, issue := range opts.Issues {
-			fmt.Printf("OK %s %s/browse/%s\n", issue, globals.Endpoint.Value, issue)
+			fmt.Printf("OK %s %s\n", issue, jira.URLJoin(globals.Endpoint.Value, "browse", issue))
 		}
 	}
 

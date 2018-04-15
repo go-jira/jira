@@ -108,7 +108,7 @@ func CmdSubtask(o *oreo.Client, globals *jiracli.GlobalOptions, opts *SubtaskOpt
 	}
 
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, globals.Endpoint.Value, issueResp.Key)
+		fmt.Printf("OK %s %s\n", issueResp.Key, jira.URLJoin(globals.Endpoint.Value, "browse", issueResp.Key))
 	}
 
 	if opts.Browse.Value {

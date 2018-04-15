@@ -71,7 +71,7 @@ func CmdWatch(o *oreo.Client, globals *jiracli.GlobalOptions, opts *WatchOptions
 	}
 
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
+		fmt.Printf("OK %s %s\n", opts.Issue, jira.URLJoin(globals.Endpoint.Value, "browse", opts.Issue))
 	}
 
 	if opts.Browse.Value {

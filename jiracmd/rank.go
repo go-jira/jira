@@ -59,8 +59,8 @@ func CmdRank(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RankOptions) 
 	}
 
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", opts.First, globals.Endpoint.Value, opts.First)
-		fmt.Printf("OK %s %s/browse/%s\n", opts.Second, globals.Endpoint.Value, opts.Second)
+		fmt.Printf("OK %s %s\n", opts.First, jira.URLJoin(globals.Endpoint.Value, "browse", opts.First))
+		fmt.Printf("OK %s %s\n", opts.Second, jira.URLJoin(globals.Endpoint.Value, "browse", opts.Second))
 	}
 
 	if opts.Browse.Value {

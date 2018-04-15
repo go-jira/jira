@@ -3,7 +3,6 @@ package jira
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
@@ -23,7 +22,7 @@ func CreateComponent(ua HttpClient, endpoint string, cp ComponentProvider) (*jir
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/component", endpoint)
+	uri := URLJoin(endpoint, "rest/api/2/component")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err

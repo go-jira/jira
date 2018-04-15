@@ -1,8 +1,6 @@
 package jira
 
 import (
-	"fmt"
-
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 
@@ -12,7 +10,7 @@ func (j *Jira) GetAttachment(id string) (*jiradata.Attachment, error) {
 }
 
 func GetAttachment(ua HttpClient, endpoint string, id string) (*jiradata.Attachment, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/attachment/%s", endpoint, id)
+	uri := URLJoin(endpoint, "rest/api/2/attachment", id)
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -32,7 +30,7 @@ func (j *Jira) RemoveAttachment(id string) error {
 }
 
 func RemoveAttachment(ua HttpClient, endpoint string, id string) error {
-	uri := fmt.Sprintf("%s/rest/api/2/attachment/%s", endpoint, id)
+	uri := URLJoin(endpoint, "rest/api/2/attachment", id)
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err

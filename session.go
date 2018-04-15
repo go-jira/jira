@@ -3,7 +3,6 @@ package jira
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
@@ -35,7 +34,7 @@ func NewSession(ua HttpClient, endpoint string, ap AuthProvider) (*jiradata.Auth
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/auth/1/session", endpoint)
+	uri := URLJoin(endpoint, "rest/auth/1/session")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
@@ -55,7 +54,7 @@ func (j *Jira) GetSession() (*jiradata.CurrentUser, error) {
 }
 
 func GetSession(ua HttpClient, endpoint string) (*jiradata.CurrentUser, error) {
-	uri := fmt.Sprintf("%s/rest/auth/1/session", endpoint)
+	uri := URLJoin(endpoint, "rest/auth/1/session")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -75,7 +74,7 @@ func (j *Jira) DeleteSession() error {
 }
 
 func DeleteSession(ua HttpClient, endpoint string) error {
-	uri := fmt.Sprintf("%s/rest/auth/1/session", endpoint)
+	uri := URLJoin(endpoint, "rest/auth/1/session")
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err

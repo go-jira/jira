@@ -157,7 +157,7 @@ func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Transit
 		return jiracli.CliError(err)
 	}
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, globals.Endpoint.Value, issueData.Key)
+		fmt.Printf("OK %s %s\n", issueData.Key, jira.URLJoin(globals.Endpoint.Value, "browse", issueData.Key))
 	}
 
 	if opts.Browse.Value {

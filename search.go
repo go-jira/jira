@@ -83,7 +83,7 @@ func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.Search
 	if err != nil {
 		return nil, err
 	}
-	uri := fmt.Sprintf("%s/rest/api/2/search", endpoint)
+	uri := URLJoin(endpoint, "rest/api/2/search")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err

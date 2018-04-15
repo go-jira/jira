@@ -1,11 +1,10 @@
 package jiracmd
 
 import (
-	"fmt"
-
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 	"github.com/pkg/browser"
+	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -27,5 +26,5 @@ func CmdBrowseRegistry() *jiracli.CommandRegistryEntry {
 
 // CmdBrowse open the default system browser to the provided issue
 func CmdBrowse(globals *jiracli.GlobalOptions, issue string) error {
-	return browser.OpenURL(fmt.Sprintf("%s/browse/%s", globals.Endpoint.Value, issue))
+	return browser.OpenURL(jira.URLJoin(globals.Endpoint.Value, "browse", issue))
 }

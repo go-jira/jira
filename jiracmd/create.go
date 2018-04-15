@@ -93,8 +93,9 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 		return err
 	}
 
+	browseLink := jira.URLJoin(globals.Endpoint.Value, "browse", issueResp.Key)
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", issueResp.Key, globals.Endpoint.Value, issueResp.Key)
+		fmt.Printf("OK %s %s\n", issueResp.Key, browseLink)
 	}
 
 	if opts.SaveFile != "" {
@@ -105,7 +106,7 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 		defer fh.Close()
 		out, err := yaml.Marshal(map[string]string{
 			"issue": issueResp.Key,
-			"link":  fmt.Sprintf("%s/browse/%s", globals.Endpoint.Value, issueResp.Key),
+			"link":  browseLink,
 		})
 		if err != nil {
 			return err

@@ -1,8 +1,6 @@
 package jira
 
 import (
-	"fmt"
-
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 
@@ -12,7 +10,7 @@ func (j *Jira) GetFields() ([]jiradata.Field, error) {
 }
 
 func GetFields(ua HttpClient, endpoint string) ([]jiradata.Field, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/field", endpoint)
+	uri := URLJoin(endpoint, "rest/api/2/field")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err

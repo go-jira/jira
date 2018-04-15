@@ -98,7 +98,7 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 			return err
 		}
 		if !globals.Quiet.Value {
-			fmt.Printf("OK %s %s/browse/%s\n", opts.Issue, globals.Endpoint.Value, opts.Issue)
+			fmt.Printf("OK %s %s\n", opts.Issue, jira.URLJoin(globals.Endpoint.Value, "browse", opts.Issue))
 		}
 		if opts.Browse.Value {
 			return CmdBrowse(globals, opts.Issue)
@@ -145,7 +145,7 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 			return err
 		}
 		if !globals.Quiet.Value {
-			fmt.Printf("OK %s %s/browse/%s\n", issueData.Key, globals.Endpoint.Value, issueData.Key)
+			fmt.Printf("OK %s %s\n", issueData.Key, jira.URLJoin(globals.Endpoint.Value, "browse", issueData.Key))
 		}
 		if opts.Browse.Value {
 			return CmdBrowse(globals, issueData.Key)

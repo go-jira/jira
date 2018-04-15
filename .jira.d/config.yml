@@ -3,6 +3,7 @@ config:
 password-source: pass
 endpoint: https://go-jira.atlassian.net
 user: admin
+login: atlassian@corybennett.org
 
 queries:
   todo: |

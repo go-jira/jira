@@ -23,7 +23,7 @@ func EpicSearch(ua HttpClient, endpoint string, epic string, sp SearchProvider) 
 	// if err != nil {
 	// 	return nil, err
 	// }
-	uri, err := url.Parse(fmt.Sprintf("%s/rest/agile/1.0/epic/%s/issue", endpoint, epic))
+	uri, err := url.Parse(URLJoin(endpoint, "rest/agile/1.0/epic", epic, "issue"))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func EpicAddIssues(ua HttpClient, endpoint string, epic string, eip EpicIssuesPr
 		return err
 	}
 
-	uri := fmt.Sprintf("%s/rest/agile/1.0/epic/%s/issue", endpoint, epic)
+	uri := URLJoin(endpoint, "rest/agile/1.0/epic", epic, "issue")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func EpicRemoveIssues(ua HttpClient, endpoint string, eip EpicIssuesProvider) er
 		return err
 	}
 
-	uri := fmt.Sprintf("%s/rest/agile/1.0/epic/none/issue", endpoint)
+	uri := URLJoin(endpoint, "rest/agile/1.0/epic/none/issue")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err

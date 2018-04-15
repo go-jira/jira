@@ -1,8 +1,6 @@
 package jira
 
 import (
-	"fmt"
-
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 
@@ -12,7 +10,7 @@ func (j *Jira) GetProjectComponents(project string) (*jiradata.Components, error
 }
 
 func GetProjectComponents(ua HttpClient, endpoint string, project string) (*jiradata.Components, error) {
-	uri := fmt.Sprintf("%s/rest/api/2/project/%s/components", endpoint, project)
+	uri := URLJoin(endpoint, "rest/api/2/project", project, "components")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err

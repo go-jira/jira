@@ -44,9 +44,9 @@ func CmdEpicAdd(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EpicAddOpt
 	}
 
 	if !globals.Quiet.Value {
-		fmt.Printf("OK %s %s/browse/%s\n", opts.Epic, globals.Endpoint.Value, opts.Epic)
+		fmt.Printf("OK %s %s\n", opts.Epic, jira.URLJoin(globals.Endpoint.Value, "browse", opts.Epic))
 		for _, issue := range opts.Issues {
-			fmt.Printf("OK %s %s/browse/%s\n", issue, globals.Endpoint.Value, issue)
+			fmt.Printf("OK %s %s\n", issue, jira.URLJoin(globals.Endpoint.Value, "browse", issue))
 		}
 	}
 
