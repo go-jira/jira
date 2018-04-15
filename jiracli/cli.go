@@ -33,6 +33,7 @@ type GlobalOptions struct {
 	Insecure             figtree.BoolOption   `yaml:"insecure,omitempty" json:"insecure,omitempty"`
 	Login                figtree.StringOption `yaml:"login,omitempty" json:"login,omitempty"`
 	PasswordSource       figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
+	PasswordDirectory    figtree.StringOption `yaml:"password-directory,omitempty" json:"password-directory,omitempty"`
 	Quiet                figtree.BoolOption   `yaml:"quiet,omitempty" json:"quiet,omitempty"`
 	SocksProxy           figtree.StringOption `yaml:"socksproxy,omitempty" json:"socksproxy,omitempty"`
 	UnixProxy            figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`

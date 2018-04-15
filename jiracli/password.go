@@ -40,6 +40,11 @@ func (o *GlobalOptions) GetPass() string {
 				panic(err)
 			}
 		} else if o.PasswordSource.Value == "pass" {
+			if o.PasswordDirectory.Value != "" {
+				orig := os.Getenv("PASSWORD_STORE_DIR")
+				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
+				defer os.Setenv("PASSWORD_STORE_DIR", orig)
+			}
 			if bin, err := exec.LookPath("pass"); err == nil {
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, o.keyName())
@@ -95,6 +100,11 @@ func (o *GlobalOptions) SetPass(passwd string) error {
 			return err
 		}
 	} else if o.PasswordSource.Value == "pass" {
+		if o.PasswordDirectory.Value != "" {
+			orig := os.Getenv("PASSWORD_STORE_DIR")
+			os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
+			defer os.Setenv("PASSWORD_STORE_DIR", orig)
+		}
 		if bin, err := exec.LookPath("pass"); err == nil {
 			log.Debugf("using %s", bin)
 			passName := o.keyName()
