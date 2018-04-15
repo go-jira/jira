@@ -123,6 +123,9 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 					// rerun the original request
 					return o.Do(req)
 				}
+			} else if globals.AuthMethod() == "api-token" && resp.StatusCode == 401 {
+				globals.SetPass("")
+				return o.Do(req)
 			}
 			return resp, nil
 		},
