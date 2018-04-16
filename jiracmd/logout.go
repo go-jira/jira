@@ -32,7 +32,7 @@ func CmdLogoutRegistry() *jiracli.CommandRegistryEntry {
 func CmdLogout(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
 	if globals.AuthMethod() == "api-token" {
 		log.Noticef("No need to logout when using api-token authentication method")
-		if globals.GetPass() != "" && terminal.IsTerminal(syscall.Stdin) {
+		if globals.GetPass() != "" && terminal.IsTerminal(syscall.Stdin) && terminal.IsTerminal(syscall.Stdout) {
 			delete := false
 			err := survey.AskOne(
 				&survey.Confirm{
