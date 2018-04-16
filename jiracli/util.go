@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -30,7 +31,7 @@ func findClosestParentPath(fileName string) (string, error) {
 }
 
 func tmpYml(tmpFilePrefix string) (*os.File, error) {
-	fh, err := ioutil.TempFile("", tmpFilePrefix)
+	fh, err := ioutil.TempFile("", filepath.Base(tmpFilePrefix))
 	if err != nil {
 		return nil, err
 	}
