@@ -2,7 +2,7 @@ package jiracmd
 
 import (
 	"fmt"
-	"syscall"
+	"os"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
@@ -32,7 +32,7 @@ func CmdLogoutRegistry() *jiracli.CommandRegistryEntry {
 func CmdLogout(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
 	if globals.AuthMethod() == "api-token" {
 		log.Noticef("No need to logout when using api-token authentication method")
-		if globals.GetPass() != "" && terminal.IsTerminal(syscall.Stdin) && terminal.IsTerminal(syscall.Stdout) {
+		if globals.GetPass() != "" && terminal.IsTerminal(int(os.Stdin.Fd())) && terminal.IsTerminal(int(os.Stdout.Fd())) {
 			delete := false
 			err := survey.AskOne(
 				&survey.Confirm{
