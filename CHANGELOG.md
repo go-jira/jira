@@ -2,6 +2,7 @@
 
 ## 1.0.17 - 2018-04-15
 
+* fix IsTerminal usage for windows [Cory Bennett] [[7f9595c](https://github.com/Netflix-Skunkworks/go-jira/commit/7f9595c)]
 * [[#166](https://github.com/Netflix-Skunkworks/go-jira/issues/166)] fix issue when editing templates specified with full path [Cory Bennett] [[d787ac0](https://github.com/Netflix-Skunkworks/go-jira/commit/d787ac0)]
 * only prompt on logout if stdin and stdout are terminals [Cory Bennett] [[09a61c3](https://github.com/Netflix-Skunkworks/go-jira/commit/09a61c3)]
 * [[#163](https://github.com/Netflix-Skunkworks/go-jira/issues/163)] fix url path join logic [Cory Bennett] [[9146346](https://github.com/Netflix-Skunkworks/go-jira/commit/9146346)]
