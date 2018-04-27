@@ -25,6 +25,9 @@ func (o *GlobalOptions) keyName() string {
 	}
 
 	if o.PasswordSource.Value == "pass" {
+		if o.PasswordPath.Value != "" {
+			return fmt.Sprintf("%s/%s", o.PasswordPath, user)
+		}
 		return fmt.Sprintf("GoJira/%s", user)
 	}
 	return user
