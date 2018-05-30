@@ -9,6 +9,8 @@
    * [Install](#install)
       * [Download](#download)
       * [Build](#build)
+   * [Usage](#usage)
+      * [TAB completion](#setting-up-tab-completion)
    * [v1 vs v0 changes](#v1-vs-v0-changes)
       * [<strong>Golang library import</strong>](#golang-library-import)
       * [<strong>Configs per command</strong>](#configs-per-command)
@@ -30,8 +32,6 @@
          * [user vs login](#user-vs-login)
          * [keyring password source](#keyring-password-source)
          * [pass password source](#pass-password-source)
-   * [Usage](#usage)
-       * [TAB completion](#setting-up-tab-completion)
 
 # go-jira
 simple command line client for Atlassian's Jira service written in Go
@@ -61,6 +61,96 @@ From within that source dir you can build and install modifications from within 
 
 `go install ./...`  
 
+## Usage
+
+
+#### Setting up TAB completion
+
+Since go-jira is build with the "kingpin" golang command line library we supports bash/zsh shell completion automatically:
+
+ * <https://github.com/alecthomas/kingpin/tree/v2.2.5#bashzsh-shell-completion>
+
+For example, in bash, adding something along the lines of:
+
+  `eval "$(jira --completion-script-bash)"`
+
+to your bashrc, or .profile (assuming go-jira binary is already in your path) will cause jira to offer tab completion behavior.
+
+```
+usage: jira [<flags>] <command> [<args> ...]
+
+Jira Command Line Interface
+
+Global flags:
+      --help                   Show context-sensitive help (also try --help-long and --help-man).
+  -v, --verbose ...            Increase verbosity for debugging
+  -e, --endpoint=ENDPOINT      Base URI to use for Jira
+  -k, --insecure               Disable TLS certificate verification
+  -Q, --quiet                  Suppress output to console
+      --unixproxy=UNIXPROXY    Path for a unix-socket proxy
+      --socksproxy=SOCKSPROXY  Address for a socks proxy
+  -u, --user=USER              user name used within the Jira service
+      --login=LOGIN            login name that corresponds to the user used for authentication
+
+Commands:
+  help:                Show help.
+  version:             Prints version
+  acknowledge:         Transition issue to acknowledge state
+  assign:              Assign user to issue
+  attach create:       Attach file to issue
+  attach get:          Fetch attachment
+  attach list:         Prints attachment details for issue
+  attach remove:       Delete attachment
+  backlog:             Transition issue to Backlog state
+  block:               Mark issues as blocker
+  browse:              Open issue in browser
+  close:               Transition issue to close state
+  comment:             Add comment to issue
+  component add:       Add component
+  components:          Show components for a project
+  create:              Create issue
+  createmeta:          View 'create' metadata
+  done:                Transition issue to Done state
+  dup:                 Mark issues as duplicate
+  edit:                Edit issue details
+  editmeta:            View 'edit' metadata
+  epic add:            Add issues to Epic
+  epic create:         Create Epic
+  epic list:           Prints list of issues for an epic with optional search criteria
+  epic remove:         Remove issues from Epic
+  export-templates:    Export templates for customizations
+  fields:              Prints all fields, both System and Custom
+  in-progress:         Transition issue to Progress state
+  issuelink:           Link two issues
+  issuelinktypes:      Show the issue link types
+  issuetypes:          Show issue types for a project
+  labels add:          Add labels to an issue
+  labels remove:       Remove labels from an issue
+  labels set:          Set labels on an issue
+  list:                Prints list of issues for given search criteria
+  login:               Attempt to login into jira server
+  logout:              Deactivate session with Jira server
+  rank:                Mark issues as blocker
+  reopen:              Transition issue to reopen state
+  request:             Open issue in requestr
+  resolve:             Transition issue to resolve state
+  start:               Transition issue to start state
+  stop:                Transition issue to stop state
+  subtask:             Subtask issue
+  take:                Assign issue to yourself
+  todo:                Transition issue to To Do state
+  transition:          Transition issue to given state
+  transitions:         List valid issue transitions
+  transmeta:           List valid issue transitions
+  unassign:            Unassign an issue
+  unexport-templates:  Remove unmodified exported templates
+  view:                Prints issue details
+  vote:                Vote up/down an issue
+  watch:               Add/Remove watcher to issue
+  worklog add:         Add a worklog to an issue
+  worklog list:        Prints the worklog data for given issue
+
+```
 
 ## v1 vs v0 changes
 
@@ -440,95 +530,4 @@ if [ -n "${GPG_AGENT_INFO}" ]; then
     fi
 fi
 export GPG_TTY=$(tty)
-```
-
-## Usage
-
-
-#### Setting up TAB completion
-
-Since go-jira is build with the "kingpin" golang command line library we supports bash/zsh shell completion automatically:
-
- * <https://github.com/alecthomas/kingpin/tree/v2.2.5#bashzsh-shell-completion>
-
-For example, in bash, adding something along the lines of:
-
-  `eval "$(jira --completion-script-bash)"`
-
-to your bashrc, or .profile (assuming go-jira binary is already in your path) will cause jira to offer tab completion behavior.
-
-```
-usage: jira [<flags>] <command> [<args> ...]
-
-Jira Command Line Interface
-
-Global flags:
-      --help                   Show context-sensitive help (also try --help-long and --help-man).
-  -v, --verbose ...            Increase verbosity for debugging
-  -e, --endpoint=ENDPOINT      Base URI to use for Jira
-  -k, --insecure               Disable TLS certificate verification
-  -Q, --quiet                  Suppress output to console
-      --unixproxy=UNIXPROXY    Path for a unix-socket proxy
-      --socksproxy=SOCKSPROXY  Address for a socks proxy
-  -u, --user=USER              user name used within the Jira service
-      --login=LOGIN            login name that corresponds to the user used for authentication
-
-Commands:
-  help:                Show help.
-  version:             Prints version
-  acknowledge:         Transition issue to acknowledge state
-  assign:              Assign user to issue
-  attach create:       Attach file to issue
-  attach get:          Fetch attachment
-  attach list:         Prints attachment details for issue
-  attach remove:       Delete attachment
-  backlog:             Transition issue to Backlog state
-  block:               Mark issues as blocker
-  browse:              Open issue in browser
-  close:               Transition issue to close state
-  comment:             Add comment to issue
-  component add:       Add component
-  components:          Show components for a project
-  create:              Create issue
-  createmeta:          View 'create' metadata
-  done:                Transition issue to Done state
-  dup:                 Mark issues as duplicate
-  edit:                Edit issue details
-  editmeta:            View 'edit' metadata
-  epic add:            Add issues to Epic
-  epic create:         Create Epic
-  epic list:           Prints list of issues for an epic with optional search criteria
-  epic remove:         Remove issues from Epic
-  export-templates:    Export templates for customizations
-  fields:              Prints all fields, both System and Custom
-  in-progress:         Transition issue to Progress state
-  issuelink:           Link two issues
-  issuelinktypes:      Show the issue link types
-  issuetypes:          Show issue types for a project
-  labels add:          Add labels to an issue
-  labels remove:       Remove labels from an issue
-  labels set:          Set labels on an issue
-  list:                Prints list of issues for given search criteria
-  login:               Attempt to login into jira server
-  logout:              Deactivate session with Jira server
-  rank:                Mark issues as blocker
-  reopen:              Transition issue to reopen state
-  request:             Open issue in requestr
-  resolve:             Transition issue to resolve state
-  start:               Transition issue to start state
-  stop:                Transition issue to stop state
-  subtask:             Subtask issue
-  take:                Assign issue to yourself
-  todo:                Transition issue to To Do state
-  transition:          Transition issue to given state
-  transitions:         List valid issue transitions
-  transmeta:           List valid issue transitions
-  unassign:            Unassign an issue
-  unexport-templates:  Remove unmodified exported templates
-  view:                Prints issue details
-  vote:                Vote up/down an issue
-  watch:               Add/Remove watcher to issue
-  worklog add:         Add a worklog to an issue
-  worklog list:        Prints the worklog data for given issue
-
 ```

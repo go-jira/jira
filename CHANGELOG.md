@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.17 - 2018-04-15
+
+* fix IsTerminal usage for windows [Cory Bennett] [[7f9595c](https://github.com/Netflix-Skunkworks/go-jira/commit/7f9595c)]
+* [[#166](https://github.com/Netflix-Skunkworks/go-jira/issues/166)] fix issue when editing templates specified with full path [Cory Bennett] [[d787ac0](https://github.com/Netflix-Skunkworks/go-jira/commit/d787ac0)]
+* only prompt on logout if stdin and stdout are terminals [Cory Bennett] [[09a61c3](https://github.com/Netflix-Skunkworks/go-jira/commit/09a61c3)]
+* [[#163](https://github.com/Netflix-Skunkworks/go-jira/issues/163)] fix url path join logic [Cory Bennett] [[9146346](https://github.com/Netflix-Skunkworks/go-jira/commit/9146346)]
+* [[#160](https://github.com/Netflix-Skunkworks/go-jira/issues/160)] prompt when api-token is invalid to get new token [Cory Bennett] [[e639cce](https://github.com/Netflix-Skunkworks/go-jira/commit/e639cce)]
+* [[#157](https://github.com/Netflix-Skunkworks/go-jira/issues/157)] add `password-directory: path` to allow overriding PASSWORD_STORE_DIR from configs [Cory Bennett] [[06b26c9](https://github.com/Netflix-Skunkworks/go-jira/commit/06b26c9)]
+* [[#160](https://github.com/Netflix-Skunkworks/go-jira/issues/160)] allow `jira logout` to delete your api-token from keychain [Cory Bennett] [[bd3cf99](https://github.com/Netflix-Skunkworks/go-jira/commit/bd3cf99)]
+
 ## 1.0.16 - 2018-04-01
 
 * [[#159](https://github.com/Netflix-Skunkworks/go-jira/issues/159)] fix `slice bounds out of range` error in `abbrev` template function [Cory Bennett] [[359bec2](https://github.com/Netflix-Skunkworks/go-jira/commit/359bec2)]
