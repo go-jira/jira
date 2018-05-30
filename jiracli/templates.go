@@ -34,8 +34,8 @@ func findTemplate(name string) ([]byte, error) {
 }
 
 func getTemplate(name string) (string, error) {
-	if _, err := os.Stat(name); err == nil {
-		b, err := ioutil.ReadFile(name)
+	if _, err := os.Stat(".jira.d/"+name); err == nil {
+		b, err := ioutil.ReadFile(".jira.d/"+name)
 		if err != nil {
 			return "", err
 		}
