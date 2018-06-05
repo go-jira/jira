@@ -143,6 +143,9 @@ func TemplateProcessor() *template.Template {
 		"color": func(color string) string {
 			return ansi.ColorCode(color)
 		},
+		"remLineBreak": func(content string) string {
+			return strings.Replace(strings.Replace(content,string('\r'),string(' '),-1),string('\n'),string(' '),-1)
+		},
 		"regReplace": func(search string, replace string, content string) string {
 			re := regexp.MustCompile(search)
 			return re.ReplaceAllString(content, replace)
