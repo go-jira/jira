@@ -16,6 +16,7 @@ import (
 
 type IssueQueryProvider interface {
 	ProvideIssueQueryString() string
+    ProvideDefaultProject() string
 }
 
 type IssueOptions struct {
@@ -24,6 +25,11 @@ type IssueOptions struct {
 	Properties    []string `json:"properties,omitempty" yaml:"properties,omitempty"`
 	FieldsByKeys  bool     `json:"fieldsByKeys,omitempty" yaml:"fieldsByKeys,omitempty"`
 	UpdateHistory bool     `json:"updateHistory,omitempty" yaml:"updateHistory,omitempty"`
+    Project       string `json:"project,omitempty" yaml:"project,omitempty"`
+}
+
+func (o *IssueOptions) ProvideDefaultProject() string {
+    return o.Project
 }
 
 func (o *IssueOptions) ProvideIssueQueryString() string {
@@ -49,6 +55,11 @@ func (o *IssueOptions) ProvideIssueQueryString() string {
 	return ""
 }
 
+func CaseInsensitiveContains(s, substr string) bool {
+    s, substr = strings.ToUpper(s), strings.ToUpper(substr)
+    return strings.Contains(s, substr)
+}
+
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getIssue
 func (j *Jira) GetIssue(issue string, iqg IssueQueryProvider) (*jiradata.Issue, error) {
 	return GetIssue(j.UA, j.Endpoint, issue, iqg)
@@ -56,6 +67,7 @@ func (j *Jira) GetIssue(issue string, iqg IssueQueryProvider) (*jiradata.Issue, 
 
 func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvider) (*jiradata.Issue, error) {
 	query := ""
+    pro := iqg.ProvideDefaultProject()
 	if iqg != nil {
 		query = iqg.ProvideIssueQueryString()
 	}
@@ -71,6 +83,11 @@ func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvid
 		results := &jiradata.Issue{}
 		return results, readJSON(resp.Body, results)
 	}
+    // Ticket not found, maybe try prepend Project value?
+    if ! CaseInsensitiveContains(issue,pro) {
+        issue = pro+"-"+issue
+        return GetIssue(ua, endpoint, issue, iqg)
+    }
 	return nil, responseError(resp)
 }
 
