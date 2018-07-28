@@ -23,7 +23,11 @@ func Homedir() string {
 }
 
 func findClosestParentPath(fileName string) (string, error) {
-	paths := figtree.FindParentPaths(fileName)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	paths := figtree.FindParentPaths(Homedir(), cwd, fileName)
 	if len(paths) > 0 {
 		return paths[len(paths)-1], nil
 	}

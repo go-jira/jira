@@ -34,16 +34,19 @@ func main() {
 
 	jiracli.InitLogging()
 
-	fig := figtree.NewFigTree()
-	fig.EnvPrefix = "JIRA"
-	fig.ConfigDir = ".jira.d"
+	configDir := ".jira.d"
+	fig := figtree.NewFigTree(
+		figtree.WithHome(jiracli.Homedir()),
+		figtree.WithEnvPrefix("JIRA"),
+		figtree.WithConfigDir(configDir),
+	)
 
-	if err := os.MkdirAll(filepath.Join(jiracli.Homedir(), fig.ConfigDir), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(jiracli.Homedir(), configDir), 0755); err != nil {
 		log.Errorf("%s", err)
 		panic(jiracli.Exit{Code: 1})
 	}
 
-	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
+	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), configDir, "cookies.js"))
 
 	jiracmd.RegisterAllCommands()
 
