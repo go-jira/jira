@@ -20,40 +20,50 @@
 #  name = "github.com/x/y"
 #  version = "2.4.0"
 
+[prune]
+  go-tests = true
+  unused-packages = true
+  non-go = true
 
 [[constraint]]
   name = "github.com/coryb/figtree"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/coryb/kingpeon"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/coryb/oreo"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/jinzhu/copier"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/kballard/go-shellquote"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/mgutz/ansi"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/pkg/browser"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/pkg/errors"
   version = "0.8.0"
 
 [[constraint]]
-  name = "github.com/savaki/jq"
-
-[[constraint]]
   name = "github.com/tmc/keyring"
+  branch = "master"
 
 [[constraint]]
   name = "golang.org/x/crypto"
+  branch = "master"
 
 [[constraint]]
   name = "gopkg.in/AlecAivazis/survey.v1"
@@ -65,6 +75,7 @@
 
 [[constraint]]
   name = "gopkg.in/coryb/yaml.v2"
+  branch = "v2"
 
 [[constraint]]
   name = "gopkg.in/op/go-logging.v1"

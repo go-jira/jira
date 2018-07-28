@@ -4,7 +4,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/alecthomas/template"
-  packages = [".","parse"]
+  packages = [
+    ".",
+    "parse"
+  ]
   revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
 
 [[projects]]
@@ -18,12 +21,13 @@
   name = "github.com/cheekybits/genny"
   packages = ["generic"]
   revision = "9127e812e1e9e501ce899a18121d316ecb52e4ba"
+  source = "github.com/coryb/genny"
 
 [[projects]]
   branch = "master"
   name = "github.com/coryb/figtree"
   packages = ["."]
-  revision = "c7d8fbf1d7746b5864b8262fabffec813b5a43fa"
+  revision = "071d1ef303dfb7738166ba62aac71e5ee10ce218"
 
 [[projects]]
   branch = "master"
@@ -154,12 +158,19 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
+  packages = [
+    "unix",
+    "windows"
+  ]
   revision = "a5054c7c1385fd50d9394475365355a87a7873ec"
 
 [[projects]]
   name = "gopkg.in/AlecAivazis/survey.v1"
-  packages = [".","core","terminal"]
+  packages = [
+    ".",
+    "core",
+    "terminal"
+  ]
   revision = "9d910423e24aa6d7c7950160658c295e0734c7e0"
   version = "1.3.1"
 
@@ -184,6 +195,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "50016720a1e2509a915e4465a53ffa957f977d2145e831b81d946ef87f7a8f48"
+  inputs-digest = "50ab53a36ae44f587b284a614020e177ef8445f8a879940cc69f4b7c935fad33"
   solver-name = "gps-cdcl"
   solver-version = 1

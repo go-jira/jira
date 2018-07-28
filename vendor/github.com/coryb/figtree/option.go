@@ -2,7 +2,7 @@ package figtree
 
 import "regexp"
 
-type Option interface {
+type option interface {
 	IsDefined() bool
 	GetValue() interface{}
 	SetValue(interface{}) error
