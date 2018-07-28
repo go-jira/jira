@@ -17,18 +17,20 @@ import (
 
 	"github.com/sethgrid/pester"
 	flock "github.com/theckman/go-flock"
-	logging "gopkg.in/op/go-logging.v1"
 )
+
+type Logger interface {
+	Printf(format string, args ...interface{})
+}
+
+type nullLogger struct{}
+
+func (n *nullLogger) Printf(format string, args ...interface{}) {}
+
+var DefaultLogger Logger = &nullLogger{}
 
 type PreRequestCallback func(*http.Request) (*http.Request, error)
 type PostRequestCallback func(*http.Request, *http.Response) (*http.Response, error)
-
-var log = logging.MustGetLogger("oreo")
-
-// var CookieFile = filepath.Join(os.Getenv("HOME"), ".oreo-cookies.js")
-
-var TraceRequestBody = false
-var TraceResponseBody = false
 
 type Client struct {
 	pester.Client
@@ -37,6 +39,10 @@ type Client struct {
 
 	cookieFile           string
 	handlingPostCallback bool
+	log                  Logger
+	traceCookies         bool
+	traceRequestBody     bool
+	traceResponseBody    bool
 }
 
 func New() *Client {
@@ -45,6 +51,7 @@ func New() *Client {
 		handlingPostCallback: false,
 		preCallbacks:         []PreRequestCallback{},
 		postCallbacks:        []PostRequestCallback{},
+		log:                  DefaultLogger,
 	}
 }
 
@@ -154,6 +161,32 @@ func (c *Client) WithoutRedirect() *Client {
 	return c.WithCheckRedirect(NoRedirect)
 }
 
+func (c *Client) WithLogger(l Logger) *Client {
+	cp := *c
+	cp.log = l
+	return &cp
+}
+
+func (c *Client) WithRequestTrace(b bool) *Client {
+	cp := *c
+	cp.traceRequestBody = b
+	return &cp
+}
+
+func (c *Client) WithResponseTrace(b bool) *Client {
+	cp := *c
+	cp.traceResponseBody = b
+	return &cp
+}
+
+func (c *Client) WithTrace(b bool) *Client {
+	cp := *c
+	cp.traceRequestBody = b
+	cp.traceResponseBody = b
+	cp.traceCookies = b
+	return &cp
+}
+
 func (c *Client) initCookieJar() (err error) {
 	if c.Jar != nil {
 		return nil
@@ -168,7 +201,7 @@ func (c *Client) initCookieJar() (err error) {
 		return err
 	}
 	for _, cookie := range cookies {
-		url, err := url.Parse(fmt.Sprintf("http://%s", cookie.Domain))
+		url, err := url.Parse(cookie.Domain)
 		if err != nil {
 			return err
 		}
@@ -189,17 +222,20 @@ func (c *Client) saveCookies(resp *http.Response) error {
 	if c.cookieFile == "" {
 		return nil
 	}
+
 	if _, ok := resp.Header["Set-Cookie"]; !ok {
 		return nil
 	}
 
 	cookies := resp.Cookies()
 	for _, cookie := range cookies {
-		// if it is host:port then we need to split off port
-		parts := strings.Split(resp.Request.URL.Host, ":")
-		host := parts[0]
-		log.Debugf("Setting DOMAIN to %s for Cookie: %s", host, cookie)
-		cookie.Domain = host
+		if cookie.Domain == "" {
+			// if it is host:port then we need to split off port
+			parts := strings.Split(resp.Request.URL.Host, ":")
+			host := parts[0]
+			c.log.Printf("Setting DOMAIN to %s for Cookie: %s", host, cookie)
+			cookie.Domain = host
+		}
 	}
 
 	// expiry in one week from now
@@ -278,11 +314,11 @@ func (c *Client) loadCookies() ([]*http.Cookie, error) {
 	cookies := []*http.Cookie{}
 	err = json.Unmarshal(bytes, &cookies)
 	if err != nil {
-		log.Debugf("Failed to parse cookie file: %s", err)
+		c.log.Printf("Failed to parse cookie file: %s", err)
 	}
 
-	if log.IsEnabledFor(logging.DEBUG) && os.Getenv("LOG_TRACE") != "" {
-		log.Debugf("Loading Cookies: %s", cookies)
+	if c.traceCookies {
+		c.log.Printf("Loading Cookies: %s", cookies)
 	}
 	return cookies, nil
 }
@@ -302,40 +338,36 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 
 	// Callback may want to resubmit the request, so we
 	// will need to rewind (Seek) the Reader back to start.
-	var bodyCache []byte
 	if len(c.postCallbacks) > 0 && !c.handlingPostCallback && req.Body != nil {
-		bodyCache, err = ioutil.ReadAll(req.Body)
+		bites, err := ioutil.ReadAll(req.Body)
 		if err != nil {
 			return nil, err
 		}
-		req.Body = ioutil.NopCloser(bytes.NewReader(bodyCache))
+		req.Body = ioutil.NopCloser(bytes.NewReader(bites))
 	}
 
-	log.Debugf("%s %s", req.Method, req.URL.String())
-	if log.IsEnabledFor(logging.DEBUG) && TraceRequestBody {
-		out, _ := httputil.DumpRequest(req, true)
-		log.Debugf("Request: %s", out)
-	}
-
+	c.log.Printf("%s %s", req.Method, req.URL.String())
 	resp, err = c.Client.Do(req)
 	if err != nil {
+		if c.traceRequestBody {
+			out, _ := httputil.DumpRequest(req, true)
+			c.log.Printf("Request: %s", out)
+		}
+
 		return nil, err
 	}
-	// log any cookies sent b/c they will not be present until
-	// afater we call the `Do` func
-	if log.IsEnabledFor(logging.DEBUG) && TraceRequestBody {
-		for key, values := range req.Header {
-			if key == "Cookie" {
-				for _, cookie := range values {
-					log.Debugf("Cookie: %s", cookie)
-				}
-			}
-		}
+
+	// we log this after the request is made because http.send
+	// will modify the request to append cookies, so to see the
+	// cookies sent we need to log post-send.
+	if c.traceRequestBody {
+		out, _ := httputil.DumpRequest(req, true)
+		c.log.Printf("Request: %s", out)
 	}
 
-	if log.IsEnabledFor(logging.DEBUG) && TraceResponseBody {
+	if c.traceResponseBody {
 		out, _ := httputil.DumpResponse(resp, true)
-		log.Debugf("Response: %s", out)
+		c.log.Printf("Response: %s", out)
 	}
 
 	err = c.saveCookies(resp)
@@ -344,8 +376,11 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 	}
 
 	if len(c.postCallbacks) > 0 && !c.handlingPostCallback {
-		if len(bodyCache) > 0 {
-			req.Body = ioutil.NopCloser(bytes.NewReader(bodyCache))
+		if req.Body != nil {
+			rs, ok := req.Body.(io.ReadSeeker)
+			if ok {
+				rs.Seek(0, 0)
+			}
 		}
 		c.handlingPostCallback = true
 		defer func() {

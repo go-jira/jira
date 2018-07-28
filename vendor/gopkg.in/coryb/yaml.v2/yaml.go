@@ -146,14 +146,25 @@ func unmarshal(in []byte, out interface{}, strict bool) (err error) {
 //     yaml.Marshal(&T{B: 2}) // Returns "b: 2\n"
 //     yaml.Marshal(&T{F: 1}} // Returns "a: 1\nb: 0\n"
 //
-func Marshal(in interface{}) (out []byte, err error) {
+func Marshal(in interface{}, opts ...MarshalOption) (out []byte, err error) {
 	defer handleErr(&err)
 	e := newEncoder()
 	defer e.destroy()
+	for _, opt := range opts {
+		opt(e)
+	}
 	e.marshal("", reflect.ValueOf(in))
 	e.finish()
 	out = e.out
 	return
+}
+
+type MarshalOption func(*encoder)
+
+func WithWidth(width int) MarshalOption {
+	return func(e *encoder) {
+		yaml_emitter_set_width(&e.emitter, width)
+	}
 }
 
 func handleErr(err *error) {

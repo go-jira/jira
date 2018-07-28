@@ -4,7 +4,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/coryb/oreo"
 	logging "gopkg.in/op/go-logging.v1"
 )
 
@@ -14,10 +13,6 @@ var (
 
 func IncreaseLogLevel(verbosity int) {
 	logging.SetLevel(logging.GetLevel("")+logging.Level(verbosity), "")
-	if logging.GetLevel("") > logging.DEBUG {
-		oreo.TraceRequestBody = true
-		oreo.TraceResponseBody = true
-	}
 }
 
 func InitLogging() {

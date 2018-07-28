@@ -14,9 +14,15 @@ import (
 	"gopkg.in/op/go-logging.v1"
 )
 
-var (
-	log = logging.MustGetLogger("jira")
-)
+type oreoLogger struct {
+	logger *logging.Logger
+}
+
+var log = logging.MustGetLogger("jira")
+
+func (ol *oreoLogger) Printf(format string, args ...interface{}) {
+	ol.logger.Debugf(format, args...)
+}
 
 func handleExit() {
 	if e := recover(); e != nil {
@@ -46,7 +52,7 @@ func main() {
 		panic(jiracli.Exit{Code: 1})
 	}
 
-	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), configDir, "cookies.js"))
+	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), configDir, "cookies.js")).WithLogger(&oreoLogger{log})
 
 	jiracmd.RegisterAllCommands()
 

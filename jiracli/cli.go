@@ -21,6 +21,7 @@ import (
 	"gopkg.in/AlecAivazis/survey.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 	yaml "gopkg.in/coryb/yaml.v2"
+	logging "gopkg.in/op/go-logging.v1"
 )
 
 type Exit struct {
@@ -219,6 +220,9 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 
 		cmd.Action(
 			func(_ *kingpin.ParseContext) error {
+				if logging.GetLevel("") > logging.DEBUG {
+					o = o.WithTrace(true)
+				}
 				return copy.Entry.ExecuteFunc(o, &globals)
 			},
 		)
