@@ -149,6 +149,7 @@ Commands:
   watch:               Add/Remove watcher to issue
   worklog add:         Add a worklog to an issue
   worklog list:        Prints the worklog data for given issue
+  session:             Attempt to login into jira server
 
 ```
 
