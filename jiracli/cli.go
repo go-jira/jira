@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"runtime/debug"
 	"strings"
 
 	"github.com/coryb/figtree"
@@ -26,6 +27,25 @@ import (
 
 type Exit struct {
 	Code int
+}
+
+// HandleExit will unwind any panics and check to see if they are jiracli.Exit
+// and exit accordingly.
+//
+// Example:
+// func main() {
+//     defer jiracli.HandleExit()
+//     ...
+// }
+func HandleExit() {
+	if e := recover(); e != nil {
+		if exit, ok := e.(Exit); ok {
+			os.Exit(exit.Code)
+		} else {
+			fmt.Fprintf(os.Stderr, "%s\n%s", e, debug.Stack())
+			os.Exit(1)
+		}
+	}
 }
 
 type GlobalOptions struct {

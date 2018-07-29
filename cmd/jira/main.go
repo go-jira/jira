@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
@@ -24,19 +22,8 @@ func (ol *oreoLogger) Printf(format string, args ...interface{}) {
 	ol.logger.Debugf(format, args...)
 }
 
-func handleExit() {
-	if e := recover(); e != nil {
-		if exit, ok := e.(jiracli.Exit); ok {
-			os.Exit(exit.Code)
-		} else {
-			fmt.Fprintf(os.Stderr, "%s\n%s", e, debug.Stack())
-			os.Exit(1)
-		}
-	}
-}
-
 func main() {
-	defer handleExit()
+	defer jiracli.HandleExit()
 
 	jiracli.InitLogging()
 
