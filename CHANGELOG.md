@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.18 - 2018-07-29
+
+* [[#196](https://github.com/Netflix-Skunkworks/go-jira/issues/196)] add `jira session` command to show session information if user is authenticated [Cory Bennett] [[f592107](https://github.com/Netflix-Skunkworks/go-jira/commit/f592107)]
+* [[#192](https://github.com/Netflix-Skunkworks/go-jira/issues/192)] fix template usage for 'fixVersions' in transition template [Cory Bennett] [[c9a4e30](https://github.com/Netflix-Skunkworks/go-jira/commit/c9a4e30)]
+* move HandleExit to the jiracli package [Cory Bennett] [[ef9b731](https://github.com/Netflix-Skunkworks/go-jira/commit/ef9b731)]
+* they broke golang.org/x/net: ERROR: vendor/golang.org/x/net/proxy/socks5.go:11:2: use of internal package not allowed [Cory Bennett] [[7191c77](https://github.com/Netflix-Skunkworks/go-jira/commit/7191c77)]
+* udpate deps [Cory Bennett] [[d16bcc2](https://github.com/Netflix-Skunkworks/go-jira/commit/d16bcc2)]
+* udpate for figtree api changes [Cory Bennett] [[07ba74b](https://github.com/Netflix-Skunkworks/go-jira/commit/07ba74b)]
+* udpate to use latest dep, update figtree [Cory Bennett] [[462ef1c](https://github.com/Netflix-Skunkworks/go-jira/commit/462ef1c)]
+* [[#171](https://github.com/Netflix-Skunkworks/go-jira/issues/171)] change proposed PasswordPath to PasswordName [Cory Bennett] [[213a7e0](https://github.com/Netflix-Skunkworks/go-jira/commit/213a7e0)]
+* add pass path to config [dvogt23] [[fa01ff5](https://github.com/Netflix-Skunkworks/go-jira/commit/fa01ff5)]
+
 ## 1.0.17 - 2018-04-15
 
 * fix IsTerminal usage for windows [Cory Bennett] [[7f9595c](https://github.com/Netflix-Skunkworks/go-jira/commit/7f9595c)]
