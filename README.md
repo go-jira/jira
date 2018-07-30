@@ -49,7 +49,7 @@ You can build and install the official repository with [Go](https://golang.org/d
 ```
 go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
 ```
-This will checkout this repository into `$GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`, build, and install it.  
+This will checkout this repository into `$GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`, build, and install it.
 
 Because golang likes fully qualified import paths, forking and contributing can be a bit tricky.
 
@@ -59,7 +59,7 @@ If you want to tinker or hack on go-jira, the [easiest way to do so](http://code
 
 From within that source dir you can build and install modifications from within that directory like:
 
-`go install ./...`  
+`go install ./...`
 
 ## Usage
 
@@ -167,7 +167,7 @@ import "gopkg.in/Netflix-Skunkworks/go-jira.v0"
 ```
 
 ###### **Configs per command**
-Instead of requiring a exectuable template to get configs for a given command now you can create a config to be applied to a command.  So if you want to use `template: table` by default for yor `jira list` you can now do:
+Instead of requiring a executable template to get configs for a given command now you can create a config to be applied to a command.  So if you want to use `template: table` by default for your `jira list` you can now do:
 ```
 $ cat $HOME/.jira.d/list.yml
 template: table
@@ -176,7 +176,7 @@ Where previously you needed something like:
 ```
 # cat $HOME/.jira.d/config.yml
 #!/bin/sh
-case $JIRA_OPERATION in 
+case $JIRA_OPERATION in
     list)
       echo "template: table";;
 esac
@@ -219,13 +219,13 @@ Unfortunately during the rewrite between v0 and v1 there were some necessary cha
 ###### **Login process change**
 We have, once again, changed how login happens for Jira.  When authenticating against Atlassian Cloud Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  Please read [the Authentication section](#authentication) below for more information.
 
-If you use a privately hosted Jira service, you can chose to use the API Token method or continue using the session login api.  Please read [the Authentication section](#authentication) below for more information.  
+If you use a privately hosted Jira service, you can chose to use the API Token method or continue using the session login api.  Please read [the Authentication section](#authentication) below for more information.
 
 Previously `jira` used attempt to get a `JSESSION` cookies by authenticating with the webservice standard GUI login process.  This has been especially problematic as users need to authenticate with various credential providers (google auth, etc).  We now attempt to authenticate via the [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login).  This may be problematic for users if admins have locked down the session-login api, so we might have to bring back the error-prone Basic-Auth approach.  For users that are unable to authenticate via `jira` hopefully someone in your organization can provide me with details on a process for you to authenticate and we can try to update `jira`.
 
 ## Configuration
 
-**go-jira** uses a configuration hierarchy.  When loading the configuration from disk it will recursively look through all parent directories in your current path looking for a **.jira.d** directory.  If your current directory is not a child directory of your homedir, then your homedir will also be inspected for a **.jira.d** directory.  From all of **.jira.d** directories discovered **go-jira** will load a **&lt;command&gt;.yml** file (ie for `jira list` it will load `.jira.d/list.yml`) then it will merge in any properties from the **config.yml** if found.  The configuration properties found in a file closests to your current working directory will have precedence.  Properties overriden with command line options will have final precedence.
+**go-jira** uses a configuration hierarchy.  When loading the configuration from disk it will recursively look through all parent directories in your current path looking for a **.jira.d** directory.  If your current directory is not a child directory of your homedir, then your homedir will also be inspected for a **.jira.d** directory.  From all of **.jira.d** directories discovered **go-jira** will load a **&lt;command&gt;.yml** file (ie for `jira list` it will load `.jira.d/list.yml`) then it will merge in any properties from the **config.yml** if found.  The configuration properties found in a file closest to your current working directory will have precedence.  Properties overridden with command line options will have final precedence.
 
 The complicated configuration hierarchy is used because **go-jira** attempts to be context aware.  For example, if you are working on a "foo" project and you `cd` into your project workspace, wouldn't it be nice if `jira ls` automatically knew to list only issues related to the "foo" project?  Likewise when you `cd` to the "bar" project then `jira ls` should only list issues related to "bar" project.  You can do this with by creating a configuration under your project workspace at **./.jira.d/config.yml** that looks like:
 
@@ -255,7 +255,7 @@ If the **.jira.d/config.yml** file is executable, then **go-jira** will attempt 
 echo "endpoint: https://jira.mycompany.com"
 echo "editor: emacs -nw"
 
-case $JIRA_OPERATION in 
+case $JIRA_OPERATION in
     list)
       echo "template: table";;
 esac
@@ -290,14 +290,14 @@ Where the individual commands are maps with these keys:
 * `default: bool` Use this for compound command groups.  If you wanted to have `jira foo bar` and `jira foo baz` you would have two commands with `name: foo bar` and `name: foo baz`.  Then if you wanted `jira foo baz` to be called by default when you type `jira foo` you would set `default: true` for that custom command.
 * `options: list`  This is the list of possible option flags that the command will accept
 * `args: list` This is the list of command arguments (like the ISSUE) that the command will accept.
-* `aliases: string list`: This is a list of alternate names that the user can provide on the command line to run the same command.  Typically used to shorten the command name or provide alternatives that users might expect. 
+* `aliases: string list`: This is a list of alternate names that the user can provide on the command line to run the same command.  Typically used to shorten the command name or provide alternatives that users might expect.
 * `script: string` [**required**] This is the script that will be executed as the action for this command. The value will be treated as a template and substitutions for options and arguments will be made before executing.
 
 ##### Options
 These are possible keys under the command `options` property:
 * `name: string` [**required**] Name of the option, so `name: foobar` will result in `--foobar` option.
-* `help: string` The help messsage displayed in usage for the option.
-* `type: string`:  The type of the option, can be one of these values: `BOOL`, `COUNTER`, `ENUM`, `FLOAT32`, `FLOAT64`, `INT8`, `INT16`, `INT32`, `INT64`, `INT`, `STRING`, `STRINGMAP`, `UINT8`, `UINT16`, `UINT32`,  `UINT64` and `UINT`.  Most of these are primitive data types an should be self-explanitory.  The default type is `STRING`. There are some special types:
+* `help: string` The help message displayed in usage for the option.
+* `type: string`:  The type of the option, can be one of these values: `BOOL`, `COUNTER`, `ENUM`, `FLOAT32`, `FLOAT64`, `INT8`, `INT16`, `INT32`, `INT64`, `INT`, `STRING`, `STRINGMAP`, `UINT8`, `UINT16`, `UINT32`,  `UINT64` and `UINT`.  Most of these are primitive data types an should be self-explanatory.  The default type is `STRING`. There are some special types:
   * `COUNTER` will be an integer type that increments each time the option is used.  So something like `--count --count` will results in `{{options.count}}` of `2`.
   * `ENUM` type is used with the `enum` property.  The raw type is a string and **must** be one of the values listed in the `enum` property.
   * `STRINGMAP` is a `string => string` map with the format of `KEY=VALUE`.  So `--override foo=bar --override bin=baz` will allow for `{{options.override.foo}}` to be `bar` and `{{options.override.bin}}` to be `baz`.
@@ -310,9 +310,9 @@ These are possible keys under the command `options` property:
 
 ##### Arguments
 These are possible keys under the command `args` property:
-* `name: string` [**required**] Name of the option, so `name: ISSUE` will show in the usasge as `jira <command> ISSUE`.  This also represents the name of the argument to be used in the script template, so `{{args.ISSUE}}`.
-* `help: string` The help messsage displayed in usage for the argument.
-* `type: string`:  The type of the argumemnt, can be one of these values: `BOOL`, `COUNTER`, `ENUM`, `FLOAT32`, `FLOAT64`, `INT8`, `INT16`, `INT32`, `INT64`, `INT`, `STRING`, `STRINGMAP`, `UINT8`, `UINT16`, `UINT32`,  `UINT64` and `UINT`.  Most of these are primitive data types an should be self-explanitory.  The default type is `STRING`.  There are some special types:
+* `name: string` [**required**] Name of the option, so `name: ISSUE` will show in the usage as `jira <command> ISSUE`.  This also represents the name of the argument to be used in the script template, so `{{args.ISSUE}}`.
+* `help: string` The help message displayed in usage for the argument.
+* `type: string`:  The type of the argument, can be one of these values: `BOOL`, `COUNTER`, `ENUM`, `FLOAT32`, `FLOAT64`, `INT8`, `INT16`, `INT32`, `INT64`, `INT`, `STRING`, `STRINGMAP`, `UINT8`, `UINT16`, `UINT32`,  `UINT64` and `UINT`.  Most of these are primitive data types an should be self-explanatory.  The default type is `STRING`.  There are some special types:
   * `COUNTER` will be an integer type that increments each the argument is provided  So something like `jira <command> ISSUE-12 ISSUE-23` will results in `{{args.ISSUE}}` of `2`.
   * `ENUM` type is used with the `enum` property.  The raw type is a string and **must** be one of the values listed in the `enum` property.
   * `STRINGMAP` is a `string => string` map with the format of `KEY=VALUE`.  So `jira <command> foo=bar bin=baz` along with a `name: OVERRIDE` property will allow for `{{args.OVERRIDE.foo}}` to be `bar` and `{{args.OVERRIDE.bin}}` to be `baz`.
@@ -322,7 +322,7 @@ These are possible keys under the command `args` property:
 * `enum: string list` Used with the `type: ENUM` property, it is a list of strings values that represent the set of possible values for the argument.
 
 ##### Script Template
-The `script` property is a template that whould produce `/bin/sh` compatible syntax after the template has been processed.  There are 2 key template functions `{{args}}` and `{{options}}` that return the parsed arguments and option flags as a map.  
+The `script` property is a template that would produce `/bin/sh` compatible syntax after the template has been processed.  There are 2 key template functions `{{args}}` and `{{options}}` that return the parsed arguments and option flags as a map.
 
 To demonstrate how you might use args and options here is a `custom-test` command:
 ```yaml
@@ -383,7 +383,7 @@ custom-commands:
     script: |
       env | grep JIRA
  ```
- 
+
 You could use the environment variables automatically, so if your `.jira.d/config.yml` looks something like this:
 ```yaml
 project: PROJECT
@@ -427,7 +427,7 @@ custom-commands:
 ### Editing
 
 When you run command like `jira edit` it will open up your favorite editor with the templatized output so you can quickly edit.  When the editor
-closes **go-jira** will submit the completed form.  The order which **go-jira** attempts to determine your prefered editor is:
+closes **go-jira** will submit the completed form.  The order which **go-jira** attempts to determine your preferred editor is:
 
 * **editor** property in any config.yml file
 * **JIRA_EDITOR** environment variable
@@ -446,9 +446,9 @@ hard-coded templates with `jira export-templates` which will write them to **~/.
 
 #### Writing/Editing Templates
 
-First the basic templating functionality is defined by the Go language 'text/template' library.  The library reference documentation can be found [here](https://golang.org/pkg/text/template/), and there is a good primer document [here](https://gohugo.io/templates/go-templates/).  `go-jira` also provides a few extra helper functions to make it a bit easlier to format the data, those functions are defined [here](https://github.com/Netflix-Skunkworks/go-jira/blob/master/jiracli/templates.go#L64).
+First the basic templating functionality is defined by the Go language 'text/template' library.  The library reference documentation can be found [here](https://golang.org/pkg/text/template/), and there is a good primer document [here](https://gohugo.io/templates/go-templates/).  `go-jira` also provides a few extra helper functions to make it a bit easier to format the data, those functions are defined [here](https://github.com/Netflix-Skunkworks/go-jira/blob/master/jiracli/templates.go#L64).
 
-Knowing what data and fields are available to any given template is not obvious. The easiest approach to determine what is available is to use the `debug` template on any given operation.  For eample to find out what is available to the "view" templates, you can use:
+Knowing what data and fields are available to any given template is not obvious. The easiest approach to determine what is available is to use the `debug` template on any given operation.  For example to find out what is available to the "view" templates, you can use:
 ```
 jira view GOJIRA-321 -t debug
 ```
@@ -460,12 +460,12 @@ jira list -t debug
 
 ### Authentication
 
-For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endoint ends in `.atlassian.net`.  If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass` service as documented below so that it can be programatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
+For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endpoint ends in `.atlassian.net`.  If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass` service as documented below so that it can be programmatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
 
-If your Jira service still allows you to use the Session based authention method then `jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring` or `pass`.
+If your Jira service still allows you to use the Session based authentication method then `jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring` or `pass`.
 
 #### User vs Login
-The Jira service has sometimes differing opinions about how a user is identified.  In other words the ID you login with might not be ID that the jira system recognized you as.  This matters when trying to identify a user via various Jira REST APIs (like issue assignment).  This is especially relevent when trying to authenticate with an API Token where the authentication user is usually an email address, but within the Jira system the user is identified by a user name.  To accomodate this `jira` now supports two different properties in the config file.  So when authentication using the API Tokens you will likely want something like this in your `$HOME/.jira.d/config.yml` file:
+The Jira service has sometimes differing opinions about how a user is identified.  In other words the ID you login with might not be ID that the jira system recognized you as.  This matters when trying to identify a user via various Jira REST APIs (like issue assignment).  This is especially relevant when trying to authenticate with an API Token where the authentication user is usually an email address, but within the Jira system the user is identified by a user name.  To accommodate this `jira` now supports two different properties in the config file.  So when authentication using the API Tokens you will likely want something like this in your `$HOME/.jira.d/config.yml` file:
 ```yaml
 user: person
 login: person@example.com
@@ -507,7 +507,7 @@ Then initialize the `pass` tool to use the correct key:
 $ pass init "Go Jira <gojira@example.com>"
 ```
 
-You probably want to setup gpg-agent so that you dont have to type in your gpg passphrase all the time.  You can get `gpg-agent` to automatically start by adding something like this to your `$HOME/.bashrc`
+You probably want to setup gpg-agent so that you don't have to type in your gpg passphrase all the time.  You can get `gpg-agent` to automatically start by adding something like this to your `$HOME/.bashrc`
 ```bash
 if [ -f $HOME/.gpg-agent-info ]; then
     . $HOME/.gpg-agent-info
