@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sethgrid/pester"
 	flock "github.com/theckman/go-flock"
 )
 
@@ -33,7 +32,10 @@ type PreRequestCallback func(*http.Request) (*http.Request, error)
 type PostRequestCallback func(*http.Request, *http.Response) (*http.Response, error)
 
 type Client struct {
-	pester.Client
+	http.Client
+	backoff    BackoffStrategy
+	maxRetries int
+
 	preCallbacks  []PreRequestCallback
 	postCallbacks []PostRequestCallback
 
@@ -47,7 +49,7 @@ type Client struct {
 
 func New() *Client {
 	return &Client{
-		Client:               *pester.New(),
+		maxRetries:           3,
 		handlingPostCallback: false,
 		preCallbacks:         []PreRequestCallback{},
 		postCallbacks:        []PostRequestCallback{},
@@ -61,8 +63,6 @@ func (c *Client) WithCookieFile(file string) *Client {
 	if cp.Jar != nil {
 		cp.Jar = nil
 	}
-	// need to reset cached http client with embedded jar
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
@@ -70,50 +70,33 @@ func (c *Client) WithRetries(retries int) *Client {
 	cp := *c
 	// pester MaxRetries is really a MaxAttempts, so if you
 	// want 2 retries that means 3 attempts
-	cp.MaxRetries = retries + 1
+	cp.maxRetries = retries + 1
 	return &cp
 }
 
 func (c *Client) WithTimeout(duration time.Duration) *Client {
 	cp := *c
 	cp.Timeout = duration
-	// need to reset cached http client with embedded timeout
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
 type BackoffStrategy int
 
 const (
-	CONSTANT_BACKOFF           BackoffStrategy = iota
-	EXPONENTIAL_BACKOFF        BackoffStrategy = iota
-	EXPONENTIAL_JITTER_BACKOFF BackoffStrategy = iota
-	LINEAR_BACKOFF             BackoffStrategy = iota
-	LINEAR_JITTER_BACKOFF      BackoffStrategy = iota
+	CONSTANT_BACKOFF BackoffStrategy = iota
+	LINEAR_BACKOFF   BackoffStrategy = iota
+	NO_BACKOFF       BackoffStrategy = iota
 )
 
 func (c *Client) WithBackoff(backoff BackoffStrategy) *Client {
 	cp := *c
-	switch backoff {
-	case CONSTANT_BACKOFF:
-		cp.Backoff = pester.DefaultBackoff
-	case EXPONENTIAL_BACKOFF:
-		cp.Backoff = pester.ExponentialBackoff
-	case EXPONENTIAL_JITTER_BACKOFF:
-		cp.Backoff = pester.ExponentialJitterBackoff
-	case LINEAR_BACKOFF:
-		cp.Backoff = pester.LinearBackoff
-	case LINEAR_JITTER_BACKOFF:
-		cp.Backoff = pester.LinearJitterBackoff
-	}
+	cp.backoff = backoff
 	return &cp
 }
 
 func (c *Client) WithTransport(transport http.RoundTripper) *Client {
 	cp := *c
 	cp.Transport = transport
-	// need to reset cached http client with embedded tranport
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
@@ -152,8 +135,6 @@ func (c *Client) WithoutCallbacks() *Client {
 func (c *Client) WithCheckRedirect(checkFunc func(*http.Request, []*http.Request) error) *Client {
 	cp := *c
 	cp.CheckRedirect = checkFunc
-	// need to reset cached http client with embedded CheckRedirect
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
@@ -323,6 +304,14 @@ func (c *Client) loadCookies() ([]*http.Cookie, error) {
 	return cookies, nil
 }
 
+type bytesReaderCloser struct {
+	bytes.Reader
+}
+
+func (b *bytesReaderCloser) Close() error {
+	return nil
+}
+
 func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 	for _, cb := range c.preCallbacks {
 		req, err = cb(req)
@@ -338,36 +327,76 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 
 	// Callback may want to resubmit the request, so we
 	// will need to rewind (Seek) the Reader back to start.
-	if len(c.postCallbacks) > 0 && !c.handlingPostCallback && req.Body != nil {
+	if (c.maxRetries != 0 || (c.traceRequestBody || len(c.postCallbacks) > 0)) && req.Body != nil {
 		bites, err := ioutil.ReadAll(req.Body)
 		if err != nil {
 			return nil, err
 		}
-		req.Body = ioutil.NopCloser(bytes.NewReader(bites))
+		reader := bytes.NewReader(bites)
+		req.Body = &bytesReaderCloser{*reader}
 	}
 
-	c.log.Printf("%s %s", req.Method, req.URL.String())
-	resp, err = c.Client.Do(req)
-	if err != nil {
-		if c.traceRequestBody {
-			out, _ := httputil.DumpRequest(req, true)
-			c.log.Printf("Request: %s", out)
+	attempt := 1
+	for {
+		resp, err = c.Client.Do(req)
+		if err != nil {
+			if c.traceRequestBody {
+				rewindRequest(req)
+				out, _ := httputil.DumpRequestOut(req, true)
+				c.log.Printf("Request %d: %s", attempt, out)
+			}
+		} else {
+			// we log this after the request is made because http.send
+			// will modify the request to append cookies, so to see the
+			// cookies sent we need to log post-send.
+			if c.traceRequestBody {
+				rewindRequest(req)
+				out, _ := httputil.DumpRequestOut(req, true)
+				c.log.Printf("Request %d: %s", attempt, out)
+			}
+
+			if c.traceResponseBody {
+				out, _ := httputil.DumpResponse(resp, true)
+				c.log.Printf("Response %d: %s", attempt, out)
+			}
 		}
 
+		if err != nil || resp.StatusCode >= 500 {
+			if c.maxRetries < 0 || c.maxRetries < attempt+1 {
+				break
+			}
+
+			var idle time.Duration
+			if c.backoff == CONSTANT_BACKOFF {
+				idle = time.Duration(1 * time.Second)
+			} else if c.backoff == LINEAR_BACKOFF {
+				idle = time.Duration(attempt) * time.Second
+			}
+
+			if err != nil {
+				c.log.Printf("Attempt %d error: %s, retry in %s", attempt, err, idle)
+			} else {
+				c.log.Printf("Attempt %d failed: %s, retry in %s", attempt, resp.Status, idle)
+			}
+
+			select {
+			case <-req.Context().Done():
+				c.log.Printf("Request Context timeout after attempt %d", attempt)
+				return
+			case <-time.After(idle):
+			}
+
+			// need to reset body for the retry
+			rewindRequest(req)
+
+			attempt++
+			continue
+		}
+		break
+	}
+
+	if err != nil {
 		return nil, err
-	}
-
-	// we log this after the request is made because http.send
-	// will modify the request to append cookies, so to see the
-	// cookies sent we need to log post-send.
-	if c.traceRequestBody {
-		out, _ := httputil.DumpRequest(req, true)
-		c.log.Printf("Request: %s", out)
-	}
-
-	if c.traceResponseBody {
-		out, _ := httputil.DumpResponse(resp, true)
-		c.log.Printf("Response: %s", out)
 	}
 
 	err = c.saveCookies(resp)
@@ -376,12 +405,7 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 	}
 
 	if len(c.postCallbacks) > 0 && !c.handlingPostCallback {
-		if req.Body != nil {
-			rs, ok := req.Body.(io.ReadSeeker)
-			if ok {
-				rs.Seek(0, 0)
-			}
-		}
+		rewindRequest(req)
 		c.handlingPostCallback = true
 		defer func() {
 			c.handlingPostCallback = false
@@ -395,6 +419,14 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 	}
 
 	return resp, err
+}
+
+func rewindRequest(req *http.Request) {
+	if req.Body != nil {
+		if rs, ok := req.Body.(io.ReadSeeker); ok {
+			rs.Seek(0, 0)
+		}
+	}
 }
 
 func (c *Client) Get(urlStr string) (resp *http.Response, err error) {
