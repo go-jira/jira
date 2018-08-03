@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.19 - 2018-08-02
+
+* [[#199](https://github.com/Netflix-Skunkworks/go-jira/issues/199)] [[#198](https://github.com/Netflix-Skunkworks/go-jira/issues/198)] update http client library, fix issues with internal login retries [Cory Bennett] [[0cba806](https://github.com/Netflix-Skunkworks/go-jira/commit/0cba806)]
+
 ## 1.0.18 - 2018-07-29
 
 * [[#196](https://github.com/Netflix-Skunkworks/go-jira/issues/196)] add `jira session` command to show session information if user is authenticated [Cory Bennett] [[f592107](https://github.com/Netflix-Skunkworks/go-jira/commit/f592107)]
