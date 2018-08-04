@@ -39,7 +39,7 @@
   branch = "master"
   name = "github.com/coryb/oreo"
   packages = ["."]
-  revision = "efd7a2135270bc44f64af39446c7226057e6953d"
+  revision = "3e1b88fc08f134aa91ccfb5d58c983ca8ab42589"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"

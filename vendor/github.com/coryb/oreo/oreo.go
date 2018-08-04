@@ -182,11 +182,14 @@ func (c *Client) initCookieJar() (err error) {
 		return err
 	}
 	for _, cookie := range cookies {
-		url, err := url.Parse(cookie.Domain)
-		if err != nil {
-			return err
+		// this is dumb, cookie.Domain *must not* have a scheme or port url.Parse will parse strings like "localhost"
+		// into the Path variable, not Host.  So lets just force Host. We also need to set arbitrary http/https Scheme
+		// as Jar.SetCookies will ignore cookies where the url does not have a http/https Scheme
+		u := &url.URL{
+			Scheme: "http",
+			Host:   cookie.Domain,
 		}
-		c.Jar.SetCookies(url, []*http.Cookie{cookie})
+		c.Jar.SetCookies(u, []*http.Cookie{cookie})
 	}
 	return nil
 }
