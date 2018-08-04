@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.20 - 2018-08-04
+
+* [[#201](https://github.com/Netflix-Skunkworks/go-jira/issues/201)] update required library, failing to populate cookiejar from cookies file [Cory Bennett] [[ee69afa](https://github.com/Netflix-Skunkworks/go-jira/commit/ee69afa)]
+
 ## 1.0.19 - 2018-08-02
 
 * [[#199](https://github.com/Netflix-Skunkworks/go-jira/issues/199)] [[#198](https://github.com/Netflix-Skunkworks/go-jira/issues/198)] update http client library, fix issues with internal login retries [Cory Bennett] [[0cba806](https://github.com/Netflix-Skunkworks/go-jira/commit/0cba806)]
