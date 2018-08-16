@@ -76,6 +76,7 @@ func (o *RawTypeOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -84,6 +85,7 @@ func (o *RawTypeOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }

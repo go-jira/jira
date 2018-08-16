@@ -200,6 +200,16 @@ var (
 	IfaceType      = DefaultMapType.Elem()
 )
 
+func UseMapType(mapType reflect.Type) {
+	DefaultMapType = mapType
+	IfaceType = mapType.Elem()
+}
+
+func RestoreMapType() {
+	DefaultMapType = reflect.TypeOf(map[interface{}]interface{}{})
+	IfaceType = DefaultMapType.Elem()
+}
+
 func newDecoder(strict bool) *decoder {
 	d := &decoder{mapType: DefaultMapType, strict: strict}
 	d.aliases = make(map[string]bool)

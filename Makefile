@@ -66,11 +66,11 @@ update-changelog:
 	mv CHANGELOG.md.new CHANGELOG.md; \
 	$(NULL)
 
+update-usage:
+	@perl -pi -e 'undef $$/; s|\n```\nusage.*?```|"\n```\n".qx{./jira --help}."```"|esg' README.md
+
 release:
-	perl -pi -e 'undef $$/; s/\n```\nusage.*```//sg' README.md
-	echo '```' >> README.md
-	./jira --help >> README.md 2>&1 || true
-	echo '```' >> README.md
+	make update-usage
 	git diff --exit-code --quiet README.md || git commit -m "Updated Usage" README.md
 	git commit -m "Updated Changelog" CHANGELOG.md
 	git commit -m "version bump" jira.go

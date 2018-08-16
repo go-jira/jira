@@ -26,9 +26,12 @@ Response type is a string.
 */
 type Editor struct {
 	core.Renderer
-	Message string
-	Default string
-	Help    string
+	Message       string
+	Default       string
+	Help          string
+	Editor        string
+	HideDefault   bool
+	AppendDefault bool
 }
 
 // data available to the templates when processing
@@ -48,7 +51,7 @@ var EditorQuestionTemplate = `
   {{- color "cyan"}}{{.Answer}}{{color "reset"}}{{"\n"}}
 {{- else }}
   {{- if and .Help (not .ShowHelp)}}{{color "cyan"}}[{{ HelpInputRune }} for help]{{color "reset"}} {{end}}
-  {{- if .Default}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
+  {{- if and .Default (not .HideDefault)}}{{color "white"}}({{.Default}}) {{color "reset"}}{{end}}
   {{- color "cyan"}}[Enter to launch editor] {{color "reset"}}
 {{- end}}`
 
@@ -79,12 +82,13 @@ func (e *Editor) Prompt() (interface{}, error) {
 	}
 
 	// start reading runes from the standard in
-	rr := terminal.NewRuneReader(os.Stdin)
+	rr := e.NewRuneReader()
 	rr.SetTermMode()
 	defer rr.RestoreTermMode()
 
-	terminal.CursorHide()
-	defer terminal.CursorShow()
+	cursor := e.NewCursor()
+	cursor.Hide()
+	defer cursor.Show()
 
 	for {
 		r, _, err := rr.ReadRune()
@@ -128,17 +132,32 @@ func (e *Editor) Prompt() (interface{}, error) {
 	if _, err := f.Write(bom); err != nil {
 		return "", err
 	}
+
+	// write default value
+	if e.Default != "" && e.AppendDefault {
+		if _, err := f.WriteString(e.Default); err != nil {
+			return "", err
+		}
+	}
+
 	// close the fd to prevent the editor unable to save file
 	if err := f.Close(); err != nil {
 		return "", err
 	}
 
+	// check is input editor exist
+	if e.Editor != "" {
+		editor = e.Editor
+	}
+
+	stdio := e.Stdio()
+
 	// open the editor
 	cmd := exec.Command(editor, f.Name())
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	terminal.CursorShow()
+	cmd.Stdin = stdio.In
+	cmd.Stdout = stdio.Out
+	cmd.Stderr = stdio.Err
+	cursor.Show()
 	if err := cmd.Run(); err != nil {
 		return "", err
 	}
@@ -153,7 +172,7 @@ func (e *Editor) Prompt() (interface{}, error) {
 	text := string(bytes.TrimPrefix(raw, bom))
 
 	// check length, return default value on empty
-	if len(text) == 0 {
+	if len(text) == 0 && !e.AppendDefault {
 		return e.Default, nil
 	}
 
@@ -163,6 +182,6 @@ func (e *Editor) Prompt() (interface{}, error) {
 func (e *Editor) Cleanup(val interface{}) error {
 	return e.Render(
 		EditorQuestionTemplate,
-		EditorTemplateData{Editor: *e, Answer: "<Recieved>", ShowAnswer: true},
+		EditorTemplateData{Editor: *e, Answer: "<Received>", ShowAnswer: true},
 	)
 }

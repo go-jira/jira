@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
@@ -14,36 +12,34 @@ import (
 	"gopkg.in/op/go-logging.v1"
 )
 
-var (
-	log = logging.MustGetLogger("jira")
-)
+type oreoLogger struct {
+	logger *logging.Logger
+}
 
-func handleExit() {
-	if e := recover(); e != nil {
-		if exit, ok := e.(jiracli.Exit); ok {
-			os.Exit(exit.Code)
-		} else {
-			fmt.Fprintf(os.Stderr, "%s\n%s", e, debug.Stack())
-			os.Exit(1)
-		}
-	}
+var log = logging.MustGetLogger("jira")
+
+func (ol *oreoLogger) Printf(format string, args ...interface{}) {
+	ol.logger.Debugf(format, args...)
 }
 
 func main() {
-	defer handleExit()
+	defer jiracli.HandleExit()
 
 	jiracli.InitLogging()
 
-	fig := figtree.NewFigTree()
-	fig.EnvPrefix = "JIRA"
-	fig.ConfigDir = ".jira.d"
+	configDir := ".jira.d"
+	fig := figtree.NewFigTree(
+		figtree.WithHome(jiracli.Homedir()),
+		figtree.WithEnvPrefix("JIRA"),
+		figtree.WithConfigDir(configDir),
+	)
 
-	if err := os.MkdirAll(filepath.Join(jiracli.Homedir(), fig.ConfigDir), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(jiracli.Homedir(), configDir), 0755); err != nil {
 		log.Errorf("%s", err)
 		panic(jiracli.Exit{Code: 1})
 	}
 
-	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), fig.ConfigDir, "cookies.js"))
+	o := oreo.New().WithCookieFile(filepath.Join(jiracli.Homedir(), configDir, "cookies.js")).WithLogger(&oreoLogger{log})
 
 	jiracmd.RegisterAllCommands()
 

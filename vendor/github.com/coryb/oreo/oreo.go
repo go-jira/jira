@@ -15,36 +15,45 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sethgrid/pester"
 	flock "github.com/theckman/go-flock"
-	logging "gopkg.in/op/go-logging.v1"
 )
+
+type Logger interface {
+	Printf(format string, args ...interface{})
+}
+
+type nullLogger struct{}
+
+func (n *nullLogger) Printf(format string, args ...interface{}) {}
+
+var DefaultLogger Logger = &nullLogger{}
 
 type PreRequestCallback func(*http.Request) (*http.Request, error)
 type PostRequestCallback func(*http.Request, *http.Response) (*http.Response, error)
 
-var log = logging.MustGetLogger("oreo")
-
-// var CookieFile = filepath.Join(os.Getenv("HOME"), ".oreo-cookies.js")
-
-var TraceRequestBody = false
-var TraceResponseBody = false
-
 type Client struct {
-	pester.Client
+	http.Client
+	backoff    BackoffStrategy
+	maxRetries int
+
 	preCallbacks  []PreRequestCallback
 	postCallbacks []PostRequestCallback
 
 	cookieFile           string
 	handlingPostCallback bool
+	log                  Logger
+	traceCookies         bool
+	traceRequestBody     bool
+	traceResponseBody    bool
 }
 
 func New() *Client {
 	return &Client{
-		Client:               *pester.New(),
+		maxRetries:           3,
 		handlingPostCallback: false,
 		preCallbacks:         []PreRequestCallback{},
 		postCallbacks:        []PostRequestCallback{},
+		log:                  DefaultLogger,
 	}
 }
 
@@ -54,8 +63,6 @@ func (c *Client) WithCookieFile(file string) *Client {
 	if cp.Jar != nil {
 		cp.Jar = nil
 	}
-	// need to reset cached http client with embedded jar
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
@@ -63,50 +70,33 @@ func (c *Client) WithRetries(retries int) *Client {
 	cp := *c
 	// pester MaxRetries is really a MaxAttempts, so if you
 	// want 2 retries that means 3 attempts
-	cp.MaxRetries = retries + 1
+	cp.maxRetries = retries + 1
 	return &cp
 }
 
 func (c *Client) WithTimeout(duration time.Duration) *Client {
 	cp := *c
 	cp.Timeout = duration
-	// need to reset cached http client with embedded timeout
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
 type BackoffStrategy int
 
 const (
-	CONSTANT_BACKOFF           BackoffStrategy = iota
-	EXPONENTIAL_BACKOFF        BackoffStrategy = iota
-	EXPONENTIAL_JITTER_BACKOFF BackoffStrategy = iota
-	LINEAR_BACKOFF             BackoffStrategy = iota
-	LINEAR_JITTER_BACKOFF      BackoffStrategy = iota
+	CONSTANT_BACKOFF BackoffStrategy = iota
+	LINEAR_BACKOFF   BackoffStrategy = iota
+	NO_BACKOFF       BackoffStrategy = iota
 )
 
 func (c *Client) WithBackoff(backoff BackoffStrategy) *Client {
 	cp := *c
-	switch backoff {
-	case CONSTANT_BACKOFF:
-		cp.Backoff = pester.DefaultBackoff
-	case EXPONENTIAL_BACKOFF:
-		cp.Backoff = pester.ExponentialBackoff
-	case EXPONENTIAL_JITTER_BACKOFF:
-		cp.Backoff = pester.ExponentialJitterBackoff
-	case LINEAR_BACKOFF:
-		cp.Backoff = pester.LinearBackoff
-	case LINEAR_JITTER_BACKOFF:
-		cp.Backoff = pester.LinearJitterBackoff
-	}
+	cp.backoff = backoff
 	return &cp
 }
 
 func (c *Client) WithTransport(transport http.RoundTripper) *Client {
 	cp := *c
 	cp.Transport = transport
-	// need to reset cached http client with embedded tranport
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
@@ -145,13 +135,37 @@ func (c *Client) WithoutCallbacks() *Client {
 func (c *Client) WithCheckRedirect(checkFunc func(*http.Request, []*http.Request) error) *Client {
 	cp := *c
 	cp.CheckRedirect = checkFunc
-	// need to reset cached http client with embedded CheckRedirect
-	cp.Client.EmbedHTTPClient(nil)
 	return &cp
 }
 
 func (c *Client) WithoutRedirect() *Client {
 	return c.WithCheckRedirect(NoRedirect)
+}
+
+func (c *Client) WithLogger(l Logger) *Client {
+	cp := *c
+	cp.log = l
+	return &cp
+}
+
+func (c *Client) WithRequestTrace(b bool) *Client {
+	cp := *c
+	cp.traceRequestBody = b
+	return &cp
+}
+
+func (c *Client) WithResponseTrace(b bool) *Client {
+	cp := *c
+	cp.traceResponseBody = b
+	return &cp
+}
+
+func (c *Client) WithTrace(b bool) *Client {
+	cp := *c
+	cp.traceRequestBody = b
+	cp.traceResponseBody = b
+	cp.traceCookies = b
+	return &cp
 }
 
 func (c *Client) initCookieJar() (err error) {
@@ -168,11 +182,14 @@ func (c *Client) initCookieJar() (err error) {
 		return err
 	}
 	for _, cookie := range cookies {
-		url, err := url.Parse(fmt.Sprintf("http://%s", cookie.Domain))
-		if err != nil {
-			return err
+		// this is dumb, cookie.Domain *must not* have a scheme or port url.Parse will parse strings like "localhost"
+		// into the Path variable, not Host.  So lets just force Host. We also need to set arbitrary http/https Scheme
+		// as Jar.SetCookies will ignore cookies where the url does not have a http/https Scheme
+		u := &url.URL{
+			Scheme: "http",
+			Host:   cookie.Domain,
 		}
-		c.Jar.SetCookies(url, []*http.Cookie{cookie})
+		c.Jar.SetCookies(u, []*http.Cookie{cookie})
 	}
 	return nil
 }
@@ -189,17 +206,20 @@ func (c *Client) saveCookies(resp *http.Response) error {
 	if c.cookieFile == "" {
 		return nil
 	}
+
 	if _, ok := resp.Header["Set-Cookie"]; !ok {
 		return nil
 	}
 
 	cookies := resp.Cookies()
 	for _, cookie := range cookies {
-		// if it is host:port then we need to split off port
-		parts := strings.Split(resp.Request.URL.Host, ":")
-		host := parts[0]
-		log.Debugf("Setting DOMAIN to %s for Cookie: %s", host, cookie)
-		cookie.Domain = host
+		if cookie.Domain == "" {
+			// if it is host:port then we need to split off port
+			parts := strings.Split(resp.Request.URL.Host, ":")
+			host := parts[0]
+			c.log.Printf("Setting DOMAIN to %s for Cookie: %s", host, cookie)
+			cookie.Domain = host
+		}
 	}
 
 	// expiry in one week from now
@@ -278,13 +298,21 @@ func (c *Client) loadCookies() ([]*http.Cookie, error) {
 	cookies := []*http.Cookie{}
 	err = json.Unmarshal(bytes, &cookies)
 	if err != nil {
-		log.Debugf("Failed to parse cookie file: %s", err)
+		c.log.Printf("Failed to parse cookie file: %s", err)
 	}
 
-	if log.IsEnabledFor(logging.DEBUG) && os.Getenv("LOG_TRACE") != "" {
-		log.Debugf("Loading Cookies: %s", cookies)
+	if c.traceCookies {
+		c.log.Printf("Loading Cookies: %s", cookies)
 	}
 	return cookies, nil
+}
+
+type bytesReaderCloser struct {
+	bytes.Reader
+}
+
+func (b *bytesReaderCloser) Close() error {
+	return nil
 }
 
 func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
@@ -302,40 +330,76 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 
 	// Callback may want to resubmit the request, so we
 	// will need to rewind (Seek) the Reader back to start.
-	var bodyCache []byte
-	if len(c.postCallbacks) > 0 && !c.handlingPostCallback && req.Body != nil {
-		bodyCache, err = ioutil.ReadAll(req.Body)
+	if (c.maxRetries != 0 || (c.traceRequestBody || len(c.postCallbacks) > 0)) && req.Body != nil {
+		bites, err := ioutil.ReadAll(req.Body)
 		if err != nil {
 			return nil, err
 		}
-		req.Body = ioutil.NopCloser(bytes.NewReader(bodyCache))
+		reader := bytes.NewReader(bites)
+		req.Body = &bytesReaderCloser{*reader}
 	}
 
-	log.Debugf("%s %s", req.Method, req.URL.String())
-	if log.IsEnabledFor(logging.DEBUG) && TraceRequestBody {
-		out, _ := httputil.DumpRequest(req, true)
-		log.Debugf("Request: %s", out)
-	}
+	attempt := 1
+	for {
+		resp, err = c.Client.Do(req)
+		if err != nil {
+			if c.traceRequestBody {
+				rewindRequest(req)
+				out, _ := httputil.DumpRequestOut(req, true)
+				c.log.Printf("Request %d: %s", attempt, out)
+			}
+		} else {
+			// we log this after the request is made because http.send
+			// will modify the request to append cookies, so to see the
+			// cookies sent we need to log post-send.
+			if c.traceRequestBody {
+				rewindRequest(req)
+				out, _ := httputil.DumpRequestOut(req, true)
+				c.log.Printf("Request %d: %s", attempt, out)
+			}
 
-	resp, err = c.Client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	// log any cookies sent b/c they will not be present until
-	// afater we call the `Do` func
-	if log.IsEnabledFor(logging.DEBUG) && TraceRequestBody {
-		for key, values := range req.Header {
-			if key == "Cookie" {
-				for _, cookie := range values {
-					log.Debugf("Cookie: %s", cookie)
-				}
+			if c.traceResponseBody {
+				out, _ := httputil.DumpResponse(resp, true)
+				c.log.Printf("Response %d: %s", attempt, out)
 			}
 		}
+
+		if err != nil || resp.StatusCode >= 500 {
+			if c.maxRetries < 0 || c.maxRetries < attempt+1 {
+				break
+			}
+
+			var idle time.Duration
+			if c.backoff == CONSTANT_BACKOFF {
+				idle = time.Duration(1 * time.Second)
+			} else if c.backoff == LINEAR_BACKOFF {
+				idle = time.Duration(attempt) * time.Second
+			}
+
+			if err != nil {
+				c.log.Printf("Attempt %d error: %s, retry in %s", attempt, err, idle)
+			} else {
+				c.log.Printf("Attempt %d failed: %s, retry in %s", attempt, resp.Status, idle)
+			}
+
+			select {
+			case <-req.Context().Done():
+				c.log.Printf("Request Context timeout after attempt %d", attempt)
+				return
+			case <-time.After(idle):
+			}
+
+			// need to reset body for the retry
+			rewindRequest(req)
+
+			attempt++
+			continue
+		}
+		break
 	}
 
-	if log.IsEnabledFor(logging.DEBUG) && TraceResponseBody {
-		out, _ := httputil.DumpResponse(resp, true)
-		log.Debugf("Response: %s", out)
+	if err != nil {
+		return nil, err
 	}
 
 	err = c.saveCookies(resp)
@@ -344,9 +408,7 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 	}
 
 	if len(c.postCallbacks) > 0 && !c.handlingPostCallback {
-		if len(bodyCache) > 0 {
-			req.Body = ioutil.NopCloser(bytes.NewReader(bodyCache))
-		}
+		rewindRequest(req)
 		c.handlingPostCallback = true
 		defer func() {
 			c.handlingPostCallback = false
@@ -360,6 +422,14 @@ func (c *Client) Do(req *http.Request) (resp *http.Response, err error) {
 	}
 
 	return resp, err
+}
+
+func rewindRequest(req *http.Request) {
+	if req.Body != nil {
+		if rs, ok := req.Body.(io.ReadSeeker); ok {
+			rs.Seek(0, 0)
+		}
+	}
 }
 
 func (c *Client) Get(urlStr string) (resp *http.Response, err error) {

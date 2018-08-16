@@ -2,23 +2,43 @@ package survey
 
 import (
 	"errors"
+	"io"
+	"os"
 
 	"gopkg.in/AlecAivazis/survey.v1/core"
+	"gopkg.in/AlecAivazis/survey.v1/terminal"
 )
 
 // PageSize is the default maximum number of items to show in select/multiselect prompts
 var PageSize = 7
 
+// DefaultAskOptions is the default options on ask, using the OS stdio.
+var DefaultAskOptions = AskOptions{
+	Stdio: terminal.Stdio{
+		In:  os.Stdin,
+		Out: os.Stdout,
+		Err: os.Stderr,
+	},
+}
+
 // Validator is a function passed to a Question after a user has provided a response.
 // If the function returns an error, then the user will be prompted again for another
 // response.
-type Validator func(interface{}) error
+type Validator func(ans interface{}) error
+
+// Transformer is a function passed to a Question after a user has provided a response.
+// The function can be used to implement a custom logic that will result to return
+// a different representation of the given answer.
+//
+// Look `TransformString`, `ToLower` `Title` and `ComposeTransformers` for more.
+type Transformer func(ans interface{}) (newAns interface{})
 
 // Question is the core data structure for a survey questionnaire.
 type Question struct {
-	Name     string
-	Prompt   Prompt
-	Validate Validator
+	Name      string
+	Prompt    Prompt
+	Validate  Validator
+	Transform Transformer
 }
 
 // Prompt is the primary interface for the objects that can take user input
@@ -27,6 +47,29 @@ type Prompt interface {
 	Prompt() (interface{}, error)
 	Cleanup(interface{}) error
 	Error(error) error
+}
+
+// AskOpt allows setting optional ask options.
+type AskOpt func(options *AskOptions) error
+
+// AskOptions provides additional options on ask.
+type AskOptions struct {
+	Stdio terminal.Stdio
+}
+
+// WithStdio specifies the standard input, output and error files survey
+// interacts with. By default, these are os.Stdin, os.Stdout, and os.Stderr.
+func WithStdio(in terminal.FileReader, out terminal.FileWriter, err io.Writer) AskOpt {
+	return func(options *AskOptions) error {
+		options.Stdio.In = in
+		options.Stdio.Out = out
+		options.Stdio.Err = err
+		return nil
+	}
+}
+
+type wantsStdio interface {
+	WithStdio(terminal.Stdio)
 }
 
 /*
@@ -42,8 +85,8 @@ in the documentation. For example:
 	survey.AskOne(prompt, &name, nil)
 
 */
-func AskOne(p Prompt, response interface{}, v Validator) error {
-	err := Ask([]*Question{{Prompt: p, Validate: v}}, response)
+func AskOne(p Prompt, response interface{}, v Validator, opts ...AskOpt) error {
+	err := Ask([]*Question{{Prompt: p, Validate: v}}, response, opts...)
 	if err != nil {
 		return err
 	}
@@ -65,6 +108,7 @@ matching name. For example:
 			Name:     "name",
 			Prompt:   &survey.Input{Message: "What is your name?"},
 			Validate: survey.Required,
+			Transform: survey.Title,
 		},
 	}
 
@@ -73,7 +117,14 @@ matching name. For example:
 
 	err := survey.Ask(qs, &answers)
 */
-func Ask(qs []*Question, response interface{}) error {
+func Ask(qs []*Question, response interface{}, opts ...AskOpt) error {
+
+	options := DefaultAskOptions
+	for _, opt := range opts {
+		if err := opt(&options); err != nil {
+			return err
+		}
+	}
 
 	// if we weren't passed a place to record the answers
 	if response == nil {
@@ -83,6 +134,11 @@ func Ask(qs []*Question, response interface{}) error {
 
 	// go over every question
 	for _, q := range qs {
+		// If Prompt implements controllable stdio, pass in specified stdio.
+		if p, ok := q.Prompt.(wantsStdio); ok {
+			p.WithStdio(options.Stdio)
+		}
+
 		// grab the user input and save it
 		ans, err := q.Prompt.Prompt()
 		// if there was a problem
@@ -109,6 +165,15 @@ func Ask(qs []*Question, response interface{}) error {
 			}
 		}
 
+		if q.Transform != nil {
+			// check if we have a transformer available, if so
+			// then try to acquire the new representation of the
+			// answer, if the resulting answer is not nil.
+			if newAns := q.Transform(ans); newAns != nil {
+				ans = newAns
+			}
+		}
+
 		// tell the prompt to cleanup with the validated value
 		q.Prompt.Cleanup(ans)
 
@@ -126,6 +191,7 @@ func Ask(qs []*Question, response interface{}) error {
 		}
 
 	}
+
 	// return the response
 	return nil
 }

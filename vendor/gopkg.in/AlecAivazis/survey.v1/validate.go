@@ -8,8 +8,11 @@ import (
 
 // Required does not allow an empty value
 func Required(val interface{}) error {
+	// the reflect value of the result
+	value := reflect.ValueOf(val)
+
 	// if the value passed in is the zero value of the appropriate type
-	if isZero(reflect.ValueOf(val)) {
+	if isZero(value) && value.Kind() != reflect.Bool {
 		return errors.New("Value is required")
 	}
 	return nil
@@ -61,13 +64,13 @@ func ComposeValidators(validators ...Validator) Validator {
 	return func(val interface{}) error {
 		// execute each validator
 		for _, validator := range validators {
-			// if the string is not valid
+			// if the answer's value is not valid
 			if err := validator(val); err != nil {
 				// return the error
 				return err
 			}
 		}
-		// we passed all validators, the string is valid
+		// we passed all validators, the answer is valid
 		return nil
 	}
 }

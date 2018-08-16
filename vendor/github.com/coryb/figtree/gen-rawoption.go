@@ -74,6 +74,7 @@ func (o *BoolOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -82,6 +83,7 @@ func (o *BoolOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -305,6 +307,7 @@ func (o *ByteOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -313,6 +316,7 @@ func (o *ByteOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -536,6 +540,7 @@ func (o *Complex128Option) UnmarshalYAML(unmarshal func(interface{}) error) erro
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -544,6 +549,7 @@ func (o *Complex128Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -767,6 +773,7 @@ func (o *Complex64Option) UnmarshalYAML(unmarshal func(interface{}) error) error
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -775,6 +782,7 @@ func (o *Complex64Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -998,6 +1006,7 @@ func (o *ErrorOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -1006,6 +1015,7 @@ func (o *ErrorOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -1229,6 +1239,7 @@ func (o *Float32Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -1237,6 +1248,7 @@ func (o *Float32Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -1460,6 +1472,7 @@ func (o *Float64Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -1468,6 +1481,7 @@ func (o *Float64Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -1691,6 +1705,7 @@ func (o *IntOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -1699,6 +1714,7 @@ func (o *IntOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -1922,6 +1938,7 @@ func (o *Int16Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -1930,6 +1947,7 @@ func (o *Int16Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -2153,6 +2171,7 @@ func (o *Int32Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -2161,6 +2180,7 @@ func (o *Int32Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -2384,6 +2404,7 @@ func (o *Int64Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -2392,6 +2413,7 @@ func (o *Int64Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -2615,6 +2637,7 @@ func (o *Int8Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -2623,6 +2646,7 @@ func (o *Int8Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -2846,6 +2870,7 @@ func (o *RuneOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -2854,6 +2879,7 @@ func (o *RuneOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -3077,6 +3103,7 @@ func (o *StringOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -3085,6 +3112,7 @@ func (o *StringOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -3308,6 +3336,7 @@ func (o *UintOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -3316,6 +3345,7 @@ func (o *UintOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -3539,6 +3569,7 @@ func (o *Uint16Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -3547,6 +3578,7 @@ func (o *Uint16Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -3770,6 +3802,7 @@ func (o *Uint32Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -3778,6 +3811,7 @@ func (o *Uint32Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -4001,6 +4035,7 @@ func (o *Uint64Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -4009,6 +4044,7 @@ func (o *Uint64Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -4232,6 +4268,7 @@ func (o *Uint8Option) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -4240,6 +4277,7 @@ func (o *Uint8Option) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }
@@ -4463,6 +4501,7 @@ func (o *UintptrOption) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&o.Value); err != nil {
 		return err
 	}
+	o.Source = "yaml"
 	o.Defined = true
 	return nil
 }
@@ -4471,6 +4510,7 @@ func (o *UintptrOption) UnmarshalJSON(b []byte) error {
 	if err := json.Unmarshal(b, &o.Value); err != nil {
 		return err
 	}
+	o.Source = "json"
 	o.Defined = true
 	return nil
 }

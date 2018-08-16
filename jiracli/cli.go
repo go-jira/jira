@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"runtime/debug"
 	"strings"
 
 	"github.com/coryb/figtree"
@@ -21,23 +22,79 @@ import (
 	"gopkg.in/AlecAivazis/survey.v1"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 	yaml "gopkg.in/coryb/yaml.v2"
+	logging "gopkg.in/op/go-logging.v1"
 )
 
 type Exit struct {
 	Code int
 }
 
+// HandleExit will unwind any panics and check to see if they are jiracli.Exit
+// and exit accordingly.
+//
+// Example:
+// func main() {
+//     defer jiracli.HandleExit()
+//     ...
+// }
+func HandleExit() {
+	if e := recover(); e != nil {
+		if exit, ok := e.(Exit); ok {
+			os.Exit(exit.Code)
+		} else {
+			fmt.Fprintf(os.Stderr, "%s\n%s", e, debug.Stack())
+			os.Exit(1)
+		}
+	}
+}
+
 type GlobalOptions struct {
+	// AuthenticationMethod is the method we use to authenticate with the jira serivce. Possible values are "api-token" or "session".
+	// The default is "api-token" when the service endpoint ends with "atlassian.net", otherwise it "session".  Session authentication
+	// will promt for user password and use the /auth/1/session-login endpoint.
 	AuthenticationMethod figtree.StringOption `yaml:"authentication-method,omitempty" json:"authentication-method,omitempty"`
-	Endpoint             figtree.StringOption `yaml:"endpoint,omitempty" json:"endpoint,omitempty"`
-	Insecure             figtree.BoolOption   `yaml:"insecure,omitempty" json:"insecure,omitempty"`
-	Login                figtree.StringOption `yaml:"login,omitempty" json:"login,omitempty"`
-	PasswordSource       figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
-	PasswordDirectory    figtree.StringOption `yaml:"password-directory,omitempty" json:"password-directory,omitempty"`
-	Quiet                figtree.BoolOption   `yaml:"quiet,omitempty" json:"quiet,omitempty"`
-	SocksProxy           figtree.StringOption `yaml:"socksproxy,omitempty" json:"socksproxy,omitempty"`
-	UnixProxy            figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
-	User                 figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
+
+	// Endpoint is the URL for the Jira service.  Something like: https://go-jira.atlassian.net
+	Endpoint figtree.StringOption `yaml:"endpoint,omitempty" json:"endpoint,omitempty"`
+
+	// Insecure will allow you to connect to an https endpoint with a self-signed SSL certificate
+	Insecure figtree.BoolOption `yaml:"insecure,omitempty" json:"insecure,omitempty"`
+
+	// Login is the id used for authenticating with the Jira service.  For "api-token" AuthenticationMethod this is usually a
+	// full email address, something like "user@example.com".  For "session" AuthenticationMethod this will be something
+	// like "user", which by default will use the same value in the `User` field.
+	Login figtree.StringOption `yaml:"login,omitempty" json:"login,omitempty"`
+
+	// PasswordSource specificies the method that we fetch the password.  Possible values are "keyring" or "pass".
+	// If this is unset we will just prompt the user.  For "keyring" this will look in the OS keychain, if missing
+	// then prompt the user and store the password in the OS keychain.  For "pass" this will look in the PasswordDirectory
+	// location using the `pass` tool, if missing prompt the user and store in the PasswordDirectory
+	PasswordSource figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
+
+	// PasswordDirectory is only used for the "pass" PasswordSource.  It is the location for the encrypted password
+	// files used by `pass`.  Effectively this overrides the "PASSWORD_STORE_DIR" environment variable
+	PasswordDirectory figtree.StringOption `yaml:"password-directory,omitempty" json:"password-directory,omitempty"`
+
+	// PasswordName is the the name of the password key entry stored used with PasswordSource `pass`.
+	PasswordName figtree.StringOption `yaml:"password-name,omitempty" json:"password-name,omitempty"`
+
+	// Quiet will lower the defalt log level to suppress the standard output for commands
+	Quiet figtree.BoolOption `yaml:"quiet,omitempty" json:"quiet,omitempty"`
+
+	// SocksProxy is used to configure the http client to access the Endpoint via a socks proxy.  The value
+	// should be a ip address and port string, something like "127.0.0.1:1080"
+	SocksProxy figtree.StringOption `yaml:"socksproxy,omitempty" json:"socksproxy,omitempty"`
+
+	// UnixProxy is use to configure the http client to access the Endpoint via a local unix domain socket used
+	// to proxy requests
+	UnixProxy figtree.StringOption `yaml:"unixproxy,omitempty" json:"unixproxy,omitempty"`
+
+	// User is use to represent the user on the Jira service.  This can be different from the username used to
+	// authenticate with the service.  For example when using AuthenticationMethod `api-token` the Login is
+	// typically an email address like `username@example.com` and the User property would be someting like
+	// `username`  The User property is used on Jira service API calls that require a user to associate with
+	// an Issue (like assigning a Issue to yourself)
+	User figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
 }
 
 type CommonOptions struct {
@@ -183,6 +240,9 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 
 		cmd.Action(
 			func(_ *kingpin.ParseContext) error {
+				if logging.GetLevel("") > logging.DEBUG {
+					o = o.WithTrace(true)
+				}
 				return copy.Entry.ExecuteFunc(o, &globals)
 			},
 		)

@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.0.19 - 2018-08-02
+
+* [[#199](https://github.com/Netflix-Skunkworks/go-jira/issues/199)] [[#198](https://github.com/Netflix-Skunkworks/go-jira/issues/198)] update http client library, fix issues with internal login retries [Cory Bennett] [[0cba806](https://github.com/Netflix-Skunkworks/go-jira/commit/0cba806)]
+
+## 1.0.18 - 2018-07-29
+
+* [[#196](https://github.com/Netflix-Skunkworks/go-jira/issues/196)] add `jira session` command to show session information if user is authenticated [Cory Bennett] [[f592107](https://github.com/Netflix-Skunkworks/go-jira/commit/f592107)]
+* [[#192](https://github.com/Netflix-Skunkworks/go-jira/issues/192)] fix template usage for 'fixVersions' in transition template [Cory Bennett] [[c9a4e30](https://github.com/Netflix-Skunkworks/go-jira/commit/c9a4e30)]
+* move HandleExit to the jiracli package [Cory Bennett] [[ef9b731](https://github.com/Netflix-Skunkworks/go-jira/commit/ef9b731)]
+* they broke golang.org/x/net: ERROR: vendor/golang.org/x/net/proxy/socks5.go:11:2: use of internal package not allowed [Cory Bennett] [[7191c77](https://github.com/Netflix-Skunkworks/go-jira/commit/7191c77)]
+* udpate deps [Cory Bennett] [[d16bcc2](https://github.com/Netflix-Skunkworks/go-jira/commit/d16bcc2)]
+* udpate for figtree api changes [Cory Bennett] [[07ba74b](https://github.com/Netflix-Skunkworks/go-jira/commit/07ba74b)]
+* udpate to use latest dep, update figtree [Cory Bennett] [[462ef1c](https://github.com/Netflix-Skunkworks/go-jira/commit/462ef1c)]
+* [[#171](https://github.com/Netflix-Skunkworks/go-jira/issues/171)] change proposed PasswordPath to PasswordName [Cory Bennett] [[213a7e0](https://github.com/Netflix-Skunkworks/go-jira/commit/213a7e0)]
+* add pass path to config [dvogt23] [[fa01ff5](https://github.com/Netflix-Skunkworks/go-jira/commit/fa01ff5)]
+
+## 1.0.17 - 2018-04-15
+
+* fix IsTerminal usage for windows [Cory Bennett] [[7f9595c](https://github.com/Netflix-Skunkworks/go-jira/commit/7f9595c)]
+* [[#166](https://github.com/Netflix-Skunkworks/go-jira/issues/166)] fix issue when editing templates specified with full path [Cory Bennett] [[d787ac0](https://github.com/Netflix-Skunkworks/go-jira/commit/d787ac0)]
+* only prompt on logout if stdin and stdout are terminals [Cory Bennett] [[09a61c3](https://github.com/Netflix-Skunkworks/go-jira/commit/09a61c3)]
+* [[#163](https://github.com/Netflix-Skunkworks/go-jira/issues/163)] fix url path join logic [Cory Bennett] [[9146346](https://github.com/Netflix-Skunkworks/go-jira/commit/9146346)]
+* [[#160](https://github.com/Netflix-Skunkworks/go-jira/issues/160)] prompt when api-token is invalid to get new token [Cory Bennett] [[e639cce](https://github.com/Netflix-Skunkworks/go-jira/commit/e639cce)]
+* [[#157](https://github.com/Netflix-Skunkworks/go-jira/issues/157)] add `password-directory: path` to allow overriding PASSWORD_STORE_DIR from configs [Cory Bennett] [[06b26c9](https://github.com/Netflix-Skunkworks/go-jira/commit/06b26c9)]
+* [[#160](https://github.com/Netflix-Skunkworks/go-jira/issues/160)] allow `jira logout` to delete your api-token from keychain [Cory Bennett] [[bd3cf99](https://github.com/Netflix-Skunkworks/go-jira/commit/bd3cf99)]
+
 ## 1.0.16 - 2018-04-01
 
 * [[#159](https://github.com/Netflix-Skunkworks/go-jira/issues/159)] fix `slice bounds out of range` error in `abbrev` template function [Cory Bennett] [[359bec2](https://github.com/Netflix-Skunkworks/go-jira/commit/359bec2)]

@@ -1,4 +1,0 @@
-package: github.com/coryb/kingpeon
-import:
-- package: gopkg.in/alecthomas/kingpin.v2
-  version: ^2.2.5

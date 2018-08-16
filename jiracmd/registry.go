@@ -57,4 +57,5 @@ func RegisterAllCommands() {
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "watch", Entry: CmdWatchRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "worklog add", Entry: CmdWorklogAddRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "worklog list", Entry: CmdWorklogListRegistry(), Default: true})
+	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "session", Entry: CmdSessionRegistry()})
 }
