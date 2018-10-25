@@ -108,6 +108,39 @@ func TemplateProcessor() *template.Template {
 		"sub": func(a, b int) int {
 			return a - b
 		},
+		"sum": func(num int, nums ...int) int {
+			for _, n := range nums {
+				num += n
+			}
+			return num
+		},
+		"prod": func(num int, nums ...int) int {
+			for _, n := range nums {
+				num *= n
+			}
+			return num
+		},
+		"div": func(a, b int) int {
+			// This is intentionally integer division.
+			// 1/2 a character width is unlikely to be useful.
+			return a / b
+		},
+		"min": func(num int, nums ...int) int {
+			for _, n := range nums {
+				if n < num {
+					num = n
+				}
+			}
+			return num
+		},
+		"max": func(num int, nums ...int) int {
+			for _, n := range nums {
+				if n > num {
+					num = n
+				}
+			}
+			return num
+		},
 		"append": func(more string, content interface{}) (string, error) {
 			switch value := content.(type) {
 			case string:
