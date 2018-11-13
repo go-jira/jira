@@ -484,6 +484,7 @@ After setting this and issuing a `jira login`, your credentials will be stored i
 An alternative to the keyring password source is the `pass` tool (documentation [here](https://www.passwordstore.org/)).  This uses gpg to encrypt/decrypt passwords on demand and by using `gpg-agent` you can cache the gpg credentials for a period of time so you will not be prompted repeatedly for decrypting the passwords.  The advantage over the keyring integration is that `pass` can be used on more platforms than OSX and Linux, although it does require more setup.  To use `pass` for password storage and retrieval via `go-jira` just add this configuration to `$HOME/.jira.d/config.yml`:
 ```yaml
 password-source: pass
+password-name: jira.example.com/myuser
 ```
 
 This assumes you have already setup `pass` correctly on your system.  Specifically you will need to have created a gpg key like this:
@@ -505,6 +506,12 @@ sub   2048R/F9A047B8 2016-12-18
 Then initialize the `pass` tool to use the correct key:
 ```
 $ pass init "Go Jira <gojira@example.com>"
+```
+
+Now insert your password with the name you configured.
+
+```
+$ pass insert jira.example.com/myuser
 ```
 
 You probably want to setup gpg-agent so that you don't have to type in your gpg passphrase all the time.  You can get `gpg-agent` to automatically start by adding something like this to your `$HOME/.bashrc`
