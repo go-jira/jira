@@ -66,7 +66,7 @@ From within that source dir you can build and install modifications from within 
 
 #### Setting up TAB completion
 
-Since go-jira is build with the "kingpin" golang command line library we supports bash/zsh shell completion automatically:
+Since go-jira is built with the "kingpin" golang command line library we support bash/zsh shell completion automatically:
 
  * <https://github.com/alecthomas/kingpin/tree/v2.2.5#bashzsh-shell-completion>
 
