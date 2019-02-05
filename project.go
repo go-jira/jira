@@ -1,6 +1,8 @@
 package jira
 
-import "github.com/arenstar/go-jira/jiradata"
+import (
+	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
+)
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/project-getProjectComponents
 func (j *Jira) GetProjectComponents(project string) (*jiradata.Components, error) {
