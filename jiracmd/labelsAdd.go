@@ -39,7 +39,7 @@ func CmdLabelsAddUsage(cmd *kingpin.CmdClause, opts *LabelsAddOptions) error {
 	return nil
 }
 
-// CmdLabels will add labels on a given issue
+// CmdLabelsAdd will add labels on a given issue
 func CmdLabelsAdd(o *oreo.Client, globals *jiracli.GlobalOptions, opts *LabelsAddOptions) error {
 	ops := jiradata.FieldOperations{}
 	for _, label := range opts.Labels {

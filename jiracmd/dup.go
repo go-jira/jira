@@ -60,7 +60,7 @@ func CmdDupUsage(cmd *kingpin.CmdClause, opts *DupOptions) error {
 	return nil
 }
 
-// CmdDups will update the given issue as being a duplicate by the given dup issue
+// CmdDup will update the given issue as being a duplicate by the given dup issue
 // and will attempt to resolve the dup issue
 func CmdDup(o *oreo.Client, globals *jiracli.GlobalOptions, opts *DupOptions) error {
 	if err := jira.LinkIssues(o, globals.Endpoint.Value, &opts.LinkIssueRequest); err != nil {
