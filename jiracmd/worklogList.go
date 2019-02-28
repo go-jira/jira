@@ -40,7 +40,7 @@ func CmdWorklogListUsage(cmd *kingpin.CmdClause, opts *WorklogListOptions) error
 	return nil
 }
 
-// // CmdWorklogList will get worklog data for given issue and sent to the "worklogs" template
+// CmdWorklogList will get worklog data for given issue and sent to the "worklogs" template
 func CmdWorklogList(o *oreo.Client, globals *jiracli.GlobalOptions, opts *WorklogListOptions) error {
 	data, err := jira.GetIssueWorklog(o, globals.Endpoint.Value, opts.Issue)
 	if err != nil {

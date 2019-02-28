@@ -41,7 +41,7 @@ func CmdEditMetaUsage(cmd *kingpin.CmdClause, opts *EditMetaOptions) error {
 	return nil
 }
 
-// EditMeta will get issue edit metadata and send to "editmeta" template
+// CmdEditMeta will get issue edit metadata and send to "editmeta" template
 func CmdEditMeta(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditMetaOptions) error {
 	editMeta, err := jira.GetIssueEditMeta(o, globals.Endpoint.Value, opts.Issue)
 	if err != nil {
