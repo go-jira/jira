@@ -39,7 +39,7 @@ func CmdLabelsRemoveUsage(cmd *kingpin.CmdClause, opts *LabelsRemoveOptions) err
 	return nil
 }
 
-// CmdLabels will remove labels on a given issue
+// CmdLabelsRemove will remove labels on a given issue
 func CmdLabelsRemove(o *oreo.Client, globals *jiracli.GlobalOptions, opts *LabelsRemoveOptions) error {
 	ops := jiradata.FieldOperations{}
 	for _, label := range opts.Labels {
