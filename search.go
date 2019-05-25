@@ -91,6 +91,7 @@ func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.Search
 		if err != nil {
 			return nil, err
 		}
+		defer resp.Body.Close()
 
 		if resp.StatusCode != 200 {
 			return nil, responseError(resp)
@@ -107,7 +108,6 @@ func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.Search
 		if len(issues) == results.Total || results.Total == 0 {
 			break
 		}
-		resp.Body.Close()
 	}
 	results.Issues = issues
 	return results, nil
