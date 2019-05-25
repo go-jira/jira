@@ -777,5 +777,6 @@ type SearchResults struct {
 	Schema          JSONTypeMap       `json:"schema,omitempty" yaml:"schema,omitempty"`
 	StartAt         int               `json:"startAt,omitempty" yaml:"startAt,omitempty"`
 	Total           int               `json:"total,omitempty" yaml:"total,omitempty"`
+	IsLast          bool              `json:"isLast,omitempty" yaml:"isLast,omitempty"`
 	WarningMessages WarningMessages   `json:"warningMessages,omitempty" yaml:"warningMessages,omitempty"`
 }

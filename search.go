@@ -79,20 +79,36 @@ func (j *Jira) Search(sp SearchProvider) (*jiradata.SearchResults, error) {
 
 func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.SearchResults, error) {
 	req := sp.ProvideSearchRequest()
-	encoded, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-	uri := URLJoin(endpoint, "rest/api/2/search")
-	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+	results := &jiradata.SearchResults{}
+	issues := jiradata.Issues{}
+	for {
+		encoded, err := json.Marshal(req)
+		if err != nil {
+			return nil, err
+		}
+		uri := URLJoin(endpoint, "rest/api/2/search")
+		resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
+		if err != nil {
+			return nil, err
+		}
 
-	if resp.StatusCode == 200 {
-		results := &jiradata.SearchResults{}
-		return results, readJSON(resp.Body, results)
+		if resp.StatusCode != 200 {
+			return nil, responseError(resp)
+		}
+
+		err = readJSON(resp.Body, results)
+		if err != nil {
+			return nil, err
+		}
+
+		issues = append(issues, results.Issues...)
+		req.StartAt = len(issues)
+
+		if len(issues) == results.Total || results.Total == 0 {
+			break
+		}
+		resp.Body.Close()
 	}
-	return nil, responseError(resp)
+	results.Issues = issues
+	return results, nil
 }
