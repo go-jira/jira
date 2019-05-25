@@ -567,3 +567,11 @@ labels: better-label, more-label
 description: |
   blocks
 EOF
+
+
+###############################################################################
+## List 150 closed issues, should be more than 100
+###############################################################################
+
+RUNS $jira ls --project BASIC --status Closed --limit 150
+IS $(printf $0 | wc -l) -eq 150
