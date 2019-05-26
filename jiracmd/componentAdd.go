@@ -52,9 +52,8 @@ func CmdComponentAddUsage(cmd *kingpin.CmdClause, opts *ComponentAddOptions) err
 func CmdComponentAdd(o *oreo.Client, globals *jiracli.GlobalOptions, opts *ComponentAddOptions) error {
 	var err error
 	component := &jiradata.Component{}
-	var resp *jiradata.Component
 	err = jiracli.EditLoop(&opts.CommonOptions, &opts.Component, component, func() error {
-		resp, err = jira.CreateComponent(o, globals.Endpoint.Value, component)
+		_, err = jira.CreateComponent(o, globals.Endpoint.Value, component)
 		return err
 	})
 	if err != nil {
