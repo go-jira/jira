@@ -6,10 +6,11 @@ addons:
 
 language: go
 
-go_import_path: gopkg.in/Netflix-Skunkworks/go-jira.v1
-
 go:
   - 1.12.x
+
+env:
+  - GO111MODULE=on
 
 script:
   - go test ./...
