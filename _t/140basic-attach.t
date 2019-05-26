@@ -62,7 +62,7 @@ DIFF <<EOF
 +------------+------------------------------+------------+--------------+--------------+
 | id         | filename                     | bytes      | user         | created      |
 +------------+------------------------------+------------+--------------+--------------+
-| $(printf %10s $attach1) | README.md                    |       1238 | gojira       | a minute     |
+| $(printf %10s $attach1) | README.md                    |       1239 | gojira       | a minute     |
 | $(printf %10s $attach2) | garbage.bin                  |    1048576 | gojira       | a minute     |
 | $(printf %10s $attach3) | foobar.bin                   |    1048576 | gojira       | a minute     |
 +------------+------------------------------+------------+--------------+--------------+

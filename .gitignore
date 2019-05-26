@@ -1,10 +1,10 @@
 jira
 schemas/*.json
-t/.gnupg/random_seed
-t/issue.props
-t/attach.props
-t/garbage.bin
-t/attach1.txt
-t/binary.out
-t/foobar.bin
+/_t/.gnupg/random_seed
+/_t/issue.props
+/_t/attach.props
+/_t/garbage.bin
+/_t/attach1.txt
+/_t/binary.out
+/_t/foobar.bin
 dist

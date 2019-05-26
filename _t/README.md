@@ -9,7 +9,7 @@ From the top level of the project you can run:
 # this creates a local "jira" binary
 make
 
-# this runs the integration tests in the "t" directory
+# this runs the integration tests in the "_t" directory
 prove
 ```
 
