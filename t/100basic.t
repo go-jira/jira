@@ -4,7 +4,7 @@ cd $(dirname $0)
 jira="../jira"
 . env.sh
 
-PLAN 94
+PLAN 98
 
 # reset login
 RUNS $jira logout
@@ -567,11 +567,15 @@ labels: better-label, more-label
 description: |
   blocks
 EOF
-
+ 
+###############################################################################
+## List 102 closed issues, should be more than 100 (max page size), verify pagination
+###############################################################################
+RUNS $jira ls -q "project = 'BASIC' AND status = 'Done'" --limit 102
+IS $(wc -l <$OSHT_STDOUT) -eq 102
 
 ###############################################################################
-## List 150 closed issues, should be more than 100
+## List 1 issue, verify we dont get full page
 ###############################################################################
-
-RUNS $jira ls --project BASIC --status Closed --limit 150
-IS $(printf $0 | wc -l) -eq 150
+RUNS $jira ls -q "project = 'BASIC' AND status = 'Done'" --limit 1
+IS $(wc -l <$OSHT_STDOUT) -eq 1

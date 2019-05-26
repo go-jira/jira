@@ -73,13 +73,35 @@ func (o *SearchOptions) ProvideSearchRequest() *jiradata.SearchRequest {
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/search-searchUsingSearchRequest
-func (j *Jira) Search(sp SearchProvider) (*jiradata.SearchResults, error) {
-	return Search(j.UA, j.Endpoint, sp)
+func (j *Jira) Search(sp SearchProvider, opts ...SearchOpt) (*jiradata.SearchResults, error) {
+	return Search(j.UA, j.Endpoint, sp, opts...)
 }
 
-func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.SearchResults, error) {
+type searchConfig struct {
+	autoPaginate bool
+}
+
+type SearchOpt func(*searchConfig)
+
+func WithAutoPagination() SearchOpt {
+	return func(c *searchConfig) {
+		c.autoPaginate = true
+	}
+}
+
+func Search(ua HttpClient, endpoint string, sp SearchProvider, opts ...SearchOpt) (*jiradata.SearchResults, error) {
+	c := &searchConfig{}
+	for _, opt := range opts {
+		opt(c)
+	}
+
 	req := sp.ProvideSearchRequest()
-	results := &jiradata.SearchResults{}
+	limit := req.MaxResults
+	if limit == 0 {
+		// max page size is 100
+		req.MaxResults = 100
+	}
+
 	issues := jiradata.Issues{}
 	for {
 		encoded, err := json.Marshal(req)
@@ -97,18 +119,25 @@ func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.Search
 			return nil, responseError(resp)
 		}
 
-		err = readJSON(resp.Body, results)
+		page := &jiradata.SearchResults{}
+		err = readJSON(resp.Body, page)
 		if err != nil {
 			return nil, err
 		}
+		if !c.autoPaginate {
+			return page, nil
+		}
 
-		issues = append(issues, results.Issues...)
+		issues = append(issues, page.Issues...)
+		// if we are done paginating just force all issues onto current
+		// response and return
+		if (limit > 0 && len(issues) >= limit) || len(issues) >= page.Total {
+			page.Issues = issues
+			return page, nil
+		}
 		req.StartAt = len(issues)
-
-		if len(issues) == results.Total || results.Total == 0 {
-			break
+		if len(issues)+req.MaxResults > limit {
+			req.MaxResults = limit - len(issues)
 		}
 	}
-	results.Issues = issues
-	return results, nil
 }
