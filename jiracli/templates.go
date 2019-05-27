@@ -119,7 +119,7 @@ func TemplateProcessor() *template.Template {
 			}
 		},
 		"indent": func(spaces int, content string) string {
-			indent := make([]rune, spaces+1, spaces+1)
+			indent := make([]rune, spaces+1)
 			indent[0] = '\n'
 			for i := 1; i < spaces+1; i++ {
 				indent[i] = ' '

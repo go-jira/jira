@@ -2,10 +2,7 @@ package jira
 
 import (
 	"github.com/coryb/oreo"
-	logging "gopkg.in/op/go-logging.v1"
 )
-
-var log = logging.MustGetLogger("jira")
 
 const VERSION = "1.0.20"
 

@@ -129,7 +129,7 @@ func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Transit
 		*jiradata.Issue `yaml:",inline"`
 		// Yes, Meta and Transition are redundant, but this is for backwards compatibility
 		// with old templates
-		Meta       *jiradata.Transition `yaml:"meta,omitempty" json:"meta,omitemtpy"`
+		Meta       *jiradata.Transition `yaml:"meta,omitempty" json:"meta,omitempty"`
 		Transition *jiradata.Transition `yaml:"transition,omitempty" json:"transition,omitempty"`
 		Overrides  map[string]string    `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	}
