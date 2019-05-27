@@ -1,40 +1,10 @@
-[![Join the chat at https://gitter.im/go-jira-cli/help](https://badges.gitter.im/go-jira-cli/help.svg)](https://gitter.im/go-jira-cli/help?utm_source=badge&utm_medium=badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/Netflix-Skunkworks/go-jira.svg?branch=master)](https://travis-ci.org/Netflix-Skunkworks/go-jira)
 [![GoDoc](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1?status.svg)](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-### Table of Contents
-
-   * [Summary](#go-jira)
-   * [Install](#install)
-      * [Download](#download)
-      * [Build](#build)
-   * [Usage](#usage)
-      * [TAB completion](#setting-up-tab-completion)
-   * [v1 vs v0 changes](#v1-vs-v0-changes)
-      * [<strong>Golang library import</strong>](#golang-library-import)
-      * [<strong>Configs per command</strong>](#configs-per-command)
-      * [<strong>Custom Commands</strong>](#custom-commands)
-      * [<strong>Incompatible command changes</strong>](#incompatible-command-changes)
-      * [<strong>Login process change</strong>](#login-process-change)
-   * [Configuration](#configuration)
-      * [Dynamic Configuration](#dynamic-configuration)
-      * [Custom Commands](#custom-commands-1)
-         * [Commands](#commands)
-         * [Options](#options)
-         * [Arguments](#arguments)
-         * [Script Template](#script-template)
-         * [Examples](#examples)
-      * [Editing](#editing)
-      * [Templates](#templates)
-         * [Writing/Editing Templates](#writingediting-templates)
-      * [Authentication](#authentication)
-         * [user vs login](#user-vs-login)
-         * [keyring password source](#keyring-password-source)
-         * [pass password source](#pass-password-source)
-
 # go-jira
-simple command line client for Atlassian's Jira service written in Go
+
+Simple command line client for Atlassian's Jira service written in Go.
 
 ## Install
 
@@ -46,20 +16,9 @@ You can download one of the pre-built binaries for **go-jira** [here](https://gi
 
 You can build and install the official repository with [Go](https://golang.org/dl/):
 
-```
-go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
-```
+	go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
+
 This will checkout this repository into `$GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`, build, and install it.
-
-Because golang likes fully qualified import paths, forking and contributing can be a bit tricky.
-
-If you want to tinker or hack on go-jira, the [easiest way to do so](http://code.openark.org/blog/development/forking-golang-repositories-on-github-and-managing-the-import-path) is to fork the repository and clone directly into the official path like this:
-
-`git clone https://github.com/YOUR_USER_NAME_HERE/go-jira $GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`
-
-From within that source dir you can build and install modifications from within that directory like:
-
-`go install ./...`
 
 ## Usage
 
@@ -75,153 +34,6 @@ For example, in bash, adding something along the lines of:
   `eval "$(jira --completion-script-bash)"`
 
 to your bashrc, or .profile (assuming go-jira binary is already in your path) will cause jira to offer tab completion behavior.
-
-```
-usage: jira [<flags>] <command> [<args> ...]
-
-Jira Command Line Interface
-
-Global flags:
-      --help                   Show context-sensitive help (also try --help-long and --help-man).
-  -v, --verbose ...            Increase verbosity for debugging
-  -e, --endpoint=ENDPOINT      Base URI to use for Jira
-  -k, --insecure               Disable TLS certificate verification
-  -Q, --quiet                  Suppress output to console
-      --unixproxy=UNIXPROXY    Path for a unix-socket proxy
-      --socksproxy=SOCKSPROXY  Address for a socks proxy
-  -u, --user=USER              user name used within the Jira service
-      --login=LOGIN            login name that corresponds to the user used for authentication
-
-Commands:
-  help:                Show help.
-  version:             Prints version
-  acknowledge:         Transition issue to acknowledge state
-  assign:              Assign user to issue
-  attach create:       Attach file to issue
-  attach get:          Fetch attachment
-  attach list:         Prints attachment details for issue
-  attach remove:       Delete attachment
-  backlog:             Transition issue to Backlog state
-  block:               Mark issues as blocker
-  browse:              Open issue in browser
-  close:               Transition issue to close state
-  comment:             Add comment to issue
-  component add:       Add component
-  components:          Show components for a project
-  create:              Create issue
-  createmeta:          View 'create' metadata
-  done:                Transition issue to Done state
-  dup:                 Mark issues as duplicate
-  edit:                Edit issue details
-  editmeta:            View 'edit' metadata
-  epic add:            Add issues to Epic
-  epic create:         Create Epic
-  epic list:           Prints list of issues for an epic with optional search criteria
-  epic remove:         Remove issues from Epic
-  export-templates:    Export templates for customizations
-  fields:              Prints all fields, both System and Custom
-  in-progress:         Transition issue to Progress state
-  issuelink:           Link two issues
-  issuelinktypes:      Show the issue link types
-  issuetypes:          Show issue types for a project
-  labels add:          Add labels to an issue
-  labels remove:       Remove labels from an issue
-  labels set:          Set labels on an issue
-  list:                Prints list of issues for given search criteria
-  login:               Attempt to login into jira server
-  logout:              Deactivate session with Jira server
-  rank:                Mark issues as blocker
-  reopen:              Transition issue to reopen state
-  request:             Open issue in requestr
-  resolve:             Transition issue to resolve state
-  start:               Transition issue to start state
-  stop:                Transition issue to stop state
-  subtask:             Subtask issue
-  take:                Assign issue to yourself
-  todo:                Transition issue to To Do state
-  transition:          Transition issue to given state
-  transitions:         List valid issue transitions
-  transmeta:           List valid issue transitions
-  unassign:            Unassign an issue
-  unexport-templates:  Remove unmodified exported templates
-  view:                Prints issue details
-  vote:                Vote up/down an issue
-  watch:               Add/Remove watcher to issue
-  worklog add:         Add a worklog to an issue
-  worklog list:        Prints the worklog data for given issue
-  session:             Attempt to login into jira server
-
-```
-
-## v1 vs v0 changes
-
-###### **Golang library import**
-For the new version of go-jira you should use:
-```
-import "gopkg.in/Netflix-Skunkworks/go-jira.v1"
-```
-
-If you have code that depends on the old apis, you can still use them with this import:
-```
-import "gopkg.in/Netflix-Skunkworks/go-jira.v0"
-```
-
-###### **Configs per command**
-Instead of requiring a executable template to get configs for a given command now you can create a config to be applied to a command.  So if you want to use `template: table` by default for your `jira list` you can now do:
-```
-$ cat $HOME/.jira.d/list.yml
-template: table
-```
-Where previously you needed something like:
-```
-# cat $HOME/.jira.d/config.yml
-#!/bin/sh
-case $JIRA_OPERATION in
-    list)
-      echo "template: table";;
-esac
-```
-
-###### **Custom Commands**
-Now you can create your own custom commands to do common operations with jira.  Please see the details **Custom Commands** section below for more details.  If you want to create a command `jira mine` that lists all the issues assigned to you now you can modify your `.jira.d/config.yml` file to add a `custom-commands` section like this:
-```yaml
-custom-commands:
-  - name: mine
-    help: display issues assigned to me
-    script: |-
-      {{jira}} list --query "resolution = unresolved and assignee=currentuser() ORDER BY created"
-```
-Then the next time you run `jira help` you will see your usage:
-```
-$ jira mine --help
-usage: jira mine
-
-display issues assigned to me
-
-Flags:
-      --help                 Show context-sensitive help (also try --help-long and --help-man).
-  -v, --verbose ...          Increase verbosity for debugging
-  -e, --endpoint=ENDPOINT    Base URI to use for Jira
-  -u, --user=USER            Login name used for authentication with Jira service
-      --unixproxy=UNIXPROXY  Path for a unix-socket proxy
-  -k, --insecure             Disable TLS certificate verification
-```
-
-###### **Incompatible command changes**
-Unfortunately during the rewrite between v0 and v1 there were some necessary changes that broke backwards compatibility with existing commands.  Specifically the `dups`, `blocks`, `add worklog` and `add|remove|set labels` commands have had the command word swapped around:
-  * `jira DUPLICATE dups ISSUE` => `jira dup DUPLICATE ISSUE`
-  * `jira BLOCKER blocks ISSUE` => `jira block BLOCKER ISSUE`
-  * `jira add worklog` => `jira worklog add`
-  * `jira add labels` => `jira labels add`
-  * `jira remove labels` => `jira labels remove`
-  * `jira set labels` => `jira labels set`
-
-###### **Login process change**
-We have, once again, changed how login happens for Jira.  When authenticating against Atlassian Cloud Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  Please read [the Authentication section](#authentication) below for more information.
-
-If you use a privately hosted Jira service, you can chose to use the API Token method or continue using the session login api.  Please read [the Authentication section](#authentication) below for more information.
-
-Previously `jira` used attempt to get a `JSESSION` cookies by authenticating with the webservice standard GUI login process.  This has been especially problematic as users need to authenticate with various credential providers (google auth, etc).  We now attempt to authenticate via the [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login).  This may be problematic for users if admins have locked down the session-login api, so we might have to bring back the error-prone Basic-Auth approach.  For users that are unable to authenticate via `jira` hopefully someone in your organization can provide me with details on a process for you to authenticate and we can try to update `jira`.
 
 ## Configuration
 
