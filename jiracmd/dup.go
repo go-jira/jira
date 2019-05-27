@@ -76,29 +76,30 @@ func CmdDup(o *oreo.Client, globals *jiracli.GlobalOptions, opts *DupOptions) er
 	}
 	for _, trans := range []string{"close", "done", "cancel", "start", "stop"} {
 		transMeta := meta.Transitions.Find(trans)
-		if transMeta != nil {
-			issueUpdate := jiradata.IssueUpdate{
-				Transition: transMeta,
+		if transMeta == nil {
+			continue
+		}
+		issueUpdate := jiradata.IssueUpdate{
+			Transition: transMeta,
+		}
+		resolution := defaultResolution(transMeta)
+		if resolution != "" {
+			issueUpdate.Fields = map[string]interface{}{
+				"resolution": map[string]interface{}{
+					"name": resolution,
+				},
 			}
-			resolution := defaultResolution(transMeta)
-			if resolution != "" {
-				issueUpdate.Fields = map[string]interface{}{
-					"resolution": map[string]interface{}{
-						"name": resolution,
-					},
-				}
-			}
-			if err = jira.TransitionIssue(o, globals.Endpoint.Value, opts.InwardIssue.Key, &issueUpdate); err != nil {
-				return err
-			}
-			if trans != "start" {
-				break
-			}
-			// if we are here then we must be stopping, so need to reset the meta
-			meta, err = jira.GetIssueTransitions(o, globals.Endpoint.Value, opts.InwardIssue.Key)
-			if err != nil {
-				return err
-			}
+		}
+		if err = jira.TransitionIssue(o, globals.Endpoint.Value, opts.InwardIssue.Key, &issueUpdate); err != nil {
+			return err
+		}
+		if trans != "start" {
+			break
+		}
+		// if we are here then we must be stopping, so need to reset the meta
+		meta, err = jira.GetIssueTransitions(o, globals.Endpoint.Value, opts.InwardIssue.Key)
+		if err != nil {
+			return err
 		}
 	}
 
