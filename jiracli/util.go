@@ -1,7 +1,6 @@
 package jiracli
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -31,7 +30,7 @@ func findClosestParentPath(fileName string) (string, error) {
 	if len(paths) > 0 {
 		return paths[len(paths)-1], nil
 	}
-	return "", errors.New(fmt.Sprintf("%s not found in parent directory hierarchy", fileName))
+	return "", fmt.Errorf("%s not found in parent directory hierarchy", fileName)
 }
 
 func tmpYml(tmpFilePrefix string) (*os.File, error) {
@@ -86,7 +85,7 @@ func fuzzyAge(start string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	delta := time.Now().Sub(t)
+	delta := time.Since(t)
 	if delta.Minutes() < 2 {
 		return "a minute", nil
 	} else if dm := delta.Minutes(); dm < 45 {

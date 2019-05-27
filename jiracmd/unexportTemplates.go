@@ -47,15 +47,13 @@ func CmdUnexportTemplates(globals *jiracli.GlobalOptions, opts *ExportTemplatesO
 		if err != nil {
 			return err
 		}
-		if bytes.Compare([]byte(template), contents) == 0 {
+		if bytes.Equal([]byte(template), contents) {
 			if !globals.Quiet.Value {
 				log.Notice("Removing %s, template identical to default", templateFile)
 			}
 			os.Remove(templateFile)
-		} else {
-			if !globals.Quiet.Value {
-				log.Notice("Skipping %s, found customizations to template", templateFile)
-			}
+		} else if !globals.Quiet.Value {
+			log.Notice("Skipping %s, found customizations to template", templateFile)
 		}
 	}
 	return nil
