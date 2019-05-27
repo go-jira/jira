@@ -101,9 +101,7 @@ func GetIssueWorklog(ua HttpClient, endpoint string, issue string) (*jiradata.Wo
 			}
 			startAt = startAt + maxResults
 			total = results.Total
-			for _, worklog := range results.Worklogs {
-				worklogs = append(worklogs, worklog)
-			}
+			worklogs = append(worklogs, results.Worklogs...)
 		} else {
 			return nil, responseError(resp)
 		}
@@ -238,7 +236,7 @@ func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string
 				return project, nil
 			}
 		}
-		return nil, fmt.Errorf("Project %s not found", projectKey)
+		return nil, fmt.Errorf("project %s not found", projectKey)
 	}
 	return nil, responseError(resp)
 }
@@ -272,7 +270,7 @@ func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, iss
 				}
 			}
 		}
-		return nil, fmt.Errorf("Project %s and IssueType %s not found", projectKey, issueTypeName)
+		return nil, fmt.Errorf("project %s and IssueType %s not found", projectKey, issueTypeName)
 	}
 	return nil, responseError(resp)
 }
@@ -563,6 +561,9 @@ func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, con
 	}
 
 	uri, err := url.Parse(URLJoin(endpoint, "rest/api/2/issue", issue, "attachments"))
+	if err != nil {
+		return nil, err
+	}
 	req := oreo.RequestBuilder(uri).WithMethod("POST").WithHeader(
 		"X-Atlassian-Token", "no-check",
 	).WithHeader(

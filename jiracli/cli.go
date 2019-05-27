@@ -340,7 +340,7 @@ func (o *CommonOptions) editFile(fileName string) (changes bool, err error) {
 						if oldCount != newCount {
 							return true, nil
 						}
-						if bytes.Compare(oldBuf[:oldCount], newBuf[:newCount]) != 0 {
+						if !bytes.Equal(oldBuf[:oldCount], newBuf[:newCount]) {
 							return true, nil
 						}
 					}
@@ -352,7 +352,7 @@ func (o *CommonOptions) editFile(fileName string) (changes bool, err error) {
 	return false, err
 }
 
-var EditLoopAbort = fmt.Errorf("Edit Loop aborted by request")
+var EditLoopAbort = fmt.Errorf("edit Loop aborted by request")
 
 func EditLoop(opts *CommonOptions, input interface{}, output interface{}, submit func() error) error {
 	tmpFile, err := tmpTemplate(opts.Template.Value, input)

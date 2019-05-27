@@ -27,7 +27,7 @@ func readJSON(input io.Reader, data interface{}) error {
 func URLJoin(endpoint string, paths ...string) string {
 	u, err := url.Parse(endpoint)
 	if err != nil {
-		panic(fmt.Errorf("Unable to parse endpoint: %s", endpoint))
+		panic(fmt.Errorf("unable to parse endpoint: %s", endpoint))
 	}
 	paths = append([]string{u.Path}, paths...)
 	u.Path = path.Join(paths...)
