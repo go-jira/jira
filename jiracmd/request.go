@@ -3,7 +3,6 @@ package jiracmd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/url"
 	"strings"
 
@@ -75,21 +74,9 @@ func CmdRequest(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RequestOpt
 	}
 	defer resp.Body.Close()
 
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	if len(content) == 0 {
-		if !globals.Quiet.Value {
-			fmt.Println("No content in response")
-		}
-		return nil
-	}
 	var data interface{}
-	err = json.Unmarshal(content, &data)
-	if err != nil {
-		return fmt.Errorf("JSON Parse Error: %s from %q", err, content)
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return fmt.Errorf("JSON Parse Error: %v", err)
 	}
-
 	return opts.PrintTemplate(&data)
 }

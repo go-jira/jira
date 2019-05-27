@@ -31,7 +31,7 @@ func CreateComponent(ua HttpClient, endpoint string, cp ComponentProvider) (*jir
 
 	if resp.StatusCode == 201 {
 		results := &jiradata.Component{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }

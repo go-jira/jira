@@ -1,6 +1,8 @@
 package jira
 
 import (
+	"encoding/json"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 
@@ -18,7 +20,7 @@ func GetFields(ua HttpClient, endpoint string) ([]jiradata.Field, error) {
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
 		results := []jiradata.Field{}
-		return results, readJSON(resp.Body, &results)
+		return results, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }
