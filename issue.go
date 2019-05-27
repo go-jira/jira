@@ -255,24 +255,24 @@ func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, iss
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		results := &jiradata.CreateMeta{}
-		err = json.NewDecoder(resp.Body).Decode(results)
-		if err != nil {
-			return nil, err
+	if resp.StatusCode != 200 {
+		return nil, responseError(resp)
+	}
+	results := &jiradata.CreateMeta{}
+	if err := json.NewDecoder(resp.Body).Decode(results); err != nil {
+		return nil, err
+	}
+	for _, project := range results.Projects {
+		if project.Key != projectKey {
+			continue
 		}
-		for _, project := range results.Projects {
-			if project.Key == projectKey {
-				for _, issueType := range project.IssueTypes {
-					if issueType.Name == issueTypeName {
-						return issueType, nil
-					}
-				}
+		for _, issueType := range project.IssueTypes {
+			if issueType.Name == issueTypeName {
+				return issueType, nil
 			}
 		}
-		return nil, fmt.Errorf("project %s and IssueType %s not found", projectKey, issueTypeName)
 	}
-	return nil, responseError(resp)
+	return nil, fmt.Errorf("project %s and IssueType %s not found", projectKey, issueTypeName)
 }
 
 type LinkIssueProvider interface {

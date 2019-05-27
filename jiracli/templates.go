@@ -44,7 +44,8 @@ func getTemplate(name string) (string, error) {
 	b, err := findTemplate(name)
 	if err != nil {
 		return "", err
-	} else if b != nil {
+	}
+	if b != nil {
 		return string(b), nil
 	}
 	if s, ok := AllTemplates[name]; ok {
