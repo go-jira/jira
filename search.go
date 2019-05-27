@@ -120,7 +120,7 @@ func Search(ua HttpClient, endpoint string, sp SearchProvider, opts ...SearchOpt
 		}
 
 		page := &jiradata.SearchResults{}
-		err = readJSON(resp.Body, page)
+		err = json.NewDecoder(resp.Body).Decode(page)
 		if err != nil {
 			return nil, err
 		}
