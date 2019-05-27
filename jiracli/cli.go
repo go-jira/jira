@@ -150,43 +150,39 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 	app.Flag("user", "user name used within the Jira service").Short('u').SetValue(&globals.User)
 	app.Flag("login", "login name that corresponds to the user used for authentication").SetValue(&globals.Login)
 
-	o = o.WithPreCallback(
-		func(req *http.Request) (*http.Request, error) {
-			if globals.AuthMethod() == "api-token" {
-				// need to set basic auth header with user@domain:api-token
-				token := globals.GetPass()
-				authHeader := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", globals.Login.Value, token))))
-				req.Header.Add("Authorization", authHeader)
-			}
-			return req, nil
-		},
-	)
+	o = o.WithPreCallback(func(req *http.Request) (*http.Request, error) {
+		if globals.AuthMethod() == "api-token" {
+			// need to set basic auth header with user@domain:api-token
+			token := globals.GetPass()
+			authHeader := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", globals.Login.Value, token))))
+			req.Header.Add("Authorization", authHeader)
+		}
+		return req, nil
+	})
 
-	o = o.WithPostCallback(
-		func(req *http.Request, resp *http.Response) (*http.Response, error) {
-			if globals.AuthMethod() == "session" {
-				authUser := resp.Header.Get("X-Ausername")
-				if authUser == "" || authUser == "anonymous" {
-					// preserve the --quiet value, we need to temporarily disable it so
-					// the normal login output is surpressed
-					defer func(quiet bool) {
-						globals.Quiet.Value = quiet
-					}(globals.Quiet.Value)
-					globals.Quiet.Value = true
+	o = o.WithPostCallback(func(req *http.Request, resp *http.Response) (*http.Response, error) {
+		if globals.AuthMethod() == "session" {
+			authUser := resp.Header.Get("X-Ausername")
+			if authUser == "" || authUser == "anonymous" {
+				// preserve the --quiet value, we need to temporarily disable it so
+				// the normal login output is surpressed
+				defer func(quiet bool) {
+					globals.Quiet.Value = quiet
+				}(globals.Quiet.Value)
+				globals.Quiet.Value = true
 
-					// we are not logged in, so force login now by running the "login" command
-					app.Parse([]string{"login"})
+				// we are not logged in, so force login now by running the "login" command
+				app.Parse([]string{"login"})
 
-					// rerun the original request
-					return o.Do(req)
-				}
-			} else if globals.AuthMethod() == "api-token" && resp.StatusCode == 401 {
-				globals.SetPass("")
+				// rerun the original request
 				return o.Do(req)
 			}
-			return resp, nil
-		},
-	)
+		} else if globals.AuthMethod() == "api-token" && resp.StatusCode == 401 {
+			globals.SetPass("")
+			return o.Do(req)
+		}
+		return resp, nil
+	})
 
 	for _, command := range globalCommandRegistry {
 		copy := command
@@ -238,14 +234,12 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 			copy.Entry.UsageFunc(fig, cmd)
 		}
 
-		cmd.Action(
-			func(_ *kingpin.ParseContext) error {
-				if logging.GetLevel("") > logging.DEBUG {
-					o = o.WithTrace(true)
-				}
-				return copy.Entry.ExecuteFunc(o, &globals)
-			},
-		)
+		cmd.Action(func(_ *kingpin.ParseContext) error {
+			if logging.GetLevel("") > logging.DEBUG {
+				o = o.WithTrace(true)
+			}
+			return copy.Entry.ExecuteFunc(o, &globals)
+		})
 	}
 }
 
@@ -321,35 +315,42 @@ func (o *CommonOptions) editFile(fileName string) (changes bool, err error) {
 	}
 
 	// now we just need to diff the files to see if there are any changes
-	var oldHandle, newHandle *os.File
-	var oldStat, newStat os.FileInfo
-	if oldHandle, err = os.Open(tmpFileNameOrig); err == nil {
-		if newHandle, err = os.Open(fileName); err == nil {
-			if oldStat, err = oldHandle.Stat(); err == nil {
-				if newStat, err = newHandle.Stat(); err == nil {
-					// different sizes, so must have changes
-					if oldStat.Size() != newStat.Size() {
-						return true, err
-					}
-					oldBuf, newBuf := make([]byte, 1024), make([]byte, 1024)
-					var oldCount, newCount int
-					// loop though 1024 bytes at a time comparing the buffers for changes
-					for err != io.EOF {
-						oldCount, _ = oldHandle.Read(oldBuf)
-						newCount, err = newHandle.Read(newBuf)
-						if oldCount != newCount {
-							return true, nil
-						}
-						if !bytes.Equal(oldBuf[:oldCount], newBuf[:newCount]) {
-							return true, nil
-						}
-					}
-					return false, nil
-				}
-			}
+	f1, err := os.Open(tmpFileNameOrig)
+	if err != nil {
+		return false, err
+	}
+	f2, err := os.Open(fileName)
+	if err != nil {
+		return false, err
+	}
+
+	stat1, err := f1.Stat()
+	if err != nil {
+		return false, err
+	}
+	stat2, err := f2.Stat()
+	if err != nil {
+		return false, err
+	}
+	// different sizes, so must have changes
+	if stat1.Size() != stat2.Size() {
+		return true, nil
+	}
+
+	p1, p2 := make([]byte, 1024), make([]byte, 1024)
+	var n1, n2 int
+	// loop though 1024 bytes at a time comparing the buffers for changes
+	for err != io.EOF {
+		n1, _ = f1.Read(p1)
+		n2, err = f2.Read(p2)
+		if n1 != n2 {
+			return true, nil
+		}
+		if !bytes.Equal(p1[:n1], p2[:n2]) {
+			return true, nil
 		}
 	}
-	return false, err
+	return false, nil
 }
 
 var EditLoopAbort = fmt.Errorf("edit Loop aborted by request")
