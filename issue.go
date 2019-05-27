@@ -69,7 +69,7 @@ func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvid
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.Issue{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -95,7 +95,7 @@ func GetIssueWorklog(ua HttpClient, endpoint string, issue string) (*jiradata.Wo
 
 		if resp.StatusCode == 200 {
 			results := &jiradata.WorklogWithPagination{}
-			err := readJSON(resp.Body, results)
+			err := json.NewDecoder(resp.Body).Decode(results)
 			if err != nil {
 				return nil, err
 			}
@@ -133,7 +133,7 @@ func AddIssueWorklog(ua HttpClient, endpoint string, issue string, wp WorklogPro
 
 	if resp.StatusCode == 201 {
 		results := &jiradata.Worklog{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -153,7 +153,7 @@ func GetIssueEditMeta(ua HttpClient, endpoint string, issue string) (*jiradata.E
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.EditMeta{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -206,7 +206,7 @@ func CreateIssue(ua HttpClient, endpoint string, iup IssueUpdateProvider) (*jira
 
 	if resp.StatusCode == 201 {
 		results := &jiradata.IssueCreateResponse{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -227,7 +227,7 @@ func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.CreateMeta{}
-		err = readJSON(resp.Body, results)
+		err = json.NewDecoder(resp.Body).Decode(results)
 		if err != nil {
 			return nil, err
 		}
@@ -257,7 +257,7 @@ func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, iss
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.CreateMeta{}
-		err = readJSON(resp.Body, results)
+		err = json.NewDecoder(resp.Body).Decode(results)
 		if err != nil {
 			return nil, err
 		}
@@ -319,7 +319,7 @@ func GetIssueTransitions(ua HttpClient, endpoint string, issue string) (*jiradat
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.TransitionsMeta{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -367,7 +367,7 @@ func GetIssueLinkTypes(ua HttpClient, endpoint string) (*jiradata.IssueLinkTypes
 		}{
 			IssueLinkTypes: jiradata.IssueLinkTypes{},
 		}
-		return &results.IssueLinkTypes, readJSON(resp.Body, &results)
+		return &results.IssueLinkTypes, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }
@@ -501,7 +501,7 @@ func IssueAddComment(ua HttpClient, endpoint string, issue string, cp CommentPro
 
 	if resp.StatusCode == 201 {
 		results := jiradata.Comment{}
-		return &results, readJSON(resp.Body, &results)
+		return &results, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }
@@ -579,7 +579,7 @@ func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, con
 
 	if resp.StatusCode == 200 {
 		results := jiradata.ListOfAttachment{}
-		return &results, readJSON(resp.Body, &results)
+		return &results, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }

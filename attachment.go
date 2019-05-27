@@ -1,6 +1,8 @@
 package jira
 
 import (
+	"encoding/json"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 
@@ -19,7 +21,7 @@ func GetAttachment(ua HttpClient, endpoint string, id string) (*jiradata.Attachm
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.Attachment{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }

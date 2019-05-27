@@ -43,7 +43,7 @@ func NewSession(ua HttpClient, endpoint string, ap AuthProvider) (*jiradata.Auth
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.AuthSuccess{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -63,7 +63,7 @@ func GetSession(ua HttpClient, endpoint string) (*jiradata.CurrentUser, error) {
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.CurrentUser{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
