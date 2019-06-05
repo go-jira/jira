@@ -3,6 +3,7 @@ package jiracli
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -57,6 +58,12 @@ func (o *GlobalOptions) GetPass() string {
 					passwd = strings.TrimSpace(buf.String())
 				}
 			}
+		} else if o.PasswordSource.Value == "stdin" {
+			allBytes, err := ioutil.ReadAll(os.Stdin)
+			if err != nil {
+				panic(fmt.Sprintf("unable to read bytes from stdin: %s", err))
+			}
+			passwd = string(allBytes)
 		} else {
 			log.Warningf("Unknown password-source: %s", o.PasswordSource)
 		}
