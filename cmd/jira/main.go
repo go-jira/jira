@@ -7,8 +7,8 @@ import (
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracmd"
+	"gopkg.in/jira.v1/jiracli"
+	"gopkg.in/jira.v1/jiracmd"
 	"gopkg.in/op/go-logging.v1"
 )
 

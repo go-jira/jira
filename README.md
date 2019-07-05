@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/Netflix-Skunkworks/go-jira.svg?branch=master)](https://travis-ci.org/Netflix-Skunkworks/go-jira)
-[![GoDoc](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1?status.svg)](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1)
+[![Build Status](https://travis-ci.org/go-jira/jira.svg?branch=master)](https://travis-ci.org/go-jira/jira)
+[![GoDoc](https://godoc.org/gopkg.in/jira.v1?status.svg)](https://godoc.org/gopkg.in/jira.v1)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # go-jira
@@ -10,15 +10,15 @@ Simple command line client for Atlassian's Jira service written in Go.
 
 ### Download
 
-You can download one of the pre-built binaries for **go-jira** [here](https://github.com/Netflix-Skunkworks/go-jira/releases).
+You can download one of the pre-built binaries for **go-jira** [here](https://github.com/go-jira/jira/releases).
 
 ### Build
 
 You can build and install the official repository with [Go](https://golang.org/dl/):
 
-	go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
+	go get gopkg.in/jira.v1/cmd/jira
 
-This will checkout this repository into `$GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`, build, and install it.
+This will checkout this repository into `$GOPATH/src/gopkg.in/jira.v1`, build, and install it.
 
 ## Usage
 
@@ -258,7 +258,7 @@ hard-coded templates with `jira export-templates` which will write them to **~/.
 
 #### Writing/Editing Templates
 
-First the basic templating functionality is defined by the Go language 'text/template' library.  The library reference documentation can be found [here](https://golang.org/pkg/text/template/), and there is a good primer document [here](https://gohugo.io/templates/go-templates/).  `go-jira` also provides a few extra helper functions to make it a bit easier to format the data, those functions are defined [here](https://github.com/Netflix-Skunkworks/go-jira/blob/master/jiracli/templates.go#L64).
+First the basic templating functionality is defined by the Go language 'text/template' library.  The library reference documentation can be found [here](https://golang.org/pkg/text/template/), and there is a good primer document [here](https://gohugo.io/templates/go-templates/).  `go-jira` also provides a few extra helper functions to make it a bit easier to format the data, those functions are defined [here](https://github.com/go-jira/jira/blob/master/jiracli/templates.go#L64).
 
 Knowing what data and fields are available to any given template is not obvious. The easiest approach to determine what is available is to use the `debug` template on any given operation.  For example to find out what is available to the "view" templates, you can use:
 ```

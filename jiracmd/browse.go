@@ -4,8 +4,8 @@ import (
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 	"github.com/pkg/browser"
-	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
+	jira "gopkg.in/jira.v1"
+	"gopkg.in/jira.v1/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 

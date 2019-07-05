@@ -9,8 +9,8 @@ import (
 	"github.com/mgutz/ansi"
 	"golang.org/x/crypto/ssh/terminal"
 	survey "gopkg.in/AlecAivazis/survey.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
+	"gopkg.in/jira.v1"
+	"gopkg.in/jira.v1/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 

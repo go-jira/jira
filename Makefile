@@ -59,8 +59,8 @@ update-changelog:
 	echo "## $(NEWVER) - $(TODAY)" >> CHANGELOG.md.new; \
 	echo >> CHANGELOG.md.new; \
 	$(MAKE) --no-print-directory --silent changes | \
-	perl -pe 's{\[([a-f0-9]+)\]}{[[$$1](https://github.com/Netflix-Skunkworks/go-jira/commit/$$1)]}g' | \
-	perl -pe 's{\#(\d+)}{[#$$1](https://github.com/Netflix-Skunkworks/go-jira/issues/$$1)}g' >> CHANGELOG.md.new; \
+	perl -pe 's{\[([a-f0-9]+)\]}{[[$$1](https://github.com/go-jira/jira/commit/$$1)]}g' | \
+	perl -pe 's{\#(\d+)}{[#$$1](https://github.com/go-jira/jira/issues/$$1)}g' >> CHANGELOG.md.new; \
 	tail -n +2 CHANGELOG.md >> CHANGELOG.md.new; \
     perl -pi -e 's{VERSION = "$(CURVER)"}{VERSION = "$(NEWVER)"}' jira.go; \
 	mv CHANGELOG.md.new CHANGELOG.md; \
