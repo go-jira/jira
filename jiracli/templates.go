@@ -547,7 +547,7 @@ transition:
 const defaultWorklogTemplate = `{{/* worklog template */ -}}
 # issue: {{ .issue }}
 comment: |~
-  {{ or .comment "" }}
+  {{ or .comment "" | indent 2 }}
 timeSpent: {{ or .timeSpent "" }}
 started: {{ or .started "" }}
 `
