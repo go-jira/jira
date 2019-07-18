@@ -1,6 +1,8 @@
 package jira
 
 import (
+	"encoding/json"
+
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 
@@ -19,7 +21,7 @@ func GetProjectComponents(ua HttpClient, endpoint string, project string) (*jira
 
 	if resp.StatusCode == 200 {
 		results := jiradata.Components{}
-		return &results, readJSON(resp.Body, &results)
+		return &results, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }

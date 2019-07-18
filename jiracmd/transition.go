@@ -110,15 +110,13 @@ func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Transit
 	}
 
 	// need to default the Resolution, usually Fixed works but sometime need Done
-	if opts.Resolution == "" {
-		if resField, ok := transMeta.Fields["resolution"]; ok {
-			for _, allowedValueRaw := range resField.AllowedValues {
-				if allowedValue, ok := allowedValueRaw.(map[string]interface{}); ok {
-					if allowedValue["name"] == "Fixed" {
-						opts.Resolution = "Fixed"
-					} else if allowedValue["name"] == "Done" {
-						opts.Resolution = "Done"
-					}
+	if resField, ok := transMeta.Fields["resolution"]; ok && opts.Resolution == "" {
+		for _, allowedValueRaw := range resField.AllowedValues {
+			if allowedValue, ok := allowedValueRaw.(map[string]interface{}); ok {
+				if allowedValue["name"] == "Fixed" {
+					opts.Resolution = "Fixed"
+				} else if allowedValue["name"] == "Done" {
+					opts.Resolution = "Done"
 				}
 			}
 		}
@@ -129,7 +127,7 @@ func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Transit
 		*jiradata.Issue `yaml:",inline"`
 		// Yes, Meta and Transition are redundant, but this is for backwards compatibility
 		// with old templates
-		Meta       *jiradata.Transition `yaml:"meta,omitempty" json:"meta,omitemtpy"`
+		Meta       *jiradata.Transition `yaml:"meta,omitempty" json:"meta,omitempty"`
 		Transition *jiradata.Transition `yaml:"transition,omitempty" json:"transition,omitempty"`
 		Overrides  map[string]string    `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	}

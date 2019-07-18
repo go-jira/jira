@@ -1,6 +1,7 @@
 package jira
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
@@ -8,7 +9,7 @@ import (
 
 func responseError(resp *http.Response) error {
 	results := &jiradata.ErrorCollection{}
-	if err := readJSON(resp.Body, results); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(results); err != nil {
 		results.Status = resp.StatusCode
 		results.ErrorMessages = append(results.ErrorMessages, err.Error())
 	}

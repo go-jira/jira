@@ -44,7 +44,8 @@ func getTemplate(name string) (string, error) {
 	b, err := findTemplate(name)
 	if err != nil {
 		return "", err
-	} else if b != nil {
+	}
+	if b != nil {
 		return string(b), nil
 	}
 	if s, ok := AllTemplates[name]; ok {
@@ -119,7 +120,7 @@ func TemplateProcessor() *template.Template {
 			}
 		},
 		"indent": func(spaces int, content string) string {
-			indent := make([]rune, spaces+1, spaces+1)
+			indent := make([]rune, spaces+1)
 			indent[0] = '\n'
 			for i := 1; i < spaces+1; i++ {
 				indent[i] = ' '
@@ -546,7 +547,7 @@ transition:
 const defaultWorklogTemplate = `{{/* worklog template */ -}}
 # issue: {{ .issue }}
 comment: |~
-  {{ or .comment "" }}
+  {{ or .comment "" | indent 2 }}
 timeSpent: {{ or .timeSpent "" }}
 started: {{ or .started "" }}
 `

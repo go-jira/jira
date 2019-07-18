@@ -30,9 +30,6 @@ func CmdListRegistry() *jiracli.CommandRegistryEntry {
 			return CmdListUsage(cmd, &opts, fig)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
-			if opts.MaxResults == 0 {
-				opts.MaxResults = 500
-			}
 			if opts.QueryFields == "" {
 				opts.QueryFields = "assignee,created,priority,reporter,status,summary,updated,issuetype"
 			}
@@ -72,7 +69,7 @@ func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions, fig *figtree.FigTre
 
 // List will query jira and send data to "list" template
 func CmdList(o *oreo.Client, globals *jiracli.GlobalOptions, opts *ListOptions) error {
-	data, err := jira.Search(o, globals.Endpoint.Value, opts)
+	data, err := jira.Search(o, globals.Endpoint.Value, opts, jira.WithAutoPagination())
 	if err != nil {
 		return err
 	}

@@ -53,7 +53,7 @@ func EpicSearch(ua HttpClient, endpoint string, epic string, sp SearchProvider) 
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.SearchResults{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }

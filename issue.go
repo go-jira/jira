@@ -69,7 +69,7 @@ func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvid
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.Issue{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -95,15 +95,13 @@ func GetIssueWorklog(ua HttpClient, endpoint string, issue string) (*jiradata.Wo
 
 		if resp.StatusCode == 200 {
 			results := &jiradata.WorklogWithPagination{}
-			err := readJSON(resp.Body, results)
+			err := json.NewDecoder(resp.Body).Decode(results)
 			if err != nil {
 				return nil, err
 			}
 			startAt = startAt + maxResults
 			total = results.Total
-			for _, worklog := range results.Worklogs {
-				worklogs = append(worklogs, worklog)
-			}
+			worklogs = append(worklogs, results.Worklogs...)
 		} else {
 			return nil, responseError(resp)
 		}
@@ -135,7 +133,7 @@ func AddIssueWorklog(ua HttpClient, endpoint string, issue string, wp WorklogPro
 
 	if resp.StatusCode == 201 {
 		results := &jiradata.Worklog{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -155,7 +153,7 @@ func GetIssueEditMeta(ua HttpClient, endpoint string, issue string) (*jiradata.E
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.EditMeta{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -208,7 +206,7 @@ func CreateIssue(ua HttpClient, endpoint string, iup IssueUpdateProvider) (*jira
 
 	if resp.StatusCode == 201 {
 		results := &jiradata.IssueCreateResponse{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -229,7 +227,7 @@ func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.CreateMeta{}
-		err = readJSON(resp.Body, results)
+		err = json.NewDecoder(resp.Body).Decode(results)
 		if err != nil {
 			return nil, err
 		}
@@ -238,7 +236,7 @@ func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string
 				return project, nil
 			}
 		}
-		return nil, fmt.Errorf("Project %s not found", projectKey)
+		return nil, fmt.Errorf("project %s not found", projectKey)
 	}
 	return nil, responseError(resp)
 }
@@ -257,24 +255,24 @@ func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, iss
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		results := &jiradata.CreateMeta{}
-		err = readJSON(resp.Body, results)
-		if err != nil {
-			return nil, err
+	if resp.StatusCode != 200 {
+		return nil, responseError(resp)
+	}
+	results := &jiradata.CreateMeta{}
+	if err := json.NewDecoder(resp.Body).Decode(results); err != nil {
+		return nil, err
+	}
+	for _, project := range results.Projects {
+		if project.Key != projectKey {
+			continue
 		}
-		for _, project := range results.Projects {
-			if project.Key == projectKey {
-				for _, issueType := range project.IssueTypes {
-					if issueType.Name == issueTypeName {
-						return issueType, nil
-					}
-				}
+		for _, issueType := range project.IssueTypes {
+			if issueType.Name == issueTypeName {
+				return issueType, nil
 			}
 		}
-		return nil, fmt.Errorf("Project %s and IssueType %s not found", projectKey, issueTypeName)
 	}
-	return nil, responseError(resp)
+	return nil, fmt.Errorf("project %s and IssueType %s not found", projectKey, issueTypeName)
 }
 
 type LinkIssueProvider interface {
@@ -321,7 +319,7 @@ func GetIssueTransitions(ua HttpClient, endpoint string, issue string) (*jiradat
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.TransitionsMeta{}
-		return results, readJSON(resp.Body, results)
+		return results, json.NewDecoder(resp.Body).Decode(results)
 	}
 	return nil, responseError(resp)
 }
@@ -369,7 +367,7 @@ func GetIssueLinkTypes(ua HttpClient, endpoint string) (*jiradata.IssueLinkTypes
 		}{
 			IssueLinkTypes: jiradata.IssueLinkTypes{},
 		}
-		return &results.IssueLinkTypes, readJSON(resp.Body, &results)
+		return &results.IssueLinkTypes, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }
@@ -503,7 +501,7 @@ func IssueAddComment(ua HttpClient, endpoint string, issue string, cp CommentPro
 
 	if resp.StatusCode == 201 {
 		results := jiradata.Comment{}
-		return &results, readJSON(resp.Body, &results)
+		return &results, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }
@@ -563,6 +561,9 @@ func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, con
 	}
 
 	uri, err := url.Parse(URLJoin(endpoint, "rest/api/2/issue", issue, "attachments"))
+	if err != nil {
+		return nil, err
+	}
 	req := oreo.RequestBuilder(uri).WithMethod("POST").WithHeader(
 		"X-Atlassian-Token", "no-check",
 	).WithHeader(
@@ -578,7 +579,7 @@ func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, con
 
 	if resp.StatusCode == 200 {
 		results := jiradata.ListOfAttachment{}
-		return &results, readJSON(resp.Body, &results)
+		return &results, json.NewDecoder(resp.Body).Decode(&results)
 	}
 	return nil, responseError(resp)
 }

@@ -73,26 +73,71 @@ func (o *SearchOptions) ProvideSearchRequest() *jiradata.SearchRequest {
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/search-searchUsingSearchRequest
-func (j *Jira) Search(sp SearchProvider) (*jiradata.SearchResults, error) {
-	return Search(j.UA, j.Endpoint, sp)
+func (j *Jira) Search(sp SearchProvider, opts ...SearchOpt) (*jiradata.SearchResults, error) {
+	return Search(j.UA, j.Endpoint, sp, opts...)
 }
 
-func Search(ua HttpClient, endpoint string, sp SearchProvider) (*jiradata.SearchResults, error) {
-	req := sp.ProvideSearchRequest()
-	encoded, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-	uri := URLJoin(endpoint, "rest/api/2/search")
-	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
+type searchConfig struct {
+	autoPaginate bool
+}
 
-	if resp.StatusCode == 200 {
-		results := &jiradata.SearchResults{}
-		return results, readJSON(resp.Body, results)
+type SearchOpt func(*searchConfig)
+
+func WithAutoPagination() SearchOpt {
+	return func(c *searchConfig) {
+		c.autoPaginate = true
 	}
-	return nil, responseError(resp)
+}
+
+func Search(ua HttpClient, endpoint string, sp SearchProvider, opts ...SearchOpt) (*jiradata.SearchResults, error) {
+	c := &searchConfig{}
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	req := sp.ProvideSearchRequest()
+	limit := req.MaxResults
+	if limit == 0 {
+		// max page size is 100
+		req.MaxResults = 100
+	}
+
+	issues := jiradata.Issues{}
+	for {
+		encoded, err := json.Marshal(req)
+		if err != nil {
+			return nil, err
+		}
+		uri := URLJoin(endpoint, "rest/api/2/search")
+		resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != 200 {
+			return nil, responseError(resp)
+		}
+
+		page := &jiradata.SearchResults{}
+		err = json.NewDecoder(resp.Body).Decode(page)
+		if err != nil {
+			return nil, err
+		}
+		if !c.autoPaginate {
+			return page, nil
+		}
+
+		issues = append(issues, page.Issues...)
+		// if we are done paginating just force all issues onto current
+		// response and return
+		if (limit > 0 && len(issues) >= limit) || len(issues) >= page.Total {
+			page.Issues = issues
+			return page, nil
+		}
+		req.StartAt = len(issues)
+		if len(issues)+req.MaxResults > limit {
+			req.MaxResults = limit - len(issues)
+		}
+	}
 }

@@ -187,13 +187,12 @@ func ParseCommandLine(app *kingpin.Application, args []string) {
 		if _, ok := err.(*Error); ok {
 			log.Errorf("%s", err)
 			panic(Exit{Code: 1})
-		} else {
-			ctx, _ := app.ParseContext(os.Args[1:])
-			if ctx != nil {
-				app.UsageForContext(ctx)
-			}
-			log.Errorf("Invalid Usage: %s", err)
-			panic(Exit{Code: 1})
 		}
+		ctx, _ := app.ParseContext(os.Args[1:])
+		if ctx != nil {
+			app.UsageForContext(ctx)
+		}
+		log.Errorf("Invalid Usage: %s", err)
+		panic(Exit{Code: 1})
 	}
 }

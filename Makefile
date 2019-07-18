@@ -84,8 +84,8 @@ clean:
 	rm -rf ./$(NAME)
 
 prove:
-	chmod -R g-rwx,o-rwx $(CWD)/t/.gnupg
-	OSHT_VERBOSE=1 prove -v 
+	chmod -R g-rwx,o-rwx $(CWD)/_t/.gnupg
+	OSHT_VERBOSE=1 prove -v _t/*.t
 
 generate:
 	cd schemas && ./fetch-schemas.py

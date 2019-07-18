@@ -1,40 +1,10 @@
-[![Join the chat at https://gitter.im/go-jira-cli/help](https://badges.gitter.im/go-jira-cli/help.svg)](https://gitter.im/go-jira-cli/help?utm_source=badge&utm_medium=badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/Netflix-Skunkworks/go-jira.svg?branch=master)](https://travis-ci.org/Netflix-Skunkworks/go-jira)
 [![GoDoc](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1?status.svg)](https://godoc.org/gopkg.in/Netflix-Skunkworks/go-jira.v1)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-### Table of Contents
-
-   * [Summary](#go-jira)
-   * [Install](#install)
-      * [Download](#download)
-      * [Build](#build)
-   * [Usage](#usage)
-      * [TAB completion](#setting-up-tab-completion)
-   * [v1 vs v0 changes](#v1-vs-v0-changes)
-      * [<strong>Golang library import</strong>](#golang-library-import)
-      * [<strong>Configs per command</strong>](#configs-per-command)
-      * [<strong>Custom Commands</strong>](#custom-commands)
-      * [<strong>Incompatible command changes</strong>](#incompatible-command-changes)
-      * [<strong>Login process change</strong>](#login-process-change)
-   * [Configuration](#configuration)
-      * [Dynamic Configuration](#dynamic-configuration)
-      * [Custom Commands](#custom-commands-1)
-         * [Commands](#commands)
-         * [Options](#options)
-         * [Arguments](#arguments)
-         * [Script Template](#script-template)
-         * [Examples](#examples)
-      * [Editing](#editing)
-      * [Templates](#templates)
-         * [Writing/Editing Templates](#writingediting-templates)
-      * [Authentication](#authentication)
-         * [user vs login](#user-vs-login)
-         * [keyring password source](#keyring-password-source)
-         * [pass password source](#pass-password-source)
-
 # go-jira
-simple command line client for Atlassian's Jira service written in Go
+
+Simple command line client for Atlassian's Jira service written in Go.
 
 ## Install
 
@@ -46,27 +16,16 @@ You can download one of the pre-built binaries for **go-jira** [here](https://gi
 
 You can build and install the official repository with [Go](https://golang.org/dl/):
 
-```
-go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
-```
+	go get gopkg.in/Netflix-Skunkworks/go-jira.v1/cmd/jira
+
 This will checkout this repository into `$GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`, build, and install it.
-
-Because golang likes fully qualified import paths, forking and contributing can be a bit tricky.
-
-If you want to tinker or hack on go-jira, the [easiest way to do so](http://code.openark.org/blog/development/forking-golang-repositories-on-github-and-managing-the-import-path) is to fork the repository and clone directly into the official path like this:
-
-`git clone https://github.com/YOUR_USER_NAME_HERE/go-jira $GOPATH/src/gopkg.in/Netflix-Skunkworks/go-jira.v1`
-
-From within that source dir you can build and install modifications from within that directory like:
-
-`go install ./...`
 
 ## Usage
 
 
 #### Setting up TAB completion
 
-Since go-jira is build with the "kingpin" golang command line library we supports bash/zsh shell completion automatically:
+Since go-jira is built with the "kingpin" golang command line library we support bash/zsh shell completion automatically:
 
  * <https://github.com/alecthomas/kingpin/tree/v2.2.5#bashzsh-shell-completion>
 
@@ -75,153 +34,6 @@ For example, in bash, adding something along the lines of:
   `eval "$(jira --completion-script-bash)"`
 
 to your bashrc, or .profile (assuming go-jira binary is already in your path) will cause jira to offer tab completion behavior.
-
-```
-usage: jira [<flags>] <command> [<args> ...]
-
-Jira Command Line Interface
-
-Global flags:
-      --help                   Show context-sensitive help (also try --help-long and --help-man).
-  -v, --verbose ...            Increase verbosity for debugging
-  -e, --endpoint=ENDPOINT      Base URI to use for Jira
-  -k, --insecure               Disable TLS certificate verification
-  -Q, --quiet                  Suppress output to console
-      --unixproxy=UNIXPROXY    Path for a unix-socket proxy
-      --socksproxy=SOCKSPROXY  Address for a socks proxy
-  -u, --user=USER              user name used within the Jira service
-      --login=LOGIN            login name that corresponds to the user used for authentication
-
-Commands:
-  help:                Show help.
-  version:             Prints version
-  acknowledge:         Transition issue to acknowledge state
-  assign:              Assign user to issue
-  attach create:       Attach file to issue
-  attach get:          Fetch attachment
-  attach list:         Prints attachment details for issue
-  attach remove:       Delete attachment
-  backlog:             Transition issue to Backlog state
-  block:               Mark issues as blocker
-  browse:              Open issue in browser
-  close:               Transition issue to close state
-  comment:             Add comment to issue
-  component add:       Add component
-  components:          Show components for a project
-  create:              Create issue
-  createmeta:          View 'create' metadata
-  done:                Transition issue to Done state
-  dup:                 Mark issues as duplicate
-  edit:                Edit issue details
-  editmeta:            View 'edit' metadata
-  epic add:            Add issues to Epic
-  epic create:         Create Epic
-  epic list:           Prints list of issues for an epic with optional search criteria
-  epic remove:         Remove issues from Epic
-  export-templates:    Export templates for customizations
-  fields:              Prints all fields, both System and Custom
-  in-progress:         Transition issue to Progress state
-  issuelink:           Link two issues
-  issuelinktypes:      Show the issue link types
-  issuetypes:          Show issue types for a project
-  labels add:          Add labels to an issue
-  labels remove:       Remove labels from an issue
-  labels set:          Set labels on an issue
-  list:                Prints list of issues for given search criteria
-  login:               Attempt to login into jira server
-  logout:              Deactivate session with Jira server
-  rank:                Mark issues as blocker
-  reopen:              Transition issue to reopen state
-  request:             Open issue in requestr
-  resolve:             Transition issue to resolve state
-  start:               Transition issue to start state
-  stop:                Transition issue to stop state
-  subtask:             Subtask issue
-  take:                Assign issue to yourself
-  todo:                Transition issue to To Do state
-  transition:          Transition issue to given state
-  transitions:         List valid issue transitions
-  transmeta:           List valid issue transitions
-  unassign:            Unassign an issue
-  unexport-templates:  Remove unmodified exported templates
-  view:                Prints issue details
-  vote:                Vote up/down an issue
-  watch:               Add/Remove watcher to issue
-  worklog add:         Add a worklog to an issue
-  worklog list:        Prints the worklog data for given issue
-  session:             Attempt to login into jira server
-
-```
-
-## v1 vs v0 changes
-
-###### **Golang library import**
-For the new version of go-jira you should use:
-```
-import "gopkg.in/Netflix-Skunkworks/go-jira.v1"
-```
-
-If you have code that depends on the old apis, you can still use them with this import:
-```
-import "gopkg.in/Netflix-Skunkworks/go-jira.v0"
-```
-
-###### **Configs per command**
-Instead of requiring a executable template to get configs for a given command now you can create a config to be applied to a command.  So if you want to use `template: table` by default for your `jira list` you can now do:
-```
-$ cat $HOME/.jira.d/list.yml
-template: table
-```
-Where previously you needed something like:
-```
-# cat $HOME/.jira.d/config.yml
-#!/bin/sh
-case $JIRA_OPERATION in
-    list)
-      echo "template: table";;
-esac
-```
-
-###### **Custom Commands**
-Now you can create your own custom commands to do common operations with jira.  Please see the details **Custom Commands** section below for more details.  If you want to create a command `jira mine` that lists all the issues assigned to you now you can modify your `.jira.d/config.yml` file to add a `custom-commands` section like this:
-```yaml
-custom-commands:
-  - name: mine
-    help: display issues assigned to me
-    script: |-
-      {{jira}} list --query "resolution = unresolved and assignee=currentuser() ORDER BY created"
-```
-Then the next time you run `jira help` you will see your usage:
-```
-$ jira mine --help
-usage: jira mine
-
-display issues assigned to me
-
-Flags:
-      --help                 Show context-sensitive help (also try --help-long and --help-man).
-  -v, --verbose ...          Increase verbosity for debugging
-  -e, --endpoint=ENDPOINT    Base URI to use for Jira
-  -u, --user=USER            Login name used for authentication with Jira service
-      --unixproxy=UNIXPROXY  Path for a unix-socket proxy
-  -k, --insecure             Disable TLS certificate verification
-```
-
-###### **Incompatible command changes**
-Unfortunately during the rewrite between v0 and v1 there were some necessary changes that broke backwards compatibility with existing commands.  Specifically the `dups`, `blocks`, `add worklog` and `add|remove|set labels` commands have had the command word swapped around:
-  * `jira DUPLICATE dups ISSUE` => `jira dup DUPLICATE ISSUE`
-  * `jira BLOCKER blocks ISSUE` => `jira block BLOCKER ISSUE`
-  * `jira add worklog` => `jira worklog add`
-  * `jira add labels` => `jira labels add`
-  * `jira remove labels` => `jira labels remove`
-  * `jira set labels` => `jira labels set`
-
-###### **Login process change**
-We have, once again, changed how login happens for Jira.  When authenticating against Atlassian Cloud Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  Please read [the Authentication section](#authentication) below for more information.
-
-If you use a privately hosted Jira service, you can chose to use the API Token method or continue using the session login api.  Please read [the Authentication section](#authentication) below for more information.
-
-Previously `jira` used attempt to get a `JSESSION` cookies by authenticating with the webservice standard GUI login process.  This has been especially problematic as users need to authenticate with various credential providers (google auth, etc).  We now attempt to authenticate via the [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login).  This may be problematic for users if admins have locked down the session-login api, so we might have to bring back the error-prone Basic-Auth approach.  For users that are unable to authenticate via `jira` hopefully someone in your organization can provide me with details on a process for you to authenticate and we can try to update `jira`.
 
 ## Configuration
 
@@ -462,6 +274,8 @@ jira list -t debug
 
 For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endpoint ends in `.atlassian.net`.  If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass` service as documented below so that it can be programmatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
 
+The API Token authentication requires both the token and the email of the user. The email mut be set in the  `user:` in your config.yml. Failure to provide the `user` will result in a 401 error.
+
 If your Jira service still allows you to use the Session based authentication method then `jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring` or `pass`.
 
 #### User vs Login
@@ -473,7 +287,7 @@ login: person@example.com
 
 You can also override these values on the command line with `jira --user person --login person@example.com`.  The `login` value will be used only for authentication purposes, the `user` value will be used when a user name is required for any Jira service API calls.
 
-#### keyring password source
+#### `keyring` password source
 On OSX and Linux there are a few keyring providers that `go-jira` can use (via this [golang module](https://github.com/tmc/keyring)).  To integrate `go-jira` with a supported keyring just add this configuration to `$HOME/.jira.d/config.yml`:
 ```yaml
 password-source: keyring
@@ -484,6 +298,7 @@ After setting this and issuing a `jira login`, your credentials will be stored i
 An alternative to the keyring password source is the `pass` tool (documentation [here](https://www.passwordstore.org/)).  This uses gpg to encrypt/decrypt passwords on demand and by using `gpg-agent` you can cache the gpg credentials for a period of time so you will not be prompted repeatedly for decrypting the passwords.  The advantage over the keyring integration is that `pass` can be used on more platforms than OSX and Linux, although it does require more setup.  To use `pass` for password storage and retrieval via `go-jira` just add this configuration to `$HOME/.jira.d/config.yml`:
 ```yaml
 password-source: pass
+password-name: jira.example.com/myuser
 ```
 
 This assumes you have already setup `pass` correctly on your system.  Specifically you will need to have created a gpg key like this:
@@ -505,6 +320,12 @@ sub   2048R/F9A047B8 2016-12-18
 Then initialize the `pass` tool to use the correct key:
 ```
 $ pass init "Go Jira <gojira@example.com>"
+```
+
+Now insert your password with the name you configured.
+
+```
+$ pass insert jira.example.com/myuser
 ```
 
 You probably want to setup gpg-agent so that you don't have to type in your gpg passphrase all the time.  You can get `gpg-agent` to automatically start by adding something like this to your `$HOME/.bashrc`
@@ -531,4 +352,12 @@ if [ -n "${GPG_AGENT_INFO}" ]; then
     fi
 fi
 export GPG_TTY=$(tty)
+```
+
+#### `stdin` password source
+
+When `password-source` is set to `stdin`, the `jira login` command will read from stdin until EOF, and the bytes read will be the used as the password. This is useful if you have some other programmatic method for fetching passwords. For example, if `password-generator` creates a one-time password and prints it to stdout, you could use it like this.
+
+```bash
+$ ./password-generator | jira login --endpoint=https://my.jira.endpoint.com --user=USERNAME
 ```
