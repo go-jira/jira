@@ -8,8 +8,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/go-jira/jira/jiradata"
 	"gopkg.in/AlecAivazis/survey.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 )
 
 func (o *GlobalOptions) ProvideAuthParams() *jiradata.AuthParams {
