@@ -9,7 +9,7 @@ import (
 
 	"github.com/coryb/oreo"
 
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
+	"github.com/go-jira/jira/jiradata"
 )
 
 // https://docs.atlassian.com/jira-software/REST/latest/#agile/1.0/epic-getIssuesForEpic

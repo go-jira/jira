@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
+	"github.com/go-jira/jira/jiradata"
 )
 
 type SearchProvider interface {

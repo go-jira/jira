@@ -7,9 +7,9 @@ import (
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
+	"github.com/go-jira/jira"
+	"github.com/go-jira/jira/jiracli"
+	"github.com/go-jira/jira/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 

@@ -5,10 +5,10 @@ import (
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
+	"github.com/go-jira/jira"
+	"github.com/go-jira/jira/jiracli"
+	"github.com/go-jira/jira/jiradata"
 	"gopkg.in/AlecAivazis/survey.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 

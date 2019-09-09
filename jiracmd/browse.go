@@ -3,9 +3,9 @@ package jiracmd
 import (
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
+	jira "github.com/go-jira/jira"
+	"github.com/go-jira/jira/jiracli"
 	"github.com/pkg/browser"
-	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
