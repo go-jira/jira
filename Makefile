@@ -80,10 +80,18 @@ release:
 version:
 	@echo $(CURVER)
 
-clean:
+clean: clean-password-store
 	rm -rf ./$(NAME)
 
-prove:
+clean-password-store:
+	rm -f "$(CWD)/_t/.password-store/GoJira/api-token:gojira@corybennett.org.gpg"
+	rm -f "$(CWD)/_t/.password-store/GoJira/api-token:mothra@corybennett.org.gpg"
+
+test-password-store:
+	ln -s "$(CWD)/_t/.password-store/GoJira/api-token__gojira@corybennett.org.gpg" "$(CWD)/_t/.password-store/GoJira/api-token:gojira@corybennett.org.gpg"
+	ln -s "$(CWD)/_t/.password-store/GoJira/api-token__mothra@corybennett.org.gpg" "$(CWD)/_t/.password-store/GoJira/api-token:mothra@corybennett.org.gpg"
+
+prove: test-password-store
 	chmod -R g-rwx,o-rwx $(CWD)/_t/.gnupg
 	OSHT_VERBOSE=1 prove -v _t/*.t
 
