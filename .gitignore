@@ -7,4 +7,6 @@ schemas/*.json
 /_t/attach1.txt
 /_t/binary.out
 /_t/foobar.bin
+/_t/.password-store/GoJira/api-token:gojira@corybennett.org.gpg
+/_t/.password-store/GoJira/api-token:mothra@corybennett.org.gpg
 dist
