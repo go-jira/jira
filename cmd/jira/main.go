@@ -3,12 +3,14 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
 
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracli"
 	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiracmd"
+	"gopkg.in/coryb/yaml.v2"
 	"gopkg.in/op/go-logging.v1"
 )
 
@@ -28,6 +30,10 @@ func main() {
 	jiracli.InitLogging()
 
 	configDir := ".jira.d"
+
+	yaml.UseMapType(reflect.TypeOf(map[string]interface{}{}))
+	defer yaml.RestoreMapType()
+
 	fig := figtree.NewFigTree(
 		figtree.WithHome(jiracli.Homedir()),
 		figtree.WithEnvPrefix("JIRA"),
