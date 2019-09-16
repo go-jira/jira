@@ -1,4 +1,4 @@
-module gopkg.in/Netflix-Skunkworks/go-jira.v1
+module github.com/go-jira/jira
 
 go 1.12
 

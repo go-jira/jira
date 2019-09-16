@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
+	"github.com/go-jira/jira/jiradata"
 )
 
 func responseError(resp *http.Response) error {

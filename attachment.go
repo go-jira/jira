@@ -3,7 +3,7 @@ package jira
 import (
 	"encoding/json"
 
-	"gopkg.in/Netflix-Skunkworks/go-jira.v1/jiradata"
+	"github.com/go-jira/jira/jiradata"
 )
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/attachment-getAttachment

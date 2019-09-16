@@ -11,7 +11,7 @@ import (
 	"github.com/coryb/figtree"
 	"github.com/coryb/kingpeon"
 	"github.com/coryb/oreo"
-	jira "gopkg.in/Netflix-Skunkworks/go-jira.v1"
+	jira "github.com/go-jira/jira"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
