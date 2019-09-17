@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.21 - 2019-09-16
+
+* [[#277](https://github.com/Netflix-Skunkworks/go-jira/issues/277)] update figtree to latest [Cory Bennett] [[0e520a4](https://github.com/Netflix-Skunkworks/go-jira/commit/0e520a4)]
+* Switch over to using github.com/go-jira/jira, from gopkg.in [Mike Pountney] [[27f57b2](https://github.com/Netflix-Skunkworks/go-jira/commit/27f57b2)]
+* fix worklog template to allow multiline comments [Matthias Bethke] [[43e07f1](https://github.com/Netflix-Skunkworks/go-jira/commit/43e07f1)]
+* Allow reading password from stdin [Justin Ko] [[225e1dc](https://github.com/Netflix-Skunkworks/go-jira/commit/225e1dc)]
+* all: unindent some code [Daniel Martí] [[31c113d](https://github.com/Netflix-Skunkworks/go-jira/commit/31c113d)]
+* don't use ReadAll when decoding JSON [Daniel Martí] [[9bcdcc1](https://github.com/Netflix-Skunkworks/go-jira/commit/9bcdcc1)]
+* start making staticcheck happier [Daniel Martí] [[9b9186f](https://github.com/Netflix-Skunkworks/go-jira/commit/9b9186f)]
+* all: convert to a Go module [Daniel Martí] [[f125ef3](https://github.com/Netflix-Skunkworks/go-jira/commit/f125ef3)]
+* CI: test on Go 1.12.x, cleanup [Daniel Martí] [[664c5ca](https://github.com/Netflix-Skunkworks/go-jira/commit/664c5ca)]
+* make automatic pagination on search optional, fix tests [Cory Bennett] [[36c99ce](https://github.com/Netflix-Skunkworks/go-jira/commit/36c99ce)]
+* prefer defer resp.Body.Close to avoid leaks on subsequent errors [Cory Bennett] [[181bd74](https://github.com/Netflix-Skunkworks/go-jira/commit/181bd74)]
+* add pagination to search [Miles Maddox] [[76dd1d8](https://github.com/Netflix-Skunkworks/go-jira/commit/76dd1d8)]
+* Fix function comments based on best practices from Effective Go [CodeLingo Bot] [[23ac118](https://github.com/Netflix-Skunkworks/go-jira/commit/23ac118)]
+* [[#201](https://github.com/Netflix-Skunkworks/go-jira/issues/201)] update required library, failing to populate cookiejar from cookies file [Cory Bennett] [[ee69afa](https://github.com/Netflix-Skunkworks/go-jira/commit/ee69afa)]
+
 ## 1.0.20 - 2018-08-04
 
 * [[#201](https://github.com/Netflix-Skunkworks/go-jira/issues/201)] update required library, failing to populate cookiejar from cookies file [Cory Bennett] [[ee69afa](https://github.com/Netflix-Skunkworks/go-jira/commit/ee69afa)]
