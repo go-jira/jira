@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## 1.0.21 - 2019-09-16
 
 * [[#277](https://github.com/Netflix-Skunkworks/go-jira/issues/277)] update figtree to latest [Cory Bennett] [[0e520a4](https://github.com/Netflix-Skunkworks/go-jira/commit/0e520a4)]
