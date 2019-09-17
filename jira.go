@@ -4,7 +4,7 @@ import (
 	"github.com/coryb/oreo"
 )
 
-const VERSION = "1.0.20"
+const VERSION = "1.0.21"
 
 type Jira struct {
 	Endpoint string     `json:"endpoint,omitempty" yaml:"endpoint,omitempty"`
