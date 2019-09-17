@@ -39,7 +39,7 @@ lint:
 	@golint ./cmd/jira
 
 all:
-	$(GO) get -u github.com/karalabe/xgo
+	GO111MODULE=off $(GO) get -u src.techknowlogick.com/xgo
 	rm -rf dist
 	mkdir -p dist
 	xgo --targets="freebsd/amd64,linux/386,linux/amd64,windows/386,windows/amd64,darwin/amd64" -dest ./dist -ldflags="-w -s" ./cmd/jira
