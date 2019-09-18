@@ -13,7 +13,7 @@ function error() {
 DIST_DIR="dist/github.com/go-jira"
 
 out=`file ${DIST_DIR}/jira-darwin-amd64 2>&1`
-if ! [[ "$out" =~ "Mach-O 64-bit executable x86_64" ]]; then
+if ! [[ "$out" =~ "Mach-O 64-bit" ]]; then
    error "darwin/amd64 build not as expected: $out"
 fi
 
