@@ -39,10 +39,11 @@ lint:
 	@golint ./cmd/jira
 
 all:
-	GO111MODULE=off $(GO) get -u src.techknowlogick.com/xgo
+	GO111MODULE=off $(GO) get -u github.com/mitchellh/gox
 	rm -rf dist
 	mkdir -p dist
-	xgo --targets="freebsd/amd64,linux/386,linux/amd64,windows/386,windows/amd64,darwin/amd64" -dest ./dist -ldflags="-w -s" ./cmd/jira
+	gox -ldflags="-w -s" -output="dist/github.com/go-jira/jira-{{.OS}}-{{.Arch}}" -osarch="darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64" ./...
+	_t/test_binaries.sh
 
 install:
 	${MAKE} GOBIN=$$HOME/bin build
