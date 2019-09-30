@@ -11,7 +11,7 @@ func (t Transitions) Find(name string) *Transition {
 	name = strings.ToLower(name)
 	matches := []Transitions{}
 	for _, trans := range t {
-		if strings.Compare(strings.ToLower(trans.Name), name) == 0 {
+		if strings.ToLower(trans.Name) == name {
 			return trans
 		}
 		if strings.Contains(strings.ToLower(trans.Name), name) {
