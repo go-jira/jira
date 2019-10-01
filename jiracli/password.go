@@ -31,6 +31,13 @@ func (o *GlobalOptions) keyName() string {
 		}
 		return fmt.Sprintf("GoJira/%s", user)
 	}
+
+	if o.PasswordSource.Value == "gopass" {
+		if o.PasswordName.Value != "" {
+			return o.PasswordName.Value
+		}
+		return fmt.Sprintf("GoJira/%s", user)
+	}
 	return user
 }
 
@@ -42,6 +49,25 @@ func (o *GlobalOptions) GetPass() string {
 			passwd, err = keyringGet(o.keyName())
 			if err != nil {
 				panic(err)
+			}
+		} else if o.PasswordSource.Value == "gopass" {
+			if o.PasswordDirectory.Value != "" {
+				orig := os.Getenv("PASSWORD_STORE_DIR")
+				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
+				defer os.Setenv("PASSWORD_STORE_DIR", orig)
+			}
+			if bin, err := exec.LookPath("gopass"); err == nil {
+				buf := bytes.NewBufferString("")
+				cmd := exec.Command(bin, "show", "-o", o.keyName())
+				cmd.Stdout = buf
+				cmd.Stderr = buf
+				if err := cmd.Run(); err == nil {
+					passwd = strings.TrimSpace(buf.String())
+				} else {
+					panic(err)
+				}
+			} else {
+				log.Warning("Gopass binary was not found! Fallback to default password behaviour!")
 			}
 		} else if o.PasswordSource.Value == "pass" {
 			if o.PasswordDirectory.Value != "" {
@@ -108,6 +134,34 @@ func (o *GlobalOptions) SetPass(passwd string) error {
 		if err != nil {
 			log.Errorf("Failed to set password in keyring: %s", err)
 			return err
+		}
+	} else if o.PasswordSource.Value == "gopass" {
+		if o.PasswordDirectory.Value != "" {
+			orig := os.Getenv("PASSWORD_STORE_DIR")
+			os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
+			defer os.Setenv("PASSWORD_STORE_DIR", orig)
+		}
+		if bin, err := exec.LookPath("gopass"); err == nil {
+			log.Debugf("using %s", bin)
+			passName := o.keyName()
+			if passwd != "" {
+				in := bytes.NewBufferString(fmt.Sprintf("%s\n", passwd))
+				out := bytes.NewBufferString("")
+				cmd := exec.Command(bin, "insert", "--force", passName)
+				cmd.Stdin = in
+				cmd.Stdout = out
+				cmd.Stderr = out
+				if err := cmd.Run(); err != nil {
+					return fmt.Errorf("Failed to insert password: %s", out.String())
+				}
+			} else {
+				// clear the `pass` entry on empty password
+				if err := exec.Command(bin, "rm", "--force", passName).Run(); err != nil {
+					return fmt.Errorf("Failed to clear password for %s", passName)
+				}
+			}
+		} else {
+			return fmt.Errorf("Gopass binary not found!")
 		}
 	} else if o.PasswordSource.Value == "pass" {
 		if o.PasswordDirectory.Value != "" {
