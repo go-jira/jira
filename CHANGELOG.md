@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.22 - 2019-09-30
+
+* fix syntax [Cory Bennett] [[807ca76](https://github.com/Netflix-Skunkworks/go-jira/commit/807ca76)]
+* Address comments for direct name match [Patrick Cockwell] [[a70384b](https://github.com/Netflix-Skunkworks/go-jira/commit/a70384b)]
+* Choose exact transition match if available [Patrick Cockwell] [[a646f76](https://github.com/Netflix-Skunkworks/go-jira/commit/a646f76)]
+
 
 ## 1.0.21 - 2019-09-16
 
