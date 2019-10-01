@@ -9,10 +9,17 @@ import (
 // or nil
 func (t Transitions) Find(name string) *Transition {
 	name = strings.ToLower(name)
+	matches := []Transitions{}
 	for _, trans := range t {
-		if strings.Contains(strings.ToLower(trans.Name), name) {
+		if strings.ToLower(trans.Name) == name {
 			return trans
 		}
+		if strings.Contains(strings.ToLower(trans.Name), name) {
+			matches = append(matches, trans)
+		}
+	}
+	if len(matches) > 0 {
+		return matches[0]
 	}
 	return nil
 }
