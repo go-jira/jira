@@ -25,3 +25,23 @@ func GetProjectComponents(ua HttpClient, endpoint string, project string) (*jira
 	}
 	return nil, responseError(resp)
 }
+
+// https://developer.atlassian.com/cloud/jira/platform/rest/v2#api-api-2-project-projectIdOrKey-versions-get
+func (j *Jira) GetProjectVersions(project string) (*jiradata.Versions, error) {
+	return GetProjectVersions(j.UA, j.Endpoint, project)
+}
+
+func GetProjectVersions(ua HttpClient, endpoint string, project string) (*jiradata.Versions, error) {
+	uri := URLJoin(endpoint, "rest/api/2/project", project, "versions")
+	resp, err := ua.GetJSON(uri)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		results := jiradata.Versions{}
+		return &results, json.NewDecoder(resp.Body).Decode(&results)
+	}
+	return nil, responseError(resp)
+}
