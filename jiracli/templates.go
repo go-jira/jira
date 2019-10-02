@@ -76,6 +76,9 @@ func TemplateProcessor() *template.Template {
 			}
 			return out
 		},
+		"fit": func(size int, content string) string {
+			return fmt.Sprintf(fmt.Sprintf("%%-%d.%ds", size, size), content)
+		},
 		"shellquote": func(content string) string {
 			return shellquote.Join(content)
 		},
@@ -105,6 +108,9 @@ func TemplateProcessor() *template.Template {
 				return w
 			}
 			return 120
+		},
+		"pctOf": func(size, percent int) int {
+			return int(float32(size) * (float32(percent) / 100))
 		},
 		"sub": func(a, b int) int {
 			return a - b
@@ -354,7 +360,7 @@ const defaultEditTemplate = `{{/* edit template */ -}}
 # issue: {{ .key }} - created: {{ .fields.created | age}} ago
 update:
   comment:
-    - add: 
+    - add:
         body: |~
           {{ or .overrides.comment "" | indent 10 }}
 fields:
@@ -484,7 +490,7 @@ const defaultTransitionTemplate = `{{/* transition template */ -}}
 {{- if .meta.fields.comment }}
 update:
   comment:
-    - add: 
+    - add:
         body: |~
           {{ or .overrides.comment "" | indent 10 }}
 {{- end -}}
