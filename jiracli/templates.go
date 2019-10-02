@@ -16,6 +16,7 @@ import (
 
 	yaml "gopkg.in/coryb/yaml.v2"
 
+	"github.com/Masterminds/sprig"
 	"github.com/coryb/figtree"
 	shellquote "github.com/kballard/go-shellquote"
 	"github.com/mgutz/ansi"
@@ -187,7 +188,7 @@ func TemplateProcessor() *template.Template {
 			return dateFormat(format, content)
 		},
 	}
-	return template.New("gojira").Funcs(funcs)
+	return template.New("gojira").Funcs(sprig.GenericFuncMap()).Funcs(funcs)
 }
 
 func ConfigTemplate(fig *figtree.FigTree, template, command string, opts interface{}) (string, error) {
