@@ -82,7 +82,11 @@ func (o *GlobalOptions) GetPass() string {
 				cmd.Stderr = buf
 				if err := cmd.Run(); err == nil {
 					passwd = strings.TrimSpace(buf.String())
+				} else {
+					panic(err)
 				}
+			} else {
+				log.Warning("Pass binary was not found! Fallback to default password behaviour!")
 			}
 		} else if o.PasswordSource.Value == "stdin" {
 			allBytes, err := ioutil.ReadAll(os.Stdin)
@@ -188,6 +192,8 @@ func (o *GlobalOptions) SetPass(passwd string) error {
 					return fmt.Errorf("Failed to clear password for %s", passName)
 				}
 			}
+		} else {
+			return fmt.Errorf("Pass binary not found!")
 		}
 	} else if o.PasswordSource.Value != "" {
 		return fmt.Errorf("Unknown password-source: %s", o.PasswordSource)
