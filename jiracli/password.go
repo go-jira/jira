@@ -41,6 +41,20 @@ func (o *GlobalOptions) keyName() string {
 	return user
 }
 
+func (o *GlobalOptions) GetPasswordBinary() string {
+        binary := o.PasswordSourceBinary.Value
+
+        if binary == "" {
+          if o.PasswordSource.Value == "gopass" {
+            return "gopass"
+          } else if o.PasswordSource.Value == "pass" {
+            return "pass"
+          }
+        }
+
+        return binary 
+}
+
 func (o *GlobalOptions) GetPass() string {
 	passwd := ""
 	if o.PasswordSource.Value != "" {
@@ -50,13 +64,15 @@ func (o *GlobalOptions) GetPass() string {
 			if err != nil {
 				panic(err)
 			}
-		} else if o.PasswordSource.Value == "gopass" {
+		} else if o.PasswordSource.Value == "gopass" && o.GetPasswordBinary() != "" {
+                        binary := o.GetPasswordBinary()
+
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
 				defer os.Setenv("PASSWORD_STORE_DIR", orig)
 			}
-			if bin, err := exec.LookPath("gopass"); err == nil {
+			if bin, err := exec.LookPath(binary); err == nil {
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, "show", "-o", o.keyName())
 				cmd.Stdout = buf
@@ -69,13 +85,14 @@ func (o *GlobalOptions) GetPass() string {
 			} else {
 				log.Warning("Gopass binary was not found! Fallback to default password behaviour!")
 			}
-		} else if o.PasswordSource.Value == "pass" {
+		} else if o.PasswordSource.Value == "pass" && o.GetPasswordBinary() != "" {
+                        binary := o.GetPasswordBinary()
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
 				defer os.Setenv("PASSWORD_STORE_DIR", orig)
 			}
-			if bin, err := exec.LookPath("pass"); err == nil {
+			if bin, err := exec.LookPath(binary); err == nil {
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, o.keyName())
 				cmd.Stdout = buf
