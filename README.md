@@ -274,11 +274,11 @@ jira list -t debug
 
 ### Authentication
 
-For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endpoint ends in `.atlassian.net`.  If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass` service as documented below so that it can be programmatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
+For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endpoint ends in `.atlassian.net`.  If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass`/`gopass` service as documented below so that it can be programmatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
 
 The API Token authentication requires both the token and the email of the user. The email mut be set in the  `user:` in your config.yml. Failure to provide the `user` will result in a 401 error.
 
-If your Jira service still allows you to use the Session based authentication method then `jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring` or `pass`.
+If your Jira service still allows you to use the Session based authentication method then `jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring`, `pass` or `gopass`.
 
 #### User vs Login
 The Jira service has sometimes differing opinions about how a user is identified.  In other words the ID you login with might not be ID that the jira system recognized you as.  This matters when trying to identify a user via various Jira REST APIs (like issue assignment).  This is especially relevant when trying to authenticate with an API Token where the authentication user is usually an email address, but within the Jira system the user is identified by a user name.  To accommodate this `jira` now supports two different properties in the config file.  So when authentication using the API Tokens you will likely want something like this in your `$HOME/.jira.d/config.yml` file:
@@ -355,6 +355,17 @@ if [ -n "${GPG_AGENT_INFO}" ]; then
 fi
 export GPG_TTY=$(tty)
 ```
+
+#### `gopass` password source
+There is also the possibility to use [gopass](https://www.gopass.pw/) as a password source. `gopass` (like `pass`) uses gpg to encrypt/decrypt passwords. To use `gopass` for password storagte and retrieval via `go-jira` just add this configuration to `$HOME/.jira.d/config.yml`:
+```yaml
+password-source: gopass
+password-name: jira.example.com/myuser
+```
+
+For this to work, you need a working `gopass` installation. 
+
+To configure your `gpg-agent` to cache your gpg passphrase take a look at the `pass` section of the readme. 
 
 #### `stdin` password source
 
