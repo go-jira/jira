@@ -42,15 +42,19 @@ func (o *GlobalOptions) keyName() string {
 }
 
 func (o *GlobalOptions) GetPass() string {
-	passwd := ""
+	if o.cachedPassword != "" {
+		return o.cachedPassword
+	}
 	if o.PasswordSource.Value != "" {
 		if o.PasswordSource.Value == "keyring" {
+			log.Info("Querying keyring password source.")
 			var err error
-			passwd, err = keyringGet(o.keyName())
+			o.cachedPassword, err = keyringGet(o.keyName())
 			if err != nil {
 				panic(err)
 			}
 		} else if o.PasswordSource.Value == "gopass" {
+			log.Info("Querying gopass password source.")
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
@@ -62,7 +66,7 @@ func (o *GlobalOptions) GetPass() string {
 				cmd.Stdout = buf
 				cmd.Stderr = buf
 				if err := cmd.Run(); err == nil {
-					passwd = strings.TrimSpace(buf.String())
+					o.cachedPassword = strings.TrimSpace(buf.String())
 				} else {
 					panic(err)
 				}
@@ -70,6 +74,7 @@ func (o *GlobalOptions) GetPass() string {
 				log.Warning("Gopass binary was not found! Fallback to default password behaviour!")
 			}
 		} else if o.PasswordSource.Value == "pass" {
+			log.Info("Querying pass password source.")
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
@@ -81,7 +86,7 @@ func (o *GlobalOptions) GetPass() string {
 				cmd.Stdout = buf
 				cmd.Stderr = buf
 				if err := cmd.Run(); err == nil {
-					passwd = strings.TrimSpace(buf.String())
+					o.cachedPassword = strings.TrimSpace(buf.String())
 				} else {
 					panic(err)
 				}
@@ -89,22 +94,24 @@ func (o *GlobalOptions) GetPass() string {
 				log.Warning("Pass binary was not found! Fallback to default password behaviour!")
 			}
 		} else if o.PasswordSource.Value == "stdin" {
+			log.Info("Reading password from stdin.")
 			allBytes, err := ioutil.ReadAll(os.Stdin)
 			if err != nil {
 				panic(fmt.Sprintf("unable to read bytes from stdin: %s", err))
 			}
-			passwd = string(allBytes)
+			o.cachedPassword = string(allBytes)
 		} else {
 			log.Warningf("Unknown password-source: %s", o.PasswordSource)
 		}
 	}
 
-	if passwd != "" {
-		return passwd
+	if o.cachedPassword != "" {
+		log.Info("Password cached.")
+		return o.cachedPassword
 	}
 
-	if passwd = os.Getenv("JIRA_API_TOKEN"); passwd != "" && o.AuthMethod() == "api-token" {
-		return passwd
+	if o.cachedPassword = os.Getenv("JIRA_API_TOKEN"); o.cachedPassword != "" && o.AuthMethod() == "api-token" {
+		return o.cachedPassword
 	}
 
 	prompt := fmt.Sprintf("Jira Password [%s]: ", o.Login)
@@ -120,15 +127,15 @@ func (o *GlobalOptions) GetPass() string {
 			Message: prompt,
 			Help:    help,
 		},
-		&passwd,
+		&o.cachedPassword,
 		nil,
 	)
 	if err != nil {
 		log.Errorf("%s", err)
 		panic(Exit{Code: 1})
 	}
-	o.SetPass(passwd)
-	return passwd
+	o.SetPass(o.cachedPassword)
+	return o.cachedPassword
 }
 
 func (o *GlobalOptions) SetPass(passwd string) error {
