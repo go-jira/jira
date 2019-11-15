@@ -293,14 +293,30 @@ const defaultDebugTemplate = "{{ . | toJson}}\n"
 const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
 
 const defaultTableTemplate = `{{/* table template */ -}}
-{{$w := sub termWidth 107 -}}
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
-| {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf (printf "%%-%ds" (sub $w 2)) }} | {{ "Type" | printf "%-12s"}} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+{{$issuew := int 10 -}}
+{{$typew := int $issuew -}}
+{{$priorityw := int 14 -}}
+{{$statusw := $priorityw -}}
+{{$agew := int 10 -}}
+{{$reporterw := int 25 -}}
+{{$assigneew := int 12 -}}
+{{$dissuew := int (add 2 $issuew) -}}
+{{$dtypew := int (add 2 $typew) -}}
+{{$dpriorityw := int (add 2 $priorityw) -}}
+{{$dstatusw := int (add 2 $statusw) -}}
+{{$dagew := int (add 2 $agew) -}}
+{{$dreporterw := int (add 2 $reporterw) -}}
+{{$dassigneew := int (add 2 $assigneew) -}}
+{{$usedcols := int (add 25 (add $issuew (add $typew (add $priorityw (add $statusw (add $agew (add $reporterw $assigneew))))))) -}}
+{{$summaryw := sub termWidth $usedcols -}}
+{{$dsummaryw := int (add 2 $summaryw) -}}
++{{ "-" | rep $dissuew }}+{{ "-" | rep $dsummaryw }}+{{ "-" | rep $dtypew }}+{{ "-" | rep $dpriorityw }}+{{ "-" | rep $dstatusw }}+{{ "-" | rep $dagew }}+{{ "-" | rep $dreporterw }}+{{ "-" | rep $dassigneew }}+
+| {{ "Issue" | printf (printf "%%-%ds" $issuew) }} | {{ "Summary" | printf (printf "%%-%ds" $summaryw) }} | {{ "Type" | printf (printf "%%-%ds" $typew)}} | {{ "Priority" | printf (printf "%%-%ds" $priorityw) }} | {{ "Status" | printf (printf "%%-%ds" $statusw) }} | {{ "Age" | printf (printf "%%-%ds" $agew) }} | {{ "Reporter" | printf (printf "%%-%ds" $reporterw) }} | {{ "Assignee" | printf (printf "%%-%ds" $assigneew) }} |
++{{ "-" | rep $dissuew }}+{{ "-" | rep $dsummaryw }}+{{ "-" | rep $dtypew }}+{{ "-" | rep $dpriorityw }}+{{ "-" | rep $dstatusw }}+{{ "-" | rep $dagew }}+{{ "-" | rep $dreporterw }}+{{ "-" | rep $dassigneew }}+
 {{ range .issues -}}
-  | {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev (sub $w 2) | printf (printf "%%-%ds" (sub $w 2)) }} | {{.fields.issuetype.name | printf "%-12s" }} | {{if .fields.priority}}{{.fields.priority.name | printf "%-12s" }}{{else}}<unassigned>{{end}} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned>{{end}} |
+  | {{ .key | printf (printf "%%-%ds" $issuew)}} | {{ .fields.summary | abbrev (int (sub $summaryw 2)) | printf (printf "%%-%ds" $summaryw) }} | {{.fields.issuetype.name | printf (printf "%%-%ds" $typew) }} | {{if .fields.priority}}{{.fields.priority.name | printf (printf "%%-%ds" $priorityw) }}{{else}}<unassigned>{{end}} | {{.fields.status.name | printf (printf "%%-%ds" $statusw) }} | {{.fields.created | age | printf (printf "%%-%ds" $agew) }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf (printf "%%-%ds" $reporterw)}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf (printf "%%-%ds" $assigneew) }}{{else}}<unassigned>{{end}} |
 {{ end -}}
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
++{{ "-" | rep $dissuew }}+{{ "-" | rep $dsummaryw }}+{{ "-" | rep $dtypew }}+{{ "-" | rep $dpriorityw }}+{{ "-" | rep $dstatusw }}+{{ "-" | rep $dagew }}+{{ "-" | rep $dreporterw }}+{{ "-" | rep $dassigneew }}+
 `
 const defaultAttachListTemplate = `{{/* table template */ -}}
 +{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
