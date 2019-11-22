@@ -308,7 +308,7 @@ const defaultTableTemplate = `{{/* table template */ -}}
 {{$dreporterw := int (add 2 $reporterw) -}}
 {{$dassigneew := int (add 2 $assigneew) -}}
 {{$usedcols := int (add 25 (add $issuew (add $typew (add $priorityw (add $statusw (add $agew (add $reporterw $assigneew))))))) -}}
-{{$summaryw := sub termWidth $usedcols -}}
+{{$summaryw := int (max 40 (sub termWidth $usedcols)) -}}
 {{$dsummaryw := int (add 2 $summaryw) -}}
 +{{ "-" | rep $dissuew }}+{{ "-" | rep $dsummaryw }}+{{ "-" | rep $dtypew }}+{{ "-" | rep $dpriorityw }}+{{ "-" | rep $dstatusw }}+{{ "-" | rep $dagew }}+{{ "-" | rep $dreporterw }}+{{ "-" | rep $dassigneew }}+
 | {{ "Issue" | printf (printf "%%-%ds" $issuew) }} | {{ "Summary" | printf (printf "%%-%ds" $summaryw) }} | {{ "Type" | printf (printf "%%-%ds" $typew)}} | {{ "Priority" | printf (printf "%%-%ds" $priorityw) }} | {{ "Status" | printf (printf "%%-%ds" $statusw) }} | {{ "Age" | printf (printf "%%-%ds" $agew) }} | {{ "Reporter" | printf (printf "%%-%ds" $reporterw) }} | {{ "Assignee" | printf (printf "%%-%ds" $assigneew) }} |
