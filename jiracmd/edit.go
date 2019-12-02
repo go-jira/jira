@@ -36,6 +36,7 @@ func CmdEditRegistry() *jiracli.CommandRegistryEntry {
 			return CmdEditUsage(cmd, &opts, fig)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			if opts.QueryFields == "" {
 				opts.QueryFields = "assignee,created,priority,reporter,status,summary,updated,issuetype,comment,description,votes,created,customfield_10110,components"
 			}

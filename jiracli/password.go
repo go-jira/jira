@@ -41,11 +41,22 @@ func (o *GlobalOptions) keyName() string {
 	return user
 }
 
+func (o *GlobalOptions) GetPasswordPath() string {
+	// if no password source path then just default
+	// to the password source name
+	if o.PasswordSourcePath.Value == "" {
+		return o.PasswordSource.Value
+	}
+	return o.PasswordSourcePath.Value
+}
+
 func (o *GlobalOptions) GetPass() string {
 	if o.cachedPassword != "" {
 		return o.cachedPassword
 	}
+	log.Debugf("Getting Password")
 	if o.PasswordSource.Value != "" {
+		log.Debugf("password-source: %s", o.PasswordSource)
 		if o.PasswordSource.Value == "keyring" {
 			log.Info("Querying keyring password source.")
 			var err error
@@ -54,44 +65,56 @@ func (o *GlobalOptions) GetPass() string {
 				panic(err)
 			}
 		} else if o.PasswordSource.Value == "gopass" {
-			log.Info("Querying gopass password source.")
+			log.Debugf("Querying gopass password source.")
+			binary := o.GetPasswordPath()
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
+				log.Debugf("using password-directory: %s", o.PasswordDirectory)
 				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
 				defer os.Setenv("PASSWORD_STORE_DIR", orig)
 			}
-			if bin, err := exec.LookPath("gopass"); err == nil {
+			if passDir := os.Getenv("PASSWORD_STORE_DIR"); passDir != "" {
+				log.Debugf("using PASSWORD_STORE_DIR=%s", passDir)
+			}
+			if bin, err := exec.LookPath(binary); err == nil {
+				log.Debugf("found gopass at: %s", bin)
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, "show", "-o", o.keyName())
 				cmd.Stdout = buf
-				cmd.Stderr = buf
+				cmd.Stderr = os.Stderr
 				if err := cmd.Run(); err == nil {
 					o.cachedPassword = strings.TrimSpace(buf.String())
 				} else {
-					panic(err)
+					log.Warningf("gopass command failed with:\n%s", buf.String())
 				}
 			} else {
 				log.Warning("Gopass binary was not found! Fallback to default password behaviour!")
 			}
 		} else if o.PasswordSource.Value == "pass" {
-			log.Info("Querying pass password source.")
+			log.Debugf("Querying pass password source.")
+			binary := o.GetPasswordPath()
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
+				log.Debugf("using password-directory: %s", o.PasswordDirectory)
 				os.Setenv("PASSWORD_STORE_DIR", o.PasswordDirectory.Value)
 				defer os.Setenv("PASSWORD_STORE_DIR", orig)
 			}
-			if bin, err := exec.LookPath("pass"); err == nil {
+			if passDir := os.Getenv("PASSWORD_STORE_DIR"); passDir != "" {
+				log.Debugf("using PASSWORD_STORE_DIR=%s", passDir)
+			}
+			if bin, err := exec.LookPath(binary); err == nil {
+				log.Debugf("found pass at: %s", bin)
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, o.keyName())
 				cmd.Stdout = buf
-				cmd.Stderr = buf
+				cmd.Stderr = os.Stderr
 				if err := cmd.Run(); err == nil {
 					o.cachedPassword = strings.TrimSpace(buf.String())
 				} else {
-					panic(err)
+					log.Warningf("pass command failed with:\n%s", buf.String())
 				}
 			} else {
-				log.Warning("Pass binary was not found! Fallback to default password behaviour!")
+				log.Warning("pass binary was not found! Fallback to default password behaviour!")
 			}
 		} else if o.PasswordSource.Value == "stdin" {
 			log.Info("Reading password from stdin.")
@@ -139,6 +162,11 @@ func (o *GlobalOptions) GetPass() string {
 }
 
 func (o *GlobalOptions) SetPass(passwd string) error {
+	// dont reset password to empty string
+	if passwd == "" {
+		return nil
+	}
+
 	if o.PasswordSource.Value == "keyring" {
 		// save password in keychain so that it can be used for subsequent http requests
 		err := keyringSet(o.keyName(), passwd)
@@ -165,11 +193,6 @@ func (o *GlobalOptions) SetPass(passwd string) error {
 				if err := cmd.Run(); err != nil {
 					return fmt.Errorf("Failed to insert password: %s", out.String())
 				}
-			} else {
-				// clear the `pass` entry on empty password
-				if err := exec.Command(bin, "rm", "--force", passName).Run(); err != nil {
-					return fmt.Errorf("Failed to clear password for %s", passName)
-				}
 			}
 		} else {
 			return fmt.Errorf("Gopass binary not found!")
@@ -183,21 +206,14 @@ func (o *GlobalOptions) SetPass(passwd string) error {
 		if bin, err := exec.LookPath("pass"); err == nil {
 			log.Debugf("using %s", bin)
 			passName := o.keyName()
-			if passwd != "" {
-				in := bytes.NewBufferString(fmt.Sprintf("%s\n%s\n", passwd, passwd))
-				out := bytes.NewBufferString("")
-				cmd := exec.Command(bin, "insert", "--force", passName)
-				cmd.Stdin = in
-				cmd.Stdout = out
-				cmd.Stderr = out
-				if err := cmd.Run(); err != nil {
-					return fmt.Errorf("Failed to insert password: %s", out.String())
-				}
-			} else {
-				// clear the `pass` entry on empty password
-				if err := exec.Command(bin, "rm", "--force", passName).Run(); err != nil {
-					return fmt.Errorf("Failed to clear password for %s", passName)
-				}
+			in := bytes.NewBufferString(fmt.Sprintf("%s\n%s\n", passwd, passwd))
+			out := bytes.NewBufferString("")
+			cmd := exec.Command(bin, "insert", "--force", passName)
+			cmd.Stdin = in
+			cmd.Stdout = out
+			cmd.Stderr = out
+			if err := cmd.Run(); err != nil {
+				return fmt.Errorf("Failed to insert password: %s", out.String())
 			}
 		} else {
 			return fmt.Errorf("Pass binary not found!")

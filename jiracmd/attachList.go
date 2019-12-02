@@ -13,6 +13,7 @@ import (
 
 type AttachListOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
@@ -30,6 +31,7 @@ func CmdAttachListRegistry() *jiracli.CommandRegistryEntry {
 			return CmdAttachListUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdAttachList(o, globals, &opts)
 		},
 	}
