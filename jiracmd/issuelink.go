@@ -16,6 +16,7 @@ type IssueLinkOptions struct {
 	jiracli.CommonOptions     `yaml:",inline" json:",inline" figtree:",inline"`
 	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
 	LinkType                  string `yaml:"linktype,omitempty" json:"linktype,omitempty"`
+	Project                   string `yaml:"project,omitempty" json:"project,omitempty"`
 }
 
 func CmdIssueLinkRegistry() *jiracli.CommandRegistryEntry {
@@ -33,6 +34,8 @@ func CmdIssueLinkRegistry() *jiracli.CommandRegistryEntry {
 			return CmdIssueLinkUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.OutwardIssue.Key = jiracli.FormatIssue(opts.OutwardIssue.Key, opts.Project)
+			opts.InwardIssue.Key = jiracli.FormatIssue(opts.InwardIssue.Key, opts.Project)
 			return CmdIssueLink(o, globals, &opts)
 		},
 	}

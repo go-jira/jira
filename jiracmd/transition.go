@@ -15,6 +15,7 @@ import (
 
 type TransitionOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string            `yaml:"project,omitempty" json:"project,omitempty"`
 	Overrides             map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	Transition            string            `yaml:"transition,omitempty" json:"transition,omitempty"`
 	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
@@ -45,6 +46,7 @@ func CmdTransitionRegistry(transition string) *jiracli.CommandRegistryEntry {
 			return CmdTransitionUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdTransition(o, globals, &opts)
 		},
 	}

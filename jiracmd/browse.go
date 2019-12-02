@@ -9,17 +9,23 @@ import (
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
+type BrowseOptions struct {
+	Project string `yaml:"project,omitempty" json:"project,omitempty"`
+	Issue   string `yaml:"issue,omitempty" json:"issue,omitempty"`
+}
+
 func CmdBrowseRegistry() *jiracli.CommandRegistryEntry {
-	issue := ""
+	opts := BrowseOptions{}
 
 	return &jiracli.CommandRegistryEntry{
 		"Open issue in browser",
 		func(fig *figtree.FigTree, cmd *kingpin.CmdClause) error {
-			cmd.Arg("ISSUE", "Issue to browse to").Required().StringVar(&issue)
+			cmd.Arg("ISSUE", "Issue to browse to").Required().StringVar(&opts.Issue)
 			return nil
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
-			return CmdBrowse(globals, issue)
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
+			return CmdBrowse(globals, opts.Issue)
 		},
 	}
 }

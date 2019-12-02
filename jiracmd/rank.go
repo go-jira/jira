@@ -14,6 +14,7 @@ import (
 
 type RankOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 	First                 string `yaml:"first,omitempty" json:"first,omitempty"`
 	Second                string `yaml:"second,omitempty" json:"second,omitempty"`
 	Order                 string `yaml:"order,omitempty" json:"order,omitempty"`
@@ -29,6 +30,8 @@ func CmdRankRegistry() *jiracli.CommandRegistryEntry {
 			return CmdRankUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.First = jiracli.FormatIssue(opts.First, opts.Project)
+			opts.Second = jiracli.FormatIssue(opts.Second, opts.Project)
 			return CmdRank(o, globals, &opts)
 		},
 	}

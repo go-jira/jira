@@ -14,6 +14,7 @@ import (
 
 type LabelsRemoveOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string   `yaml:"project,omitempty" json:"project,omitempty"`
 	Issue                 string   `yaml:"issue,omitempty" json:"issue,omitempty"`
 	Labels                []string `yaml:"labels,omitempty" json:"labels,omitempty"`
 }
@@ -27,6 +28,7 @@ func CmdLabelsRemoveRegistry() *jiracli.CommandRegistryEntry {
 			return CmdLabelsRemoveUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdLabelsRemove(o, globals, &opts)
 		},
 	}

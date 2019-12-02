@@ -10,6 +10,7 @@ import (
 
 type TransitionsOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
@@ -27,6 +28,7 @@ func CmdTransitionsRegistry(defaultTemplate string) *jiracli.CommandRegistryEntr
 			return CmdTransitionsUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdTransitions(o, globals, &opts)
 		},
 	}

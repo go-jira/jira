@@ -14,6 +14,7 @@ import (
 
 type EpicAddOptions struct {
 	jiradata.EpicIssues `yaml:",inline" json:",inline" figtree:",inline"`
+	Project             string `yaml:"project,omitempty" json:"project,omitempty"`
 	Epic                string `yaml:"epic,omitempty" json:"epic,omitempty"`
 }
 
@@ -27,6 +28,10 @@ func CmdEpicAddRegistry() *jiracli.CommandRegistryEntry {
 			return CmdEpicAddUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Epic = jiracli.FormatIssue(opts.Epic, opts.Project)
+			for i := range opts.Issues {
+				opts.Issues[i] = jiracli.FormatIssue(opts.Issues[i], opts.Project)
+			}
 			return CmdEpicAdd(o, globals, &opts)
 		},
 	}

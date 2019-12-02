@@ -15,8 +15,7 @@ import (
 type DupOptions struct {
 	jiracli.CommonOptions     `yaml:",inline" json:",inline" figtree:",inline"`
 	jiradata.LinkIssueRequest `yaml:",inline" json:",inline" figtree:",inline"`
-	Duplicate                 string `yaml:"duplicate,omitempty" json:"duplicate,omitempty"`
-	Issue                     string `yaml:"issue,omitempty" json:"issue,omitempty"`
+	Project                   string `yaml:"project,omitempty" json:"project,omitempty"`
 }
 
 func CmdDupRegistry() *jiracli.CommandRegistryEntry {
@@ -40,6 +39,8 @@ func CmdDupRegistry() *jiracli.CommandRegistryEntry {
 			return CmdDupUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.OutwardIssue.Key = jiracli.FormatIssue(opts.OutwardIssue.Key, opts.Project)
+			opts.InwardIssue.Key = jiracli.FormatIssue(opts.InwardIssue.Key, opts.Project)
 			return CmdDup(o, globals, &opts)
 		},
 	}

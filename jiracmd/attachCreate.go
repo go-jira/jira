@@ -17,6 +17,7 @@ import (
 
 type AttachCreateOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 	Attachment            string `yaml:"attachment,omitempty" json:"attachment,omitempty"`
 	Filename              string `yaml:"filename,omitempty" json:"filename,omitempty"`
@@ -33,6 +34,7 @@ func CmdAttachCreateRegistry() *jiracli.CommandRegistryEntry {
 			return CmdAttachCreateUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdAttachCreate(o, globals, &opts)
 		},
 	}

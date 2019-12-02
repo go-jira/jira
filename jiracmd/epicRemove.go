@@ -14,6 +14,7 @@ import (
 
 type EpicRemoveOptions struct {
 	jiradata.EpicIssues `yaml:",inline" json:",inline" figtree:",inline"`
+	Project             string `yaml:"project,omitempty" json:"project,omitempty"`
 }
 
 func CmdEpicRemoveRegistry() *jiracli.CommandRegistryEntry {
@@ -26,6 +27,9 @@ func CmdEpicRemoveRegistry() *jiracli.CommandRegistryEntry {
 			return CmdEpicRemoveUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			for i := range opts.Issues {
+				opts.Issues[i] = jiracli.FormatIssue(opts.Issues[i], opts.Project)
+			}
 			return CmdEpicRemove(o, globals, &opts)
 		},
 	}
