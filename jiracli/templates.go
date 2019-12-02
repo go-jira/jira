@@ -35,8 +35,8 @@ func findTemplate(name string) ([]byte, error) {
 }
 
 func getTemplate(name string) (string, error) {
-	if _, err := os.Stat(name); err == nil {
-		b, err := ioutil.ReadFile(name)
+	if _, err := os.Stat(".jira.d/"+name); err == nil {
+		b, err := ioutil.ReadFile(".jira.d/"+name)
 		if err != nil {
 			return "", err
 		}
@@ -150,6 +150,9 @@ func TemplateProcessor() *template.Template {
 		},
 		"color": func(color string) string {
 			return ansi.ColorCode(color)
+		},
+		"remLineBreak": func(content string) string {
+			return strings.Replace(strings.Replace(content,string('\r'),string(' '),-1),string('\n'),string(' '),-1)
 		},
 		"regReplace": func(search string, replace string, content string) string {
 			re := regexp.MustCompile(search)

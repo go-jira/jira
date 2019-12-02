@@ -36,6 +36,7 @@ func CmdSubtaskRegistry() *jiracli.CommandRegistryEntry {
 			return CmdSubtaskUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			if opts.IssueType == "" {
 				opts.IssueType = "Sub-task"
 			}

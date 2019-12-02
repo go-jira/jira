@@ -20,6 +20,7 @@ const (
 
 type VoteOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string     `yaml:"project,omitempty" json:"project,omitempty"`
 	Issue                 string     `yaml:"issue,omitempty" json:"issue,omitempty"`
 	Action                VoteAction `yaml:"-" json:"-"`
 }
@@ -37,6 +38,7 @@ func CmdVoteRegistry() *jiracli.CommandRegistryEntry {
 			return CmdVoteUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdVote(o, globals, &opts)
 		},
 	}

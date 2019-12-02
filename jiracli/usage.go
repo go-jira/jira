@@ -173,7 +173,7 @@ func ParseCommandLine(app *kingpin.Application, args []string) {
 		if ctx.SelectedCommand == nil {
 			next := ctx.Next()
 			if next != nil {
-				if ok, err := regexp.MatchString("^[A-Z]+-[0-9]+$", next.Value); err != nil {
+				if ok, err := regexp.MatchString("^([A-Z]+-)?[0-9]+$", next.Value); err != nil {
 					log.Errorf("Invalid Regex: %s", err)
 				} else if ok {
 					// insert "view" at i=1 (2nd position)

@@ -17,6 +17,7 @@ func CmdUnassignRegistry() *jiracli.CommandRegistryEntry {
 			return CmdAssignUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdAssign(o, globals, &opts)
 		},
 	}

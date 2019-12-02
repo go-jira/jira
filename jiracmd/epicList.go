@@ -29,6 +29,7 @@ func CmdEpicListRegistry() *jiracli.CommandRegistryEntry {
 			return CmdEpicListUsage(cmd, &opts, fig)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Epic = jiracli.FormatIssue(opts.Epic, opts.Project)
 			if opts.MaxResults == 0 {
 				opts.MaxResults = 500
 			}

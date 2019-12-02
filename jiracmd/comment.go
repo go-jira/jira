@@ -14,6 +14,7 @@ import (
 
 type CommentOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string            `yaml:"project,omitempty" json:"project,omitempty"`
 	Overrides             map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	Issue                 string            `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
@@ -33,6 +34,7 @@ func CmdCommentRegistry() *jiracli.CommandRegistryEntry {
 			return CmdCommentUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdComment(o, globals, &opts)
 		},
 	}

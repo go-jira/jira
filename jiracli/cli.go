@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"reflect"
 	"runtime/debug"
+	"strconv"
 	"strings"
 
 	"github.com/coryb/figtree"
@@ -457,4 +458,31 @@ func EditLoop(opts *CommonOptions, input interface{}, output interface{}, submit
 		break
 	}
 	return nil
+}
+
+func FormatIssue(issueKey string, project string) string {
+	if issueKey == "" {
+		return ""
+	}
+
+	// expect PROJ-1234 issue format, this will split and
+	// reassemble, converting proj-1234 to PROJ-1234
+	parts := strings.SplitN(issueKey, "-", 2)
+	if len(parts) > 1 {
+		return fmt.Sprintf("%s-%s", strings.ToUpper(parts[0]), parts[1])
+	}
+
+	// if issue is not PROJ-1234 then it might just be 1234, so verify
+	// it is a number here otherwise warn and return input
+	if _, err := strconv.Atoi(issueKey); err != nil {
+		log.Warningf("Unexpected issue format %q, expected PROJ-1234", issueKey)
+		return issueKey
+	}
+
+	if project == "" {
+		log.Warningf("Using abbreviated issue %q but `project` property is not defined", issueKey)
+		return issueKey
+	}
+
+	return fmt.Sprintf("%s-%s", strings.ToUpper(project), issueKey)
 }

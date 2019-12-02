@@ -14,6 +14,7 @@ import (
 type WorklogAddOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
 	jiradata.Worklog      `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 }
 
@@ -30,6 +31,7 @@ func CmdWorklogAddRegistry() *jiracli.CommandRegistryEntry {
 			return CmdWorklogAddUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdWorklogAdd(o, globals, &opts)
 		},
 	}

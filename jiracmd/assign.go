@@ -12,6 +12,7 @@ import (
 
 type AssignOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
+	Project               string `yaml:"project,omitempty" json:"project,omitempty"`
 	Issue                 string `yaml:"issue,omitempty" json:"issue,omitempty"`
 	Assignee              string `yaml:"assignee,omitempty" json:"assignee,omitempty"`
 }
@@ -26,6 +27,7 @@ func CmdAssignRegistry() *jiracli.CommandRegistryEntry {
 			return CmdAssignUsage(cmd, &opts)
 		},
 		func(o *oreo.Client, globals *jiracli.GlobalOptions) error {
+			opts.Issue = jiracli.FormatIssue(opts.Issue, opts.Project)
 			return CmdAssign(o, globals, &opts)
 		},
 	}
