@@ -374,3 +374,19 @@ When `password-source` is set to `stdin`, the `jira login` command will read fro
 ```bash
 $ ./password-generator | jira login --endpoint=https://my.jira.endpoint.com --user=USERNAME
 ```
+
+#### Switch path  used for password source
+For `gopass` and `pass` it is possible to specify the full path for the `password-source` tool  used for retrieval of the password. This can be accomplised
+by setting the `password-source-path` option in the configuration file. 
+
+E.g.
+```yaml
+password-source: gopass
+password-name: jira.example.com/myuser
+password-source-path: /path/to/my-special-gopass
+```
+
+This will cause go-jira to use the `gopass` style cli interaction with the `my-special-gopass` binary.
+
+If you ommit the `password-source-path` option, either `gopass` (for `gopass`) or `pass` (for `pass`) 
+will be used.
