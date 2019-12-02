@@ -41,18 +41,13 @@ func (o *GlobalOptions) keyName() string {
 	return user
 }
 
-func (o *GlobalOptions) GetPasswordBinary() string {
-        binary := o.PasswordSourceBinary.Value
-
-        if binary == "" {
-          if o.PasswordSource.Value == "gopass" {
-            return "gopass"
-          } else if o.PasswordSource.Value == "pass" {
-            return "pass"
-          }
-        }
-
-        return binary 
+func (o *GlobalOptions) GetPasswordPath() string {
+	// if no password source path then just default
+	// to the password source name
+	if o.PasswordSourcePath.Value == "" {
+		return o.PasswordSource.Value
+	}
+	return o.PasswordSourcePath.Value
 }
 
 func (o *GlobalOptions) GetPass() string {
@@ -66,9 +61,8 @@ func (o *GlobalOptions) GetPass() string {
 			if err != nil {
 				panic(err)
 			}
-		} else if o.PasswordSource.Value == "gopass" && o.GetPasswordBinary() != "" {
-                        binary := o.GetPasswordBinary()
-
+		} else if o.PasswordSource.Value == "gopass" {
+			binary := o.GetPasswordPath()
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				log.Debugf("using password-directory: %s", o.PasswordDirectory)
@@ -92,8 +86,8 @@ func (o *GlobalOptions) GetPass() string {
 			} else {
 				log.Warning("Gopass binary was not found! Fallback to default password behaviour!")
 			}
-		} else if o.PasswordSource.Value == "pass" && o.GetPasswordBinary() != "" {
-                        binary := o.GetPasswordBinary()
+		} else if o.PasswordSource.Value == "pass" {
+			binary := o.GetPasswordPath()
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				log.Debugf("using password-directory: %s", o.PasswordDirectory)

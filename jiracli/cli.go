@@ -72,7 +72,8 @@ type GlobalOptions struct {
 	// location using the `pass` tool, if missing prompt the user and store in the PasswordDirectory
 	PasswordSource figtree.StringOption `yaml:"password-source,omitempty" json:"password-source,omitempty"`
 
-	PasswordSourceBinary figtree.StringOption `yaml:"password-source-binary,omitempty" json:"password-source-binary,omitempty"`
+	// PasswordSourcePath can be used to specify the path to the PasswordSource binary to use.
+	PasswordSourcePath figtree.StringOption `yaml:"password-source-path,omitempty" json:"password-source-path,omitempty"`
 
 	// PasswordDirectory is only used for the "pass" PasswordSource.  It is the location for the encrypted password
 	// files used by `pass`.  Effectively this overrides the "PASSWORD_STORE_DIR" environment variable
