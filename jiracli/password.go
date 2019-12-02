@@ -41,6 +41,20 @@ func (o *GlobalOptions) keyName() string {
 	return user
 }
 
+func (o *GlobalOptions) GetPasswordBinary() string {
+        binary := o.PasswordSourceBinary.Value
+
+        if binary == "" {
+          if o.PasswordSource.Value == "gopass" {
+            return "gopass"
+          } else if o.PasswordSource.Value == "pass" {
+            return "pass"
+          }
+        }
+
+        return binary 
+}
+
 func (o *GlobalOptions) GetPass() string {
 	log.Debugf("Getting Password")
 	passwd := ""
@@ -52,7 +66,9 @@ func (o *GlobalOptions) GetPass() string {
 			if err != nil {
 				panic(err)
 			}
-		} else if o.PasswordSource.Value == "gopass" {
+		} else if o.PasswordSource.Value == "gopass" && o.GetPasswordBinary() != "" {
+                        binary := o.GetPasswordBinary()
+
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				log.Debugf("using password-directory: %s", o.PasswordDirectory)
@@ -62,7 +78,7 @@ func (o *GlobalOptions) GetPass() string {
 			if passDir := os.Getenv("PASSWORD_STORE_DIR"); passDir != "" {
 				log.Debugf("using PASSWORD_STORE_DIR=%s", passDir)
 			}
-			if bin, err := exec.LookPath("gopass"); err == nil {
+			if bin, err := exec.LookPath(binary); err == nil {
 				log.Debugf("found gopass at: %s", bin)
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, "show", "-o", o.keyName())
@@ -76,7 +92,8 @@ func (o *GlobalOptions) GetPass() string {
 			} else {
 				log.Warning("Gopass binary was not found! Fallback to default password behaviour!")
 			}
-		} else if o.PasswordSource.Value == "pass" {
+		} else if o.PasswordSource.Value == "pass" && o.GetPasswordBinary() != "" {
+                        binary := o.GetPasswordBinary()
 			if o.PasswordDirectory.Value != "" {
 				orig := os.Getenv("PASSWORD_STORE_DIR")
 				log.Debugf("using password-directory: %s", o.PasswordDirectory)
@@ -86,7 +103,7 @@ func (o *GlobalOptions) GetPass() string {
 			if passDir := os.Getenv("PASSWORD_STORE_DIR"); passDir != "" {
 				log.Debugf("using PASSWORD_STORE_DIR=%s", passDir)
 			}
-			if bin, err := exec.LookPath("pass"); err == nil {
+			if bin, err := exec.LookPath(binary); err == nil {
 				log.Debugf("found pass at: %s", bin)
 				buf := bytes.NewBufferString("")
 				cmd := exec.Command(bin, o.keyName())
