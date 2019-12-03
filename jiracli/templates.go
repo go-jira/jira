@@ -20,6 +20,7 @@ import (
 	"github.com/coryb/figtree"
 	shellquote "github.com/kballard/go-shellquote"
 	"github.com/mgutz/ansi"
+	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -35,8 +36,8 @@ func findTemplate(name string) ([]byte, error) {
 }
 
 func getTemplate(name string) (string, error) {
-	if _, err := os.Stat(".jira.d/"+name); err == nil {
-		b, err := ioutil.ReadFile(".jira.d/"+name)
+	if _, err := os.Stat(".jira.d/" + name); err == nil {
+		b, err := ioutil.ReadFile(".jira.d/" + name)
 		if err != nil {
 			return "", err
 		}
@@ -152,7 +153,7 @@ func TemplateProcessor() *template.Template {
 			return ansi.ColorCode(color)
 		},
 		"remLineBreak": func(content string) string {
-			return strings.Replace(strings.Replace(content,string('\r'),string(' '),-1),string('\n'),string(' '),-1)
+			return strings.Replace(strings.Replace(content, string('\r'), string(' '), -1), string('\n'), string(' '), -1)
 		},
 		"regReplace": func(search string, replace string, content string) string {
 			re := regexp.MustCompile(search)
@@ -253,13 +254,40 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 		return err
 	}
 
-	tmpl, err := TemplateProcessor().Parse(templateContent)
+	table := tablewriter.NewWriter(out)
+	table.SetAutoFormatHeaders(false)
+	headers := []string{}
+	cells := [][]string{}
+	tmpl, err := TemplateProcessor().Funcs(map[string]interface{}{
+		"headers": func(titles ...string) string {
+			headers = append(headers, titles...)
+			return ""
+		},
+		"row": func() string {
+			cells = append(cells, []string{})
+			return ""
+		},
+		"cell": func(value interface{}) (string, error) {
+			if len(cells) == 0 {
+				return "", fmt.Errorf(`"cell" template function called before "row" template function`)
+			}
+			cells[len(cells)-1] = append(cells[len(cells)-1], fmt.Sprintf("%v", value))
+			return "", nil
+		},
+	}).Parse(templateContent)
 	if err != nil {
 		return err
 	}
+
 	if err := tmpl.Execute(out, rawData); err != nil {
 		return err
 	}
+	if len(headers) > 0 || len(cells) > 0 {
+		table.SetHeader(headers)
+		table.AppendBulk(cells)
+		table.Render()
+	}
+
 	return nil
 }
 
@@ -296,23 +324,42 @@ const defaultDebugTemplate = "{{ . | toJson}}\n"
 const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf \"%-12s\"}} {{ .fields.summary }}\n{{ end }}"
 
 const defaultTableTemplate = `{{/* table template */ -}}
-{{$w := sub termWidth 107 -}}
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
-| {{ "Issue" | printf "%-14s" }} | {{ "Summary" | printf (printf "%%-%ds" (sub $w 2)) }} | {{ "Type" | printf "%-12s"}} | {{ "Priority" | printf "%-12s" }} | {{ "Status" | printf "%-12s" }} | {{ "Age" | printf "%-10s" }} | {{ "Reporter" | printf "%-12s" }} | {{ "Assignee" | printf "%-12s" }} |
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
-{{ range .issues -}}
-  | {{ .key | printf "%-14s"}} | {{ .fields.summary | abbrev (sub $w 2) | printf (printf "%%-%ds" (sub $w 2)) }} | {{.fields.issuetype.name | printf "%-12s" }} | {{if .fields.priority}}{{.fields.priority.name | printf "%-12s" }}{{else}}<unassigned>{{end}} | {{.fields.status.name | printf "%-12s" }} | {{.fields.created | age | printf "%-10s" }} | {{if .fields.reporter}}{{ .fields.reporter.name | printf "%-12s"}}{{else}}<unassigned>{{end}} | {{if .fields.assignee }}{{.fields.assignee.name | printf "%-12s" }}{{else}}<unassigned>{{end}} |
-{{ end -}}
-+{{ "-" | rep 16 }}+{{ "-" | rep $w }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+{{- headers "Issue" "Summary" "Type" "Priority" "Status" "Age" "Reporter" "Assignee" -}}
+{{- range .issues -}} 
+  {{- row -}}
+  {{- cell .key -}}
+  {{- cell .fields.summary -}}
+  {{- cell .fields.issuetype.name -}}
+  {{- if .fields.priority -}}
+    {{- cell .fields.priority.name -}}
+  {{- else -}}
+    {{- cell "<none>" -}}
+  {{- end -}}
+  {{- cell .fields.status.name -}}
+  {{- cell (.fields.created | age) -}}
+  {{- if .fields.reporter -}}
+    {{- cell .fields.reporter.name -}}
+  {{- else -}}
+    {{- cell "<unknown>" -}}
+  {{- end -}}
+  {{- if .fields.assignee -}}
+    {{- cell .fields.assignee.name -}}
+  {{- else -}}
+    {{- cell "<unassigned>" -}}
+  {{- end -}}
+{{- end -}}
 `
-const defaultAttachListTemplate = `{{/* table template */ -}}
-+{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
-| {{printf "%-10s" "id"}} | {{printf "%-28s" "filename"}} | {{printf "%-10s" "bytes"}} | {{printf "%-12s" "user"}} | {{printf "%-12s" "created"}} |
-+{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
-{{range . -}}
-| {{.id | printf "%10d" }} | {{.filename | printf "%-28s"}} | {{.size | printf "%10d"}} | {{.author.name | printf "%-12s"}} | {{.created | age | printf "%-12s"}} |
-{{end -}}
-+{{ "-" | rep 12 }}+{{ "-" | rep 30 }}+{{ "-" | rep 12 }}+{{ "-" | rep 14 }}+{{ "-" | rep 14 }}+
+
+const defaultAttachListTemplate = `{{/* attach list template */ -}}
+{{- headers "id" "filename" "bytes" "user" "created" -}}
+{{- range . -}}
+  {{- row -}}
+  {{- cell .id -}}
+  {{- cell .filename -}}
+  {{- cell .size -}}
+  {{- cell .author.name -}}
+  {{- cell (.created | age) -}}
+{{- end -}}
 `
 
 const defaultViewTemplate = `{{/* view template */ -}}
