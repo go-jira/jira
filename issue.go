@@ -439,13 +439,13 @@ func RankIssues(ua HttpClient, endpoint string, rrp RankRequestProvider) error {
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addWatcher
-func (j *Jira) IssueAddWatcher(issue, user string) error {
-	return IssueAddWatcher(j.UA, j.Endpoint, issue, user)
+func (j *Jira) IssueAddWatcher(issue, accountId string) error {
+	return IssueAddWatcher(j.UA, j.Endpoint, issue, accountId)
 }
 
-func IssueAddWatcher(ua HttpClient, endpoint string, issue, user string) error {
+func IssueAddWatcher(ua HttpClient, endpoint string, issue, accountId string) error {
 	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "watchers")
-	resp, err := ua.Post(uri, "application/json", strings.NewReader(fmt.Sprintf("%q", user)))
+	resp, err := ua.Post(uri, "application/json", strings.NewReader(fmt.Sprintf("%q", accountId)))
 	if err != nil {
 		return err
 	}
@@ -458,13 +458,13 @@ func IssueAddWatcher(ua HttpClient, endpoint string, issue, user string) error {
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addWatcher
-func (j *Jira) IssueRemoveWatcher(issue, user string) error {
-	return IssueRemoveWatcher(j.UA, j.Endpoint, issue, user)
+func (j *Jira) IssueRemoveWatcher(issue, accountId string) error {
+	return IssueRemoveWatcher(j.UA, j.Endpoint, issue, accountId)
 }
 
-func IssueRemoveWatcher(ua HttpClient, endpoint string, issue, user string) error {
+func IssueRemoveWatcher(ua HttpClient, endpoint string, issue, accountId string) error {
 	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "watchers")
-	uri += fmt.Sprintf("?username=%s", user)
+	uri += fmt.Sprintf("?accountId=%s", accountId)
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err
@@ -511,19 +511,19 @@ type UserProvider interface {
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-assign
-func (j *Jira) IssueAssign(issue, name string) error {
-	return IssueAssign(j.UA, j.Endpoint, issue, name)
+func (j *Jira) IssueAssign(issue, accountId string) error {
+	return IssueAssign(j.UA, j.Endpoint, issue, accountId)
 }
 
-func IssueAssign(ua HttpClient, endpoint string, issue, name string) error {
+func IssueAssign(ua HttpClient, endpoint string, issue, accountId string) error {
 	// this is special, not using the jiradata.User structure
 	// because we need to be able to send `null` as the name param
 	// when we want to un-assign the issue
 	req := struct {
-		Name *string `json:"name"`
-	}{&name}
-	if name == "" {
-		req.Name = nil
+		AccountId *string `json:"accountId"`
+	}{&accountId}
+	if accountId == "" {
+		req.AccountId = nil
 	}
 
 	encoded, err := json.Marshal(req)

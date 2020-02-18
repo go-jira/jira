@@ -102,6 +102,10 @@ type GlobalOptions struct {
 	// `username`  The User property is used on Jira service API calls that require a user to associate with
 	// an Issue (like assigning a Issue to yourself)
 	User figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
+
+	// AccountId is used to represent the user on the Jira service.  The AccountId property is used on Jira
+	// service API calls that require a user to associate with an Issue (like assigning a Issue to yourself)
+	AccountId figtree.StringOption `yaml:"account-id,omitempty" json:"accountId,omitempty"`
 }
 
 type CommonOptions struct {
@@ -156,6 +160,7 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 	app.Flag("socksproxy", "Address for a socks proxy").SetValue(&globals.SocksProxy)
 	app.Flag("user", "user name used within the Jira service").Short('u').SetValue(&globals.User)
 	app.Flag("login", "login name that corresponds to the user used for authentication").SetValue(&globals.Login)
+	app.Flag("account-id", "account id that corresponds to the user used within the Jira service").SetValue(&globals.AccountId)
 
 	o = o.WithPreCallback(func(req *http.Request) (*http.Request, error) {
 		if globals.AuthMethod() == "api-token" {

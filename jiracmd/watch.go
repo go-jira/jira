@@ -60,7 +60,7 @@ func CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) error {
 // with the 'remove' flag)
 func CmdWatch(o *oreo.Client, globals *jiracli.GlobalOptions, opts *WatchOptions) error {
 	if opts.Watcher == "" {
-		opts.Watcher = globals.User.Value
+		opts.Watcher = globals.AccountId.Value
 	}
 	if opts.Action == WatcherAdd {
 		if err := jira.IssueAddWatcher(o, globals.Endpoint.Value, opts.Issue, opts.Watcher); err != nil {
