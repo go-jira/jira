@@ -338,12 +338,12 @@ const defaultTableTemplate = `{{/* table template */ -}}
   {{- cell .fields.status.name -}}
   {{- cell (.fields.created | age) -}}
   {{- if .fields.reporter -}}
-    {{- cell .fields.reporter.name -}}
+    {{- cell .fields.reporter.displayName -}}
   {{- else -}}
     {{- cell "<unknown>" -}}
   {{- end -}}
   {{- if .fields.assignee -}}
-    {{- cell .fields.assignee.name -}}
+    {{- cell .fields.assignee.displayName -}}
   {{- else -}}
     {{- cell "<unassigned>" -}}
   {{- end -}}
@@ -379,9 +379,9 @@ components: {{ range .fields.components }}{{ .name }} {{end}}
 issuetype: {{ .fields.issuetype.name }}
 {{end -}}
 {{if .fields.assignee -}}
-assignee: {{ .fields.assignee.name }}
+assignee: {{ .fields.assignee.displayName }}
 {{end -}}
-reporter: {{ if .fields.reporter }}{{ .fields.reporter.name }}{{end}}
+reporter: {{ if .fields.reporter }}{{ .fields.reporter.displayName }}{{end}}
 {{if .fields.customfield_10110 -}}
 watchers: {{ range .fields.customfield_10110 }}{{ .name }} {{end}}
 {{end -}}
@@ -423,10 +423,10 @@ fields:
     - name: {{ .name }}{{end}}{{end}}{{end}}
 {{- if .meta.fields.assignee}}
   assignee:
-    name: {{ if .overrides.assignee }}{{.overrides.assignee}}{{else}}{{if .fields.assignee }}{{ .fields.assignee.name }}{{end}}{{end}}{{end}}
+    name: {{ if .overrides.assignee }}{{.overrides.assignee}}{{else}}{{if .fields.assignee }}{{ .fields.assignee.displayName }}{{end}}{{end}}{{end}}
 {{- if .meta.fields.reporter}}
   reporter:
-    name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}{{end}}
+    name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.displayName }}{{end}}{{end}}
 {{- if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range .fields.customfield_10110 }}
@@ -548,7 +548,7 @@ update:
 fields:
 {{- if .meta.fields.assignee}}
   assignee:
-    name: {{if .overrides.assignee}}{{.overrides.assignee}}{{else}}{{if .fields.assignee}}{{.fields.assignee.name}}{{end}}{{end}}
+    name: {{if .overrides.assignee}}{{.overrides.assignee}}{{else}}{{if .fields.assignee}}{{.fields.assignee.displayName}}{{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.components}}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
@@ -581,7 +581,7 @@ fields:
 {{- end -}}
 {{if .meta.fields.reporter}}
   reporter:
-    name: {{if .overrides.reporter}}{{.overrides.reporter}}{{else}}{{if .fields.reporter}}{{.fields.reporter.name}}{{end}}{{end}}
+    name: {{if .overrides.reporter}}{{.overrides.reporter}}{{else}}{{if .fields.reporter}}{{.fields.reporter.displayName}}{{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.resolution}}
   resolution: # Values: {{ range .meta.fields.resolution.allowedValues }}{{.name}}, {{end}}
