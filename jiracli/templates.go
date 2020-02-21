@@ -357,7 +357,7 @@ const defaultAttachListTemplate = `{{/* attach list template */ -}}
   {{- cell .id -}}
   {{- cell .filename -}}
   {{- cell .size -}}
-  {{- cell .author.name -}}
+  {{- cell .author.displayName -}}
   {{- cell (.created | age) -}}
 {{- end -}}
 `
@@ -402,7 +402,7 @@ description: |
   {{ or .fields.description "" | indent 2 }}
 {{if .fields.comment.comments}}
 comments:
-{{ range .fields.comment.comments }}  - | # {{.author.name}}, {{.created | age}} ago
+{{ range .fields.comment.comments }}  - | # {{.author.displayName}}, {{.created | age}} ago
     {{ or .body "" | indent 4}}
 {{end}}
 {{end -}}
@@ -439,7 +439,7 @@ fields:
     {{ or .overrides.description .fields.description "" | indent 4 }}
 # votes: {{ .fields.votes.votes }}
 # comments:
-# {{ range .fields.comment.comments }}  - | # {{.author.name}}, {{.created | age}} ago
+# {{ range .fields.comment.comments }}  - | # {{.author.displayName}}, {{.created | age}} ago
 #     {{ or .body "" | indent 4 | comment}}
 # {{end}}
 `
@@ -610,7 +610,7 @@ started: {{ or .started "" }}
 `
 
 const defaultWorklogsTemplate = `{{/* worklogs template */ -}}
-{{ range .worklogs }}- # {{.author.name}}, {{.created | age}} ago
+{{ range .worklogs }}- # {{.author.displayName}}, {{.created | age}} ago
   comment: {{ or .comment "" }}
   started: {{ .started }}
   timeSpent: {{ .timeSpent }}
