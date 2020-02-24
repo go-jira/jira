@@ -62,9 +62,9 @@ DIFF <<EOF
 +-------+-------------+---------+--------+----------+
 |  id   |  filename   |  bytes  |  user  | created  |
 +-------+-------------+---------+--------+----------+
-| $attach1 | README.md   |    1239 | gojira | a minute |
-| $attach2 | garbage.bin | 1048576 | gojira | a minute |
-| $attach3 | foobar.bin  | 1048576 | gojira | a minute |
+| $attach1 | README.md   |    1239 | GoJira | a minute |
+| $attach2 | garbage.bin | 1048576 | GoJira | a minute |
+| $attach3 | foobar.bin  | 1048576 | GoJira | a minute |
 +-------+-------------+---------+--------+----------+
 EOF
 
@@ -149,8 +149,8 @@ DIFF <<EOF
 +-------+-------------+---------+--------+----------+
 |  id   |  filename   |  bytes  |  user  | created  |
 +-------+-------------+---------+--------+----------+
-| $attach2 | garbage.bin | 1048576 | gojira | a minute |
-| $attach3 | foobar.bin  | 1048576 | gojira | a minute |
+| $attach2 | garbage.bin | 1048576 | GoJira | a minute |
+| $attach3 | foobar.bin  | 1048576 | GoJira | a minute |
 +-------+-------------+---------+--------+----------+
 EOF
 
@@ -168,7 +168,7 @@ DIFF <<EOF
 +-------+------------+---------+--------+----------+
 |  id   |  filename  |  bytes  |  user  | created  |
 +-------+------------+---------+--------+----------+
-| $attach3 | foobar.bin | 1048576 | gojira | a minute |
+| $attach3 | foobar.bin | 1048576 | GoJira | a minute |
 +-------+------------+---------+--------+----------+
 EOF
 

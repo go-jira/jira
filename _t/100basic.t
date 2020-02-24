@@ -35,8 +35,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 priority: Medium
 votes: 0
 description: |
@@ -69,7 +69,7 @@ DIFF <<EOF
 +------------+---------+------+----------+--------+----------+----------+----------+
 |   Issue    | Summary | Type | Priority | Status |   Age    | Reporter | Assignee |
 +------------+---------+------+----------+--------+----------+----------+----------+
-| $issue | summary | Bug  | Medium   | To Do  | a minute | gojira   | gojira   |
+| $issue | summary | Bug  | Medium   | To Do  | a minute | GoJira   | GoJira   |
 +------------+---------+------+----------+--------+----------+----------+----------+
 EOF
 
@@ -97,17 +97,17 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 priority: High
 votes: 0
 description: |
   description
 
 comments:
-  - | # gojira, a minute ago
+  - | # GoJira, a minute ago
     edit comment
-  - | # gojira, a minute ago
+  - | # GoJira, a minute ago
     bulk edit comment
 
 EOF
@@ -174,8 +174,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $dup[Done]
 priority: Medium
@@ -221,8 +221,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[To Do]
 depends: $dup[Done]
 priority: Medium
@@ -267,8 +267,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[To Do]
 depends: $dup[Done]
 priority: Medium
@@ -294,8 +294,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[To Do]
 depends: $dup[Done]
 priority: Medium
@@ -314,10 +314,10 @@ OK $issue $ENDPOINT/browse/$issue
 EOF
 
 # FIXME we probably need a watchers command to wrap this?
-RUNS sh -c "$jira req /rest/api/2/issue/$issue/watchers | jq -r .watchers[].name | sort"
+RUNS sh -c "$jira req /rest/api/2/issue/$issue/watchers | jq -r .watchers[].displayName | sort"
 DIFF <<EOF
-gojira
-mothra
+GoJira
+Mothra
 EOF
 
 ###############################################################################
@@ -386,8 +386,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[Done]
 depends: $dup[Done]
 priority: Medium
@@ -413,8 +413,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[Done]
 depends: $dup[Done]
 priority: Medium
@@ -423,7 +423,7 @@ description: |
   description
 
 comments:
-  - | # mothra, a minute ago
+  - | # Mothra, a minute ago
     Yo, Comment
 
 EOF
@@ -445,8 +445,8 @@ status: Done
 summary: blocks
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -473,8 +473,8 @@ status: Done
 summary: blocks
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -501,8 +501,8 @@ status: Done
 summary: blocks
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -529,8 +529,8 @@ status: Done
 summary: blocks
 project: BASIC
 issuetype: Bug
-assignee: mothra
-reporter: gojira
+assignee: Mothra
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -557,8 +557,8 @@ status: Done
 summary: blocks
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium

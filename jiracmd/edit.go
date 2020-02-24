@@ -2,6 +2,7 @@ package jiracmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
@@ -71,6 +72,14 @@ func CmdEditUsage(cmd *kingpin.CmdClause, opts *EditOptions, fig *figtree.FigTre
 
 // Edit will get issue data and send to "edit" template
 func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) error {
+	if globals.JiraDeploymentType.Value == "" {
+		serverInfo, err := jira.ServerInfo(o, globals.Endpoint.Value)
+		if err != nil {
+			return err
+		}
+		globals.JiraDeploymentType.Value = strings.ToLower(serverInfo.DeploymentType)
+	}
+
 	type templateInput struct {
 		*jiradata.Issue `yaml:",inline"`
 		Meta            *jiradata.EditMeta `yaml:"meta" json:"meta"`
@@ -93,6 +102,12 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 			Overrides: opts.Overrides,
 		}
 		err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
+			if globals.JiraDeploymentType.Value == jiracli.CloudDeploymentType {
+				err := fixGDPRUserFields(o, globals.Endpoint.Value, editMeta.Fields, issueUpdate.Fields)
+				if err != nil {
+					return err
+				}
+			}
 			return jira.EditIssue(o, globals.Endpoint.Value, opts.Issue, &issueUpdate)
 		})
 		if err != nil {
@@ -123,6 +138,12 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 			Overrides: opts.Overrides,
 		}
 		err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
+			if globals.JiraDeploymentType.Value == jiracli.CloudDeploymentType {
+				err := fixGDPRUserFields(o, globals.Endpoint.Value, editMeta.Fields, issueUpdate.Fields)
+				if err != nil {
+					return err
+				}
+			}
 			return jira.EditIssue(o, globals.Endpoint.Value, issueData.Key, &issueUpdate)
 		})
 		if err == jiracli.EditLoopAbort && len(results.Issues) > i+1 {
@@ -148,6 +169,93 @@ func CmdEdit(o *oreo.Client, globals *jiracli.GlobalOptions, opts *EditOptions) 
 		}
 		if opts.Browse.Value {
 			return CmdBrowse(globals, issueData.Key)
+		}
+	}
+	return nil
+}
+
+func fixUserField(ua jira.HttpClient, endpoint string, userField map[string]interface{}) error {
+	if _, ok := userField["accountId"].(string); ok {
+		// this field is already GDPR ready
+		return nil
+	}
+
+	if username, ok := userField["name"].(string); ok {
+		users, err := jira.UserSearch(ua, endpoint, &jira.UserSearchOptions{
+			Username: username,
+		})
+		if err != nil {
+			return err
+		}
+		if len(users) != 1 {
+			return fmt.Errorf("Found %d accounts for username %q", len(users), username)
+		}
+		userField["accountId"] = users[0].AccountID
+		return nil
+	}
+
+	queryName, ok := userField["displayName"].(string)
+	if !ok {
+		queryName, ok = userField["emailAddress"].(string)
+		if !ok {
+			// no fields to search on, skip user lookup
+			return nil
+		}
+	}
+	users, err := jira.UserSearch(ua, endpoint, &jira.UserSearchOptions{
+		// Query field will search users displayName and emailAddress
+		Query: queryName,
+	})
+	if err != nil {
+		return err
+	}
+	if len(users) != 1 {
+		return fmt.Errorf("Found %d accounts for users with query %q", len(users), queryName)
+	}
+	userField["accountId"] = users[0].AccountID
+	return nil
+}
+
+func fixGDPRUserFields(ua jira.HttpClient, endpoint string, meta jiradata.FieldMetaMap, fields map[string]interface{}) error {
+	for fieldName, fieldMeta := range meta {
+		// check to see if meta-field is in fields data, otherwise skip
+		if _, ok := fields[fieldName]; !ok {
+			continue
+		}
+		if fieldMeta.Schema.Type == "user" {
+			userField, ok := fields[fieldName].(map[string]interface{})
+			if !ok {
+				// for some reason the field seems to be the wrong type in the data
+				// even though the schema is a "user"
+				continue
+			}
+			err := fixUserField(ua, endpoint, userField)
+			if err != nil {
+				return err
+			}
+			fields[fieldName] = userField
+		}
+		if fieldMeta.Schema.Type == "array" && fieldMeta.Schema.Items == "user" {
+			listUserField, ok := fields[fieldName].([]interface{})
+			if !ok {
+				// for some reason the field seems to be the wrong type in the data
+				// even though the schema is a list of "user"
+				continue
+			}
+			for i, userFieldItem := range listUserField {
+				userField, ok := userFieldItem.(map[string]interface{})
+				if !ok {
+					// for some reason the field seems to be the wrong type in the data
+					// even though the schema is a "user"
+					continue
+				}
+				err := fixUserField(ua, endpoint, userField)
+				if err != nil {
+					return err
+				}
+				listUserField[i] = userField
+			}
+			fields[fieldName] = listUserField
 		}
 	}
 	return nil

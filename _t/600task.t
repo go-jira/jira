@@ -35,8 +35,8 @@ status: To Do
 summary: summary
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 priority: Medium
 votes: 0
 description: |
@@ -116,8 +116,8 @@ status: To Do
 summary: summary
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $dup[Done]
 priority: Medium
@@ -163,8 +163,8 @@ status: To Do
 summary: summary
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[To Do]
 depends: $dup[Done]
 priority: Medium
@@ -209,8 +209,8 @@ status: To Do
 summary: summary
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[To Do]
 depends: $dup[Done]
 priority: Medium
@@ -236,8 +236,8 @@ status: To Do
 summary: summary
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[To Do]
 depends: $dup[Done]
 priority: Medium
@@ -256,10 +256,10 @@ OK $issue $ENDPOINT/browse/$issue
 EOF
 
 # FIXME we probably need a watchers command to wrap this?
-RUNS sh -c "$jira req /rest/api/2/issue/$issue/watchers | jq -r .watchers[].name | sort"
+RUNS sh -c "$jira req /rest/api/2/issue/$issue/watchers | jq -r .watchers[].displayName | sort"
 DIFF <<EOF
-gojira
-mothra
+GoJira
+Mothra
 EOF
 
 ###############################################################################
@@ -321,8 +321,8 @@ status: To Do
 summary: summary
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[Done]
 depends: $dup[Done]
 priority: Medium
@@ -348,8 +348,8 @@ status: To Do
 summary: summary
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: $blocker[Done]
 depends: $dup[Done]
 priority: Medium
@@ -358,7 +358,7 @@ description: |
   description
 
 comments:
-  - | # mothra, a minute ago
+  - | # Mothra, a minute ago
     Yo, Comment
 
 EOF
@@ -380,8 +380,8 @@ status: Done
 summary: blocks
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -408,8 +408,8 @@ status: Done
 summary: blocks
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -436,8 +436,8 @@ status: Done
 summary: blocks
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -464,8 +464,8 @@ status: Done
 summary: blocks
 project: TASK
 issuetype: Task
-assignee: mothra
-reporter: gojira
+assignee: Mothra
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium
@@ -492,8 +492,8 @@ status: Done
 summary: blocks
 project: TASK
 issuetype: Task
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 blockers: 
 depends: $issue[To Do]
 priority: Medium

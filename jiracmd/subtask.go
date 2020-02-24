@@ -2,6 +2,7 @@ package jiracmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
@@ -63,6 +64,14 @@ func CmdSubtaskUsage(cmd *kingpin.CmdClause, opts *SubtaskOptions) error {
 // CmdSubtask sends the subtask-metadata to the "subtask" template for editing, then
 // will parse the edited document as YAML and submit the document to jira.
 func CmdSubtask(o *oreo.Client, globals *jiracli.GlobalOptions, opts *SubtaskOptions) error {
+	if globals.JiraDeploymentType.Value == "" {
+		serverInfo, err := jira.ServerInfo(o, globals.Endpoint.Value)
+		if err != nil {
+			return err
+		}
+		globals.JiraDeploymentType.Value = strings.ToLower(serverInfo.DeploymentType)
+	}
+
 	type templateInput struct {
 		Meta      *jiradata.IssueType `yaml:"meta" json:"meta"`
 		Overrides map[string]string   `yaml:"overrides" json:"overrides"`
@@ -101,6 +110,12 @@ func CmdSubtask(o *oreo.Client, globals *jiracli.GlobalOptions, opts *SubtaskOpt
 
 	var issueResp *jiradata.IssueCreateResponse
 	err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
+		if globals.JiraDeploymentType.Value == jiracli.CloudDeploymentType {
+			err := fixGDPRUserFields(o, globals.Endpoint.Value, createMeta.Fields, issueUpdate.Fields)
+			if err != nil {
+				return err
+			}
+		}
 		issueResp, err = jira.CreateIssue(o, globals.Endpoint.Value, &issueUpdate)
 		return err
 	})
