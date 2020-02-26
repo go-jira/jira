@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.23 - 2020-02-26
+
+* update all usage of user.name to user.accountId for privacy migration: https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/ [Cory Bennett] [[a26683e](https://github.com/Netflix-Skunkworks/go-jira/commit/a26683e)]
+* add template functions to handle table output, fixes [#176](https://github.com/Netflix-Skunkworks/go-jira/issues/176), replaces [#296](https://github.com/Netflix-Skunkworks/go-jira/issues/296) [Cory Bennett] [[7e97463](https://github.com/Netflix-Skunkworks/go-jira/commit/7e97463)]
+* use `password-source-path` to allow overriding binary and/or path to binary [Cory Bennett] [[d6173ce](https://github.com/Netflix-Skunkworks/go-jira/commit/d6173ce)]
+* allow issues on command line to automatically prefix with project when defined [Cory Bennett] [[d002d7f](https://github.com/Netflix-Skunkworks/go-jira/commit/d002d7f)]
+* Forgot you use TAB instead of spaces [Cory Bennett] [[789886c](https://github.com/Netflix-Skunkworks/go-jira/commit/789886c)]
+* Fixed append project to view [Cory Bennett] [[8a46215](https://github.com/Netflix-Skunkworks/go-jira/commit/8a46215)]
+* Added a line break removal function [Cory Bennett] [[9cbd993](https://github.com/Netflix-Skunkworks/go-jira/commit/9cbd993)]
+* Pushed Readfile to .jira.d directory instead of pwd [Cory Bennett] [[db53622](https://github.com/Netflix-Skunkworks/go-jira/commit/db53622)]
+* Cache password to avoid invoking password source on each API request [Patrick Decat] [[0f059a5](https://github.com/Netflix-Skunkworks/go-jira/commit/0f059a5)]
+* Add support to switch out password source binary [Patrick Pichler] [[659a5c8](https://github.com/Netflix-Skunkworks/go-jira/commit/659a5c8)]
+* Add error handling to pass password-source [Patrick Pichler] [[3339303](https://github.com/Netflix-Skunkworks/go-jira/commit/3339303)]
+* Add gopass support [Patrick Pichler] [[3c0a62e](https://github.com/Netflix-Skunkworks/go-jira/commit/3c0a62e)]
+* add sprig template functions, replaces [[#215](https://github.com/Netflix-Skunkworks/go-jira/issues/215)] http://masterminds.github.io/sprig/ [Cory Bennett] [[719f7a6](https://github.com/Netflix-Skunkworks/go-jira/commit/719f7a6)]
+* [[#232](https://github.com/Netflix-Skunkworks/go-jira/issues/232)] fix api to use common Version schema also rewrote the schema fetcher to use Go [Cory Bennett] [[90f01ce](https://github.com/Netflix-Skunkworks/go-jira/commit/90f01ce)]
+
 ## 1.0.22 - 2019-09-30
 
 * fix syntax [Cory Bennett] [[807ca76](https://github.com/Netflix-Skunkworks/go-jira/commit/807ca76)]
