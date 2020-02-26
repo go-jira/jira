@@ -543,6 +543,34 @@ func IssueAssign(ua HttpClient, endpoint string, issue, name string) error {
 	return responseError(resp)
 }
 
+func IssueAssignAccountID(ua HttpClient, endpoint string, issue, acctId string) error {
+	// this is special, not using the jiradata.User structure
+	// because we need to be able to send `null` as the name param
+	// when we want to un-assign the issue
+	req := struct {
+		AccountID *string `json:"accountId"`
+	}{&acctId}
+	if acctId == "" {
+		req.AccountID = nil
+	}
+
+	encoded, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "assignee")
+	resp, err := ua.Put(uri, "application/json", bytes.NewBuffer(encoded))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}
+
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue/{issueIdOrKey}/attachments-addAttachment
 func (j *Jira) IssueAttachFile(issue, filename string, contents io.Reader) (*jiradata.ListOfAttachment, error) {
 	return IssueAttachFile(j.UA, j.Endpoint, issue, filename, contents)

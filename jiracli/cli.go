@@ -49,6 +49,11 @@ func HandleExit() {
 	}
 }
 
+const (
+	ServerDeploymentType = "server"
+	CloudDeploymentType  = "cloud"
+)
+
 type GlobalOptions struct {
 	// AuthenticationMethod is the method we use to authenticate with the jira serivce. Possible values are "api-token" or "session".
 	// The default is "api-token" when the service endpoint ends with "atlassian.net", otherwise it "session".  Session authentication
@@ -75,7 +80,7 @@ type GlobalOptions struct {
 	// PasswordSourcePath can be used to specify the path to the PasswordSource binary to use.
 	PasswordSourcePath figtree.StringOption `yaml:"password-source-path,omitempty" json:"password-source-path,omitempty"`
 
-  // Cached password to avoid invoking password source on each API request
+	// Cached password to avoid invoking password source on each API request
 	cachedPassword string
 
 	// PasswordDirectory is only used for the "pass" PasswordSource.  It is the location for the encrypted password
@@ -102,6 +107,10 @@ type GlobalOptions struct {
 	// `username`  The User property is used on Jira service API calls that require a user to associate with
 	// an Issue (like assigning a Issue to yourself)
 	User figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
+
+	// JiraDeploymentType can be `cloud` or `server`, if not set it will be inferred from
+	// the /rest/api/2/serverInfo REST API.
+	JiraDeploymentType figtree.StringOption `yaml:"jira-deployment-type,omitempty" json:"jira-deployment-type,omitempty"`
 }
 
 type CommonOptions struct {

@@ -72,8 +72,8 @@ DIFF<<EOF
 +------------+---------+------+----------+--------+----------+----------+----------+
 |   Issue    | Summary | Type | Priority | Status |   Age    | Reporter | Assignee |
 +------------+---------+------+----------+--------+----------+----------+----------+
-| $issue1 | summary | Bug  | Medium   | To Do  | a minute | gojira   | gojira   |
-| $issue2 | summary | Bug  | Medium   | To Do  | a minute | gojira   | gojira   |
+| $issue1 | summary | Bug  | Medium   | To Do  | a minute | GoJira   | GoJira   |
+| $issue2 | summary | Bug  | Medium   | To Do  | a minute | GoJira   | GoJira   |
 +------------+---------+------+----------+--------+----------+----------+----------+
 EOF
 
@@ -95,7 +95,7 @@ DIFF<<EOF
 +------------+---------+------+----------+--------+----------+----------+----------+
 |   Issue    | Summary | Type | Priority | Status |   Age    | Reporter | Assignee |
 +------------+---------+------+----------+--------+----------+----------+----------+
-| $issue2 | summary | Bug  | Medium   | To Do  | a minute | gojira   | gojira   |
+| $issue2 | summary | Bug  | Medium   | To Do  | a minute | GoJira   | GoJira   |
 +------------+---------+------+----------+--------+----------+----------+----------+
 EOF
 

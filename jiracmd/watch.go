@@ -2,6 +2,7 @@ package jiracmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
@@ -62,6 +63,29 @@ func CmdWatch(o *oreo.Client, globals *jiracli.GlobalOptions, opts *WatchOptions
 	if opts.Watcher == "" {
 		opts.Watcher = globals.User.Value
 	}
+
+	if globals.JiraDeploymentType.Value == "" {
+		serverInfo, err := jira.ServerInfo(o, globals.Endpoint.Value)
+		if err != nil {
+			return err
+		}
+		globals.JiraDeploymentType.Value = strings.ToLower(serverInfo.DeploymentType)
+	}
+
+	if globals.JiraDeploymentType.Value == jiracli.CloudDeploymentType {
+		users, err := jira.UserSearch(o, globals.Endpoint.Value, &jira.UserSearchOptions{
+			Username: opts.Watcher,
+		})
+		if err != nil {
+			return err
+		}
+		if len(users) > 1 {
+			return fmt.Errorf("Found %d accounts for users with username %q", len(users), opts.Watcher)
+		} else if len(users) == 1 {
+			opts.Watcher = users[0].AccountID
+		}
+	}
+
 	if opts.Action == WatcherAdd {
 		if err := jira.IssueAddWatcher(o, globals.Endpoint.Value, opts.Issue, opts.Watcher); err != nil {
 			return err

@@ -75,6 +75,6 @@ DIFF <<EOF
 +------------+---------+------+----------+--------+----------+----------+----------+
 |   Issue    | Summary | Type | Priority | Status |   Age    | Reporter | Assignee |
 +------------+---------+------+----------+--------+----------+----------+----------+
-| $issue | summary | Bug  | Medium   | To Do  | a minute | gojira   | gojira   |
+| $issue | summary | Bug  | Medium   | To Do  | a minute | GoJira   | GoJira   |
 +------------+---------+------+----------+--------+----------+----------+----------+
 EOF

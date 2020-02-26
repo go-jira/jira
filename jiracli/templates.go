@@ -338,12 +338,12 @@ const defaultTableTemplate = `{{/* table template */ -}}
   {{- cell .fields.status.name -}}
   {{- cell (.fields.created | age) -}}
   {{- if .fields.reporter -}}
-    {{- cell .fields.reporter.name -}}
+    {{- cell .fields.reporter.displayName -}}
   {{- else -}}
     {{- cell "<unknown>" -}}
   {{- end -}}
   {{- if .fields.assignee -}}
-    {{- cell .fields.assignee.name -}}
+    {{- cell .fields.assignee.displayName -}}
   {{- else -}}
     {{- cell "<unassigned>" -}}
   {{- end -}}
@@ -357,7 +357,7 @@ const defaultAttachListTemplate = `{{/* attach list template */ -}}
   {{- cell .id -}}
   {{- cell .filename -}}
   {{- cell .size -}}
-  {{- cell .author.name -}}
+  {{- cell .author.displayName -}}
   {{- cell (.created | age) -}}
 {{- end -}}
 `
@@ -379,11 +379,11 @@ components: {{ range .fields.components }}{{ .name }} {{end}}
 issuetype: {{ .fields.issuetype.name }}
 {{end -}}
 {{if .fields.assignee -}}
-assignee: {{ .fields.assignee.name }}
+assignee: {{ .fields.assignee.displayName }}
 {{end -}}
-reporter: {{ if .fields.reporter }}{{ .fields.reporter.name }}{{end}}
+reporter: {{ if .fields.reporter }}{{ .fields.reporter.displayName }}{{end}}
 {{if .fields.customfield_10110 -}}
-watchers: {{ range .fields.customfield_10110 }}{{ .name }} {{end}}
+watchers: {{ range .fields.customfield_10110 }}{{ .displayName }} {{end}}
 {{end -}}
 {{if .fields.issuelinks -}}
 blockers: {{ range .fields.issuelinks }}{{if .outwardIssue}}{{ .outwardIssue.key }}[{{.outwardIssue.fields.status.name}}]{{end}}{{end}}
@@ -402,7 +402,7 @@ description: |
   {{ or .fields.description "" | indent 2 }}
 {{if .fields.comment.comments}}
 comments:
-{{ range .fields.comment.comments }}  - | # {{.author.name}}, {{.created | age}} ago
+{{ range .fields.comment.comments }}  - | # {{.author.displayName}}, {{.created | age}} ago
     {{ or .body "" | indent 4}}
 {{end}}
 {{end -}}
@@ -421,9 +421,15 @@ fields:
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
     - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
     - name: {{ .name }}{{end}}{{end}}{{end}}
-{{- if .meta.fields.assignee}}
+{{- if .meta.fields.assignee }}
+  {{- if .overrides.assignee }}
   assignee:
-    name: {{ if .overrides.assignee }}{{.overrides.assignee}}{{else}}{{if .fields.assignee }}{{ .fields.assignee.name }}{{end}}{{end}}{{end}}
+    name: {{ .overrides.assignee }}
+  {{- else if .fields.assignee }}
+  assignee: {{if .fields.assignee.name}}
+    name: {{ or .fields.assignee.name}}
+  {{- else }}
+    displayName: {{.fields.assignee.displayName}}{{end}}{{end}}{{end}}
 {{- if .meta.fields.reporter}}
   reporter:
     name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}{{end}}
@@ -439,7 +445,7 @@ fields:
     {{ or .overrides.description .fields.description "" | indent 4 }}
 # votes: {{ .fields.votes.votes }}
 # comments:
-# {{ range .fields.comment.comments }}  - | # {{.author.name}}, {{.created | age}} ago
+# {{ range .fields.comment.comments }}  - | # {{.author.displayName}}, {{.created | age}} ago
 #     {{ or .body "" | indent 4 | comment}}
 # {{end}}
 `
@@ -546,9 +552,15 @@ update:
           {{ or .overrides.comment "" | indent 10 }}
 {{- end -}}
 fields:
-{{- if .meta.fields.assignee}}
+{{- if .meta.fields.assignee }}
+  {{- if .overrides.assignee }}
   assignee:
-    name: {{if .overrides.assignee}}{{.overrides.assignee}}{{else}}{{if .fields.assignee}}{{.fields.assignee.name}}{{end}}{{end}}
+    name: {{ .overrides.assignee }}
+  {{- else if .fields.assignee }}
+  assignee: {{if .fields.assignee.name}}
+    name: {{ or .fields.assignee.name}}
+  {{- else }}
+    displayName: {{.fields.assignee.displayName}}{{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.components}}
   components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
@@ -579,9 +591,15 @@ fields:
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority "unassigned" }}
 {{- end -}}
-{{if .meta.fields.reporter}}
+{{- if .meta.fields.reporter }}
+  {{- if .overrides.reporter }}
   reporter:
-    name: {{if .overrides.reporter}}{{.overrides.reporter}}{{else}}{{if .fields.reporter}}{{.fields.reporter.name}}{{end}}{{end}}
+    name: {{ .overrides.reporter }}
+  {{- else if .fields.reporter }}
+  reporter: {{if .fields.reporter.name}}
+    name: {{ or .fields.reporter.name}}
+  {{- else }}
+    displayName: {{.fields.reporter.displayName}}{{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.resolution}}
   resolution: # Values: {{ range .meta.fields.resolution.allowedValues }}{{.name}}, {{end}}
@@ -610,7 +628,7 @@ started: {{ or .started "" }}
 `
 
 const defaultWorklogsTemplate = `{{/* worklogs template */ -}}
-{{ range .worklogs }}- # {{.author.name}}, {{.created | age}} ago
+{{ range .worklogs }}- # {{.author.displayName}}, {{.created | age}} ago
   comment: {{ or .comment "" }}
   started: {{ .started }}
   timeSpent: {{ .timeSpent }}

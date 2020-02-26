@@ -38,8 +38,8 @@ status: To Do
 summary: summary
 project: BASIC
 issuetype: Bug
-assignee: gojira
-reporter: gojira
+assignee: GoJira
+reporter: GoJira
 priority: Medium
 votes: 0
 description: |

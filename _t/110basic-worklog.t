@@ -36,7 +36,7 @@ EOF
 ###############################################################################
 RUNS $jira worklog $issue
 DIFF <<EOF
-- # gojira, a minute ago
+- # GoJira, a minute ago
   comment: work is hard
   started: 2017-01-29T06:17:00.000-0800
   timeSpent: 1h 12m
