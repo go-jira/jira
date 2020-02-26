@@ -274,7 +274,24 @@ jira list -t debug
 
 ### Authentication
 
-For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endpoint ends in `.atlassian.net`.  If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass`/`gopass` service as documented below so that it can be programmatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
+#### Atlassian Cloud
+
+For Atlassian Cloud hosted Jira [API Tokens are now required](https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/).  You will automatically be prompted for an API Token if your jira endpoint ends in `.atlassian.net`.
+
+##### Quickstart API Token and Keychain
+
+1. Edit your config or execute the snippit (make sure to replace `<SUBDOMAIN>` and `<EMAIL>`)
+```
+export SUBDOMAIN="https://<SUBDOMAIN>.atlassian.net"
+export EMAIL="<EMAIL>"
+mkdir -p ~/.jira.d
+printf "endpoint: $SUBDOMAIN\nuser: $EMAIL\npassword-source: keyring" > ~/.jira.d/config.yml
+```
+2. Create a new API Token at [id.atlassian.com](https://id.atlassian.com/manage-profile/security)
+3. Execute `jira session` and enter your API Token. `jira` will add your session to the keyring.
+
+#### Private Jira Service
+If you are using a private Jira service, you can force `jira` to use an api-token by setting the `authentication-method: api-token` property in your `$HOME/.jira.d/config.yml` file.  The API Token needs to be presented to the Jira service on every request, so it is recommended to store this API Token security within your OS's keyring, or using the `pass`/`gopass` service as documented below so that it can be programmatically accessed via `jira` and not prompt you every time.  For a less-secure option you can also provide the API token via a `JIRA_API_TOKEN` environment variable.  If you are unable to use an api-token for an Atlassian Cloud hosted Jira then you can still force `jira` to use the old session based authentication (until it the hosted system stops accepting it) by setting `authentication-method: session`.
 
 The API Token authentication requires both the token and the email of the user. The email mut be set in the  `user:` in your config.yml. Failure to provide the `user` will result in a 401 error.
 
