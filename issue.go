@@ -109,6 +109,41 @@ func GetIssueWorklog(ua HttpClient, endpoint string, issue string) (*jiradata.Wo
 	return &worklogs, nil
 }
 
+func (j *Jira) GetIssueComment(issue string) (*jiradata.Comments, error) {
+	return GetIssueComment(j.UA, j.Endpoint, issue)
+}
+
+// https://docs.atlassian.com/software/jira/docs/api/REST/7.12.0/#api/2/issue-getComments
+func GetIssueComment(ua HttpClient, endpoint string, issue string) (*jiradata.Comments, error) {
+	startAt := 0
+	total := 1
+	maxResults := 100
+	comments := jiradata.Comments{}
+	for startAt < total {
+		uri := URLJoin(endpoint, "rest/api/2/issue", issue, "comment")
+		uri += fmt.Sprintf("?startAt=%d&maxResults=%d", startAt, maxResults)
+		resp, err := ua.GetJSON(uri)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode == 200 {
+			results := &jiradata.CommentsWithPagination{}
+			err := json.NewDecoder(resp.Body).Decode(results)
+			if err != nil {
+				return nil, err
+			}
+			startAt = startAt + maxResults
+			total = results.Total
+			comments = append(comments, results.Comments...)
+		} else {
+			return nil, responseError(resp)
+		}
+	}
+	return &comments, nil
+}
+
 type WorklogProvider interface {
 	ProvideWorklog() *jiradata.Worklog
 }
