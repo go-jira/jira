@@ -14,13 +14,13 @@ You can download one of the pre-built binaries for **go-jira** [here](https://gi
 
 ### Build
 
-You can build and install the official repository with [Go](https://golang.org/dl/):
+You can build and install the official repository with [Go](https://golang.org/dl/) (before running the below command, ensure you have `GO111MODULE=on` set in your environment):
 
 	go get github.com/go-jira/jira/cmd/jira
 
 This will checkout this repository into `$GOPATH/src/github.com/go-jira/jira/`, build, and install it.
 
-It should then be available in $GOPATH/bin/jira
+It should then be available in $GOPATH/bin/jira.
 
 ## Usage
 
