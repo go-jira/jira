@@ -74,9 +74,11 @@ func CmdRequest(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RequestOpt
 	}
 	defer resp.Body.Close()
 
-	var data interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return fmt.Errorf("JSON Parse Error: %v", err)
-	}
-	return opts.PrintTemplate(&data)
+        if (opts.Method != "DELETE") {
+		var data interface{}
+		if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+			return fmt.Errorf("JSON Parse Error: %v", err)
+		}
+		return opts.PrintTemplate(&data)
+        }
 }
