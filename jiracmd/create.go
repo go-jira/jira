@@ -93,6 +93,9 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 	input.Overrides["issuetype"] = opts.IssueType
 	input.Overrides["user"] = globals.User.Value
 
+	// user is NOT necessary for issue create and causes GDPR errors.
+        delete(input.Overrides, "user")
+
 	var issueResp *jiradata.IssueCreateResponse
 	err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
 		if globals.JiraDeploymentType.Value == jiracli.CloudDeploymentType {
@@ -101,6 +104,9 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 				return err
 			}
 		}
+
+                // reporter is NOT necessary for issue create and causes GDPR errors.
+                delete(issueUpdate.Fields, "reporter")
 		issueResp, err = jira.CreateIssue(o, globals.Endpoint.Value, &issueUpdate)
 		return err
 	})
