@@ -325,7 +325,7 @@ const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf 
 
 const defaultTableTemplate = `{{/* table template */ -}}
 {{- headers "Issue" "Summary" "Type" "Priority" "Status" "Age" "Reporter" "Assignee" -}}
-{{- range .issues -}} 
+{{- range .issues -}}
   {{- row -}}
   {{- cell .key -}}
   {{- cell .fields.summary -}}
@@ -432,7 +432,7 @@ fields:
     displayName: {{.fields.assignee.displayName}}{{end}}{{end}}{{end}}
 {{- if .meta.fields.reporter}}
   reporter:
-    name: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.name }}{{end}}{{end}}
+    id: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.id }}{{end}}{{end}}
 {{- if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range .fields.customfield_10110 }}
@@ -483,7 +483,7 @@ fields:
   assignee:
     name: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
   reporter:
-    name: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
+    id: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
@@ -506,7 +506,7 @@ fields:
   assignee:
     name: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
   reporter:
-    name: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
+    id: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
@@ -529,7 +529,7 @@ fields:
   assignee:
     name: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
   reporter:
-    name: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
+    id: {{ or .overrides.reporter .overrides.user }}{{end}}{{if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
@@ -594,10 +594,10 @@ fields:
 {{- if .meta.fields.reporter }}
   {{- if .overrides.reporter }}
   reporter:
-    name: {{ .overrides.reporter }}
+    id: {{ .overrides.reporter }}
   {{- else if .fields.reporter }}
-  reporter: {{if .fields.reporter.name}}
-    name: {{ or .fields.reporter.name}}
+  reporter: {{if .fields.reporter.id}}
+    id: {{ or .fields.reporter.id}}
   {{- else }}
     displayName: {{.fields.reporter.displayName}}{{end}}{{end}}
 {{- end -}}
