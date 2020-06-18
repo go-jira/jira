@@ -234,7 +234,7 @@ custom-commands:
           {{jira}} list --template table --query "sprint in openSprints() and type != epic and resolution = unresolved and project=$JIRA_PROJECT ORDER BY rank asc, created"
       else
           # otherwise list issues for all project
-          echo "\"project: ...\" configuration missing from .jira.d/config.yml"
+          {{jira}} list --template table --query "sprint in openSprints() and type != epic and resolution = unresolved ORDER BY rank asc, created"
       fi
 ```
 
