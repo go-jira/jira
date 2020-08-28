@@ -308,7 +308,7 @@ EOF
 ## set mothra user as watcher to issue and verify from REST api
 ###############################################################################
 
-RUNS $jira watch $issue
+RUNS ../jira --login mothra@corybennett.org watch $issue
 DIFF <<EOF
 OK $issue $ENDPOINT/browse/$issue
 EOF
