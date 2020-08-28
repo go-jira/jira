@@ -6,6 +6,14 @@
 
 Simple command line client for Atlassian's Jira service written in Go.
 
+## GDPR USERNAME DISCLAIMER
+
+When this tool was initial written the "username" parameter was widely used in the Atlassian API.
+Due to GDPR restrictions this parameter was been almost completely phased out other then V1 login.
+The "--user" field is still provided as a default global, however moving forward any usage of this field should be phased out in favor of the "--login" option. 
+
+Commands which previously took a username will now expect an email address such as watch, create, assign, etc...
+
 ## Install
 
 ### Download

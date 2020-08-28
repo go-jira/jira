@@ -26,9 +26,6 @@ func UserSearch(ua HttpClient, endpoint string, opts *UserSearchOptions) ([]*jir
 	if opts.Query != "" {
 		params = append(params, "query="+url.QueryEscape(opts.Query))
 	}
-	if opts.Username != "" {
-		params = append(params, "username="+url.QueryEscape(opts.Username))
-	}
 	if opts.AccountID != "" {
 		params = append(params, "accountId="+url.QueryEscape(opts.AccountID))
 	}

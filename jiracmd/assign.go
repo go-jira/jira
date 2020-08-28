@@ -43,7 +43,7 @@ func CmdAssignUsage(cmd *kingpin.CmdClause, opts *AssignOptions) error {
 		return nil
 	}).Bool()
 	cmd.Arg("ISSUE", "issue to assign").Required().StringVar(&opts.Issue)
-	cmd.Arg("ASSIGNEE", "user to assign to issue").StringVar(&opts.Assignee)
+	cmd.Arg("ASSIGNEE", "email or display name of user to assign to issue").StringVar(&opts.Assignee)
 	return nil
 }
 
@@ -61,7 +61,7 @@ func CmdAssign(o *oreo.Client, globals *jiracli.GlobalOptions, opts *AssignOptio
 	if globals.JiraDeploymentType.Value == jiracli.CloudDeploymentType {
 		if opts.Assignee != "" && opts.Assignee != "-1" {
 			users, err := jira.UserSearch(o, globals.Endpoint.Value, &jira.UserSearchOptions{
-				Username: opts.Assignee,
+				Query: opts.Assignee,
 			})
 			if err != nil {
 				return err
