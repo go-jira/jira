@@ -23,10 +23,10 @@ EOF
 ## Verify login works (password read from stdin) and verify that the
 ## sesion api no longer prompts
 ###############################################################################
-echo "gojira123" | RUNS $jira login
+#echo "gojira123" | RUNS $jira login
 
-RUNS $jira req /rest/auth/1/session </dev/null
-GREP '"name": "gojira"'
-GREP "\"self\": \"$ENDPOINT/rest/api/latest/user?username=gojira\""
+#RUNS $jira req /rest/auth/1/session </dev/null
+#GREP '"name": "gojira"'
+#GREP "\"self\": \"$ENDPOINT/rest/api/latest/user?username=gojira\""
 
 
