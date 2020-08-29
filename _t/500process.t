@@ -10,6 +10,10 @@ PLAN 84
 ($jira ls --project PROCESS | awk -F: '{print $1}' | while read issue; do ../jira start $issue; done) | sed 's/^/# CLEANUP: /g'
 ($jira ls --project PROCESS | awk -F: '{print $1}' | while read issue; do ../jira stop $issue; done) | sed 's/^/# CLEANUP: /g'
 
+# for any issues still remaining, they are stuck in "Under Review" status
+($jira ls --project PROCESS | awk -F: '{print $1}' | while read issue; do ../jira transition --noedit -m  "approve" "Approve" $issue; done) | sed 's/^/# CLEANUP: /g'
+($jira ls --project PROCESS | awk -F: '{print $1}' | while read issue; do ../jira transition --noedit -m  "done" "Done" $issue; done) | sed 's/^/# CLEANUP: /g'
+
 # reset login
 RUNS $jira logout
 echo "gojira123" | RUNS $jira login
