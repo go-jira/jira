@@ -103,6 +103,7 @@ Commands:
 
 func CommandLine(fig *figtree.FigTree, o *oreo.Client) *kingpin.Application {
 	app := kingpin.New("jira", "Jira Command Line Interface")
+	app.HelpFlag.Short('h')
 	app.UsageWriter(os.Stdout)
 	app.ErrorWriter(os.Stderr)
 	app.Command("version", "Prints version").PreAction(func(*kingpin.ParseContext) error {
