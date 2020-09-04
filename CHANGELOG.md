@@ -1,5 +1,43 @@
 # Changelog
 
+## 1.0.23 - 2020-09-04
+
+* Make -h flag show --help [Benjamin Kane] [[4bf1d03](https://github.com/Netflix-Skunkworks/go-jira/commit/4bf1d03)]
+* transition: map field name to id [Louis DeLosSantos] [[3c1c4d9](https://github.com/Netflix-Skunkworks/go-jira/commit/3c1c4d9)]
+* username-deprecation: use email and display names [Louis DeLosSantos] [[6a27e28](https://github.com/Netflix-Skunkworks/go-jira/commit/6a27e28)]
+* Add support to get all comments for an issue [Thibault Jamet] [[a311d0d](https://github.com/Netflix-Skunkworks/go-jira/commit/a311d0d)]
+* update all usage of user.name to user.accountId for privacy migration: https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/ [Cory Bennett] [[a26683e](https://github.com/Netflix-Skunkworks/go-jira/commit/a26683e)]
+* add template functions to handle table output, fixes [#176](https://github.com/Netflix-Skunkworks/go-jira/issues/176), replaces [#296](https://github.com/Netflix-Skunkworks/go-jira/issues/296) [Cory Bennett] [[7e97463](https://github.com/Netflix-Skunkworks/go-jira/commit/7e97463)]
+* use `password-source-path` to allow overriding binary and/or path to binary [Cory Bennett] [[d6173ce](https://github.com/Netflix-Skunkworks/go-jira/commit/d6173ce)]
+* allow issues on command line to automatically prefix with project when defined [Cory Bennett] [[d002d7f](https://github.com/Netflix-Skunkworks/go-jira/commit/d002d7f)]
+* Forgot you use TAB instead of spaces [Cory Bennett] [[789886c](https://github.com/Netflix-Skunkworks/go-jira/commit/789886c)]
+* Fixed append project to view [Cory Bennett] [[8a46215](https://github.com/Netflix-Skunkworks/go-jira/commit/8a46215)]
+* Added a line break removal function [Cory Bennett] [[9cbd993](https://github.com/Netflix-Skunkworks/go-jira/commit/9cbd993)]
+* Pushed Readfile to .jira.d directory instead of pwd [Cory Bennett] [[db53622](https://github.com/Netflix-Skunkworks/go-jira/commit/db53622)]
+* Cache password to avoid invoking password source on each API request [Patrick Decat] [[0f059a5](https://github.com/Netflix-Skunkworks/go-jira/commit/0f059a5)]
+* Add support to switch out password source binary [Patrick Pichler] [[659a5c8](https://github.com/Netflix-Skunkworks/go-jira/commit/659a5c8)]
+* Add error handling to pass password-source [Patrick Pichler] [[3339303](https://github.com/Netflix-Skunkworks/go-jira/commit/3339303)]
+* Add gopass support [Patrick Pichler] [[3c0a62e](https://github.com/Netflix-Skunkworks/go-jira/commit/3c0a62e)]
+* add sprig template functions, replaces [[#215](https://github.com/Netflix-Skunkworks/go-jira/issues/215)] http://masterminds.github.io/sprig/ [Cory Bennett] [[719f7a6](https://github.com/Netflix-Skunkworks/go-jira/commit/719f7a6)]
+* [[#232](https://github.com/Netflix-Skunkworks/go-jira/issues/232)] fix api to use common Version schema also rewrote the schema fetcher to use Go [Cory Bennett] [[90f01ce](https://github.com/Netflix-Skunkworks/go-jira/commit/90f01ce)]
+* fix syntax [Cory Bennett] [[94dd489](https://github.com/Netflix-Skunkworks/go-jira/commit/94dd489)]
+* Address comments for direct name match [Patrick Cockwell] [[a70384b](https://github.com/Netflix-Skunkworks/go-jira/commit/a70384b)]
+* Choose exact transition match if available [Patrick Cockwell] [[a646f76](https://github.com/Netflix-Skunkworks/go-jira/commit/a646f76)]
+* [[#277](https://github.com/Netflix-Skunkworks/go-jira/issues/277)] update figtree to latest [Cory Bennett] [[0e520a4](https://github.com/Netflix-Skunkworks/go-jira/commit/0e520a4)]
+* Switch over to using github.com/go-jira/jira, from gopkg.in [Mike Pountney] [[27f57b2](https://github.com/Netflix-Skunkworks/go-jira/commit/27f57b2)]
+* Add 'pctOf' and 'fit' template functions [Adriano Caloiaro] [[027adee](https://github.com/Netflix-Skunkworks/go-jira/commit/027adee)]
+* fix worklog template to allow multiline comments [Matthias Bethke] [[43e07f1](https://github.com/Netflix-Skunkworks/go-jira/commit/43e07f1)]
+* Allow reading password from stdin [Justin Ko] [[225e1dc](https://github.com/Netflix-Skunkworks/go-jira/commit/225e1dc)]
+* all: unindent some code [Daniel Martí] [[31c113d](https://github.com/Netflix-Skunkworks/go-jira/commit/31c113d)]
+* don't use ReadAll when decoding JSON [Daniel Martí] [[9bcdcc1](https://github.com/Netflix-Skunkworks/go-jira/commit/9bcdcc1)]
+* start making staticcheck happier [Daniel Martí] [[9b9186f](https://github.com/Netflix-Skunkworks/go-jira/commit/9b9186f)]
+* all: convert to a Go module [Daniel Martí] [[f125ef3](https://github.com/Netflix-Skunkworks/go-jira/commit/f125ef3)]
+* CI: test on Go 1.12.x, cleanup [Daniel Martí] [[664c5ca](https://github.com/Netflix-Skunkworks/go-jira/commit/664c5ca)]
+* make automatic pagination on search optional, fix tests [Cory Bennett] [[36c99ce](https://github.com/Netflix-Skunkworks/go-jira/commit/36c99ce)]
+* prefer defer resp.Body.Close to avoid leaks on subsequent errors [Cory Bennett] [[181bd74](https://github.com/Netflix-Skunkworks/go-jira/commit/181bd74)]
+* add pagination to search [Miles Maddox] [[76dd1d8](https://github.com/Netflix-Skunkworks/go-jira/commit/76dd1d8)]
+* Fix function comments based on best practices from Effective Go [CodeLingo Bot] [[23ac118](https://github.com/Netflix-Skunkworks/go-jira/commit/23ac118)]
+
 ## 1.0.23 - 2020-02-26
 
 * update all usage of user.name to user.accountId for privacy migration: https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/ [Cory Bennett] [[a26683e](https://github.com/Netflix-Skunkworks/go-jira/commit/a26683e)]
