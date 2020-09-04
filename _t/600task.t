@@ -44,13 +44,10 @@ description: |
 EOF
 
 ###############################################################################
-## List all issues, should be just the one we created
+## List all issues, should be see ours
 ###############################################################################
 
-RUNS $jira ls --project TASK
-DIFF <<EOF
-$(printf %-12s $issue:) summary
-EOF
+RUNS $jira ls --project TASK | grep $issue
 
 ###############################################################################
 ## Try to close the issue, but TASK projects do not allow that state
@@ -71,12 +68,10 @@ OK $issue $ENDPOINT/browse/$issue
 EOF
 
 ###############################################################################
-## Verify there are no unresolved issues
+## Verify our issue is not unresolved issues
 ###############################################################################
 
-RUNS $jira ls --project TASK
-DIFF <<EOF
-EOF
+NRUNS $jira ls --project TASK | grep $issue
 
 ###############################################################################
 ## Setup 2 more issues so we can test duping
@@ -130,10 +125,7 @@ EOF
 ## We should see only one unresolved issue, the Dup should be resolved
 ###############################################################################
 
-RUNS $jira ls --project TASK
-DIFF <<EOF
-$(printf %-12s $issue:) summary
-EOF
+NRUNS $jira ls --project TASK | grep $dub
 
 ###############################################################################
 ## Setup for testing blocking issues
@@ -177,11 +169,8 @@ EOF
 ## Both issues are unresolved now
 ###############################################################################
 
-RUNS $jira ls --project TASK
-DIFF <<EOF
-$(printf %-12s $issue:) summary
-$(printf %-12s $blocker:) blocks
-EOF
+RUNS $jira ls --project TASK | grep $issue
+RUNS $jira ls --project TASK | grep $blocker
 
 ###############################################################################
 # reset login for mothra for voting

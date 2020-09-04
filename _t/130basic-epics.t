@@ -16,7 +16,8 @@ RUNS $jira login
 ###############################################################################
 ## Create an epic
 ###############################################################################
-RUNS $jira epic create --project BASIC -o summary="Totally Epic" -o description=description --epic-name "Basic Epic" --noedit --saveFile issue.props
+rand_string=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 10)
+RUNS $jira epic create --project BASIC -o summary="Totally Epic" -o description=description --epic-name "Basic Epic - $rand_string" --noedit --saveFile issue.props
 epic=$(awk '/issue/{print $2}' issue.props)
 
 DIFF <<EOF
