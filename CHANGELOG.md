@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.23 - 2020-09-04
+## 1.0.24 - 2020-09-04
 
 * Make -h flag show --help [Benjamin Kane] [[4bf1d03](https://github.com/Netflix-Skunkworks/go-jira/commit/4bf1d03)]
 * transition: map field name to id [Louis DeLosSantos] [[3c1c4d9](https://github.com/Netflix-Skunkworks/go-jira/commit/3c1c4d9)]
