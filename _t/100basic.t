@@ -44,34 +44,27 @@ description: |
 EOF
 
 ###############################################################################
-## List all issues, should be just the one we created
+## List all issues, should contain our issue
 ###############################################################################
 
-RUNS $jira ls --project BASIC
-DIFF <<EOF
-$(printf %-12s $issue:) summary
-EOF
+RUNS $jira ls --project BASIC | grep $issue
 
 ###############################################################################
 ## List issues using a named query
 ###############################################################################
-RUNS $jira ls --project BASIC -n todo
-DIFF <<EOF
-$(printf %-12s $issue:) summary
-EOF
+RUNS $jira ls --project BASIC -n todo | grep $issue
 
 ###############################################################################
 ## List all issues, using the table template
 ###############################################################################
 
-RUNS $jira ls --project BASIC --template table
-DIFF <<EOF
-+------------+---------+------+----------+--------+----------+----------+----------+
-|   Issue    | Summary | Type | Priority | Status |   Age    | Reporter | Assignee |
-+------------+---------+------+----------+--------+----------+----------+----------+
-| $issue | summary | Bug  | Medium   | To Do  | a minute | GoJira   | GoJira   |
-+------------+---------+------+----------+--------+----------+----------+----------+
-EOF
+#+------------+---------+------+----------+--------+----------+----------+----------+
+#|   Issue    | Summary | Type | Priority | Status |   Age    | Reporter | Assignee |
+#+------------+---------+------+----------+--------+----------+----------+----------+
+#| $issue | summary | Bug  | Medium   | To Do  | a minute | GoJira   | GoJira   |
+#+------------+---------+------+----------+--------+----------+----------+----------+
+
+RUNS $jira ls --project BASIC --template table | grep "${issue}.*summary.*Bug.*Medium.*To Do.*a minute.*GoJira.*GoJira"
 
 ###############################################################################
 ## Edit an issue
@@ -131,12 +124,10 @@ OK $issue $ENDPOINT/browse/$issue
 EOF
 
 ###############################################################################
-## Verify there are no unresolved issues
+## Verify our issue is resolved
 ###############################################################################
 
-RUNS $jira ls --project BASIC
-DIFF <<EOF
-EOF
+NRUNS $jira ls --project BASIC | grep $issue
 
 ###############################################################################
 ## Setup 2 more issues so we can test duping
@@ -185,13 +176,10 @@ description: |
 EOF
 
 ###############################################################################
-## We should see only one unresolved issue, the Dup should be resolved
+## We should not see the dup issue. It should be resolved.
 ###############################################################################
 
-RUNS $jira ls --project BASIC
-DIFF <<EOF
-$(printf %-12s $issue:) summary
-EOF
+NRUNS $jira ls --project BASIC | grep $dup
 
 ###############################################################################
 ## Setup for testing blocking issues
@@ -235,11 +223,8 @@ EOF
 ## Both issues are unresolved now
 ###############################################################################
 
-RUNS $jira ls --project BASIC
-DIFF <<EOF
-$(printf %-12s $issue:) summary
-$(printf %-12s $blocker:) blocks
-EOF
+RUNS $jira ls --project BASIC | grep $issue
+RUNS $jira ls --project BASIC | grep $blocker
 
 ###############################################################################
 # reset login for mothra for voting
