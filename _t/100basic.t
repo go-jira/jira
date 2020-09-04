@@ -4,7 +4,7 @@ cd $(dirname $0)
 jira="../jira"
 . env.sh
 
-PLAN 98
+PLAN 93
 
 # reset login
 RUNS $jira logout
