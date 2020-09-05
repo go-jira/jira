@@ -1,0 +1,49 @@
+config:
+  stop: true
+endpoint: https://go-jira.atlassian.net
+password-source: stdin
+user: gojira
+login: gojira@corybennett.org
+
+project: BASIC
+
+queries:
+  todo: >-
+    resolution = unresolved {{if .project}}AND project = '{{.project}}'{{end}} AND status = 'To Do'
+
+custom-commands:
+  - name: env
+    help: print the JIRA environment variables available to custom commands
+    script: |-
+      env | sort | grep JIRA
+  - name: print-project
+    help: print the name of the configured project
+    script: "echo $JIRA_PROJECT"
+  - name: jira-path
+    help: print the path the jira command that is running this alias
+    script: |-
+      echo {{jira}}
+  - name: mine
+    help: display issues assigned to me
+    script: |-
+      if [ -n "$JIRA_PROJECT" ]; then
+          # if `project: ...` configured just list the issues for current project
+          {{jira}} list --template table --query "resolution = unresolved and assignee=currentuser() and project = $JIRA_PROJECT ORDER BY priority asc, created"
+      else
+          # otherwise list issues for all project
+          {{jira}} list --template table --query "resolution = unresolved and assignee=currentuser() ORDER BY priority asc, created"
+      fi
+  - name: argtest
+    help: testing passing args
+    script: |-
+      echo {{args.ARG}}
+    args:
+      - name: ARG
+        help: string to echo for testing
+  - name: opttest
+    help: testing passing option flags
+    script: |-
+      echo {{options.OPT}}
+    options:
+      - name: OPT
+        help: string to echo for testing

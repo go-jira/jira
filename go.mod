@@ -15,6 +15,7 @@ require (
 	github.com/coryb/oreo v0.0.0-20180804211640-3e1b88fc08f1
 	github.com/davecgh/go-spew v1.1.0 // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
+	github.com/google/go-cmp v0.5.2
 	github.com/google/uuid v1.1.1 // indirect
 	github.com/guelfey/go.dbus v0.0.0-20131113121618-f6a3a2366cc3 // indirect
 	github.com/hinshun/vt10x v0.0.0-20180809195222-d55458df857c // indirect
