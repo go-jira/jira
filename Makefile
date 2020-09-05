@@ -43,7 +43,6 @@ all:
 	rm -rf dist
 	mkdir -p dist
 	gox -ldflags="-w -s" -output="dist/github.com/go-jira/jira-{{.OS}}-{{.Arch}}" -osarch="darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64" ./...
-	_t/test_binaries.sh
 
 install:
 	${MAKE} GOBIN=$$HOME/bin build
