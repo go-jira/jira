@@ -72,6 +72,9 @@ func CmdRequest(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RequestOpt
 	if err != nil {
 		return err
 	}
+	if resp.Body == nil {
+		return fmt.Errorf("Empty Response Body")
+	}
 	defer resp.Body.Close()
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
