@@ -37,4 +37,3 @@ jobs:
           commit-message: "chore: ${{ github.event.inputs.tag }} changelog bump"
           branch: "ready-${{ github.event.inputs.tag }}"
           signoff: "gh-actions"
-

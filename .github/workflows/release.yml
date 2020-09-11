@@ -10,6 +10,7 @@ jobs:
   release:
     name: Release
     runs-on: 'ubuntu-latest'
+    container: docker.io/library/golang:1.14
     steps:
       - name: Setup
         run: |
@@ -21,6 +22,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: add gox
+        run: go install github.com/mitchellh/gox
       - name: ChangeLog
         shell: bash
         run: |
@@ -36,6 +39,7 @@ jobs:
           ::set-env name=CHANGELOG::${chglog}
           .
       - name: Create Release
+        id: create_release
         uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,16 +58,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./dist/github.com/go-jira/jira-drawin-amd64
-          asset_name: jira-drawin-amd64
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/go-jira/jira-darwin-amd64
+          asset_name: jira-darwin-amd64
           asset_content_type: application/octet-stream
       - name: "Publish Linux 386"
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/github.com/go-jira/jira-linux-386
           asset_name: jira-linux-386
           asset_content_type: application/octet-stream
@@ -72,7 +76,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/github.com/go-jira/jira-linux-amd64
           asset_name: jira-linux-amd64
           asset_content_type: application/octet-stream
@@ -81,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/github.com/go-jira/jira-windows-386.exe
           asset_name: jira-windows-386.exe
           asset_content_type: application/octet-stream
@@ -90,8 +94,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/github.com/go-jira/jira-windows-amd64.exe
           asset_name: jira-windows-amd64.exe
           asset_content_type: application/octet-stream
+
 
