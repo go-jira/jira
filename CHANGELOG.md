@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.25 - 2020-09-11
+
+* Ensure body is NPE safe [Louis DeLosSantos] [[42e5d23](https://github.com/Netflix-Skunkworks/go-jira/commit/42e5d23)]
+* Support empty responses in request commands [Louis DeLosSantos] [[b572037](https://github.com/Netflix-Skunkworks/go-jira/commit/b572037)]
+
 ## 1.0.24 - 2020-09-04
 
 * Make -h flag show --help [Benjamin Kane] [[4bf1d03](https://github.com/Netflix-Skunkworks/go-jira/commit/4bf1d03)]
