@@ -91,7 +91,7 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 	}
 	input.Overrides["project"] = opts.Project
 	input.Overrides["issuetype"] = opts.IssueType
-	input.Overrides["user"] = globals.User.Value
+	input.Overrides["login"] = globals.Login.Value
 
 	var issueResp *jiradata.IssueCreateResponse
 	err = jiracli.EditLoop(&opts.CommonOptions, &input, &issueUpdate, func() error {
