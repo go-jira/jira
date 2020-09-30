@@ -21,6 +21,7 @@ import (
 	shellquote "github.com/kballard/go-shellquote"
 	"github.com/mgutz/ansi"
 	"github.com/olekukonko/tablewriter"
+	wordwrap "github.com/mitchellh/go-wordwrap"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -190,6 +191,9 @@ func TemplateProcessor() *template.Template {
 		},
 		"dateFormat": func(format string, content string) (string, error) {
 			return dateFormat(format, content)
+		},
+		"wrap": func(width uint, content string) string {
+			return wordwrap.WrapString(content, width)
 		},
 	}
 	return template.New("gojira").Funcs(sprig.GenericFuncMap()).Funcs(funcs)
