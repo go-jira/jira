@@ -2,8 +2,17 @@
 ## [Unreleased]
 
 
+<a name="V1.0.27"></a>
+## [V1.0.27] - 2020-10-01
+### Block
+- [f7587f4](https://github.com/go-jira/go-jira/commit/f7587f43f12bcf0b47e52a5abe775daf6cbb3229): reverse order of arguments
+### Templates
+- [0e3082f](https://github.com/go-jira/go-jira/commit/0e3082fab6e12a337f5fe26c3e2dec5cb51425d8): add wrap helper function
+
 <a name="v1.0.26"></a>
 ## [v1.0.26] - 2020-09-11
+### Chore
+- [c3d22b7](https://github.com/go-jira/go-jira/commit/c3d22b765a6f3cd93445033da5c19fc0feaeaece): v1.0.26 changelog bump
 ### Cicd
 - [96ec333](https://github.com/go-jira/go-jira/commit/96ec3339a4cc810da20450a9d9e91612c2b9aad4): automated releases fixes
 - [31f7b03](https://github.com/go-jira/go-jira/commit/31f7b0397890388947f2312cf42af494c7a6979f): automated changelog and release
@@ -432,7 +441,8 @@ limit of 1000 results in a single query.
 - Merge pull request [#2](https://github.com/go-jira/go-jira/issues/2) from jaybuff/clean-up
 
 
-[Unreleased]: https://github.com/go-jira/go-jira/compare/v1.0.26...HEAD
+[Unreleased]: https://github.com/go-jira/go-jira/compare/V1.0.27...HEAD
+[V1.0.27]: https://github.com/go-jira/go-jira/compare/v1.0.26...V1.0.27
 [v1.0.26]: https://github.com/go-jira/go-jira/compare/v1.0.25...v1.0.26
 [v1.0.25]: https://github.com/go-jira/go-jira/compare/v1.0.24...v1.0.25
 [v1.0.24]: https://github.com/go-jira/go-jira/compare/v1.0.23...v1.0.24
