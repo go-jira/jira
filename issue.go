@@ -545,6 +545,42 @@ type UserProvider interface {
 	ProvideUser() *jiradata.User
 }
 
+// https://docs.atlassian.com/software/jira/docs/api/REST/8.12.2/#api/2/issue-archiveIssues
+func IssueArchive(ua HttpClient, endpoint string, issue string) error {
+	issues := []string{issue}
+	encoded, err := json.Marshal(issues)
+	if err != nil {
+		return err
+	}
+	uri := URLJoin(endpoint, "rest/api/2/issue/archive")
+	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		return nil
+	}
+	return responseError(resp)
+}
+
+// https://docs.atlassian.com/software/jira/docs/api/REST/8.12.2/#api/2/issue-restoreIssue
+func IssueRestore(ua HttpClient, endpoint string, issue string) error {
+	uri := URLJoin(endpoint, "rest/api/2/issue/", issue, "/restore")
+	resp, err := ua.Put(uri, "application/json", nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 204 {
+		return nil
+	}
+	return responseError(resp)
+}
+
+
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-assign
 func (j *Jira) IssueAssign(issue, name string) error {
 	return IssueAssign(j.UA, j.Endpoint, issue, name)

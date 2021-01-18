@@ -5,6 +5,7 @@ import "github.com/go-jira/jira/jiracli"
 func RegisterAllCommands() {
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "acknowledge", Entry: CmdTransitionRegistry("acknowledge"), Aliases: []string{"ack"}})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "assign", Entry: CmdAssignRegistry(), Aliases: []string{"give"}})
+	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "archive", Entry: CmdArchiveRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "attach create", Entry: CmdAttachCreateRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "attach get", Entry: CmdAttachGetRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "attach list", Entry: CmdAttachListRegistry(), Aliases: []string{"ls"}})
@@ -42,6 +43,7 @@ func RegisterAllCommands() {
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "reopen", Entry: CmdTransitionRegistry("reopen")})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "request", Entry: CmdRequestRegistry(), Aliases: []string{"req"}})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "resolve", Entry: CmdTransitionRegistry("resolve")})
+	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "restore", Entry: CmdRestoreRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "start", Entry: CmdTransitionRegistry("start")})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "stop", Entry: CmdTransitionRegistry("stop")})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "subtask", Entry: CmdSubtaskRegistry()})
