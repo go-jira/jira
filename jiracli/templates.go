@@ -20,8 +20,8 @@ import (
 	"github.com/coryb/figtree"
 	shellquote "github.com/kballard/go-shellquote"
 	"github.com/mgutz/ansi"
-	"github.com/olekukonko/tablewriter"
 	wordwrap "github.com/mitchellh/go-wordwrap"
+	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -312,6 +312,7 @@ var AllTemplates = map[string]string{
 	"issuetypes":     defaultIssuetypesTemplate,
 	"json":           defaultDebugTemplate,
 	"list":           defaultListTemplate,
+	"releases":       defaultReleasesTemplate,
 	"request":        defaultDebugTemplate,
 	"subtask":        defaultSubtaskTemplate,
 	"table":          defaultTableTemplate,
@@ -457,6 +458,9 @@ const defaultTransitionsTemplate = `{{ range .transitions }}{{.id }}: {{.name}}
 {{end}}`
 
 const defaultComponentsTemplate = `{{ range . }}{{.id }}: {{.name}}
+{{end}}`
+
+const defaultReleasesTemplate = `{{ range . }}{{.id }}: {{.name}}
 {{end}}`
 
 const defaultComponentAddTemplate = `{{/* compoinent add template */ -}}
