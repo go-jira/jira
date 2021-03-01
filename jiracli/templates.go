@@ -72,9 +72,13 @@ func TemplateProcessor() *template.Template {
 		"jira": func() string {
 			return os.Args[0]
 		},
-		"jiraExec": func(args ...string) *exec.Cmd {
+		"jiraExec": func(args ...interface{}) *exec.Cmd {
 			var outb, errb bytes.Buffer
-			cmd := exec.Command(os.Args[0], args...)
+			var argStrings []string = make([]string, len(args))
+			for i, d := range args {
+				argStrings[i] = fmt.Sprint(d)
+			}
+			cmd := exec.Command(os.Args[0], argStrings...)
 			cmd.Stdout = &outb
 			cmd.Stderr = &errb
 			err := cmd.Run()
