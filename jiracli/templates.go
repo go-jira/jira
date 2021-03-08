@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -14,15 +15,15 @@ import (
 	"strings"
 	"text/template"
 
-	yaml "gopkg.in/coryb/yaml.v2"
+	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/Masterminds/sprig"
 	"github.com/coryb/figtree"
 	shellquote "github.com/kballard/go-shellquote"
 	"github.com/mgutz/ansi"
-	"github.com/olekukonko/tablewriter"
 	wordwrap "github.com/mitchellh/go-wordwrap"
-	"golang.org/x/crypto/ssh/terminal"
+	"github.com/olekukonko/tablewriter"
+	yaml "gopkg.in/coryb/yaml.v2"
 )
 
 func findTemplate(name string) ([]byte, error) {
@@ -70,6 +71,25 @@ func TemplateProcessor() *template.Template {
 	funcs := map[string]interface{}{
 		"jira": func() string {
 			return os.Args[0]
+		},
+		"jiraExec": func(stdin interface{}, args ...interface{}) *exec.Cmd {
+			var outb, errb bytes.Buffer
+			var argStrings = make([]string, len(args))
+			for i, d := range args {
+				argStrings[i] = fmt.Sprint(d)
+			}
+			cmd := exec.Command(os.Args[0], argStrings...)
+			if stdinStr := fmt.Sprint(stdin); stdinStr != "" {
+				cmd.Stdin = strings.NewReader(stdinStr)
+			}
+			cmd.Stdout = &outb
+			cmd.Stderr = &errb
+			err := cmd.Run()
+			if err != nil {
+				log.Warning("error running %v: %v", cmd.Args, err)
+				log.Warning("error: %v", cmd.Stderr)
+			}
+			return cmd
 		},
 		"env": func() map[string]string {
 			out := map[string]string{}
