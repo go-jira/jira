@@ -20,8 +20,8 @@ import (
 	"github.com/coryb/figtree"
 	shellquote "github.com/kballard/go-shellquote"
 	"github.com/mgutz/ansi"
-	"github.com/olekukonko/tablewriter"
 	wordwrap "github.com/mitchellh/go-wordwrap"
+	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

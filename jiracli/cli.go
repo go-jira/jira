@@ -488,7 +488,7 @@ func ReadYmlInputFile(opts *CommonOptions, input interface{}, output interface{}
 		return err
 	}
 
-    tmpFile = opts.File.String()
+	tmpFile = opts.File.String()
 
 	// we need to copy the original output so that we can restore
 	// it on retries in case we try to populate bogus fields that
@@ -499,57 +499,57 @@ func ReadYmlInputFile(opts *CommonOptions, input interface{}, output interface{}
 		return err
 	}
 
-		// parse template
-		data, err := ioutil.ReadFile(tmpFile)
-		if err != nil {
-			return err
-		}
+	// parse template
+	data, err := ioutil.ReadFile(tmpFile)
+	if err != nil {
+		return err
+	}
 
-		defer func(mapType, iface reflect.Type) {
-			yaml.DefaultMapType = mapType
-			yaml.IfaceType = iface
-		}(yaml.DefaultMapType, yaml.IfaceType)
-		yaml.DefaultMapType = reflect.TypeOf(map[string]interface{}{})
-		yaml.IfaceType = yaml.DefaultMapType.Elem()
+	defer func(mapType, iface reflect.Type) {
+		yaml.DefaultMapType = mapType
+		yaml.IfaceType = iface
+	}(yaml.DefaultMapType, yaml.IfaceType)
+	yaml.DefaultMapType = reflect.TypeOf(map[string]interface{}{})
+	yaml.IfaceType = yaml.DefaultMapType.Elem()
 
-		// restore output incase of retry loop
-		err = copier.Copy(output, dup.Interface())
-		if err != nil {
-			return err
-		}
+	// restore output incase of retry loop
+	err = copier.Copy(output, dup.Interface())
+	if err != nil {
+		return err
+	}
 
-		// HACK HACK HACK we want to trim out all the yaml garbage that is not
-		// poplulated, like empty arrays, string values with only a newline,
-		// etc.  We need to do this because jira will reject json documents
-		// with empty arrays, or empty strings typically.  So here we process
-		// the data to a raw interface{} then we fixup the yaml parsed
-		// interface, then we serialize to a new yaml document ... then is
-		// parsed as the original document to populate the output struct.  Phew.
-		var raw interface{}
-		if err := yaml.Unmarshal(data, &raw); err != nil {
-			log.Error(err.Error())
-            fmt.Printf("Invalid YAML syntax\n")
-			return FileAbort
-		}
-		yamlFixup(&raw)
-		fixedYAML, err := yaml.Marshal(&raw)
-		if err != nil {
-			log.Error(err.Error())
-            fmt.Printf("Invalid YAML syntax\n")
-			return FileAbort
-		}
+	// HACK HACK HACK we want to trim out all the yaml garbage that is not
+	// poplulated, like empty arrays, string values with only a newline,
+	// etc.  We need to do this because jira will reject json documents
+	// with empty arrays, or empty strings typically.  So here we process
+	// the data to a raw interface{} then we fixup the yaml parsed
+	// interface, then we serialize to a new yaml document ... then is
+	// parsed as the original document to populate the output struct.  Phew.
+	var raw interface{}
+	if err := yaml.Unmarshal(data, &raw); err != nil {
+		log.Error(err.Error())
+		fmt.Printf("Invalid YAML syntax\n")
+		return FileAbort
+	}
+	yamlFixup(&raw)
+	fixedYAML, err := yaml.Marshal(&raw)
+	if err != nil {
+		log.Error(err.Error())
+		fmt.Printf("Invalid YAML syntax\n")
+		return FileAbort
+	}
 
-		if err := yaml.Unmarshal(fixedYAML, output); err != nil {
-			log.Error(err.Error())
-            fmt.Printf("Invalid YAML syntax\n")
-			return FileAbort
-		}
-		// submit template
-		if err := submit(); err != nil {
-			log.Error(err.Error())
-            fmt.Printf("Jira reported an error\n")
-			return FileAbort
-		}
+	if err := yaml.Unmarshal(fixedYAML, output); err != nil {
+		log.Error(err.Error())
+		fmt.Printf("Invalid YAML syntax\n")
+		return FileAbort
+	}
+	// submit template
+	if err := submit(); err != nil {
+		log.Error(err.Error())
+		fmt.Printf("Jira reported an error\n")
+		return FileAbort
+	}
 	return nil
 }
 
