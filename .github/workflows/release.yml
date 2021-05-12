@@ -12,12 +12,15 @@ jobs:
     runs-on: 'ubuntu-latest'
     container: docker.io/library/golang:1.14
     steps:
+      # This step is for local testing using https://github.com/nektos/act
+      - name: install node
+        run: |
+          apt update 
+          apt install -y nodejs
       - name: Setup
         run: |
           tag=`basename ${{ github.ref }}`
-          cat <<.
-          ::set-env name=VERSION::${tag}
-          .
+          echo "VERSION=${tag}" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -35,9 +38,7 @@ jobs:
           chglog="${chglog//'%'/'%25'}"
           chglog="${chglog//$'\n'/'%0A'}"
           chglog="${chglog//$'\r'/'%0D'}"
-          cat <<.
-          ::set-env name=CHANGELOG::${chglog}
-          .
+          echo "CHANGELOG=${chglog}" >> $GITHUB_ENV
       - name: Create Release
         id: create_release
         uses: actions/create-release@latest
@@ -45,7 +46,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ env.VERSION}} Release
+          release_name: ${{ env.VERSION }} Release
           body: |
             ${{ env.CHANGELOG }}
           prerelease: ${{ contains(env.VERSION, 'alpha') || contains(env.VERSION, 'beta') || contains(env.VERSION, 'rc') }}
