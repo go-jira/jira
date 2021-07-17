@@ -499,7 +499,7 @@ func (j *Jira) IssueRemoveWatcher(issue, user string) error {
 
 func IssueRemoveWatcher(ua HttpClient, endpoint string, issue, user string) error {
 	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "watchers")
-	uri += fmt.Sprintf("?username=%s", user)
+	uri += fmt.Sprintf("?accountId=%s", user)
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err

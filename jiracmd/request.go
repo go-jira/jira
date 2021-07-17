@@ -3,12 +3,12 @@ package jiracmd
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/url"
 	"strings"
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
-
 	"github.com/go-jira/jira/jiracli"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -72,10 +72,22 @@ func CmdRequest(o *oreo.Client, globals *jiracli.GlobalOptions, opts *RequestOpt
 	if err != nil {
 		return err
 	}
+	if resp.Body == nil {
+		return fmt.Errorf("Empty Response Body")
+	}
 	defer resp.Body.Close()
 
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("Response Body read Error: %v", err)
+	}
+	if len(bodyBytes) == 0 {
+		log.Info("Empty response for status %d", resp.StatusCode)
+		return nil
+	}
+
 	var data interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	if err := json.Unmarshal(bodyBytes, &data); err != nil {
 		return fmt.Errorf("JSON Parse Error: %v", err)
 	}
 	return opts.PrintTemplate(&data)

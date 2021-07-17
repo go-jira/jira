@@ -1,0 +1,23 @@
+---
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    container: docker.io/library/golang:${{ matrix.go }}
+    strategy:
+      matrix:
+        go: ['1.13', '1.14']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: add gox
+        run: go install github.com/mitchellh/gox
+      - name: make binaries
+        run: make all
+      - name: perform tests
+        run: go test -v ./...
+

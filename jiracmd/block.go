@@ -56,8 +56,8 @@ func CmdBlockUsage(cmd *kingpin.CmdClause, opts *BlockOptions) error {
 		}
 		return nil
 	}).String()
-	cmd.Arg("BLOCKER", "blocker issue").Required().StringVar(&opts.OutwardIssue.Key)
-	cmd.Arg("ISSUE", "issue that is blocked").Required().StringVar(&opts.InwardIssue.Key)
+	cmd.Arg("ISSUE", "issue that is blocked").Required().StringVar(&opts.OutwardIssue.Key)
+	cmd.Arg("BLOCKER", "blocker issue").Required().StringVar(&opts.InwardIssue.Key)
 	return nil
 }
 

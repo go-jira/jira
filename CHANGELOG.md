@@ -1,432 +1,513 @@
-# Changelog
-
-## 1.0.22 - 2019-09-30
-
-* fix syntax [Cory Bennett] [[807ca76](https://github.com/Netflix-Skunkworks/go-jira/commit/807ca76)]
-* Address comments for direct name match [Patrick Cockwell] [[a70384b](https://github.com/Netflix-Skunkworks/go-jira/commit/a70384b)]
-* Choose exact transition match if available [Patrick Cockwell] [[a646f76](https://github.com/Netflix-Skunkworks/go-jira/commit/a646f76)]
-
-
-## 1.0.21 - 2019-09-16
-
-* [[#277](https://github.com/Netflix-Skunkworks/go-jira/issues/277)] update figtree to latest [Cory Bennett] [[0e520a4](https://github.com/Netflix-Skunkworks/go-jira/commit/0e520a4)]
-* Switch over to using github.com/go-jira/jira, from gopkg.in [Mike Pountney] [[27f57b2](https://github.com/Netflix-Skunkworks/go-jira/commit/27f57b2)]
-* fix worklog template to allow multiline comments [Matthias Bethke] [[43e07f1](https://github.com/Netflix-Skunkworks/go-jira/commit/43e07f1)]
-* Allow reading password from stdin [Justin Ko] [[225e1dc](https://github.com/Netflix-Skunkworks/go-jira/commit/225e1dc)]
-* all: unindent some code [Daniel Martí] [[31c113d](https://github.com/Netflix-Skunkworks/go-jira/commit/31c113d)]
-* don't use ReadAll when decoding JSON [Daniel Martí] [[9bcdcc1](https://github.com/Netflix-Skunkworks/go-jira/commit/9bcdcc1)]
-* start making staticcheck happier [Daniel Martí] [[9b9186f](https://github.com/Netflix-Skunkworks/go-jira/commit/9b9186f)]
-* all: convert to a Go module [Daniel Martí] [[f125ef3](https://github.com/Netflix-Skunkworks/go-jira/commit/f125ef3)]
-* CI: test on Go 1.12.x, cleanup [Daniel Martí] [[664c5ca](https://github.com/Netflix-Skunkworks/go-jira/commit/664c5ca)]
-* make automatic pagination on search optional, fix tests [Cory Bennett] [[36c99ce](https://github.com/Netflix-Skunkworks/go-jira/commit/36c99ce)]
-* prefer defer resp.Body.Close to avoid leaks on subsequent errors [Cory Bennett] [[181bd74](https://github.com/Netflix-Skunkworks/go-jira/commit/181bd74)]
-* add pagination to search [Miles Maddox] [[76dd1d8](https://github.com/Netflix-Skunkworks/go-jira/commit/76dd1d8)]
-* Fix function comments based on best practices from Effective Go [CodeLingo Bot] [[23ac118](https://github.com/Netflix-Skunkworks/go-jira/commit/23ac118)]
-* [[#201](https://github.com/Netflix-Skunkworks/go-jira/issues/201)] update required library, failing to populate cookiejar from cookies file [Cory Bennett] [[ee69afa](https://github.com/Netflix-Skunkworks/go-jira/commit/ee69afa)]
-
-## 1.0.20 - 2018-08-04
-
-* [[#201](https://github.com/Netflix-Skunkworks/go-jira/issues/201)] update required library, failing to populate cookiejar from cookies file [Cory Bennett] [[ee69afa](https://github.com/Netflix-Skunkworks/go-jira/commit/ee69afa)]
-
-## 1.0.19 - 2018-08-02
-
-* [[#199](https://github.com/Netflix-Skunkworks/go-jira/issues/199)] [[#198](https://github.com/Netflix-Skunkworks/go-jira/issues/198)] update http client library, fix issues with internal login retries [Cory Bennett] [[0cba806](https://github.com/Netflix-Skunkworks/go-jira/commit/0cba806)]
-
-## 1.0.18 - 2018-07-29
-
-* [[#196](https://github.com/Netflix-Skunkworks/go-jira/issues/196)] add `jira session` command to show session information if user is authenticated [Cory Bennett] [[f592107](https://github.com/Netflix-Skunkworks/go-jira/commit/f592107)]
-* [[#192](https://github.com/Netflix-Skunkworks/go-jira/issues/192)] fix template usage for 'fixVersions' in transition template [Cory Bennett] [[c9a4e30](https://github.com/Netflix-Skunkworks/go-jira/commit/c9a4e30)]
-* move HandleExit to the jiracli package [Cory Bennett] [[ef9b731](https://github.com/Netflix-Skunkworks/go-jira/commit/ef9b731)]
-* they broke golang.org/x/net: ERROR: vendor/golang.org/x/net/proxy/socks5.go:11:2: use of internal package not allowed [Cory Bennett] [[7191c77](https://github.com/Netflix-Skunkworks/go-jira/commit/7191c77)]
-* udpate deps [Cory Bennett] [[d16bcc2](https://github.com/Netflix-Skunkworks/go-jira/commit/d16bcc2)]
-* udpate for figtree api changes [Cory Bennett] [[07ba74b](https://github.com/Netflix-Skunkworks/go-jira/commit/07ba74b)]
-* udpate to use latest dep, update figtree [Cory Bennett] [[462ef1c](https://github.com/Netflix-Skunkworks/go-jira/commit/462ef1c)]
-* [[#171](https://github.com/Netflix-Skunkworks/go-jira/issues/171)] change proposed PasswordPath to PasswordName [Cory Bennett] [[213a7e0](https://github.com/Netflix-Skunkworks/go-jira/commit/213a7e0)]
-* add pass path to config [dvogt23] [[fa01ff5](https://github.com/Netflix-Skunkworks/go-jira/commit/fa01ff5)]
-
-## 1.0.17 - 2018-04-15
-
-* fix IsTerminal usage for windows [Cory Bennett] [[7f9595c](https://github.com/Netflix-Skunkworks/go-jira/commit/7f9595c)]
-* [[#166](https://github.com/Netflix-Skunkworks/go-jira/issues/166)] fix issue when editing templates specified with full path [Cory Bennett] [[d787ac0](https://github.com/Netflix-Skunkworks/go-jira/commit/d787ac0)]
-* only prompt on logout if stdin and stdout are terminals [Cory Bennett] [[09a61c3](https://github.com/Netflix-Skunkworks/go-jira/commit/09a61c3)]
-* [[#163](https://github.com/Netflix-Skunkworks/go-jira/issues/163)] fix url path join logic [Cory Bennett] [[9146346](https://github.com/Netflix-Skunkworks/go-jira/commit/9146346)]
-* [[#160](https://github.com/Netflix-Skunkworks/go-jira/issues/160)] prompt when api-token is invalid to get new token [Cory Bennett] [[e639cce](https://github.com/Netflix-Skunkworks/go-jira/commit/e639cce)]
-* [[#157](https://github.com/Netflix-Skunkworks/go-jira/issues/157)] add `password-directory: path` to allow overriding PASSWORD_STORE_DIR from configs [Cory Bennett] [[06b26c9](https://github.com/Netflix-Skunkworks/go-jira/commit/06b26c9)]
-* [[#160](https://github.com/Netflix-Skunkworks/go-jira/issues/160)] allow `jira logout` to delete your api-token from keychain [Cory Bennett] [[bd3cf99](https://github.com/Netflix-Skunkworks/go-jira/commit/bd3cf99)]
-
-## 1.0.16 - 2018-04-01
-
-* [[#159](https://github.com/Netflix-Skunkworks/go-jira/issues/159)] fix `slice bounds out of range` error in `abbrev` template function [Cory Bennett] [[359bec2](https://github.com/Netflix-Skunkworks/go-jira/commit/359bec2)]
-* [[#158](https://github.com/Netflix-Skunkworks/go-jira/issues/158)] always print usage to stdout [Cory Bennett] [[79c83f6](https://github.com/Netflix-Skunkworks/go-jira/commit/79c83f6)]
-
-## 1.0.15 - 2018-03-08
-
-* [[#147](https://github.com/Netflix-Skunkworks/go-jira/issues/147)] [[#148](https://github.com/Netflix-Skunkworks/go-jira/issues/148)] add support for api token based authentication [Cory Bennett] [[edb0662](https://github.com/Netflix-Skunkworks/go-jira/commit/edb0662)]
-* refactor to simplify main [Cory Bennett] [[43ebc84](https://github.com/Netflix-Skunkworks/go-jira/commit/43ebc84)] [[0d7c1a7](https://github.com/Netflix-Skunkworks/go-jira/commit/0d7c1a7)]
-* [[#145](https://github.com/Netflix-Skunkworks/go-jira/issues/145)] fix to match AuthProvider interface [Cory Bennett] [[80325a5](https://github.com/Netflix-Skunkworks/go-jira/commit/80325a5)]
-* [[#141](https://github.com/Netflix-Skunkworks/go-jira/issues/141)] better handling in responseError for non-json error responses [Cory Bennett] [[20a9666](https://github.com/Netflix-Skunkworks/go-jira/commit/20a9666)]
-* Update unexportTemplates.go [GitHub] [[6da9974](https://github.com/Netflix-Skunkworks/go-jira/commit/6da9974)]
-* [[#139](https://github.com/Netflix-Skunkworks/go-jira/issues/139)] add shellquote and toMinJson template functions [Cory Bennett] [[8c7ca38](https://github.com/Netflix-Skunkworks/go-jira/commit/8c7ca38)]
-* [[#137](https://github.com/Netflix-Skunkworks/go-jira/issues/137)] update kingpeon dep to allow access to dynamic command structure [Cory Bennett] [[425fa63](https://github.com/Netflix-Skunkworks/go-jira/commit/425fa63)]
-* field name is "comment" not "comments" [Cory Bennett] [[464742c](https://github.com/Netflix-Skunkworks/go-jira/commit/464742c)]
-
-## 1.0.14 - 2017-11-04
-
-* [[#131](https://github.com/Netflix-Skunkworks/go-jira/issues/131)] fix parsing global options before command execution (allow unixproxy/socksproxy to be set in config.yml) [Cory Bennett] [[042bc48](https://github.com/Netflix-Skunkworks/go-jira/commit/042bc48)]
-* add/update deps [Cory Bennett] [[a2e36e8](https://github.com/Netflix-Skunkworks/go-jira/commit/a2e36e8)]
-* add support for using socks proxy [onionjake] [[ff985f9](https://github.com/Netflix-Skunkworks/go-jira/commit/ff985f9)]
-
-## 1.0.13 - 2017-10-28
-
-* fix transition command [Cory Bennett] [[9597f9b](https://github.com/Netflix-Skunkworks/go-jira/commit/9597f9b)]
-* fix default values to load after parsing configs [Cory Bennett] [[c9b5054](https://github.com/Netflix-Skunkworks/go-jira/commit/c9b5054)]
-* add test to make sure IssueType.Fields does not disappear on regeneration [Cory Bennett] [[3966def](https://github.com/Netflix-Skunkworks/go-jira/commit/3966def)]
-* add tests for validating changes to auto-generated jiradata files [Cory Bennett] [[41d1a7c](https://github.com/Netflix-Skunkworks/go-jira/commit/41d1a7c)]
-* Fix typo in 'logout' command help [Cory Bennett] [[9000777](https://github.com/Netflix-Skunkworks/go-jira/commit/9000777)]
-* Add URL escaping to an additional issuetype call [Cory Bennett] [[7bfa241](https://github.com/Netflix-Skunkworks/go-jira/commit/7bfa241)]
-* Add --resolution option [Cory Bennett] [[e6600cf](https://github.com/Netflix-Skunkworks/go-jira/commit/e6600cf)]
-* Create Metadata Not Populated Correctly [Dillon Buchanan] [[093c510](https://github.com/Netflix-Skunkworks/go-jira/commit/093c510)]
-* add regexReplace template function [Dirk Heilig] [[d3e294e](https://github.com/Netflix-Skunkworks/go-jira/commit/d3e294e)]
-
-## 1.0.12 - 2017-10-04
-
-* add `{{env.VARNAME}}` template support to allow use of env vars [Cory Bennett] [[4d74554](https://github.com/Netflix-Skunkworks/go-jira/commit/4d74554)]
-
-## 1.0.11 - 2017-09-26
-
-* [[#115](https://github.com/Netflix-Skunkworks/go-jira/issues/115)] fix transition template for description [Cory Bennett] [[986cc78](https://github.com/Netflix-Skunkworks/go-jira/commit/986cc78)]
-* update edit command to set queryFields on search to match what is used in template [Cory Bennett] [[3913726](https://github.com/Netflix-Skunkworks/go-jira/commit/3913726)]
-* fix edit with query loop, allow continuation when not submitting previous issue [Cory Bennett] [[0ba8aa0](https://github.com/Netflix-Skunkworks/go-jira/commit/0ba8aa0)]
-* fix edit when priority is not set [Cory Bennett] [[098eb99](https://github.com/Netflix-Skunkworks/go-jira/commit/098eb99)]
-* flatten CommandRegistry list to make it more readable [Cory Bennett] [[2ddaed2](https://github.com/Netflix-Skunkworks/go-jira/commit/2ddaed2)]
-
-## 1.0.10 - 2017-09-18
-
-* clean up usage formatting, print aliases [Cory Bennett] [[9f433ac](https://github.com/Netflix-Skunkworks/go-jira/commit/9f433ac)]
-* fix edit [Cory Bennett] [[4c6b36c](https://github.com/Netflix-Skunkworks/go-jira/commit/4c6b36c)]
-* fix named query template expansion [Cory Bennett] [[a8eaa97](https://github.com/Netflix-Skunkworks/go-jira/commit/a8eaa97)]
-* fix usage message [Cory Bennett] [[cd3cfd8](https://github.com/Netflix-Skunkworks/go-jira/commit/cd3cfd8)]
-
-## 1.0.9 - 2017-09-17
-
-* need issuetype to use the default list table template now [Cory Bennett] [[3e8b9bd](https://github.com/Netflix-Skunkworks/go-jira/commit/3e8b9bd)]
-* [[#102](https://github.com/Netflix-Skunkworks/go-jira/issues/102)] add issuetype into the default queryfields and add it to the default `table` list template [Cory Bennett] [[c9d8dfb](https://github.com/Netflix-Skunkworks/go-jira/commit/c9d8dfb)]
-
-## 1.0.8 - 2017-09-17
-
-* [[#100](https://github.com/Netflix-Skunkworks/go-jira/issues/100)] add support for posting, fetching, listing and removing attachments [Cory Bennett] [[66eb7bf](https://github.com/Netflix-Skunkworks/go-jira/commit/66eb7bf)]
-
-## 1.0.7 - 2017-09-15
-
-* [[#87](https://github.com/Netflix-Skunkworks/go-jira/issues/87)] add various commands for interacting with epics [Cory Bennett] [[893454f](https://github.com/Netflix-Skunkworks/go-jira/commit/893454f)]
-
-## 1.0.6 - 2017-09-13
-
-* tweaks for templates in named queries to work better [Cory Bennett] [[00cba79](https://github.com/Netflix-Skunkworks/go-jira/commit/00cba79)]
-* [[#99](https://github.com/Netflix-Skunkworks/go-jira/issues/99)] add support for named queries to be stored in configs [Cory Bennett] [[fb43753](https://github.com/Netflix-Skunkworks/go-jira/commit/fb43753)]
-* [[#98](https://github.com/Netflix-Skunkworks/go-jira/issues/98)] add `--status` option for JQL filter on status with `list` command [Cory Bennett] [[5da04c1](https://github.com/Netflix-Skunkworks/go-jira/commit/5da04c1)]
-
-## 1.0.5 - 2017-09-11
-
-* use --gjq for GJson Query to filter json response data [Cory Bennett] [[608e586](https://github.com/Netflix-Skunkworks/go-jira/commit/608e586)]
-* fix field tag syntax [Cory Bennett] [[2c552ac](https://github.com/Netflix-Skunkworks/go-jira/commit/2c552ac)]
-* add '{{jira}}' template macro to refer to path of currently running jira command [Cory Bennett] [[941824d](https://github.com/Netflix-Skunkworks/go-jira/commit/941824d)]
-
-## 1.0.4 - 2017-09-08
-
-* update deps for kingpeon update use os.exec instead of syscall.exec for windows [Cory Bennett] [[86b963b](https://github.com/Netflix-Skunkworks/go-jira/commit/86b963b)]
-
-## 1.0.3 - 2017-09-06
-
-* [[#66](https://github.com/Netflix-Skunkworks/go-jira/issues/66)] add --started option to `jira worklog add` to change the start time for worklog [Cory Bennett] [[e6faee1](https://github.com/Netflix-Skunkworks/go-jira/commit/e6faee1)]
-* [[#45](https://github.com/Netflix-Skunkworks/go-jira/issues/45)] automatically add comment to issue even if transition does not support comment updates during transtion [Cory Bennett] [[c4be59c](https://github.com/Netflix-Skunkworks/go-jira/commit/c4be59c)]
-
-## 1.0.2 - 2017-09-06
-
-* update dependencies [Cory Bennett] [[aa876cd](https://github.com/Netflix-Skunkworks/go-jira/commit/aa876cd)]
-* update for github.com/AlecAivazis/survey => gopkg.in/AlecAivazis/survey.v1 package [Cory Bennett] [[9453179](https://github.com/Netflix-Skunkworks/go-jira/commit/9453179)]
-* use stdout to determin output terminal size [Cory Bennett] [[4d79af4](https://github.com/Netflix-Skunkworks/go-jira/commit/4d79af4)]
-
-## 1.0.1 - 2017-09-06
-
-* [[#13](https://github.com/Netflix-Skunkworks/go-jira/issues/13)] change default input syntax to not require escaping for special characters [Cory Bennett] [[1106558](https://github.com/Netflix-Skunkworks/go-jira/commit/1106558)]
-
-## 1.0.0 - 2017-09-05
-
-* fix build for windows [Cory Bennett] [[1b854da](https://github.com/Netflix-Skunkworks/go-jira/commit/1b854da)]
-* change the default log output format [Cory Bennett] [[f1b8c64](https://github.com/Netflix-Skunkworks/go-jira/commit/f1b8c64)]
-* tweak auto-login so it does not print the standard `jira login` command output [Cory Bennett] [[49f6cdc](https://github.com/Netflix-Skunkworks/go-jira/commit/49f6cdc)]
-* add --quiet global option [Cory Bennett] [[c226077](https://github.com/Netflix-Skunkworks/go-jira/commit/c226077)]
-* refactor to allow for --insecure and --unixproxy arguments [Cory Bennett] [[c0358eb](https://github.com/Netflix-Skunkworks/go-jira/commit/c0358eb)]
-* handle html response on expired cookies (require X-Ausername header to always be present) [Cory Bennett] [[21920c5](https://github.com/Netflix-Skunkworks/go-jira/commit/21920c5)]
-* allow login prompt to be interrupted [Cory Bennett] [[7ab6c22](https://github.com/Netflix-Skunkworks/go-jira/commit/7ab6c22)]
-* fmt -> log typo [Cory Bennett] [[bccf09f](https://github.com/Netflix-Skunkworks/go-jira/commit/bccf09f)]
-* make ~/.jira.d directory if not already present [Cory Bennett] [[e72479c](https://github.com/Netflix-Skunkworks/go-jira/commit/e72479c)]
-* fix go vet [Cory Bennett] [[e04b506](https://github.com/Netflix-Skunkworks/go-jira/commit/e04b506)]
-* fix tests [Cory Bennett] [[ba35f55](https://github.com/Netflix-Skunkworks/go-jira/commit/ba35f55)]
-* add OK printf [Cory Bennett] [[dc02181](https://github.com/Netflix-Skunkworks/go-jira/commit/dc02181)]
-* change --method to use -M for backwards compat [Cory Bennett] [[b120c0b](https://github.com/Netflix-Skunkworks/go-jira/commit/b120c0b)]
-* add resolution to dup'd issues when necessary [Cory Bennett] [[2638396](https://github.com/Netflix-Skunkworks/go-jira/commit/2638396)]
-* call correct function for `labels remove|set` commands [Cory Bennett] [[ad1a62a](https://github.com/Netflix-Skunkworks/go-jira/commit/ad1a62a)]
-* data argument is optional (for GET and DELETE requests) [Cory Bennett] [[4b60313](https://github.com/Netflix-Skunkworks/go-jira/commit/4b60313)]
-* fix usage, overrides not serialized correctly [Cory Bennett] [[84119a2](https://github.com/Netflix-Skunkworks/go-jira/commit/84119a2)]
-* fix `jira ISSUE-123` command line parsing [Cory Bennett] [[fa4ac25](https://github.com/Netflix-Skunkworks/go-jira/commit/fa4ac25)]
-* add logger object to jiracmd [Cory Bennett] [[aed952b](https://github.com/Netflix-Skunkworks/go-jira/commit/aed952b)]
-* refactor for GlobalOptions and CommonOptions [Cory Bennett] [[979da1f](https://github.com/Netflix-Skunkworks/go-jira/commit/979da1f)]
-* move commands from jiracli package to jiracmd package [Cory Bennett] [[0a5510b](https://github.com/Netflix-Skunkworks/go-jira/commit/0a5510b)]
-* use jiracli.Error object to disambiguate between kingpin errors and cli errors [Cory Bennett] [[fb1bfeb](https://github.com/Netflix-Skunkworks/go-jira/commit/fb1bfeb)]
-* fix stray newline for list table template [Cory Bennett] [[36c26c5](https://github.com/Netflix-Skunkworks/go-jira/commit/36c26c5)]
-* fix dynamic table output when not on tty [Cory Bennett] [[3942f6f](https://github.com/Netflix-Skunkworks/go-jira/commit/3942f6f)]
-* when using --verbose set the JIRA_DEBUG environment variable so custom-commands can auto enable verbose output [Cory Bennett] [[da9a2b2](https://github.com/Netflix-Skunkworks/go-jira/commit/da9a2b2)]
-* make `jira ISSUE-123` usage call `jira view ISSUE-123` [Cory Bennett] [[ec0858b](https://github.com/Netflix-Skunkworks/go-jira/commit/ec0858b)]
-* integrate kingpeon library to allow for custom commands via configuration [Cory Bennett] [[301a61f](https://github.com/Netflix-Skunkworks/go-jira/commit/301a61f)]
-* use terminal width to adjust list table output [Cory Bennett] [[2a081dd](https://github.com/Netflix-Skunkworks/go-jira/commit/2a081dd)]
-* set yaml/json tags for option structs [Cory Bennett] [[f52d2c4](https://github.com/Netflix-Skunkworks/go-jira/commit/f52d2c4)]
-* update generated data files [Cory Bennett] [[c89f11d](https://github.com/Netflix-Skunkworks/go-jira/commit/c89f11d)]
-* automatically login when anonymous user detected [Cory Bennett] [[21add54](https://github.com/Netflix-Skunkworks/go-jira/commit/21add54)]
-* refactor trivial objects in favor of arguments to static functions [Cory Bennett] [[1f345ce](https://github.com/Netflix-Skunkworks/go-jira/commit/1f345ce)]
-* set JIRA_OPERATION when parsing configs.  Use figtree config types for options to make defaulting work [Cory Bennett] [[5716a7c](https://github.com/Netflix-Skunkworks/go-jira/commit/5716a7c)]
-* add better handing for usage error [Cory Bennett] [[b235dcc](https://github.com/Netflix-Skunkworks/go-jira/commit/b235dcc)]
-* adding `request` command, removing dead code [Cory Bennett] [[56b1c9d](https://github.com/Netflix-Skunkworks/go-jira/commit/56b1c9d)]
-* adding Do required for request language [Cory Bennett] [[a1c2849](https://github.com/Netflix-Skunkworks/go-jira/commit/a1c2849)]
-* add `browse` command and implement -b option for most operations [Cory Bennett] [[a91b9d5](https://github.com/Netflix-Skunkworks/go-jira/commit/a91b9d5)]
-* fix IssueAssign [Cory Bennett] [[f32cc70](https://github.com/Netflix-Skunkworks/go-jira/commit/f32cc70)]
-* merge in update for upstream changes [#104](https://github.com/Netflix-Skunkworks/go-jira/issues/104) [Cory Bennett] [[19d8686](https://github.com/Netflix-Skunkworks/go-jira/commit/19d8686)]
-* add `export-templates` command [Cory Bennett] [[abaad56](https://github.com/Netflix-Skunkworks/go-jira/commit/abaad56)]
-* add `issuetypes` command [Cory Bennett] [[da39323](https://github.com/Netflix-Skunkworks/go-jira/commit/da39323)]
-* add `components` command [Cory Bennett] [[0bd3ca2](https://github.com/Netflix-Skunkworks/go-jira/commit/0bd3ca2)]
-* add `component add` command [Cory Bennett] [[cc90610](https://github.com/Netflix-Skunkworks/go-jira/commit/cc90610)]
-* add `take`, `unassign` and `assign|give` commands [Cory Bennett] [[959524a](https://github.com/Netflix-Skunkworks/go-jira/commit/959524a)]
-* adding `labels [add|set|remove]` commands [Cory Bennett] [[9161861](https://github.com/Netflix-Skunkworks/go-jira/commit/9161861)]
-* add `comment` command [Cory Bennett] [[f0b08c5](https://github.com/Netflix-Skunkworks/go-jira/commit/f0b08c5)]
-* add `watch` command [Cory Bennett] [[ec0ac3c](https://github.com/Netflix-Skunkworks/go-jira/commit/ec0ac3c)]
-* add `rank ISSUE after|before ISSUE` command [Cory Bennett] [[8b863d2](https://github.com/Netflix-Skunkworks/go-jira/commit/8b863d2)]
-* add `vote` command [Cory Bennett] [[a08c92f](https://github.com/Netflix-Skunkworks/go-jira/commit/a08c92f)]
-* add `issuelinktypes` command [Cory Bennett] [[37f81a4](https://github.com/Netflix-Skunkworks/go-jira/commit/37f81a4)]
-* add `issuelink` command [Cory Bennett] [[aacc9f4](https://github.com/Netflix-Skunkworks/go-jira/commit/aacc9f4)]
-* fix closing duplicate issue on `dup` command [Cory Bennett] [[fc696c3](https://github.com/Netflix-Skunkworks/go-jira/commit/fc696c3)]
-* rewrite checkpoint [Cory Bennett] [[36632a5](https://github.com/Netflix-Skunkworks/go-jira/commit/36632a5)]
-
-## 0.1.14 - 2017-05-10
-
-* fix unsafe casting for --quiet flag [Cory Bennett] [[6f29f43](https://github.com/Netflix-Skunkworks/go-jira/commit/6f29f43)]
-* [[#80](https://github.com/Netflix-Skunkworks/go-jira/issues/80)] add `jira unassign` and `jira give ISSUE --default` commands [Cory Bennett] [[03d8633](https://github.com/Netflix-Skunkworks/go-jira/commit/03d8633)]
-
-## 0.1.13 - 2017-04-24
-
-* work around `github.com/tmc/keyring` compile error for windows [Cory Bennett] [[85298e9](https://github.com/Netflix-Skunkworks/go-jira/commit/85298e9)]
-* Added generic issuelink command [David Reuss] [[cc54d11](https://github.com/Netflix-Skunkworks/go-jira/commit/cc54d11)]
-* Added --start parameter for pagination on results [David Reuss] [[9b94d9e](https://github.com/Netflix-Skunkworks/go-jira/commit/9b94d9e)]
-
-## 0.1.12 - 2017-03-22
-
-* Implement "browse" subcommand on Windows [Claus Brod] [[ca333d8](https://github.com/Netflix-Skunkworks/go-jira/commit/ca333d8)]
-
-## 0.1.11 - 2017-02-26
-
-* [[#69](https://github.com/Netflix-Skunkworks/go-jira/issues/69)] add subtask command [Cory Bennett] [[21a2ed5](https://github.com/Netflix-Skunkworks/go-jira/commit/21a2ed5)]
-
-## 0.1.10 - 2017-02-08
-
-* set GPG_TTY in .bashrc [Cory Bennett] [[b1e552f](https://github.com/Netflix-Skunkworks/go-jira/commit/b1e552f)]
-* force password in case password already exists [Cory Bennett] [[d5a2c3b](https://github.com/Netflix-Skunkworks/go-jira/commit/d5a2c3b)]
-* refactor password source, allow for "pass" to be used, update tests to use `password-source: pass` [Cory Bennett] [[5a71939](https://github.com/Netflix-Skunkworks/go-jira/commit/5a71939)]
-
-## 0.1.9 - 2016-12-18
-
-* only warn about needing login when not already running the login command [Cory Bennett] [[6c24e55](https://github.com/Netflix-Skunkworks/go-jira/commit/6c24e55)]
-* fix(http): Add proxy transport [William Hearn] [[4bd740b](https://github.com/Netflix-Skunkworks/go-jira/commit/4bd740b)] [[2dff6c9](https://github.com/Netflix-Skunkworks/go-jira/commit/2dff6c9)]
-
-## 0.1.8 - 2016-11-24
-
-* [[#12](https://github.com/Netflix-Skunkworks/go-jira/issues/12)] integrate with keyring for password storage and provide http basic auth credentials for every request since most jira services have websudo enabled with does not allow cookie based authentication [Cory Bennett] [[b8a6e57](https://github.com/Netflix-Skunkworks/go-jira/commit/b8a6e57)]
-* Cleaning up usage [Jay Shirley] [[8add52b](https://github.com/Netflix-Skunkworks/go-jira/commit/8add52b)]
-* Update usage [Jay Shirley] [[b56e32a](https://github.com/Netflix-Skunkworks/go-jira/commit/b56e32a)]
-* use gopkg.in for links to maintain version compatibility [Cory Bennett] [[1414d1f](https://github.com/Netflix-Skunkworks/go-jira/commit/1414d1f)]
-* golint [Cory Bennett] [[44cdebf](https://github.com/Netflix-Skunkworks/go-jira/commit/44cdebf)]
-* add "rank" command allow ordering backlog issues in agile projects [Cory Bennett] [[e4cc9c6](https://github.com/Netflix-Skunkworks/go-jira/commit/e4cc9c6)]
-* Adding a unixproxy mechanism [Jay Shirley] [[5b9c0dd](https://github.com/Netflix-Skunkworks/go-jira/commit/5b9c0dd)]
-
-## 0.1.7 - 2016-08-24
-
-* Prefer transition names which match exactly [Don Brower] [[e40f9c1](https://github.com/Netflix-Skunkworks/go-jira/commit/e40f9c1)]
-* update tempates to make them more readable with space trimming added to go-1.6 [Cory Bennett] [[693b3e4](https://github.com/Netflix-Skunkworks/go-jira/commit/693b3e4)]
-
-## 0.1.6 - 2016-08-21
-
-* make "worklogs" command print output through template allow "add worklog" command to open edit template [Cory Bennett] [[cc3fbee](https://github.com/Netflix-Skunkworks/go-jira/commit/cc3fbee)]
-* remove extra newline at end of worklogs template [Cory Bennett] [[d08ef15](https://github.com/Netflix-Skunkworks/go-jira/commit/d08ef15)]
-* adding worklog related templates [Cory Bennett] [[ab1cd27](https://github.com/Netflix-Skunkworks/go-jira/commit/ab1cd27)]
-
-## 0.1.5 - 2016-08-21
-
-* update for golint [Cory Bennett] [[5a4e17c](https://github.com/Netflix-Skunkworks/go-jira/commit/5a4e17c)]
-* fix for go vet [Cory Bennett] [[355fb42](https://github.com/Netflix-Skunkworks/go-jira/commit/355fb42)]
-
-## 0.1.4 - 2016-08-12
-
-* when running "dups" on a Process Management Project type, you have to start/stop the task to resolve it [Cory Bennett] [[2c91905](https://github.com/Netflix-Skunkworks/go-jira/commit/2c91905)]
-* allow for defaultResolution option for transition command [Cory Bennett] [[a328c2d](https://github.com/Netflix-Skunkworks/go-jira/commit/a328c2d)]
-* add "backlog" command for Kanban related Issues [Cory Bennett] [[5d39b23](https://github.com/Netflix-Skunkworks/go-jira/commit/5d39b23)]
-* fix --noedit flag with "dups" command [Cory Bennett] [[37c07fa](https://github.com/Netflix-Skunkworks/go-jira/commit/37c07fa)]
-* add "votes" and "labels" to default view template [Cory Bennett] [[6f73b8c](https://github.com/Netflix-Skunkworks/go-jira/commit/6f73b8c)]
-* add "blockerType" config param, for issueLinkType use for "blocks" command [Cory Bennett] [[30fd301](https://github.com/Netflix-Skunkworks/go-jira/commit/30fd301)]
-* update gitter room [Cory Bennett] [[4b822b1](https://github.com/Netflix-Skunkworks/go-jira/commit/4b822b1)]
-* default issuetype to "Bug" for project that have Bug, otherwise try "Task" [Cory Bennett] [[0c807b4](https://github.com/Netflix-Skunkworks/go-jira/commit/0c807b4)]
-* make view template only show fields that have values [Cory Bennett] [[8238fe8](https://github.com/Netflix-Skunkworks/go-jira/commit/8238fe8)]
-* make default create template only display fields if they are valid fields for the project [Cory Bennett] [[adc2ace](https://github.com/Netflix-Skunkworks/go-jira/commit/adc2ace)]
-* ignore empty json fields when processing templates [Cory Bennett] [[f5f3e28](https://github.com/Netflix-Skunkworks/go-jira/commit/f5f3e28)]
-* allow JIRA_LOG_FORMAT env variable to control log output format [Cory Bennett] [[469def0](https://github.com/Netflix-Skunkworks/go-jira/commit/469def0)]
-* remove extraneous debug [Cory Bennett] [[752a94d](https://github.com/Netflix-Skunkworks/go-jira/commit/752a94d)]
-* add logout command modify password prompt to echo masked password [Cory Bennett] [[8ad91be](https://github.com/Netflix-Skunkworks/go-jira/commit/8ad91be)]
-* tweak cookies to store hostname dump all http request/response with --verbose [Cory Bennett] [[f93fe79](https://github.com/Netflix-Skunkworks/go-jira/commit/f93fe79)]
-* load configs in order of closest to cwd (/etc/go-jira.yml is last) [Cory Bennett] [[f54267b](https://github.com/Netflix-Skunkworks/go-jira/commit/f54267b)]
-
-## 0.1.3 - 2016-07-30
-
-* [[#43](https://github.com/Netflix-Skunkworks/go-jira/issues/43)] add support for jira done|todo|prog commands [Cory Bennett] [[dd7d1cc](https://github.com/Netflix-Skunkworks/go-jira/commit/dd7d1cc)]
-* Reporter is not generally editable. [Mike Pountney] [[a637b43](https://github.com/Netflix-Skunkworks/go-jira/commit/a637b43)]
-
-## 0.1.2 - 2016-06-29
-
-* [[#44](https://github.com/Netflix-Skunkworks/go-jira/issues/44)] Close tmpfile before rename to work around "The process cannot access the file because it is being used by another process" error on windows. [Cory Bennett] [[0980f8e](https://github.com/Netflix-Skunkworks/go-jira/commit/0980f8e)]
-
-## 0.1.1 - 2016-06-28
-
-* use USERPROFILE instead of HOME for windows, rework paths to use filepath.Join for better cross platform support [Cory Bennett] [[adcedc4](https://github.com/Netflix-Skunkworks/go-jira/commit/adcedc4)]
-* Include templates from a system path [Mike Pountney] [[cf10f53](https://github.com/Netflix-Skunkworks/go-jira/commit/cf10f53)]
-* Added support for the ```expand``` option for Issues [tobyjoe] [[fb4afc9](https://github.com/Netflix-Skunkworks/go-jira/commit/fb4afc9)]
-* change for api changes to go-logging [Cory Bennett] [[7bfc6e8](https://github.com/Netflix-Skunkworks/go-jira/commit/7bfc6e8)]
-* Fix issuetype calls adding URL escaping [Jonathan Wright] [[e4a25e2](https://github.com/Netflix-Skunkworks/go-jira/commit/e4a25e2)]
-
-## 0.1.0 - 2016-01-29
-
-* Fixes [#32](https://github.com/Netflix-Skunkworks/go-jira/issues/32) - make path to cookieFile if it's not present [Mike Pountney] [[6644579](https://github.com/Netflix-Skunkworks/go-jira/commit/6644579)]
-* Add component/components support: add and list for now. [Mike Pountney] [[d7b3226](https://github.com/Netflix-Skunkworks/go-jira/commit/d7b3226)]
-* Tweak the CmdWatch contract and add watcher remove support [Mike Pountney] [[383847a](https://github.com/Netflix-Skunkworks/go-jira/commit/383847a)]
-* Amend vote/unvote to be vote/vote --down [Mike Pountney] [[797edef](https://github.com/Netflix-Skunkworks/go-jira/commit/797edef)]
-* Add 'vote' and 'unvote' [Mike Pountney] [[c95e66e](https://github.com/Netflix-Skunkworks/go-jira/commit/c95e66e)]
-
-## 0.0.20 - 2016-01-21
-
-* [issue [#28](https://github.com/Netflix-Skunkworks/go-jira/issues/28)] check to make sure we got back issuetypes for create metadata [Cory Bennett] [[ee0e780](https://github.com/Netflix-Skunkworks/go-jira/commit/ee0e780)]
-* Add insecure option for TLS endpoints [Brian Lalor] [[6a88bb9](https://github.com/Netflix-Skunkworks/go-jira/commit/6a88bb9)]
-* Correct naming of parameter: set/add/remove are actions. [Mike Pountney] [[303784f](https://github.com/Netflix-Skunkworks/go-jira/commit/303784f)]
-* Tweak CmdLabels args so that magic happens with CLI [Mike Pountney] [[40a7c65](https://github.com/Netflix-Skunkworks/go-jira/commit/40a7c65)]
-* Expose ViewTicket as per FindIssues [Mike Pountney] [[8977f3d](https://github.com/Netflix-Skunkworks/go-jira/commit/8977f3d)]
-* Add exposed versions of getTemplate and runTemplate [Mike Pountney] [[da6cbd5](https://github.com/Netflix-Skunkworks/go-jira/commit/da6cbd5)]
-* Add 'labels' command to set/add/remove labels [Mike Pountney] [[230b52d](https://github.com/Netflix-Skunkworks/go-jira/commit/230b52d)]
-* Add a 'join' func to the template engine [Mike Pountney] [[a7820fe](https://github.com/Netflix-Skunkworks/go-jira/commit/a7820fe)]
-* make "jira" golang package, move code from jira/cli to root, move jira/main.go to main/main.go [Cory Bennett] [[7268b9e](https://github.com/Netflix-Skunkworks/go-jira/commit/7268b9e)]
-
-## 0.0.19 - 2015-12-09
-
-* fix jira trans TRANS ISSUE (case sensitivity issue), also go fmt [Cory Bennett] [[3c30f3b](https://github.com/Netflix-Skunkworks/go-jira/commit/3c30f3b)]
-
-## 0.0.18 - 2015-12-03
-
-* need to default "quiet" to false [Cory Bennett] [[4f4a89b](https://github.com/Netflix-Skunkworks/go-jira/commit/4f4a89b)]
-
-## 0.0.17 - 2015-12-03
-
-* add --quiet command to not print the OK .. add --saveFile option to print the issue/link to a file on create command [Cory Bennett] [[c9ac162](https://github.com/Netflix-Skunkworks/go-jira/commit/c9ac162)]
-* fix overrides [Cory Bennett] [[eaddfe6](https://github.com/Netflix-Skunkworks/go-jira/commit/eaddfe6)]
-* add abstract request wrapper to allow you to access/process random apis supported by Jira but not yet supported by go-jira [Cory Bennett] [[90ef56a](https://github.com/Netflix-Skunkworks/go-jira/commit/90ef56a)]
-
-## 0.0.16 - 2015-11-23
-
-* jira edit should not require one arguemnt (allow for --query) [Cory Bennett] [[a1eb4a1](https://github.com/Netflix-Skunkworks/go-jira/commit/a1eb4a1)]
-
-## 0.0.15 - 2015-11-23
-
-* [[#17](https://github.com/Netflix-Skunkworks/go-jira/issues/17)] print usage on missing arguments [Cory Bennett] [[fd2a2fe](https://github.com/Netflix-Skunkworks/go-jira/commit/fd2a2fe)]
-
-## 0.0.14 - 2015-11-17
-
-* s/enpoint/endpoint/g [Oliver Schrenk] [[c5d251d](https://github.com/Netflix-Skunkworks/go-jira/commit/c5d251d)]
-* Implement dateFormat template command [Mike Pountney] [[68d3bae](https://github.com/Netflix-Skunkworks/go-jira/commit/68d3bae)]
-* Add 'updated' field to default queryfields. [Mike Pountney] [[91e2475](https://github.com/Netflix-Skunkworks/go-jira/commit/91e2475)]
-* Fix export-templates option (typo) [Mike Pountney] [[4d7fdb8](https://github.com/Netflix-Skunkworks/go-jira/commit/4d7fdb8)]
-* when yaml element resolves to "\n" strip it out so we dont post it to jira [Cory Bennett] [[47ced2f](https://github.com/Netflix-Skunkworks/go-jira/commit/47ced2f)]
-* print PUT/POST data when using --dryrun to help debug [Cory Bennett] [[618f245](https://github.com/Netflix-Skunkworks/go-jira/commit/618f245)]
-
-## 0.0.13 - 2015-09-19
-
-* replace dead/deprecated code.google.com/p/gopass with golang.org/x/crypto/ssh/terminal for reading password from stdin [Cory Bennett] [[909eb06](https://github.com/Netflix-Skunkworks/go-jira/commit/909eb06)]
-
-## 0.0.12 - 2015-09-18
-
-* fix exception from "jira create" [Cory Bennett] [[9348a4b](https://github.com/Netflix-Skunkworks/go-jira/commit/9348a4b)]
-* add some debug messages to help diagnose login failures [Cory Bennett] [[1c08a7d](https://github.com/Netflix-Skunkworks/go-jira/commit/1c08a7d)]
-
-## 0.0.11 - 2015-09-16
-
-* add --version [Cory Bennett] [[8385ee2](https://github.com/Netflix-Skunkworks/go-jira/commit/8385ee2)]
-* fix command line parser broken in 0.0.10 [Cory Bennett] [[15ae929](https://github.com/Netflix-Skunkworks/go-jira/commit/15ae929)]
-
-## 0.0.10 - 2015-09-15
-
-* allow for command aliasing in conjunction with executable config files. Issue #5 [Cory Bennett] [[23590d4](https://github.com/Netflix-Skunkworks/go-jira/commit/23590d4)]
-* update usage [Cory Bennett] [[ef7a57e](https://github.com/Netflix-Skunkworks/go-jira/commit/ef7a57e)]
-
-## 0.0.9 - 2015-09-15
-
-* use forked yaml.v2 so as to not lose line terminations present in jira fields [Cory Bennett] [[f84e77f](https://github.com/Netflix-Skunkworks/go-jira/commit/f84e77f)]
-* adding a |~ literal yaml syntax to just chomp a single newline (again to preserve existing formatting in jira fields) [Cory Bennett] [[f84e77f](https://github.com/Netflix-Skunkworks/go-jira/commit/f84e77f)]
-* for indent/comment allow for unicode line termination characters that yaml will use for parsing [Cory Bennett] [[f84e77f](https://github.com/Netflix-Skunkworks/go-jira/commit/f84e77f)]
-* fix "edit" default option, change how defaults are dealt with for filters [Cory Bennett] [[4265913](https://github.com/Netflix-Skunkworks/go-jira/commit/4265913)]
-* for edit template add issue id as comment, also add "comments" as comment so you can review the comment details while editing [Cory Bennett] [[968a9df](https://github.com/Netflix-Skunkworks/go-jira/commit/968a9df)]
-* add "comment" template filter to comment out multiline statements [Cory Bennett] [[d664868](https://github.com/Netflix-Skunkworks/go-jira/commit/d664868)]
-* add getOpt wrappers to get options with defaults [Cory Bennett] [[c0070cf](https://github.com/Netflix-Skunkworks/go-jira/commit/c0070cf)]
-* make --dryrun work [Cory Bennett] [[d229ac1](https://github.com/Netflix-Skunkworks/go-jira/commit/d229ac1)]
-* refactor config/option loading so command options override settings in config files [Cory Bennett] [[d229ac1](https://github.com/Netflix-Skunkworks/go-jira/commit/d229ac1)]
-* allow query options to be used on the "edit" command to iterate editing [Cory Bennett] [[d229ac1](https://github.com/Netflix-Skunkworks/go-jira/commit/d229ac1)]
-* remove duplication for defaults [Cory Bennett] [[f8c8ddf](https://github.com/Netflix-Skunkworks/go-jira/commit/f8c8ddf)]
-* use optigo for option parsing, drop docopt [Cory Bennett] [[7bbd571](https://github.com/Netflix-Skunkworks/go-jira/commit/7bbd571)]
-* allow "abort: true" to be set while editing to cancel the edit operation [Cory Bennett] [[ea67a77](https://github.com/Netflix-Skunkworks/go-jira/commit/ea67a77)]
-* if no changes are made on edit templates then abort edit [Cory Bennett] [[e69b65c](https://github.com/Netflix-Skunkworks/go-jira/commit/e69b65c)]
-
-## 0.0.8 - 2015-07-31
-
-* Add --max_results option for 'ls' [Mike Pountney] [[e06ff0c](https://github.com/Netflix-Skunkworks/go-jira/commit/e06ff0c)]
-
-## 0.0.7 - 2015-07-01
-
-* fix "take" command not honouring user option [Andrew Haigh] [[8f1d2b9](https://github.com/Netflix-Skunkworks/go-jira/commit/8f1d2b9)]
-* fix typo [Cory Bennett] [[06f57fe](https://github.com/Netflix-Skunkworks/go-jira/commit/06f57fe)]
-
-## 0.0.6 - 2015-02-27
-
-* allow --sort= to disable sort override [Cory Bennett] [[701f091](https://github.com/Netflix-Skunkworks/go-jira/commit/701f091)]
-* fix default JIRA_OPERATION env variable [Cory Bennett] [[82fd9b9](https://github.com/Netflix-Skunkworks/go-jira/commit/82fd9b9)]
-* automatically close duplicate issues with "Duplicate" resolution [Cory Bennett] [[ebf1700](https://github.com/Netflix-Skunkworks/go-jira/commit/ebf1700)]
-* set JIRA_OPERATION to "view" when no operation used (ie: jira GOJIRA-123) [Cory Bennett] [[050848a](https://github.com/Netflix-Skunkworks/go-jira/commit/050848a)]
-* add --sort option to "list" command [Cory Bennett] [[f359030](https://github.com/Netflix-Skunkworks/go-jira/commit/f359030)]
-
-## 0.0.5 - 2015-02-21
-
-* handle editor having arguments [Cory Bennett] [[7186fb3](https://github.com/Netflix-Skunkworks/go-jira/commit/7186fb3)]
-* add more template error handling [Cory Bennett] [[3e6f2b3](https://github.com/Netflix-Skunkworks/go-jira/commit/3e6f2b3)]
-* allow create template to specify defalt watchers with -o watchers=... [Cory Bennett] [[4db2e4e](https://github.com/Netflix-Skunkworks/go-jira/commit/4db2e4e)]
-* if config files are executable then run them and parse the output [Cory Bennett] [[7a2f7f5](https://github.com/Netflix-Skunkworks/go-jira/commit/7a2f7f5)]
-
-## 0.0.4 - 2015-02-19
-
-* add --template option to export-templates to export a single template [Cory Bennett] [[343fbb6](https://github.com/Netflix-Skunkworks/go-jira/commit/343fbb6)]
-* add "table" template to be used with "list" command [Cory Bennett] [[8954ec1](https://github.com/Netflix-Skunkworks/go-jira/commit/8954ec1)]
-
-## 0.0.3 - 2015-02-19
-
-* [issue [#8](https://github.com/Netflix-Skunkworks/go-jira/issues/8)] detect X-Seraph-Loginreason: AUTHENTICATION_DENIED header to catch login failures [Cory Bennett] [[2dcf665](https://github.com/Netflix-Skunkworks/go-jira/commit/2dcf665)]
-* project should always be uppercase [Jay Buffington] [[1b69d12](https://github.com/Netflix-Skunkworks/go-jira/commit/1b69d12)]
-* if response is 400, check json for errorMessages and log them [Jay Buffington] [[4924dfa](https://github.com/Netflix-Skunkworks/go-jira/commit/4924dfa)]
-* validate project [Jay Buffington] [[dc5ae42](https://github.com/Netflix-Skunkworks/go-jira/commit/dc5ae42)]
-
-## 0.0.2 - 2015-02-18
-
-* add missing --override options on transition command
-* add browse command
-
+<a name="unreleased"></a>
+## [Unreleased]
+
+
+<a name="v1.0.28"></a>
+## [v1.0.28] - 2021-05-05
+
+<a name="v1.0.27"></a>
+## [v1.0.27] - 2020-10-01
+### Block
+- [f7587f4](https://github.com/go-jira/go-jira/commit/f7587f43f12bcf0b47e52a5abe775daf6cbb3229): reverse order of arguments
+### Chore
+- [2c7a9b2](https://github.com/go-jira/go-jira/commit/2c7a9b283025202428db629b1a9ecdc63a9b704f): V1.0.27 changelog bump
+### Templates
+- [0e3082f](https://github.com/go-jira/go-jira/commit/0e3082fab6e12a337f5fe26c3e2dec5cb51425d8): add wrap helper function
+
+<a name="v1.0.26"></a>
+## [v1.0.26] - 2020-09-11
+### Chore
+- [c3d22b7](https://github.com/go-jira/go-jira/commit/c3d22b765a6f3cd93445033da5c19fc0feaeaece): v1.0.26 changelog bump
+### Cicd
+- [96ec333](https://github.com/go-jira/go-jira/commit/96ec3339a4cc810da20450a9d9e91612c2b9aad4): automated releases fixes
+- [31f7b03](https://github.com/go-jira/go-jira/commit/31f7b0397890388947f2312cf42af494c7a6979f): automated changelog and release
+
+<a name="v1.0.25"></a>
+## [v1.0.25] - 2020-09-11
+### Bugfix
+- [aa8dae7](https://github.com/go-jira/go-jira/commit/aa8dae7c5b7035e086bd60b3d354ffa43c30caf7): only build jira tool with gox
+### Chore
+- [578c44c](https://github.com/go-jira/go-jira/commit/578c44c628e3134e4d46f3250baf46d6b054cfe8): v1.0.25 release
+### Fix(Changelog)
+- [ff5decc](https://github.com/go-jira/go-jira/commit/ff5decc114b297e9b393f8d4af72bbace0037c73): fix changelog version
+### Tests
+- [a8c961f](https://github.com/go-jira/go-jira/commit/a8c961fe19f424df3fdbe108a374cc56b8ff9fe0): rework passive tests into native go tests
+
+<a name="v1.0.24"></a>
+## [v1.0.24] - 2020-09-04
+### Cicd
+- [d093bcf](https://github.com/go-jira/go-jira/commit/d093bcf63adbd1d4e88640307aa8a5c8669ac535): deflake tests
+### Tests
+- [3bc5e42](https://github.com/go-jira/go-jira/commit/3bc5e42bd0186dbc5c47f022b9528207140fa297): transition if under review
+### Transition
+- [3c1c4d9](https://github.com/go-jira/go-jira/commit/3c1c4d95e199a717499f1f4259649152a6832e9f): map field name to id
+### Username-Deprecation
+- [6a27e28](https://github.com/go-jira/go-jira/commit/6a27e28c61c45f4b2a6aff473cf28852a2df64a2): use email and display names
+### Pull Requests
+- Merge pull request [#367](https://github.com/go-jira/go-jira/issues/367) from bbkane/master
+- Merge pull request [#349](https://github.com/go-jira/go-jira/issues/349) from aszenz/patch-1
+- Merge pull request [#355](https://github.com/go-jira/go-jira/issues/355) from go-jira/vanniktech-patch-1
+- Merge pull request [#323](https://github.com/go-jira/go-jira/issues/323) from tjamet/issue-comment
+
+
+<a name="v1.0.23"></a>
+## [v1.0.23] - 2020-02-26
+### Add Sprig Template Functions, Replaces [#215] Http
+- [719f7a6](https://github.com/go-jira/go-jira/commit/719f7a68a7f2c01e428a1ad3519a611c92268d27): //masterminds.github.io/sprig/
+ -  [#215](https://github.com/go-jira/go-jira/issues/215)### All
+- [31c113d](https://github.com/go-jira/go-jira/commit/31c113d1baf2dba814bca3e1dcc519ab8b0269e9): unindent some code
+- [f125ef3](https://github.com/go-jira/go-jira/commit/f125ef3fa9c7a64e8dfda9a643cadf0241b09bc7): convert to a Go module
+### CI
+- [664c5ca](https://github.com/go-jira/go-jira/commit/664c5cad246cbd4c861b615eb567d3874151d1a1): test on Go 1.12.x, cleanup
+### Docs
+- [d8189f0](https://github.com/go-jira/go-jira/commit/d8189f0a018d1afd364237e51ca8ed43ea1aabb1): update pass documentation with password-name
+### Fixes #228: Make '
+- [52a577e](https://github.com/go-jira/go-jira/commit/52a577ea48afea9efb7a1f4163301129a66f7b76): ' gpg files temporary to fix go mod
+ - Fixes [#228](https://github.com/go-jira/go-jira/issues/228)### Merge Branch 'Make-Password-Source-Binary-Exchangeable' Of Https
+- [e26fbfc](https://github.com/go-jira/go-jira/commit/e26fbfcb142f2ce8c7c33a977d4cf0b436d743eb): //github.com/patrickpichler/jira into patrickpichler-make-password-source-binary-exchangeable
+### README
+- [098d963](https://github.com/go-jira/go-jira/commit/098d963881322c2b2efba48ef6a39f235bdae881): trim down the content
+### T
+- [d237e86](https://github.com/go-jira/go-jira/commit/d237e86cda3812b23f432e90d120ec21e749a854): rename to _t to fix module support
+ - Fixes [#228](https://github.com/go-jira/go-jira/issues/228)### Update All Usage Of User.Name To User.AccountId For Privacy Migration: Https
+- [a26683e](https://github.com/go-jira/go-jira/commit/a26683e01dc7e161e735b1b387d1633bc32da2fe): //developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/
+### Pull Requests
+- Merge pull request [#318](https://github.com/go-jira/go-jira/issues/318) from jrschumacher/patch-1
+- Merge pull request [#317](https://github.com/go-jira/go-jira/issues/317) from go-jira/privacy-migration
+- Merge pull request [#302](https://github.com/go-jira/go-jira/issues/302) from go-jira/simplify-template-tables
+- Merge pull request [#292](https://github.com/go-jira/go-jira/issues/292) from pdecat/cache_password
+- Merge pull request [#301](https://github.com/go-jira/go-jira/issues/301) from go-jira/allow-issue-ints
+- Merge pull request [#286](https://github.com/go-jira/go-jira/issues/286) from patrickpichler/add-gopass-instructions-to-readme
+- Merge pull request [#285](https://github.com/go-jira/go-jira/issues/285) from patrickpichler/add-gopass-support
+- Merge pull request [#283](https://github.com/go-jira/go-jira/issues/283) from go-jira/sprig
+- Merge pull request [#273](https://github.com/go-jira/go-jira/issues/273) from acaloiaro/master
+- Merge pull request [#282](https://github.com/go-jira/go-jira/issues/282) from pcockwell/fix/choose-direct-transition-match-if-available
+- Merge pull request [#280](https://github.com/go-jira/go-jira/issues/280) from go-jira/cut_v1_0_21
+- Merge pull request [#275](https://github.com/go-jira/go-jira/issues/275) from go-jira/remove_gopkg_in
+- Merge pull request [#278](https://github.com/go-jira/go-jira/issues/278) from go-jira/update-figtree
+- Merge pull request [#276](https://github.com/go-jira/go-jira/issues/276) from go-jira/fix_228
+- Merge pull request [#266](https://github.com/go-jira/go-jira/issues/266) from mbethke/fix-multiline-worklog-comment
+- Merge pull request [#263](https://github.com/go-jira/go-jira/issues/263) from kojustin/master
+- Merge pull request [#253](https://github.com/go-jira/go-jira/issues/253) from mvdan/module
+- Merge pull request [#240](https://github.com/go-jira/go-jira/issues/240) from jgraglia/patch-1
+- Merge pull request [#219](https://github.com/go-jira/go-jira/issues/219) from kerhac/master
+- Merge pull request [#236](https://github.com/go-jira/go-jira/issues/236) from CodeLingoBot/rewrite
+- Merge pull request [#245](https://github.com/go-jira/go-jira/issues/245) from justmiles/211
+
+
+<a name="v1.0.22"></a>
+## [v1.0.22] - 2019-09-30
+### All
+- [bb9790f](https://github.com/go-jira/go-jira/commit/bb9790f28783c1b82a3685a9c4657241e906826a): unindent some code
+- [89fe2ec](https://github.com/go-jira/go-jira/commit/89fe2ecf16709511c3e04e02f7c7906a5ac6865a): convert to a Go module
+### CI
+- [80743e4](https://github.com/go-jira/go-jira/commit/80743e4da870a1febcc65d18d08242bb201b744d): test on Go 1.12.x, cleanup
+### Docs
+- [48c15e2](https://github.com/go-jira/go-jira/commit/48c15e2daa7b3f4c84526bd9f030828f378edfc2): update pass documentation with password-name
+### Fixes #228: Make '
+- [3984d0d](https://github.com/go-jira/go-jira/commit/3984d0d4848fdfe790f46ec18bd3b71782e36c32): ' gpg files temporary to fix go mod
+ - Fixes [#228](https://github.com/go-jira/go-jira/issues/228)### README
+- [dc9a9de](https://github.com/go-jira/go-jira/commit/dc9a9de165859057e4596aa47961e84de34b0b4b): trim down the content
+### T
+- [8994b42](https://github.com/go-jira/go-jira/commit/8994b42f714f8fc5b224bda8b5835f003d96ef02): rename to _t to fix module support
+ - Fixes [#228](https://github.com/go-jira/go-jira/issues/228)
+<a name="v1.0.21"></a>
+## [v1.0.21] - 2019-09-16
+### All
+- [31c113d](https://github.com/go-jira/go-jira/commit/31c113d1baf2dba814bca3e1dcc519ab8b0269e9): unindent some code
+- [f125ef3](https://github.com/go-jira/go-jira/commit/f125ef3fa9c7a64e8dfda9a643cadf0241b09bc7): convert to a Go module
+### CI
+- [664c5ca](https://github.com/go-jira/go-jira/commit/664c5cad246cbd4c861b615eb567d3874151d1a1): test on Go 1.12.x, cleanup
+### Docs
+- [d8189f0](https://github.com/go-jira/go-jira/commit/d8189f0a018d1afd364237e51ca8ed43ea1aabb1): update pass documentation with password-name
+### Fixes #228: Make '
+- [52a577e](https://github.com/go-jira/go-jira/commit/52a577ea48afea9efb7a1f4163301129a66f7b76): ' gpg files temporary to fix go mod
+ - Fixes [#228](https://github.com/go-jira/go-jira/issues/228)### README
+- [098d963](https://github.com/go-jira/go-jira/commit/098d963881322c2b2efba48ef6a39f235bdae881): trim down the content
+### T
+- [d237e86](https://github.com/go-jira/go-jira/commit/d237e86cda3812b23f432e90d120ec21e749a854): rename to _t to fix module support
+ - Fixes [#228](https://github.com/go-jira/go-jira/issues/228)### Pull Requests
+- Merge pull request [#275](https://github.com/go-jira/go-jira/issues/275) from go-jira/remove_gopkg_in
+- Merge pull request [#278](https://github.com/go-jira/go-jira/issues/278) from go-jira/update-figtree
+- Merge pull request [#276](https://github.com/go-jira/go-jira/issues/276) from go-jira/fix_228
+- Merge pull request [#266](https://github.com/go-jira/go-jira/issues/266) from mbethke/fix-multiline-worklog-comment
+- Merge pull request [#263](https://github.com/go-jira/go-jira/issues/263) from kojustin/master
+- Merge pull request [#253](https://github.com/go-jira/go-jira/issues/253) from mvdan/module
+- Merge pull request [#240](https://github.com/go-jira/go-jira/issues/240) from jgraglia/patch-1
+- Merge pull request [#219](https://github.com/go-jira/go-jira/issues/219) from kerhac/master
+- Merge pull request [#236](https://github.com/go-jira/go-jira/issues/236) from CodeLingoBot/rewrite
+- Merge pull request [#245](https://github.com/go-jira/go-jira/issues/245) from justmiles/211
+- Merge pull request [#220](https://github.com/go-jira/go-jira/issues/220) from ejsuncy/master
+
+
+<a name="v1.0.20"></a>
+## [v1.0.20] - 2018-08-04
+
+<a name="v1.0.19"></a>
+## [v1.0.19] - 2018-08-02
+### Pull Requests
+- Merge pull request [#197](https://github.com/go-jira/go-jira/issues/197) from kojiromike/spellcheck
+
+
+<a name="v1.0.18"></a>
+## [v1.0.18] - 2018-07-29
+### They Broke Golang.Org/X/Net: ERROR: Vendor/Golang.Org/X/Net/Proxy/Socks5.Go:11:2
+- [7191c77](https://github.com/go-jira/go-jira/commit/7191c7751b2d18d7f951d089fa3235acf5748d4b): use of internal package not allowed
+### Pull Requests
+- Merge pull request [#178](https://github.com/go-jira/go-jira/issues/178) from vergenzt/patch-1
+
+
+<a name="v1.0.17"></a>
+## [v1.0.17] - 2018-04-15
+### [#157] Add `Password-Directory
+- [06b26c9](https://github.com/go-jira/go-jira/commit/06b26c9e00384318ec7a51fa1c5ff5de63ea686b): path` to allow overriding PASSWORD_STORE_DIR from configs
+ -  [#157](https://github.com/go-jira/go-jira/issues/157)### Pull Requests
+- Merge pull request [#161](https://github.com/go-jira/go-jira/issues/161) from vanniktech/patch-1
+
+
+<a name="v1.0.16"></a>
+## [v1.0.16] - 2018-04-01
+### Pull Requests
+- Merge pull request [#150](https://github.com/go-jira/go-jira/issues/150) from catskul/parameterized-go-makefile
+- Merge pull request [#153](https://github.com/go-jira/go-jira/issues/153) from catskul/document-shell-completion
+- Merge pull request [#152](https://github.com/go-jira/go-jira/issues/152) from catskul/fix-missing-priority
+
+
+<a name="v1.0.15"></a>
+## [v1.0.15] - 2018-03-08
+### Pull Requests
+- Merge pull request [#151](https://github.com/go-jira/go-jira/issues/151) from catskul/build-instructions
+- Merge pull request [#142](https://github.com/go-jira/go-jira/issues/142) from anthonyrisinger/patch-1
+
+
+<a name="v1.0.14"></a>
+## [v1.0.14] - 2017-11-04
+### Pull Requests
+- Merge pull request [#130](https://github.com/go-jira/go-jira/issues/130) from onionjake/master
+
+
+<a name="v1.0.13"></a>
+## [v1.0.13] - 2017-10-28
+### Pull Requests
+- Merge pull request [#126](https://github.com/go-jira/go-jira/issues/126) from schorsch3000/master
+- Merge pull request [#129](https://github.com/go-jira/go-jira/issues/129) from blachniet/logout-help-typo-fix
+- Merge pull request [#124](https://github.com/go-jira/go-jira/issues/124) from gvol/master
+- Merge pull request [#128](https://github.com/go-jira/go-jira/issues/128) from mivok/escape-issuetype
+
+
+<a name="v1.0.12"></a>
+## [v1.0.12] - 2017-10-04
+
+<a name="v1.0.11"></a>
+## [v1.0.11] - 2017-09-26
+
+<a name="v1.0.10"></a>
+## [v1.0.10] - 2017-09-18
+
+<a name="v1.0.9"></a>
+## [v1.0.9] - 2017-09-17
+
+<a name="v1.0.8"></a>
+## [v1.0.8] - 2017-09-17
+
+<a name="v1.0.7"></a>
+## [v1.0.7] - 2017-09-15
+
+<a name="v1.0.6"></a>
+## [v1.0.6] - 2017-09-13
+
+<a name="v1.0.5"></a>
+## [v1.0.5] - 2017-09-11
+
+<a name="v1.0.4"></a>
+## [v1.0.4] - 2017-09-08
+
+<a name="v1.0.3"></a>
+## [v1.0.3] - 2017-09-06
+
+<a name="v1.0.2"></a>
+## [v1.0.2] - 2017-09-06
+
+<a name="v1.0.1"></a>
+## [v1.0.1] - 2017-09-06
+
+<a name="v1.0.0"></a>
+## [v1.0.0] - 2017-09-05
+
+<a name="v0.1.15"></a>
+## [v0.1.15] - 2017-08-25
+### Pull Requests
+- Merge pull request [#104](https://github.com/go-jira/go-jira/issues/104) from wrouesnel/keyring-update
+- Merge pull request [#90](https://github.com/go-jira/go-jira/issues/90) from bbaugher/master
+
+
+<a name="v0.1.14"></a>
+## [v0.1.14] - 2017-05-10
+
+<a name="v0.1.13"></a>
+## [v0.1.13] - 2017-04-24
+### Pull Requests
+- Merge pull request [#78](https://github.com/go-jira/go-jira/issues/78) from davidreuss/generic-issuelink
+- Merge pull request [#77](https://github.com/go-jira/go-jira/issues/77) from davidreuss/fix-start-parameter-for-pagination
+
+
+<a name="v0.1.12"></a>
+## [v0.1.12] - 2017-03-22
+### Pull Requests
+- Merge pull request [#74](https://github.com/go-jira/go-jira/issues/74) from clausb/BrowseOnWindows
+
+
+<a name="v0.1.11"></a>
+## [v0.1.11] - 2017-02-26
+
+<a name="v0.1.10"></a>
+## [v0.1.10] - 2017-02-08
+### Doc Tweak
+- [e6faa4e](https://github.com/go-jira/go-jira/commit/e6faa4eab1a8d6a7fb624b79bb58a641d02e876b): add info for setting username
+### Merge Branch 'Master' Of Github.Com
+- [63bc2ae](https://github.com/go-jira/go-jira/commit/63bc2ae15a2ebafa16861965951800e0d5c122bd): Netflix-Skunkworks/go-jira
+### Refactor Password Source, Allow For "Pass" To Be Used, Update Tests To Use `Password-Source
+- [cb70941](https://github.com/go-jira/go-jira/commit/cb70941aad2b8198f5c8ad8d1e1a7a98dc820cd9): pass`
+### Pull Requests
+- Merge pull request [#65](https://github.com/go-jira/go-jira/issues/65) from mlbright/patch-1
+- Merge pull request [#64](https://github.com/go-jira/go-jira/issues/64) from astrostl/patch-2
+- Merge pull request [#62](https://github.com/go-jira/go-jira/issues/62) from astrostl/patch-1
+
+
+<a name="v0.1.9"></a>
+## [v0.1.9] - 2016-12-18
+### Fix(Http)
+- [b326623](https://github.com/go-jira/go-jira/commit/b326623ed22677a3ff76d2c4c67bb7ca7ecb3877): Add proxy transport
+- [72c78c6](https://github.com/go-jira/go-jira/commit/72c78c6c1c63a70d837c8e367754792c8a30ae06): Add proxy transport
+### Merge Branch 'Master' Of Github.Com
+- [ac515e2](https://github.com/go-jira/go-jira/commit/ac515e2743e1bcf5f492a0e25d2b084f3311f0d0): Netflix-Skunkworks/go-jira
+### Pull Requests
+- Merge pull request [#61](https://github.com/go-jira/go-jira/issues/61) from sylus/feature-proxy
+- Merge pull request [#60](https://github.com/go-jira/go-jira/issues/60) from facundoolano/patch-1
+
+
+<a name="v0.1.8"></a>
+## [v0.1.8] - 2016-11-24
+### Pull Requests
+- Merge pull request [#53](https://github.com/go-jira/go-jira/issues/53) from jshirley/master
+
+
+<a name="v0.1.7"></a>
+## [v0.1.7] - 2016-08-24
+### Pull Requests
+- Merge pull request [#52](https://github.com/go-jira/go-jira/issues/52) from dbrower/master
+
+
+<a name="v0.1.6"></a>
+## [v0.1.6] - 2016-08-21
+
+<a name="v0.1.5"></a>
+## [v0.1.5] - 2016-08-21
+
+<a name="v0.1.4"></a>
+## [v0.1.4] - 2016-08-12
+
+<a name="v0.1.3"></a>
+## [v0.1.3] - 2016-07-30
+### Pull Requests
+- Merge pull request [#24](https://github.com/go-jira/go-jira/issues/24) from mikepea/edit_template_common
+
+
+<a name="v0.1.2"></a>
+## [v0.1.2] - 2016-06-29
+
+<a name="v0.1.1"></a>
+## [v0.1.1] - 2016-06-28
+### Merge Branch 'Master' Of Github.Com
+- [dd0f5ef](https://github.com/go-jira/go-jira/commit/dd0f5efd3247157686c2c88817d3ad375de399ea): Netflix-Skunkworks/go-jira
+### Pull Requests
+- Merge pull request [#39](https://github.com/go-jira/go-jira/issues/39) from mikepea/system_template_dir
+- Merge pull request [#38](https://github.com/go-jira/go-jira/issues/38) from jglick/patch-1
+- Merge pull request [#37](https://github.com/go-jira/go-jira/issues/37) from tobyjoe/add-resource-expansion
+- Merge pull request [#35](https://github.com/go-jira/go-jira/issues/35) from QuinnyPig/fix-readme
+- Merge pull request [#34](https://github.com/go-jira/go-jira/issues/34) from jonathanio/fix/issuetypes-url-escaping
+
+
+<a name="v0.1.0"></a>
+## [v0.1.0] - 2016-01-29
+### Add Component/Components Support
+- [595a521](https://github.com/go-jira/go-jira/commit/595a5212b43be28e01a0d5a6cf98a8de89383e41): add and list for now.
+### Merge Branch 'Master' Of Github.Com
+- [9e90376](https://github.com/go-jira/go-jira/commit/9e90376816c295d3a75b4f51703c24fd95873625): Netflix-Skunkworks/go-jira
+- [382bf4f](https://github.com/go-jira/go-jira/commit/382bf4faeb17198b54950a05b0fdb3e126af8d73): Netflix-Skunkworks/go-jira
+### Pull Requests
+- Merge pull request [#33](https://github.com/go-jira/go-jira/issues/33) from mikepea/make_jirad
+- Merge pull request [#31](https://github.com/go-jira/go-jira/issues/31) from mikepea/component_mgmt
+- Merge pull request [#30](https://github.com/go-jira/go-jira/issues/30) from mikepea/unwatch_support
+- Merge pull request [#26](https://github.com/go-jira/go-jira/issues/26) from mikepea/vote_support
+
+
+<a name="v0.0.20"></a>
+## [v0.0.20] - 2016-01-21
+### Correct Naming Of Parameter
+- [8e66246](https://github.com/go-jira/go-jira/commit/8e662462dac6cccdf8af277797777caeff3ad2bc): set/add/remove are actions.
+### Pull Requests
+- Merge pull request [#27](https://github.com/go-jira/go-jira/issues/27) from blalor/insecure-skip-verify
+- Merge pull request [#21](https://github.com/go-jira/go-jira/issues/21) from mikepea/label_command
+- Merge pull request [#22](https://github.com/go-jira/go-jira/issues/22) from mikepea/library_break_out
+- Merge pull request [#20](https://github.com/go-jira/go-jira/issues/20) from mikepea/add_join_template_func
+
+
+<a name="0.0.19"></a>
+## [0.0.19] - 2015-12-09
+
+<a name="0.0.18"></a>
+## [0.0.18] - 2015-12-03
+
+<a name="0.0.17"></a>
+## [0.0.17] - 2015-12-03
+
+<a name="0.0.16"></a>
+## [0.0.16] - 2015-11-23
+
+<a name="0.0.15"></a>
+## [0.0.15] - 2015-11-23
+
+<a name="0.0.14"></a>
+## [0.0.14] - 2015-11-17
+### Pull Requests
+- Merge pull request [#16](https://github.com/go-jira/go-jira/issues/16) from oschrenk/fix-typo
+- Merge pull request [#14](https://github.com/go-jira/go-jira/issues/14) from mikepea/ls_with_updated
+
+
+<a name="0.0.13"></a>
+## [0.0.13] - 2015-09-19
+
+<a name="0.0.12"></a>
+## [0.0.12] - 2015-09-18
+
+<a name="0.0.11"></a>
+## [0.0.11] - 2015-09-16
+
+<a name="0.0.10"></a>
+## [0.0.10] - 2015-09-15
+
+<a name="0.0.9"></a>
+## [0.0.9] - 2015-09-15
+### Allow "Abort
+- [80b6f5a](https://github.com/go-jira/go-jira/commit/80b6f5a198fbe17aa0245c470d47c2988d8624c3): true" to be set while editing to cancel the edit operation
+
+<a name="0.0.8"></a>
+## [0.0.8] - 2015-07-31
+### Pull Requests
+- Merge pull request [#11](https://github.com/go-jira/go-jira/issues/11) from mikepea/max_results_option
+
+### Note
+
+that testing against our JIRA instance, in a project with
+more than 1000 open issues, suggests that the JIRA has an internal
+limit of 1000 results in a single query.
+
+
+<a name="0.0.7"></a>
+## [0.0.7] - 2015-07-01
+### Merge Branch 'Master' Of Github.Com
+- [b72040b](https://github.com/go-jira/go-jira/commit/b72040bfd413bcdc88ca2c3f6843a7f6dee2e898): Netflix-Skunkworks/go-jira
+### Pull Requests
+- Merge pull request [#9](https://github.com/go-jira/go-jira/issues/9) from nelfin/quickfix/take-user
+
+
+<a name="0.0.6"></a>
+## [0.0.6] - 2015-02-27
+### Set JIRA_OPERATION To "View" When No Operation Used (Ie
+- [8040746](https://github.com/go-jira/go-jira/commit/8040746bcf6aac6e3ff6e419c349661a8fc9bf99): jira GOJIRA-123)
+
+<a name="0.0.5"></a>
+## [0.0.5] - 2015-02-21
+
+<a name="0.0.4"></a>
+## [0.0.4] - 2015-02-19
+
+<a name="0.0.3"></a>
+## [0.0.3] - 2015-02-19
+### [Issue #8] Detect X-Seraph-Loginreason
+- [f3feff7](https://github.com/go-jira/go-jira/commit/f3feff796fbecca6477ecbc1e9dae6a2b78e755c): AUTHENTICATION_DENIED header to catch login failures
+ -  [#8](https://github.com/go-jira/go-jira/issues/8)### Pull Requests
+- Merge pull request [#7](https://github.com/go-jira/go-jira/issues/7) from jaybuff/empty-projects
+
+
+<a name="0.0.2"></a>
+## [0.0.2] - 2015-02-18
+
+<a name="0.0.1"></a>
 ## 0.0.1 - 2015-02-18
+### Adding Commands
+- [18f10fd](https://github.com/go-jira/go-jira/commit/18f10fd12521584c7d85b20dff2b1c2da0854cb9): * create * dups * blocks * watch
+### Merge Branch 'Nil-Assignee' Of Https
+- [25539ef](https://github.com/go-jira/go-jira/commit/25539efedda0e06e103fc942e16405c0c09ba621): //github.com/jaybuff/go-jira into jaybuff-nil-assignee
+### Work In Progress, Minor Refactor.  Added Commands
+- [acbc24b](https://github.com/go-jira/go-jira/commit/acbc24b2096f31a5805fa48984724a4a6c1da431): * login * editmeta ISSUE * edit ISSUE * issuetypes [-p PROJECT] * createmeta [-p PROJECT] [-i ISSUETYPE] * transitions ISSUE
+### Pull Requests
+- Merge pull request [#2](https://github.com/go-jira/go-jira/issues/2) from jaybuff/clean-up
 
-* Initial experimental release
+
+[Unreleased]: https://github.com/go-jira/go-jira/compare/v1.0.28...HEAD
+[v1.0.28]: https://github.com/go-jira/go-jira/compare/v1.0.27...v1.0.28
+[v1.0.27]: https://github.com/go-jira/go-jira/compare/v1.0.26...v1.0.27
+[v1.0.26]: https://github.com/go-jira/go-jira/compare/v1.0.25...v1.0.26
+[v1.0.25]: https://github.com/go-jira/go-jira/compare/v1.0.24...v1.0.25
+[v1.0.24]: https://github.com/go-jira/go-jira/compare/v1.0.23...v1.0.24
+[v1.0.23]: https://github.com/go-jira/go-jira/compare/v1.0.22...v1.0.23
+[v1.0.22]: https://github.com/go-jira/go-jira/compare/v1.0.21...v1.0.22
+[v1.0.21]: https://github.com/go-jira/go-jira/compare/v1.0.20...v1.0.21
+[v1.0.20]: https://github.com/go-jira/go-jira/compare/v1.0.19...v1.0.20
+[v1.0.19]: https://github.com/go-jira/go-jira/compare/v1.0.18...v1.0.19
+[v1.0.18]: https://github.com/go-jira/go-jira/compare/v1.0.17...v1.0.18
+[v1.0.17]: https://github.com/go-jira/go-jira/compare/v1.0.16...v1.0.17
+[v1.0.16]: https://github.com/go-jira/go-jira/compare/v1.0.15...v1.0.16
+[v1.0.15]: https://github.com/go-jira/go-jira/compare/v1.0.14...v1.0.15
+[v1.0.14]: https://github.com/go-jira/go-jira/compare/v1.0.13...v1.0.14
+[v1.0.13]: https://github.com/go-jira/go-jira/compare/v1.0.12...v1.0.13
+[v1.0.12]: https://github.com/go-jira/go-jira/compare/v1.0.11...v1.0.12
+[v1.0.11]: https://github.com/go-jira/go-jira/compare/v1.0.10...v1.0.11
+[v1.0.10]: https://github.com/go-jira/go-jira/compare/v1.0.9...v1.0.10
+[v1.0.9]: https://github.com/go-jira/go-jira/compare/v1.0.8...v1.0.9
+[v1.0.8]: https://github.com/go-jira/go-jira/compare/v1.0.7...v1.0.8
+[v1.0.7]: https://github.com/go-jira/go-jira/compare/v1.0.6...v1.0.7
+[v1.0.6]: https://github.com/go-jira/go-jira/compare/v1.0.5...v1.0.6
+[v1.0.5]: https://github.com/go-jira/go-jira/compare/v1.0.4...v1.0.5
+[v1.0.4]: https://github.com/go-jira/go-jira/compare/v1.0.3...v1.0.4
+[v1.0.3]: https://github.com/go-jira/go-jira/compare/v1.0.2...v1.0.3
+[v1.0.2]: https://github.com/go-jira/go-jira/compare/v1.0.1...v1.0.2
+[v1.0.1]: https://github.com/go-jira/go-jira/compare/v1.0.0...v1.0.1
+[v1.0.0]: https://github.com/go-jira/go-jira/compare/v0.1.15...v1.0.0
+[v0.1.15]: https://github.com/go-jira/go-jira/compare/v0.1.14...v0.1.15
+[v0.1.14]: https://github.com/go-jira/go-jira/compare/v0.1.13...v0.1.14
+[v0.1.13]: https://github.com/go-jira/go-jira/compare/v0.1.12...v0.1.13
+[v0.1.12]: https://github.com/go-jira/go-jira/compare/v0.1.11...v0.1.12
+[v0.1.11]: https://github.com/go-jira/go-jira/compare/v0.1.10...v0.1.11
+[v0.1.10]: https://github.com/go-jira/go-jira/compare/v0.1.9...v0.1.10
+[v0.1.9]: https://github.com/go-jira/go-jira/compare/v0.1.8...v0.1.9
+[v0.1.8]: https://github.com/go-jira/go-jira/compare/v0.1.7...v0.1.8
+[v0.1.7]: https://github.com/go-jira/go-jira/compare/v0.1.6...v0.1.7
+[v0.1.6]: https://github.com/go-jira/go-jira/compare/v0.1.5...v0.1.6
+[v0.1.5]: https://github.com/go-jira/go-jira/compare/v0.1.4...v0.1.5
+[v0.1.4]: https://github.com/go-jira/go-jira/compare/v0.1.3...v0.1.4
+[v0.1.3]: https://github.com/go-jira/go-jira/compare/v0.1.2...v0.1.3
+[v0.1.2]: https://github.com/go-jira/go-jira/compare/v0.1.1...v0.1.2
+[v0.1.1]: https://github.com/go-jira/go-jira/compare/v0.1.0...v0.1.1
+[v0.1.0]: https://github.com/go-jira/go-jira/compare/v0.0.20...v0.1.0
+[v0.0.20]: https://github.com/go-jira/go-jira/compare/0.0.19...v0.0.20
+[0.0.19]: https://github.com/go-jira/go-jira/compare/0.0.18...0.0.19
+[0.0.18]: https://github.com/go-jira/go-jira/compare/0.0.17...0.0.18
+[0.0.17]: https://github.com/go-jira/go-jira/compare/0.0.16...0.0.17
+[0.0.16]: https://github.com/go-jira/go-jira/compare/0.0.15...0.0.16
+[0.0.15]: https://github.com/go-jira/go-jira/compare/0.0.14...0.0.15
+[0.0.14]: https://github.com/go-jira/go-jira/compare/0.0.13...0.0.14
+[0.0.13]: https://github.com/go-jira/go-jira/compare/0.0.12...0.0.13
+[0.0.12]: https://github.com/go-jira/go-jira/compare/0.0.11...0.0.12
+[0.0.11]: https://github.com/go-jira/go-jira/compare/0.0.10...0.0.11
+[0.0.10]: https://github.com/go-jira/go-jira/compare/0.0.9...0.0.10
+[0.0.9]: https://github.com/go-jira/go-jira/compare/0.0.8...0.0.9
+[0.0.8]: https://github.com/go-jira/go-jira/compare/0.0.7...0.0.8
+[0.0.7]: https://github.com/go-jira/go-jira/compare/0.0.6...0.0.7
+[0.0.6]: https://github.com/go-jira/go-jira/compare/0.0.5...0.0.6
+[0.0.5]: https://github.com/go-jira/go-jira/compare/0.0.4...0.0.5
+[0.0.4]: https://github.com/go-jira/go-jira/compare/0.0.3...0.0.4
+[0.0.3]: https://github.com/go-jira/go-jira/compare/0.0.2...0.0.3
+[0.0.2]: https://github.com/go-jira/go-jira/compare/0.0.1...0.0.2

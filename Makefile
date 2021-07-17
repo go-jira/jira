@@ -19,6 +19,7 @@ GOBIN ?= $(CWD)
 
 CURVER ?= $(patsubst v%,%,$(shell [ -d .git ] && git describe --abbrev=0 --tags || grep ^\#\# CHANGELOG.md | awk '{print $$2; exit}'))
 LDFLAGS:= -w
+VERSION ?= development
 
 build:
 	$(GO) build -gcflags="-e" -v -ldflags "$(LDFLAGS) -s" -o '$(BIN)' cmd/jira/main.go
@@ -42,8 +43,7 @@ all:
 	GO111MODULE=off $(GO) get -u github.com/mitchellh/gox
 	rm -rf dist
 	mkdir -p dist
-	gox -ldflags="-w -s" -output="dist/github.com/go-jira/jira-{{.OS}}-{{.Arch}}" -osarch="darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64" ./...
-	_t/test_binaries.sh
+	gox -ldflags="-w -s" -ldflags="-X 'github.com/go-jira/jira.VERSION=$(VERSION)'" -output="dist/github.com/go-jira/jira-{{.OS}}-{{.Arch}}" -osarch="darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64" ./cmd/jira
 
 install:
 	${MAKE} GOBIN=$$HOME/bin build

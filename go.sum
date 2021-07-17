@@ -24,6 +24,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fatih/camelcase v1.0.0 h1:hxNvNX/xYBp0ovncs8WyWZrOrpBNub/JfaMvbURyft8=
 github.com/fatih/camelcase v1.0.0/go.mod h1:yN2Sb0lFhZJUdVvtELVWefmrXpuZESvPmqwoZc+/fpc=
+github.com/google/go-cmp v0.5.2 h1:X2ev0eStA3AbceY54o37/0PQ/UWqKEiiO2dKL5OPaFM=
+github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/uuid v1.1.1 h1:Gkbcsh/GbpXz7lPftLA3P6TYMwjCLYm83jiFQZF/3gY=
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/guelfey/go.dbus v0.0.0-20131113121618-f6a3a2366cc3 h1:fngCxKbvZdctIsWj2hYijhAt4iK0JXSSA78B36xP0yI=
@@ -53,6 +55,8 @@ github.com/mattn/go-runewidth v0.0.6 h1:V2iyH+aX9C5fsYCpK60U8BYIvmhqxuOL3JZcqc1N
 github.com/mattn/go-runewidth v0.0.6/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
 github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b h1:j7+1HpAFS1zy5+Q4qx1fWh90gTKwiN4QCGoY9TWyyO4=
 github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b/go.mod h1:01TrycV0kFyexm33Z7vhZRXopbI8J3TDReVlkTgMUxE=
+github.com/mitchellh/go-wordwrap v1.0.1 h1:TLuKupo69TCn6TQSyGxwI1EblZZEsQ0vMlAFQflz0v0=
+github.com/mitchellh/go-wordwrap v1.0.1/go.mod h1:R62XHJLzvMFRBbcrT7m7WgmE1eOyTSsCt+hzestvNj0=
 github.com/olekukonko/tablewriter v0.0.3 h1:i0LBnzgiChAWHJYTQAZJDOgf8MNxAVYZJ2m63SIDimI=
 github.com/olekukonko/tablewriter v0.0.3/go.mod h1:YZeBtGzYYEsCHp2LST/u/0NDwGkRoBtmn1cIWCJiS6M=
 github.com/pkg/browser v0.0.0-20170505125900-c90ca0c84f15 h1:mrI+6Ae64Wjt+uahGe5we/sPS1sXjvfT3YjtawAVgps=
@@ -77,6 +81,7 @@ golang.org/x/net v0.0.0-20171102191033-01c190206fbd h1:CLQSRrSDQMOMkogMxky7XOkER
 golang.org/x/net v0.0.0-20171102191033-01c190206fbd/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/sys v0.0.0-20180727230415-bd9dbc187b6e h1:3dQ4fR8k5KugjVKO0oqSd1odxuk2yaE2CIfxWP2WarQ=
 golang.org/x/sys v0.0.0-20180727230415-bd9dbc187b6e/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
+golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 gopkg.in/AlecAivazis/survey.v1 v1.6.1 h1:HyWkjKGBpzhNxrpaKRLDqoa4L1f4cMVBNU4bnVmU8Mw=
 gopkg.in/AlecAivazis/survey.v1 v1.6.1/go.mod h1:2Ehl7OqkBl3Xb8VmC4oFW2bItAhnUfzIjrOzwRxCrOU=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6 h1:jMFz6MfLP0/4fUyZle81rXUoxOBFi19VUFKVDOQfozc=

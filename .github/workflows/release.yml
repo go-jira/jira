@@ -1,0 +1,103 @@
+---
+name: Release
+
+on:
+  push:
+    tags:
+      - v1.*
+
+jobs:
+  release:
+    name: Release
+    runs-on: 'ubuntu-latest'
+    container: docker.io/library/golang:1.14
+    steps:
+      # This step is for local testing using https://github.com/nektos/act
+      - name: install node
+        run: |
+          apt update 
+          apt install -y nodejs
+      - name: Setup
+        run: |
+          tag=`basename ${{ github.ref }}`
+          echo "VERSION=${tag}" >> $GITHUB_ENV
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: add gox
+        run: go install github.com/mitchellh/gox
+      - name: ChangeLog
+        shell: bash
+        run: |
+          curl -o git-chglog -L https://github.com/git-chglog/git-chglog/releases/download/0.9.1/git-chglog_linux_amd64
+          chmod u+x git-chglog
+          tag=`basename ${{ github.ref }}`
+          echo "creating change log for tag: $tag"
+          chglog="$(./git-chglog ${tag})"
+          chglog="${chglog//'%'/'%25'}"
+          chglog="${chglog//$'\n'/'%0A'}"
+          chglog="${chglog//$'\r'/'%0D'}"
+          echo "CHANGELOG=${chglog}" >> $GITHUB_ENV
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ env.VERSION }} Release
+          body: |
+            ${{ env.CHANGELOG }}
+          prerelease: ${{ contains(env.VERSION, 'alpha') || contains(env.VERSION, 'beta') || contains(env.VERSION, 'rc') }}
+      # perform production release of artifacts
+      - name: Build Artifacts
+        run: |
+          VERSION=${{ env.VERSION }} make all
+      - name: "Publish Darwin AMD64"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/go-jira/jira-darwin-amd64
+          asset_name: jira-darwin-amd64
+          asset_content_type: application/octet-stream
+      - name: "Publish Linux 386"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/go-jira/jira-linux-386
+          asset_name: jira-linux-386
+          asset_content_type: application/octet-stream
+      - name: "Publish Linux AMD64"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/go-jira/jira-linux-amd64
+          asset_name: jira-linux-amd64
+          asset_content_type: application/octet-stream
+      - name: "Publish Windows 386"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/go-jira/jira-windows-386.exe
+          asset_name: jira-windows-386.exe
+          asset_content_type: application/octet-stream
+      - name: "Publish Windows AMD64"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/go-jira/jira-windows-amd64.exe
+          asset_name: jira-windows-amd64.exe
+          asset_content_type: application/octet-stream
+
+

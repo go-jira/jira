@@ -53,7 +53,7 @@ func CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) error {
 		return nil
 	}).Bool()
 	cmd.Arg("ISSUE", "issue to add watcher").Required().StringVar(&opts.Issue)
-	cmd.Arg("WATCHER", "username of watcher to add to issue").StringVar(&opts.Watcher)
+	cmd.Arg("WATCHER", "email or display name of watcher to add to issue").StringVar(&opts.Watcher)
 	return nil
 }
 
@@ -61,7 +61,7 @@ func CmdWatchUsage(cmd *kingpin.CmdClause, opts *WatchOptions) error {
 // with the 'remove' flag)
 func CmdWatch(o *oreo.Client, globals *jiracli.GlobalOptions, opts *WatchOptions) error {
 	if opts.Watcher == "" {
-		opts.Watcher = globals.User.Value
+		opts.Watcher = globals.Login.Value
 	}
 
 	if globals.JiraDeploymentType.Value == "" {
@@ -74,7 +74,7 @@ func CmdWatch(o *oreo.Client, globals *jiracli.GlobalOptions, opts *WatchOptions
 
 	if globals.JiraDeploymentType.Value == jiracli.CloudDeploymentType {
 		users, err := jira.UserSearch(o, globals.Endpoint.Value, &jira.UserSearchOptions{
-			Username: opts.Watcher,
+			Query: opts.Watcher,
 		})
 		if err != nil {
 			return err

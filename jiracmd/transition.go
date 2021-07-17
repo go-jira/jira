@@ -165,6 +165,26 @@ func CmdTransition(o *oreo.Client, globals *jiracli.GlobalOptions, opts *Transit
 				return err
 			}
 		}
+
+		// if issueUpdate contains fields lets see if we can map them
+		// to their ids
+		if len(issueUpdate.Fields) > 0 {
+			fields, err := jira.GetFields(o, globals.Endpoint.Value)
+			if err != nil {
+				return err
+			}
+			for k, v := range issueUpdate.Fields {
+				for _, f := range fields {
+					if f.Name == k {
+						// re-map to field.id
+						issueUpdate.Fields[f.ID] = v
+						delete(issueUpdate.Fields, k)
+						break
+					}
+				}
+			}
+		}
+
 		return jira.TransitionIssue(o, globals.Endpoint.Value, opts.Issue, &issueUpdate)
 	})
 	if err != nil {

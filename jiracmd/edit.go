@@ -180,20 +180,6 @@ func fixUserField(ua jira.HttpClient, endpoint string, userField map[string]inte
 		return nil
 	}
 
-	if username, ok := userField["name"].(string); ok {
-		users, err := jira.UserSearch(ua, endpoint, &jira.UserSearchOptions{
-			Username: username,
-		})
-		if err != nil {
-			return err
-		}
-		if len(users) != 1 {
-			return fmt.Errorf("Found %d accounts for username %q", len(users), username)
-		}
-		userField["accountId"] = users[0].AccountID
-		return nil
-	}
-
 	queryName, ok := userField["displayName"].(string)
 	if !ok {
 		queryName, ok = userField["emailAddress"].(string)
