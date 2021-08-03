@@ -50,6 +50,10 @@ func CmdLogin(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.Comm
 		log.Noticef("No need to login when using api-token authentication method")
 		return nil
 	}
+	if globals.AuthMethod() == "bearer-token" {
+		log.Noticef("No need to login when using bearer-token authentication method")
+		return nil
+	}
 
 	ua := o.WithoutRedirect().WithRetries(0).WithoutCallbacks().WithPostCallback(authCallback)
 	for {

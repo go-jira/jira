@@ -173,7 +173,11 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 			token := globals.GetPass()
 			authHeader := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", globals.Login.Value, token))))
 			req.Header.Add("Authorization", authHeader)
-		}
+		} else if globals.AuthMethod() == "bearer-token" {
+			token := globals.GetPass()
+			authHeader := fmt.Sprintf("Bearer %s", token)
+			req.Header.Add("Authorization", authHeader)
+                }
 		return req, nil
 	})
 
