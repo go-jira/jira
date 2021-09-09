@@ -48,3 +48,5 @@ require (
 	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
+
+replace github.com/go-jira/jira => github.com/chuckliu1979/jira v1.0.29 //indirect
