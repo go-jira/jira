@@ -49,4 +49,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
 
-replace github.com/go-jira/jira => github.com/chuckliu1979/jira v1.0.29 //indirect
+replace github.com/go-jira/jira => github.com/chuckliu1979/jira v1.0.30 //indirect
