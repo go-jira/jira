@@ -30,7 +30,7 @@ func CmdLogoutRegistry() *jiracli.CommandRegistryEntry {
 
 // CmdLogout will attempt to terminate an active Jira session
 func CmdLogout(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
-	if (globals.AuthMethod() == "api-token" || globals.AuthMethod() == "bearer-token") {
+	if globals.AuthMethodIsToken() {
 		log.Noticef("No need to logout when using api-token or bearer-token authentication method")
 		if globals.GetPass() != "" && terminal.IsTerminal(int(os.Stdin.Fd())) && terminal.IsTerminal(int(os.Stdout.Fd())) {
 			delete := false
