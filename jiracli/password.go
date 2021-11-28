@@ -21,7 +21,7 @@ func (o *GlobalOptions) ProvideAuthParams() *jiradata.AuthParams {
 
 func (o *GlobalOptions) keyName() string {
 	user := o.Login.Value
-	if o.AuthMethod() == "api-token" {
+	if o.AuthMethodIsToken() {
 		user = "api-token:" + user
 	}
 
@@ -133,14 +133,14 @@ func (o *GlobalOptions) GetPass() string {
 		return o.cachedPassword
 	}
 
-	if o.cachedPassword = os.Getenv("JIRA_API_TOKEN"); o.cachedPassword != "" && o.AuthMethod() == "api-token" {
+	if o.cachedPassword = os.Getenv("JIRA_API_TOKEN"); o.cachedPassword != "" && o.AuthMethodIsToken() {
 		return o.cachedPassword
 	}
 
 	prompt := fmt.Sprintf("Jira Password [%s]: ", o.Login)
 	help := ""
 
-	if o.AuthMethod() == "api-token" {
+	if o.AuthMethodIsToken() {
 		prompt = fmt.Sprintf("Jira API-Token [%s]: ", o.Login)
 		help = "API Tokens may be required by your Jira service endpoint: https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-basic-auth-and-cookie-based-auth/"
 	}

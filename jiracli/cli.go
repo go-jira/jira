@@ -55,7 +55,8 @@ const (
 )
 
 type GlobalOptions struct {
-	// AuthenticationMethod is the method we use to authenticate with the jira serivce. Possible values are "api-token" or "session".
+	// AuthenticationMethod is the method we use to authenticate with the jira serivce.
+	// Possible values are "api-token", "bearer-token" or "session".
 	// The default is "api-token" when the service endpoint ends with "atlassian.net", otherwise it "session".  Session authentication
 	// will promt for user password and use the /auth/1/session-login endpoint.
 	AuthenticationMethod figtree.StringOption `yaml:"authentication-method,omitempty" json:"authentication-method,omitempty"`
@@ -154,6 +155,10 @@ func (o *GlobalOptions) AuthMethod() string {
 	return o.AuthenticationMethod.Value
 }
 
+func (o *GlobalOptions) AuthMethodIsToken() bool{
+	return o.AuthMethod() == "api-token" || o.AuthMethod() == "bearer-token";
+}
+
 func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 	globals := GlobalOptions{
 		User:                 figtree.NewStringOption(os.Getenv("USER")),
@@ -172,6 +177,10 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 			// need to set basic auth header with user@domain:api-token
 			token := globals.GetPass()
 			authHeader := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", globals.Login.Value, token))))
+			req.Header.Add("Authorization", authHeader)
+		} else if globals.AuthMethod() == "bearer-token" {
+			token := globals.GetPass()
+			authHeader := fmt.Sprintf("Bearer %s", token)
 			req.Header.Add("Authorization", authHeader)
 		}
 		return req, nil
@@ -194,7 +203,7 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 				// rerun the original request
 				return o.Do(req)
 			}
-		} else if globals.AuthMethod() == "api-token" && resp.StatusCode == 401 {
+		} else if globals.AuthMethodIsToken() && resp.StatusCode == 401 {
 			globals.SetPass("")
 			return o.Do(req)
 		}
@@ -232,7 +241,7 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 			} else if globals.SocksProxy.Value != "" {
 				o = o.WithTransport(socksProxy(globals.SocksProxy.Value))
 			}
-			if globals.AuthMethod() == "api-token" {
+			if globals.AuthMethodIsToken() {
 				o = o.WithCookieFile("")
 			}
 			if globals.Login.Value == "" {

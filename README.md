@@ -305,6 +305,17 @@ The API Token authentication requires both the token and the email of the user. 
 
 If your Jira service still allows you to use the Session based authentication method then `jira` will prompt for a password automatically when get a response header from the Jira service that indicates you do not have an active session (ie the `X-Ausername` header is set to `anonymous`).  Then after authentication we cache the `cloud.session.token` cookie returned by the service [session login api](https://docs.atlassian.com/jira/REST/cloud/#auth/1/session-login) and reuse that on subsequent requests.  Typically this cookie will be valid for several hours (depending on the service configuration).  To automatically securely store your password for easy reuse by jira You can enable a `password-source` via `.jira.d/config.yml` with possible values of `keyring`, `pass` or `gopass`.
 
+Depending on how your private Jira service is configured, API tokens may require the "[Bearer][]" authentication scheme instead of the traditional "[Basic][]" [authentication scheme][scheme]. In this case, set the `authentication-method: bearer-token` property in your `$HOME/.jira.d/config.yml` file.
+
+[scheme]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#authentication_schemes
+[Bearer]: https://datatracker.ietf.org/doc/html/rfc6750
+[Basic]: https://tools.ietf.org/html/rfc7617
+
+| **API token [scheme][]** | `authentication-method` | **Example HTTP request header**                 |
+|:------------------------:|-------------------------|-------------------------------------------------|
+|        [Basic][]         | `api-token`             | `Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQK` |
+|        [Bearer][]        | `bearer-token`          | `Authorization: Bearer MY_TOKEN`                |
+
 #### User vs Login
 The Jira service has sometimes differing opinions about how a user is identified.  In other words the ID you login with might not be ID that the jira system recognized you as.  This matters when trying to identify a user via various Jira REST APIs (like issue assignment).  This is especially relevant when trying to authenticate with an API Token where the authentication user is usually an email address, but within the Jira system the user is identified by a user name.  To accommodate this `jira` now supports two different properties in the config file.  So when authentication using the API Tokens you will likely want something like this in your `$HOME/.jira.d/config.yml` file:
 ```yaml
