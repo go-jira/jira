@@ -93,7 +93,9 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 		Overrides: opts.Overrides,
 	}
 	input.Overrides["project"] = opts.Project
-	input.Overrides["summary"] = opts.Summary
+	if opts.Summary != "" {
+		input.Overrides["summary"] = opts.Summary
+	}
 	input.Overrides["issuetype"] = opts.IssueType
 	input.Overrides["login"] = globals.Login.Value
 
