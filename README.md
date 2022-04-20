@@ -326,7 +326,7 @@ login: person@example.com
 You can also override these values on the command line with `jira --user person --login person@example.com`.  The `login` value will be used only for authentication purposes, the `user` value will be used when a user name is required for any Jira service API calls.
 
 #### `keyring` password source
-On OSX and Linux there are a few keyring providers that `go-jira` can use (via this [golang module](https://github.com/tmc/keyring)).  To integrate `go-jira` with a supported keyring just add this configuration to `$HOME/.jira.d/config.yml`:
+On OSX and Linux there are a few keyring providers that `go-jira` can use (via this [golang module](https://github.com/dougEfresh/keyring)).  To integrate `go-jira` with a supported keyring just add this configuration to `$HOME/.jira.d/config.yml`:
 ```yaml
 password-source: keyring
 ```
