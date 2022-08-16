@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/url"
 	"strings"
@@ -68,9 +69,35 @@ func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvid
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
+
 		results := &jiradata.Issue{}
-		return results, json.NewDecoder(resp.Body).Decode(results)
+		json_error := json.NewDecoder(resp.Body).Decode(results)
+
+		if json_error != nil {
+
+			log.Print("status Code: ", resp.Status, ", URL: ", uri)
+
+			bodyBytes, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			bodyString := string(bodyBytes)
+			log.Fatalf(bodyString)
+
+		}
+		return results, json_error
+	} else {
+
+		log.Print("status Code: ", resp.Status, ", URL: ", uri)
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bodyString := string(bodyBytes)
+		log.Fatalf(bodyString)
+
 	}
+
 	return nil, responseError(resp)
 }
 
