@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/url"
 	"strings"
@@ -69,8 +70,32 @@ func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvid
 
 	if resp.StatusCode == 200 {
 		results := &jiradata.Issue{}
-		return results, json.NewDecoder(resp.Body).Decode(results)
+		json_error := json.NewDecoder(resp.Body).Decode(results)
+		if json_error != nil {
+
+			log.Print("status Code: ", resp.Status, ", URL: ", uri)
+
+			bodyBytes, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			bodyString := string(bodyBytes)
+			log.Fatalf(bodyString)
+
+		}
+		return results, json_error
+	} else {
+
+		log.Print("status Code: ", resp.Status, ", URL: ", uri)
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bodyString := string(bodyBytes)
+		log.Fatalf(bodyString)
+
 	}
+
 	return nil, responseError(resp)
 }
 
@@ -95,14 +120,33 @@ func GetIssueWorklog(ua HttpClient, endpoint string, issue string) (*jiradata.Wo
 
 		if resp.StatusCode == 200 {
 			results := &jiradata.WorklogWithPagination{}
-			err := json.NewDecoder(resp.Body).Decode(results)
-			if err != nil {
-				return nil, err
+			json_error := json.NewDecoder(resp.Body).Decode(results)
+			if json_error != nil {
+
+				log.Print("status Code: ", resp.Status, ", URL: ", uri)
+
+				bodyBytes, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+				bodyString := string(bodyBytes)
+				log.Fatalf(bodyString)
+
+				return nil, json_error
+
 			}
 			startAt = startAt + maxResults
 			total = results.Total
 			worklogs = append(worklogs, results.Worklogs...)
 		} else {
+			log.Print("status Code: ", resp.Status, ", URL: ", uri)
+			bodyBytes, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			bodyString := string(bodyBytes)
+			log.Fatalf(bodyString)
+
 			return nil, responseError(resp)
 		}
 	}
@@ -130,14 +174,32 @@ func GetIssueComment(ua HttpClient, endpoint string, issue string) (*jiradata.Co
 
 		if resp.StatusCode == 200 {
 			results := &jiradata.CommentsWithPagination{}
-			err := json.NewDecoder(resp.Body).Decode(results)
-			if err != nil {
-				return nil, err
+			json_error := json.NewDecoder(resp.Body).Decode(results)
+			if json_error != nil {
+
+				log.Print("status Code: ", resp.Status, ", URL: ", uri)
+
+				bodyBytes, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Fatal(err)
+				}
+				bodyString := string(bodyBytes)
+				log.Fatalf(bodyString)
+
+				return nil, json_error
+
 			}
 			startAt = startAt + maxResults
 			total = results.Total
 			comments = append(comments, results.Comments...)
 		} else {
+			log.Print("status Code: ", resp.Status, ", URL: ", uri)
+			bodyBytes, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			bodyString := string(bodyBytes)
+			log.Fatalf(bodyString)
 			return nil, responseError(resp)
 		}
 	}
@@ -373,11 +435,20 @@ func TransitionIssue(ua HttpClient, endpoint string, issue string, iup IssueUpda
 	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "transitions")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
+
+		log.Print("status Code: ", resp.Status, ", URL: ", uri)
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bodyString := string(bodyBytes)
+		log.Fatalf(bodyString)
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 204 {
+
 		return nil
 	}
 	return responseError(resp)
@@ -530,13 +601,37 @@ func IssueAddComment(ua HttpClient, endpoint string, issue string, cp CommentPro
 	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "comment")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
+
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 201 {
 		results := jiradata.Comment{}
-		return &results, json.NewDecoder(resp.Body).Decode(&results)
+		json_error := json.NewDecoder(resp.Body).Decode(&results)
+		if json_error != nil {
+
+			log.Print("status Code: ", resp.Status, ", URL: ", uri)
+
+			bodyBytes, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			bodyString := string(bodyBytes)
+			log.Fatalf(bodyString)
+
+		}
+		return &results, json_error
+	} else {
+
+		log.Print("status Code: ", resp.Status, ", URL: ", uri)
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		bodyString := string(bodyBytes)
+		log.Fatalf(bodyString)
+
 	}
 	return nil, responseError(resp)
 }
