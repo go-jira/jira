@@ -60,6 +60,7 @@ func CmdListUsage(cmd *kingpin.CmdClause, opts *ListOptions, fig *figtree.FigTre
 	}).String()
 	cmd.Flag("query", "Jira Query Language (JQL) expression for the search").Short('q').StringVar(&opts.Query)
 	cmd.Flag("queryfields", "Fields that are used in \"list\" template").Short('f').StringVar(&opts.QueryFields)
+	cmd.Flag("expand", "field to expand for list").StringsVar(&opts.Expand)
 	cmd.Flag("reporter", "Reporter to search for").Short('r').StringVar(&opts.Reporter)
 	cmd.Flag("status", "Filter on issue status").Short('S').StringVar(&opts.Status)
 	cmd.Flag("sort", "Sort order to return").Short('s').StringVar(&opts.Sort)

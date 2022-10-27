@@ -17,6 +17,7 @@ type SearchOptions struct {
 	Assignee    string `yaml:"assignee,omitempty" json:"assignee,omitempty"`
 	Query       string `yaml:"query,omitempty" json:"query,omitempty"`
 	QueryFields string `yaml:"query-fields,omitempty" json:"query-fields,omitempty"`
+	Expand      string `yaml:"expand,omitempty" json:"expand,omitempty"`
 	Project     string `yaml:"project,omitempty" json:"project,omitempty"`
 	Component   string `yaml:"component,omitempty" json:"component,omitempty"`
 	IssueType   string `yaml:"issue-type,omitempty" json:"issue-type,omitempty"`
@@ -68,6 +69,10 @@ func (o *SearchOptions) ProvideSearchRequest() *jiradata.SearchRequest {
 	}
 	req.StartAt = 0
 	req.MaxResults = o.MaxResults
+	if o.Expand != "" {
+		fields := strings.Split(o.Expand, ",")
+		req.Expand = append(req.Expand, fields...)
+	}
 
 	return req
 }
