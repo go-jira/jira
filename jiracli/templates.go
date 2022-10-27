@@ -263,6 +263,10 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 	headers := []string{}
 	cells := [][]string{}
 	tmpl, err := TemplateProcessor().Funcs(map[string]interface{}{
+		"defaultColWidth": func(cw int) string {
+			table.SetColWidth(cw)
+			return ""
+		},
 		"headers": func(titles ...string) string {
 			headers = append(headers, titles...)
 			return ""
