@@ -35,8 +35,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.2.2
 	github.com/theckman/go-flock v0.4.0 // indirect
-	github.com/tidwall/gjson v0.0.0-20180711011033-ba784d767ac7
-	github.com/tidwall/match v1.0.0 // indirect
+	github.com/tidwall/gjson v1.9.3
 	github.com/tmc/keyring v0.0.0-20171121202319-839169085ae1
 	golang.org/x/crypto v0.0.0-20180723164146-c126467f60eb
 	golang.org/x/net v0.0.0-20171102191033-01c190206fbd
