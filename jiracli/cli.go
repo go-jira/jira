@@ -171,6 +171,7 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 	app.Flag("socksproxy", "Address for a socks proxy").SetValue(&globals.SocksProxy)
 	app.Flag("user", "user name used within the Jira service").Short('u').SetValue(&globals.User)
 	app.Flag("login", "login name that corresponds to the user used for authentication").SetValue(&globals.Login)
+	app.Flag("passwordsource", "Method to fetch the password").SetValue(&globals.PasswordSource)
 
 	o = o.WithPreCallback(func(req *http.Request) (*http.Request, error) {
 		if globals.AuthMethod() == "api-token" {
