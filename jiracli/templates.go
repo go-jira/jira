@@ -422,9 +422,17 @@ fields:
   summary: >-
     {{ or .overrides.summary .fields.summary }}
 {{- if and .meta.fields.components .meta.fields.components.allowedValues }}
-  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
-    - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
-    - name: {{ .name }}{{end}}{{end}}{{end}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}
+  {{if .overrides.components }}
+    {{ range (split "," .overrides.components)}}
+    - name: {{.}}
+    {{end}}
+  {{else}}
+    {{ range .fields.components }}
+    - name: {{ .name }}
+    {{end}}
+  {{end}}
+{{end}}
 {{- if .meta.fields.assignee }}
   {{- if .overrides.assignee }}
   assignee:
@@ -433,18 +441,27 @@ fields:
   assignee: {{if .fields.assignee.name}}
     emailAddress: {{ or .fields.assignee.name}}
   {{- else }}
-    emailAddress: {{.fields.assignee.emailAddress}}{{end}}{{end}}{{end}}
+    emailAddress: {{.fields.assignee.emailAddress}}
+  {{end}}{{end}}
+{{end}}
 {{- if .meta.fields.reporter}}
   reporter:
-    emailAddress: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.emailAddress }}{{end}}{{end}}
+    emailAddress: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.emailAddress }}{{end}}
+{{end}}
 {{- if .meta.fields.customfield_10110}}
   # watchers
-  customfield_10110: {{ range .fields.customfield_10110 }}
-    - name: {{ .name }}{{end}}{{if .overrides.watcher}}
-    - name: {{ .overrides.watcher}}{{end}}{{end}}
+  customfield_10110:
+  {{ range .fields.customfield_10110 }}
+    - name: {{ .name }}
+  {{end}}
+  {{if .overrides.watcher}}
+    - name: {{ .overrides.watcher}}
+  {{end}}
+{{end}}
 {{- if .meta.fields.priority }}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority .fields.priority.name "" }}{{end}}
+    name: {{ or .overrides.priority .fields.priority.name "" }}
+{{end}}
   description: |~
     {{ or .overrides.description .fields.description "" | indent 4 }}
 # votes: {{ .fields.votes.votes }}
