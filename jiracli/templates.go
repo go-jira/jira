@@ -477,21 +477,35 @@ fields:
   issuetype:
     name: {{ or .overrides.issuetype "" }}
   summary: >-
-    {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+    {{ or .overrides.summary "" }}
+{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
-  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
-    - name: {{ . }}{{end}}{{end}}
+    name: {{ or .overrides.priority ""}}
+{{end}}
+{{if .meta.fields.components.allowedValues}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}
+  {{ range split "," (or .overrides.components "")}}
+    - name: {{ . }}
+  {{end}}
+{{end}}
   description: |~
-    {{ or .overrides.description "" | indent 4 }}{{if .meta.fields.assignee}}
+    {{ or .overrides.description "" | indent 4 }}
+{{if .meta.fields.assignee}}
   assignee:
-    emailAddress: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
+    emailAddress: {{ or .overrides.assignee "" }}
+{{end}}
+{{if .meta.fields.reporter}}
   reporter:
-    emailAddress: {{ or .overrides.reporter .overrides.login }}{{end}}{{if .meta.fields.customfield_10110}}
+    emailAddress: {{ or .overrides.reporter .overrides.login }}
+{{end}}
+{{if .meta.fields.customfield_10110}}
   # watchers
-  customfield_10110: {{ range split "," (or .overrides.watchers "")}}
-    - name: {{.}}{{end}}
-    - name:{{end}}`
+  customfield_10110:
+  {{ range split "," (or .overrides.watchers "")}}
+    - name: {{.}}
+  {{end}}
+    - name:
+{{end}}`
 
 const defaultEpicCreateTemplate = `{{/* epic create template */ -}}
 fields:
