@@ -2,7 +2,7 @@
 
 package jiracli
 
-import "github.com/tmc/keyring"
+import "github.com/dougEfresh/keyring"
 
 func keyringGet(user string) (string, error) {
 	password, err := keyring.Get("go-jira", user)
