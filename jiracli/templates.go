@@ -171,10 +171,10 @@ func TemplateProcessor() *template.Template {
 			return strings.Join(vals, sep)
 		},
 		"abbrev": func(max int, content string) string {
-			if len(content) > max && max > 2 {
+			if len(content) > max && max >= 1 {
 				var buffer bytes.Buffer
-				buffer.WriteString(content[:max-3])
-				buffer.WriteString("...")
+				buffer.WriteString(content[:max-1])
+				buffer.WriteString("…")
 				return buffer.String()
 			}
 			return content
