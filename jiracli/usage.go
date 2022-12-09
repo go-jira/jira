@@ -119,6 +119,16 @@ func CommandLine(fig *figtree.FigTree, o *oreo.Client) *kingpin.Application {
 		return nil
 	}).CounterVar(&verbosity)
 
+	var color bool
+	app.Flag("color", "Enable/Disable output color").PreAction(func(_ *kingpin.ParseContext) error {
+		if color {
+			os.Unsetenv("NO_COLOR")
+		} else {
+			os.Setenv("NO_COLOR", "1")
+		}
+		return nil
+	}).Hidden().BoolVar(&color)
+
 	app.Terminate(func(status int) {
 		for _, arg := range os.Args {
 			if arg == "-h" || arg == "--help" || len(os.Args) == 1 {

@@ -67,6 +67,8 @@ func tmpTemplate(templateName string, data interface{}) (string, error) {
 }
 
 func TemplateProcessor() *template.Template {
+	noColor := len(os.Getenv("NO_COLOR")) > 0
+
 	funcs := map[string]interface{}{
 		"jira": func() string {
 			return os.Args[0]
@@ -151,6 +153,9 @@ func TemplateProcessor() *template.Template {
 			return content
 		},
 		"color": func(color string) string {
+			if noColor {
+				return ""
+			}
 			return ansi.ColorCode(color)
 		},
 		"remLineBreak": func(content string) string {
