@@ -19,6 +19,7 @@ type CreateOptions struct {
 	jiracli.CommonOptions `yaml:",inline" json:",inline" figtree:",inline"`
 	jiradata.IssueUpdate  `yaml:",inline" json:",inline" figtree:",inline"`
 	Project               string            `yaml:"project,omitempty" json:"project,omitempty"`
+	Summary               string            `yaml:"summary,omitempty" json:"summary`
 	IssueType             string            `yaml:"issuetype,omitempty" json:"issuetype,omitempty"`
 	Overrides             map[string]string `yaml:"overrides,omitempty" json:"overrides,omitempty"`
 	SaveFile              string            `yaml:"savefile,omitempty" json:"savefile,omitempty"`
@@ -51,6 +52,7 @@ func CmdCreateUsage(cmd *kingpin.CmdClause, opts *CreateOptions) error {
 	jiracli.TemplateUsage(cmd, &opts.CommonOptions)
 	cmd.Flag("noedit", "Disable opening the editor").SetValue(&opts.SkipEditing)
 	cmd.Flag("project", "project to create issue in").Short('p').StringVar(&opts.Project)
+	cmd.Flag("summary", "Summary of the issue").Short('s').StringVar(&opts.Summary)
 	cmd.Flag("issuetype", "issuetype in to create").Short('i').StringVar(&opts.IssueType)
 	cmd.Flag("comment", "Comment message for issue").Short('m').PreAction(func(ctx *kingpin.ParseContext) error {
 		opts.Overrides["comment"] = jiracli.FlagValue(ctx, "comment")
@@ -91,6 +93,9 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 		Overrides: opts.Overrides,
 	}
 	input.Overrides["project"] = opts.Project
+	if opts.Summary != "" {
+		input.Overrides["summary"] = opts.Summary
+	}
 	input.Overrides["issuetype"] = opts.IssueType
 	input.Overrides["login"] = globals.Login.Value
 
