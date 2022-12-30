@@ -451,13 +451,13 @@ fields:
 {{- if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110:
-  {{ range .fields.customfield_10110 }}
+  {{- range .fields.customfield_10110 }}
     - name: {{ .name }}
-  {{end}}
-  {{if .overrides.watcher}}
+  {{- end}}
+  {{- if .overrides.watcher}}
     - name: {{ .overrides.watcher}}
-  {{end}}
-{{end}}
+  {{- end}}
+{{- end}}
 {{- if .meta.fields.priority }}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority .fields.priority.name "" }}
