@@ -461,7 +461,7 @@ fields:
 {{- if .meta.fields.priority }}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
     name: {{ or .overrides.priority .fields.priority.name "" }}
-{{end}}
+{{- end}}
   description: |~
     {{ or .overrides.description .fields.description "" | indent 4 }}
 # votes: {{ .fields.votes.votes }}
