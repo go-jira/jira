@@ -442,8 +442,8 @@ fields:
     emailAddress: {{ or .fields.assignee.name}}
   {{- else }}
     emailAddress: {{.fields.assignee.emailAddress}}
-  {{end}}{{end}}
-{{end}}
+  {{-end}}{{end}}
+{{-end}}
 {{- if .meta.fields.reporter}}
   reporter:
     emailAddress: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.emailAddress }}{{end}}
