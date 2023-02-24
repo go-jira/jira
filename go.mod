@@ -23,7 +23,7 @@ require (
 	github.com/imdario/mergo v0.3.7 // indirect
 	github.com/jinzhu/copier v0.0.0-20180308034124-7e38e58719c3
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
-	github.com/kr/pretty v0.1.0
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/kr/pty v1.1.4 // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.3 // indirect
@@ -38,9 +38,8 @@ require (
 	github.com/tidwall/gjson v0.0.0-20180711011033-ba784d767ac7
 	github.com/tidwall/match v1.0.0 // indirect
 	github.com/tmc/keyring v0.0.0-20171121202319-839169085ae1
-	golang.org/x/crypto v0.0.0-20180723164146-c126467f60eb
-	golang.org/x/net v0.0.0-20171102191033-01c190206fbd
-	golang.org/x/sys v0.0.0-20180727230415-bd9dbc187b6e // indirect
+	golang.org/x/crypto v0.1.0
+	golang.org/x/net v0.1.0
 	gopkg.in/AlecAivazis/survey.v1 v1.6.1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
