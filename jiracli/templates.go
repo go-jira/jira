@@ -446,8 +446,8 @@ fields:
 {{-end}}
 {{- if .meta.fields.reporter}}
   reporter:
-    emailAddress: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.emailAddress }}{{end}}
-{{end}}
+    emailAddress: {{ coalesce .overrides.reporter (.fields.reporter | .fields.reporter.emailAddress "") }}
+{{- end}}
 {{- if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110:
