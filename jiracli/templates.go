@@ -426,9 +426,17 @@ fields:
   summary: >-
     {{ or .overrides.summary .fields.summary }}
 {{- if and .meta.fields.components .meta.fields.components.allowedValues }}
-  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
-    - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
-    - name: {{ .name }}{{end}}{{end}}{{end}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}
+  {{if .overrides.components }}
+    {{ range (split "," .overrides.components)}}
+    - name: {{.}}
+    {{end}}
+  {{else}}
+    {{ range .fields.components }}
+    - name: {{ .name }}
+    {{end}}
+  {{end}}
+{{end}}
 {{- if .meta.fields.assignee }}
   {{- if .overrides.assignee }}
   assignee:
@@ -437,18 +445,27 @@ fields:
   assignee: {{if .fields.assignee.name}}
     emailAddress: {{ or .fields.assignee.name}}
   {{- else }}
-    emailAddress: {{.fields.assignee.emailAddress}}{{end}}{{end}}{{end}}
+    emailAddress: {{.fields.assignee.emailAddress}}
+  {{-end}}{{end}}
+{{-end}}
 {{- if .meta.fields.reporter}}
   reporter:
-    emailAddress: {{ if .overrides.reporter }}{{ .overrides.reporter }}{{else if .fields.reporter}}{{ .fields.reporter.emailAddress }}{{end}}{{end}}
+    emailAddress: {{ coalesce .overrides.reporter (.fields.reporter | .fields.reporter.emailAddress "") }}
+{{- end}}
 {{- if .meta.fields.customfield_10110}}
   # watchers
-  customfield_10110: {{ range .fields.customfield_10110 }}
-    - name: {{ .name }}{{end}}{{if .overrides.watcher}}
-    - name: {{ .overrides.watcher}}{{end}}{{end}}
+  customfield_10110:
+  {{- range .fields.customfield_10110 }}
+    - name: {{ .name }}
+  {{- end}}
+  {{- if .overrides.watcher}}
+    - name: {{ .overrides.watcher}}
+  {{- end}}
+{{- end}}
 {{- if .meta.fields.priority }}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority .fields.priority.name "" }}{{end}}
+    name: {{ or .overrides.priority .fields.priority.name "" }}
+{{- end}}
   description: |~
     {{ or .overrides.description .fields.description "" | indent 4 }}
 # votes: {{ .fields.votes.votes }}
@@ -481,21 +498,35 @@ fields:
   issuetype:
     name: {{ or .overrides.issuetype "" }}
   summary: >-
-    {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+    {{ or .overrides.summary "" }}
+{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
-  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
-    - name: {{ . }}{{end}}{{end}}
+    name: {{ or .overrides.priority ""}}
+{{end}}
+{{if .meta.fields.components.allowedValues}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}
+  {{ range split "," (or .overrides.components "")}}
+    - name: {{ . }}
+  {{end}}
+{{end}}
   description: |~
-    {{ or .overrides.description "" | indent 4 }}{{if .meta.fields.assignee}}
+    {{ or .overrides.description "" | indent 4 }}
+{{if .meta.fields.assignee}}
   assignee:
-    emailAddress: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
+    emailAddress: {{ or .overrides.assignee "" }}
+{{end}}
+{{if .meta.fields.reporter}}
   reporter:
-    emailAddress: {{ or .overrides.reporter .overrides.login }}{{end}}{{if .meta.fields.customfield_10110}}
+    emailAddress: {{ or .overrides.reporter .overrides.login }}
+{{end}}
+{{if .meta.fields.customfield_10110}}
   # watchers
-  customfield_10110: {{ range split "," (or .overrides.watchers "")}}
-    - name: {{.}}{{end}}
-    - name:{{end}}`
+  customfield_10110:
+  {{ range split "," (or .overrides.watchers "")}}
+    - name: {{.}}
+  {{end}}
+    - name:
+{{end}}`
 
 const defaultEpicCreateTemplate = `{{/* epic create template */ -}}
 fields:
@@ -504,21 +535,32 @@ fields:
   # Epic Name
   customfield_10120: {{ or (index .overrides "epic-name") "" }}
   summary: >-
-    {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+    {{ or .overrides.summary "" }}
+{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
-  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
-    - name: {{ . }}{{end}}{{end}}
+    name: {{ or .overrides.priority ""}}
+{{end}}
+{{if .meta.fields.components.allowedValues}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}
+  {{ range split "," (or .overrides.components "")}}
+    - name: {{ . }}{{end}}
+{{end}}
   description: |~
-    {{ or .overrides.description "" | indent 4 }}{{if .meta.fields.assignee}}
+    {{ or .overrides.description "" | indent 4 }}
+{{if .meta.fields.assignee}}
   assignee:
-    emailAddress: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
+    emailAddress: {{ or .overrides.assignee "" }}
+{{end}}
+{{if .meta.fields.reporter}}
   reporter:
-    emailAddress: {{ or .overrides.reporter .overrides.login }}{{end}}{{if .meta.fields.customfield_10110}}
+    emailAddress: {{ or .overrides.reporter .overrides.login }}
+{{end}}
+{{if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
-    - name:{{end}}
+    - name:
+{{end}}
   issuetype:
     name: Epic`
 
@@ -527,21 +569,33 @@ fields:
   project:
     key: {{ .parent.fields.project.key }}
   summary: >-
-    {{ or .overrides.summary "" }}{{if .meta.fields.priority.allowedValues}}
+    {{ or .overrides.summary "" }}
+{{if .meta.fields.priority.allowedValues}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
-    name: {{ or .overrides.priority ""}}{{end}}{{if .meta.fields.components.allowedValues}}
-  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{ range split "," (or .overrides.components "")}}
-    - name: {{ . }}{{end}}{{end}}
+    name: {{ or .overrides.priority ""}}
+{{end}}
+{{if .meta.fields.components.allowedValues}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}
+  {{ range split "," (or .overrides.components "")}}
+    - name: {{ . }}
+  {{end}}
+{{end}}
   description: |~
-    {{ or .overrides.description "" | indent 4 }}{{if .meta.fields.assignee}}
+    {{ or .overrides.description "" | indent 4 }}
+{{if .meta.fields.assignee}}
   assignee:
-    emailAddress: {{ or .overrides.assignee "" }}{{end}}{{if .meta.fields.reporter}}
+    emailAddress: {{ or .overrides.assignee "" }}
+{{end}}
+{{if .meta.fields.reporter}}
   reporter:
-    emailAddress: {{ or .overrides.reporter .overrides.login }}{{end}}{{if .meta.fields.customfield_10110}}
+    emailAddress: {{ or .overrides.reporter .overrides.login }}
+{{end}}
+{{if .meta.fields.customfield_10110}}
   # watchers
   customfield_10110: {{ range split "," (or .overrides.watchers "")}}
     - name: {{.}}{{end}}
-    - name:{{end}}
+    - name:
+{{end}}
   issuetype:
     name: Sub-task
   parent:
@@ -571,9 +625,14 @@ fields:
     emailAddress: {{.fields.assignee.emailAddress}}{{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.components}}
-  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}{{if .overrides.components }}{{ range (split "," .overrides.components)}}
-    - name: {{.}}{{end}}{{else}}{{ range .fields.components }}
-    - name: {{ .name }}{{end}}{{end}}
+  components: # Values: {{ range .meta.fields.components.allowedValues }}{{.name}}, {{end}}
+  {{if .overrides.components }}
+  {{ range (split "," .overrides.components)}}
+    - name: {{.}}{{end}}
+  {{else}}
+  {{ range .fields.components }}
+    - name: {{ .name }}{{end}}
+  {{end}}
 {{- end -}}
 {{if .meta.fields.description}}
   description: |~
@@ -581,9 +640,14 @@ fields:
 {{- end -}}
 {{if .meta.fields.fixVersions -}}
   {{if .meta.fields.fixVersions.allowedValues}}
-  fixVersions: # Values: {{ range .meta.fields.fixVersions.allowedValues }}{{.name}}, {{end}}{{if .overrides.fixVersions}}{{ range (split "," .overrides.fixVersions)}}
-    - name: {{.}}{{end}}{{else}}{{range .fields.fixVersions}}
-    - name: {{.name}}{{end}}{{end}}
+  fixVersions: # Values: {{ range .meta.fields.fixVersions.allowedValues }}{{.name}}, {{end}}
+    {{if .overrides.fixVersions}}
+    {{ range (split "," .overrides.fixVersions)}}
+    - name: {{.}}{{end}}
+    {{else}}
+    {{range .fields.fixVersions}}
+    - name: {{.name}}{{end}}
+    {{end}}
   {{- end -}}
 {{- end -}}
 {{if .meta.fields.issuetype}}
@@ -592,8 +656,11 @@ fields:
 {{- end -}}
 {{if .meta.fields.labels}}
   labels: {{range .fields.labels}}
-    - {{.}}{{end}}{{if .overrides.labels}}{{range (split "," .overrides.labels)}}
-    - {{.}}{{end}}{{end}}
+    - {{.}}{{end}}
+  {{if .overrides.labels}}
+  {{range (split "," .overrides.labels)}}
+    - {{.}}{{end}}
+  {{end}}
 {{- end -}}
 {{if .meta.fields.priority}}
   priority: # Values: {{ range .meta.fields.priority.allowedValues }}{{.name}}, {{end}}
@@ -607,7 +674,8 @@ fields:
   reporter: {{if .fields.reporter.name}}
     name: {{ or .fields.reporter.name}}
   {{- else }}
-    displayName: {{.fields.reporter.displayName}}{{end}}{{end}}
+    displayName: {{.fields.reporter.displayName}}
+  {{end}}{{end}}
 {{- end -}}
 {{if .meta.fields.resolution}}
   resolution: # Values: {{ range .meta.fields.resolution.allowedValues }}{{.name}}, {{end}}
@@ -618,9 +686,14 @@ fields:
     {{or .overrides.summary .fields.summary}}
 {{- end -}}
 {{if .meta.fields.versions.allowedValues}}
-  versions: # Values: {{ range .meta.fields.versions.allowedValues }}{{.name}}, {{end}}{{if .overrides.versions}}{{ range (split "," .overrides.versions)}}
-    - name: {{.}}{{end}}{{else}}{{range .fields.versions}}
-    - name: {{.}}{{end}}{{end}}
+  versions: # Values: {{ range .meta.fields.versions.allowedValues }}{{.name}}, {{end}}
+  {{if .overrides.versions}}
+  {{ range (split "," .overrides.versions)}}
+    - name: {{.}}{{end}}
+  {{else}}
+  {{range .fields.versions}}
+    - name: {{.}}{{end}}
+  {{end}}
 {{- end}}
 transition:
   id: {{ .transition.id }}
