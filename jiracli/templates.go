@@ -258,28 +258,52 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 		return err
 	}
 
-	table := tablewriter.NewWriter(out)
-	table.SetAutoFormatHeaders(false)
-	headers := []string{}
-	cells := [][]string{}
+	footerTable := tablewriter.NewWriter(out)
+	footerTable.SetAutoFormatHeaders(false)
+	footerHeaders := []string{}
+	footerCells := [][]string{}
+
+	var table *tablewriter.Table
+	var table_str *strings.Builder
 	tmpl, err := TemplateProcessor().Funcs(map[string]interface{}{
+		"newTable": func(mw int) string {
+			table_str = new(strings.Builder)
+			table = tablewriter.NewWriter(table_str)
+			table.SetAutoFormatHeaders(false)
+			table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+			table.SetCenterSeparator("|")
+			table.SetColWidth(mw)
+			return ""
+		},
+		"tableHeaders": func(args ...string) string {
+			table.SetHeader(args)
+			return ""
+		},
+		"tableRow": func(args ...string) string {
+			table.Append(args)
+			return ""
+		},
+		"tableRender": func() string {
+			table.Render()
+			return table_str.String()
+		},
 		"defaultColWidth": func(cw int) string {
-			table.SetColWidth(cw)
+			footerTable.SetColWidth(cw)
 			return ""
 		},
 		"headers": func(titles ...string) string {
-			headers = append(headers, titles...)
+			footerHeaders = append(footerHeaders, titles...)
 			return ""
 		},
 		"row": func() string {
-			cells = append(cells, []string{})
+			footerCells = append(footerCells, []string{})
 			return ""
 		},
 		"cell": func(value interface{}) (string, error) {
-			if len(cells) == 0 {
+			if len(footerCells) == 0 {
 				return "", fmt.Errorf(`"cell" template function called before "row" template function`)
 			}
-			cells[len(cells)-1] = append(cells[len(cells)-1], fmt.Sprintf("%v", value))
+			footerCells[len(footerCells)-1] = append(footerCells[len(footerCells)-1], fmt.Sprintf("%v", value))
 			return "", nil
 		},
 	}).Parse(templateContent)
@@ -290,10 +314,12 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 	if err := tmpl.Execute(out, rawData); err != nil {
 		return err
 	}
-	if len(headers) > 0 || len(cells) > 0 {
-		table.SetHeader(headers)
-		table.AppendBulk(cells)
-		table.Render()
+	if len(footerHeaders) > 0 || len(footerCells) > 0 {
+		footerTable.SetHeader(footerHeaders)
+		footerTable.AppendBulk(footerCells)
+		footerTable.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+		footerTable.SetCenterSeparator("|")
+		footerTable.Render()
 	}
 
 	return nil
@@ -333,7 +359,7 @@ const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf 
 
 const defaultTableTemplate = `{{/* table template */ -}}
 {{- headers "Issue" "Summary" "Type" "Priority" "Status" "Age" "Reporter" "Assignee" -}}
-{{- range .issues -}} 
+{{- range .issues -}}
   {{- row -}}
   {{- cell .key -}}
   {{- cell .fields.summary -}}
