@@ -73,9 +73,9 @@ func CmdSubtask(o *oreo.Client, globals *jiracli.GlobalOptions, opts *SubtaskOpt
 	}
 
 	type templateInput struct {
-		Meta      *jiradata.IssueType `yaml:"meta" json:"meta"`
-		Overrides map[string]string   `yaml:"overrides" json:"overrides"`
-		Parent    *jiradata.Issue     `yaml:"parent" json:"parent"`
+		Meta      *jiradata.CreateMetaIssueType `yaml:"meta" json:"meta"`
+		Overrides map[string]string             `yaml:"overrides" json:"overrides"`
+		Parent    *jiradata.Issue               `yaml:"parent" json:"parent"`
 	}
 
 	parent, err := jira.GetIssue(o, globals.Endpoint.Value, opts.Issue, nil)

@@ -247,13 +247,13 @@ func CreateIssue(ua HttpClient, endpoint string, iup IssueUpdateProvider) (*jira
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getCreateIssueMeta
-func (j *Jira) GetIssueCreateMetaProject(projectKey string) (*jiradata.CreateMetaProject, error) {
+func (j *Jira) GetIssueCreateMetaProject(projectKey string) (jiradata.Values, error) {
 	return GetIssueCreateMetaProject(j.UA, j.Endpoint, projectKey)
 }
 
-func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string) (*jiradata.CreateMetaProject, error) {
+func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string) (jiradata.Values, error) {
 	uri := URLJoin(endpoint, "rest/api/2/issue/createmeta")
-	uri += fmt.Sprintf("?projectKeys=%s&expand=projects.issuetypes.fields", projectKey)
+	uri += fmt.Sprintf("/%s/issuetypes", projectKey)
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -261,29 +261,24 @@ func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		results := &jiradata.CreateMeta{}
+		results := &jiradata.PageOfCreateMetaIssueType{}
 		err = json.NewDecoder(resp.Body).Decode(results)
 		if err != nil {
 			return nil, err
 		}
-		for _, project := range results.Projects {
-			if project.Key == projectKey {
-				return project, nil
-			}
-		}
-		return nil, fmt.Errorf("project %s not found", projectKey)
+		return results.Values, nil
 	}
 	return nil, responseError(resp)
 }
 
 // https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getCreateIssueMeta
-func (j *Jira) GetIssueCreateMetaIssueType(projectKey, issueTypeName string) (*jiradata.IssueType, error) {
+func (j *Jira) GetIssueCreateMetaIssueType(projectKey, issueTypeName string) (*jiradata.CreateMetaIssueType, error) {
 	return GetIssueCreateMetaIssueType(j.UA, j.Endpoint, projectKey, issueTypeName)
 }
 
-func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, issueTypeName string) (*jiradata.IssueType, error) {
+func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, issueTypeName string) (*jiradata.CreateMetaIssueType, error) {
 	uri := URLJoin(endpoint, "rest/api/2/issue/createmeta")
-	uri += fmt.Sprintf("?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", projectKey, url.QueryEscape(issueTypeName))
+	uri += fmt.Sprintf("/%s/issuetypes", projectKey)
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -293,18 +288,13 @@ func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, iss
 	if resp.StatusCode != 200 {
 		return nil, responseError(resp)
 	}
-	results := &jiradata.CreateMeta{}
+	results := &jiradata.PageOfCreateMetaIssueType{}
 	if err := json.NewDecoder(resp.Body).Decode(results); err != nil {
 		return nil, err
 	}
-	for _, project := range results.Projects {
-		if project.Key != projectKey {
-			continue
-		}
-		for _, issueType := range project.IssueTypes {
-			if issueType.Name == issueTypeName {
-				return issueType, nil
-			}
+	for _, issueType := range results.Values {
+		if issueType.Name == issueTypeName {
+			return issueType, nil
 		}
 	}
 	return nil, fmt.Errorf("project %s and IssueType %s not found", projectKey, issueTypeName)

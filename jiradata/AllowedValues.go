@@ -11,9 +11,10 @@ package jiradata
 /////////////////////////////////////////////////////////////////////////
 
 // AllowedValues defined from schema:
-// {
-//   "title": "allowedValues",
-//   "type": "array",
-//   "items": {}
-// }
+//
+//	{
+//	  "title": "allowedValues",
+//	  "type": "array",
+//	  "items": {}
+//	}
 type AllowedValues []interface{}
