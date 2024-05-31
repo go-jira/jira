@@ -32,7 +32,7 @@ vet:
 	@$(GO) vet ./cmd/jira
 
 lint:
-	@$(GO) get github.com/golang/lint/golint
+	@$(GO) install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.59.0
 	@golint .
 	@golint ./jiracli
 	@golint ./jiracmd
@@ -40,10 +40,10 @@ lint:
 	@golint ./cmd/jira
 
 all:
-	GO111MODULE=off $(GO) get -u github.com/mitchellh/gox
+	$(GO) install github.com/mitchellh/gox@latest
 	rm -rf dist
 	mkdir -p dist
-	gox -ldflags="-w -s" -ldflags="-X 'github.com/go-jira/jira.VERSION=$(VERSION)'" -output="dist/github.com/go-jira/jira-{{.OS}}-{{.Arch}}" -osarch="darwin/amd64 linux/386 linux/amd64 windows/386 windows/amd64" ./cmd/jira
+	gox -ldflags="-w -s" -ldflags="-X 'github.com/sosheskaz/jira.VERSION=$(VERSION)'" -output="dist/github.com/sosheskaz/jira-{{.OS}}-{{.Arch}}" -osarch="darwin/amd64 darwin/arm64 linux/386 linux/amd64 linux/arm64 windows/386 windows/amd64" ./cmd/jira
 
 install:
 	${MAKE} GOBIN=$$HOME/bin build

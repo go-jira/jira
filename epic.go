@@ -9,7 +9,7 @@ import (
 
 	"github.com/coryb/oreo"
 
-	"github.com/go-jira/jira/jiradata"
+	"github.com/sosheskaz/jira/jiradata"
 )
 
 // https://docs.atlassian.com/jira-software/REST/latest/#agile/1.0/epic-getIssuesForEpic

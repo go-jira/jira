@@ -2,8 +2,10 @@ package test
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -16,7 +18,7 @@ const (
 	mothraLogin    = "mothra@corybennett.org"
 )
 
-var jira string = "../dist/github.com/go-jira/jira-linux-amd64"
+var jira string = fmt.Sprintf("../dist/github.com/sosheskaz/jira-%s-%s", runtime.GOOS, runtime.GOARCH)
 
 func Test_CLI(t *testing.T) {
 	// setup the jira cli environment
@@ -278,7 +280,7 @@ project: BASIC
 issuetype: Bug
 assignee: GoJira
 reporter: GoJira
-blockers: 
+blockers:
 depends: %s[Done]
 priority: Medium
 votes: 0
@@ -610,7 +612,7 @@ project: BASIC
 issuetype: Bug
 assignee: GoJira
 reporter: GoJira
-blockers: 
+blockers:
 depends: %s[To Do]
 priority: Medium
 votes: 0
@@ -647,7 +649,7 @@ project: BASIC
 issuetype: Bug
 assignee: GoJira
 reporter: GoJira
-blockers: 
+blockers:
 depends: %s[To Do]
 priority: Medium
 votes: 0
@@ -685,7 +687,7 @@ project: BASIC
 issuetype: Bug
 assignee: GoJira
 reporter: GoJira
-blockers: 
+blockers:
 depends: %s[To Do]
 priority: Medium
 votes: 0
@@ -721,7 +723,7 @@ project: BASIC
 issuetype: Bug
 assignee: Mothra
 reporter: GoJira
-blockers: 
+blockers:
 depends: %s[To Do]
 priority: Medium
 votes: 0
@@ -758,7 +760,7 @@ project: BASIC
 issuetype: Bug
 assignee: GoJira
 reporter: GoJira
-blockers: 
+blockers:
 depends: %s[To Do]
 priority: Medium
 votes: 0

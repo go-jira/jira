@@ -5,9 +5,9 @@ import (
 
 	"github.com/coryb/figtree"
 	"github.com/coryb/oreo"
-	"github.com/go-jira/jira"
-	"github.com/go-jira/jira/jiracli"
-	"github.com/go-jira/jira/jiradata"
+	"github.com/sosheskaz/jira"
+	"github.com/sosheskaz/jira/jiracli"
+	"github.com/sosheskaz/jira/jiradata"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 

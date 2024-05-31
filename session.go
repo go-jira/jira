@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/go-jira/jira/jiradata"
+	"github.com/sosheskaz/jira/jiradata"
 )
 
 type AuthProvider interface {

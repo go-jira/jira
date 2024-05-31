@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-jira/jira/jiradata"
+	"github.com/sosheskaz/jira/jiradata"
 )
 
 type SearchProvider interface {

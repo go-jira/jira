@@ -10,12 +10,12 @@ jobs:
   release:
     name: Release
     runs-on: 'ubuntu-latest'
-    container: docker.io/library/golang:1.14
+    container: docker.io/library/golang:1.22
     steps:
       # This step is for local testing using https://github.com/nektos/act
       - name: install node
         run: |
-          apt update 
+          apt update
           apt install -y nodejs
       - name: Setup
         run: |
@@ -60,7 +60,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/github.com/go-jira/jira-darwin-amd64
+          asset_path: ./dist/github.com/sosheskaz/jira-darwin-amd64
+          asset_name: jira-darwin-amd64
+          asset_content_type: application/octet-stream
+      - name: "Publish Darwin ARM64"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/sosheskaz/jira-darwin-arm4
           asset_name: jira-darwin-amd64
           asset_content_type: application/octet-stream
       - name: "Publish Linux 386"
@@ -69,7 +78,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/github.com/go-jira/jira-linux-386
+          asset_path: ./dist/github.com/sosheskaz/jira-linux-386
           asset_name: jira-linux-386
           asset_content_type: application/octet-stream
       - name: "Publish Linux AMD64"
@@ -78,7 +87,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/github.com/go-jira/jira-linux-amd64
+          asset_path: ./dist/github.com/sosheskaz/jira-linux-amd64
+          asset_name: jira-linux-amd64
+          asset_content_type: application/octet-stream
+      - name: "Publish Linux ARM64"
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/github.com/sosheskaz/jira-linux-arm64
           asset_name: jira-linux-amd64
           asset_content_type: application/octet-stream
       - name: "Publish Windows 386"
@@ -87,7 +105,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/github.com/go-jira/jira-windows-386.exe
+          asset_path: ./dist/github.com/sosheskaz/jira-windows-386.exe
           asset_name: jira-windows-386.exe
           asset_content_type: application/octet-stream
       - name: "Publish Windows AMD64"
@@ -96,8 +114,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/github.com/go-jira/jira-windows-amd64.exe
+          asset_path: ./dist/github.com/sosheskaz/jira-windows-amd64.exe
           asset_name: jira-windows-amd64.exe
           asset_content_type: application/octet-stream
-
-

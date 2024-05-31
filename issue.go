@@ -11,7 +11,7 @@ import (
 
 	"github.com/coryb/oreo"
 
-	"github.com/go-jira/jira/jiradata"
+	"github.com/sosheskaz/jira/jiradata"
 )
 
 type IssueQueryProvider interface {

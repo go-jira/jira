@@ -1,6 +1,6 @@
 package jiracmd
 
-import "github.com/go-jira/jira/jiracli"
+import "github.com/sosheskaz/jira/jiracli"
 
 func RegisterAllCommands() {
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "acknowledge", Entry: CmdTransitionRegistry("acknowledge"), Aliases: []string{"ack"}})
