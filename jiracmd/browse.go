@@ -2,7 +2,7 @@ package jiracmd
 
 import (
 	"github.com/coryb/figtree"
-	"github.com/coryb/oreo"
+	"github.com/eroshan/oreo"
 	jira "github.com/go-jira/jira"
 	"github.com/go-jira/jira/jiracli"
 	"github.com/pkg/browser"

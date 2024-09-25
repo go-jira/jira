@@ -1,7 +1,7 @@
 package jira
 
 import (
-	"github.com/coryb/oreo"
+	"github.com/eroshan/oreo"
 )
 
 // replace by ldflags

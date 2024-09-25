@@ -16,7 +16,7 @@ import (
 	"strings"
 
 	"github.com/coryb/figtree"
-	"github.com/coryb/oreo"
+	"github.com/eroshan/oreo"
 	"github.com/jinzhu/copier"
 	shellquote "github.com/kballard/go-shellquote"
 	"github.com/tidwall/gjson"
@@ -34,10 +34,11 @@ type Exit struct {
 // and exit accordingly.
 //
 // Example:
-// func main() {
-//     defer jiracli.HandleExit()
-//     ...
-// }
+//
+//	func main() {
+//	    defer jiracli.HandleExit()
+//	    ...
+//	}
 func HandleExit() {
 	if e := recover(); e != nil {
 		if exit, ok := e.(Exit); ok {
@@ -55,6 +56,7 @@ const (
 )
 
 type GlobalOptions struct {
+	HttpRetries figtree.Int8Option `yaml:"retries,omitempty" json:"retries,omitempty"`
 	// AuthenticationMethod is the method we use to authenticate with the jira serivce.
 	// Possible values are "api-token", "bearer-token" or "session".
 	// The default is "api-token" when the service endpoint ends with "atlassian.net", otherwise it "session".  Session authentication
@@ -155,8 +157,8 @@ func (o *GlobalOptions) AuthMethod() string {
 	return o.AuthenticationMethod.Value
 }
 
-func (o *GlobalOptions) AuthMethodIsToken() bool{
-	return o.AuthMethod() == "api-token" || o.AuthMethod() == "bearer-token";
+func (o *GlobalOptions) AuthMethodIsToken() bool {
+	return o.AuthMethod() == "api-token" || o.AuthMethod() == "bearer-token"
 }
 
 func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
@@ -171,6 +173,7 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 	app.Flag("socksproxy", "Address for a socks proxy").SetValue(&globals.SocksProxy)
 	app.Flag("user", "user name used within the Jira service").Short('u').SetValue(&globals.User)
 	app.Flag("login", "login name that corresponds to the user used for authentication").SetValue(&globals.Login)
+	app.Flag("retries", "Number of HTTP retries with Exp. backoff").Short('R').Default("3").SetValue(&globals.HttpRetries)
 
 	o = o.WithPreCallback(func(req *http.Request) (*http.Request, error) {
 		if globals.AuthMethod() == "api-token" {
@@ -197,8 +200,9 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 				}(globals.Quiet.Value)
 				globals.Quiet.Value = true
 
-				// we are not logged in, so force login now by running the "login" command
-				app.Parse([]string{"login"})
+				// we are not logged in, so force login now by running the "login"
+				// This extra parse errases passed -R option for this command. So I redefine it again
+				app.Parse([]string{"login", "-R", strconv.Itoa(int(globals.HttpRetries.Value))})
 
 				// rerun the original request
 				return o.Do(req)
@@ -264,6 +268,7 @@ func register(app *kingpin.Application, o *oreo.Client, fig *figtree.FigTree) {
 			if logging.GetLevel("") > logging.DEBUG {
 				o = o.WithTrace(true)
 			}
+			o = o.WithRetries(int(globals.HttpRetries.Value)).WithRetryOnHTTP429().WithBackoff(oreo.ExponentialBackoff)
 			return copy.Entry.ExecuteFunc(o, &globals)
 		})
 	}

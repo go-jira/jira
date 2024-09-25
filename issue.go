@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/coryb/oreo"
+	"github.com/eroshan/oreo"
 
 	"github.com/go-jira/jira/jiradata"
 )

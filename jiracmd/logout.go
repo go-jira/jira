@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/coryb/figtree"
-	"github.com/coryb/oreo"
+	"github.com/eroshan/oreo"
 	"github.com/go-jira/jira"
 	"github.com/go-jira/jira/jiracli"
 	"github.com/mgutz/ansi"
