@@ -60,4 +60,5 @@ type SearchRequest struct {
 	Properties    Properties `json:"properties,omitempty" yaml:"properties,omitempty"`
 	StartAt       int        `json:"startAt,omitempty" yaml:"startAt,omitempty"`
 	ValidateQuery string     `json:"validateQuery,omitempty" yaml:"validateQuery,omitempty"`
+	Expand        []string   `yaml:"expand,omitempty" json:"expand,omitempty"`
 }
