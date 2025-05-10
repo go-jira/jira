@@ -566,7 +566,7 @@ fields:
     emailAddress: {{ .overrides.assignee }}
   {{- else if .fields.assignee }}
   assignee: {{if .fields.assignee.name}}
-    emailAddress: {{ or .fields.assignee.name}}
+    name: {{ or .fields.assignee.name}}
   {{- else }}
     emailAddress: {{.fields.assignee.emailAddress}}{{end}}{{end}}
 {{- end -}}
