@@ -75,8 +75,8 @@ func CmdCreate(o *oreo.Client, globals *jiracli.GlobalOptions, opts *CreateOptio
 	}
 
 	type templateInput struct {
-		Meta      *jiradata.IssueType `yaml:"meta" json:"meta"`
-		Overrides map[string]string   `yaml:"overrides" json:"overrides"`
+		Meta      *jiradata.CreateMetaIssueType `yaml:"meta" json:"meta"`
+		Overrides map[string]string             `yaml:"overrides" json:"overrides"`
 	}
 
 	if err := defaultIssueType(o, globals.Endpoint.Value, &opts.Project, &opts.IssueType); err != nil {
@@ -157,26 +157,25 @@ func defaultIssueType(o *oreo.Client, endpoint string, project, issuetype *strin
 	if issuetype != nil && *issuetype != "" {
 		return nil
 	}
-	projectMeta, err := jira.GetIssueCreateMetaProject(o, endpoint, *project)
+	issueTypes, err := jira.GetIssueCreateMetaProject(o, endpoint, *project)
 	if err != nil {
 		return err
 	}
 
-	issueTypes := map[string]bool{}
-
-	for _, issuetype := range projectMeta.IssueTypes {
-		issueTypes[issuetype.Name] = true
-	}
-
 	//  prefer "Bug" type
-	if _, ok := issueTypes["Bug"]; ok {
-		*issuetype = "Bug"
-		return nil
+	for _, issueType := range issueTypes {
+		if issueType.Name == "Bug" {
+			*issuetype = "Bug"
+			return nil
+		}
 	}
+
 	// next best default it "Task"
-	if _, ok := issueTypes["Task"]; ok {
-		*issuetype = "Task"
-		return nil
+	for _, issueType := range issueTypes {
+		if issueType.Name == "Task" {
+			*issuetype = "Task"
+			return nil
+		}
 	}
 
 	return fmt.Errorf("Unable to find default issueType of Bug or Task, please set --issuetype argument or set the `issuetype` config property")
