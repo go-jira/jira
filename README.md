@@ -16,6 +16,12 @@ Commands which previously took a username will now expect an email address such 
 
 ## Install
 
+If you have `go` installed already, you can run the following to install it directly:
+
+```
+go install github.com/go-jira/jira/cmd/jira@latest
+```
+
 ### Download
 
 You can download one of the pre-built binaries for **go-jira** [here](https://github.com/go-jira/jira/releases).
