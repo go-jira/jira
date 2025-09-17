@@ -28,7 +28,7 @@ import (
 )
 type GSub struct {
 	re *regexp.Regexp
-	sub string
+	sub func(string) string
 }
 
 func findTemplate(name string) ([]byte, error) {
@@ -73,6 +73,20 @@ func tmpTemplate(templateName string, data interface{}) (string, error) {
 }
 
 func TemplateProcessor() *template.Template {
+	var userMap map[string]string
+  dir, err := os.UserHomeDir()
+	if err != nil { panic(err) }
+
+	doc, err := ioutil.ReadFile(dir + "/work/jirausersmap.json")
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal([]byte(doc), &userMap)
+	if err != nil {
+		panic(err)
+	}
+
 	funcs := map[string]interface{}{
 		"jira": func() string {
 			return os.Args[0]
@@ -110,12 +124,29 @@ func TemplateProcessor() *template.Template {
 		},
 		"toMd": func(str string) string {
 			var regexps = []GSub {
-				GSub{ regexp.MustCompile(`\[(.*?)\|(.*?)\|.*?\]`), `[$1]($2)` },
-				GSub{ regexp.MustCompile(`{{(.*?)}}`), "`$1`" },
-				GSub{ regexp.MustCompile(`-(.*)-`), "~$1~" },
-				GSub{ regexp.MustCompile(`{color:#......}(.*?){color}`), "**$1**" },
+				GSub{ regexp.MustCompile(`\[~accountid:(.*?)\]`), func(str string) string {
+					subre := regexp.MustCompile(`\[~accountid:(.*?)\]`)
+					accountId := subre.FindStringSubmatch(str)[1]
+					displayName := userMap[accountId]
+					return "@" + displayName
+				} },
+				GSub{ regexp.MustCompile(`\[(.*?)\|(.*?)\|.*?\]`), func(str string) string {
+					return `[$1]($2)`
+				} },
+				GSub{ regexp.MustCompile(`{{(.*?)}}`), func(str string) string {
+					return "`$1`"
+				} },
+				GSub{ regexp.MustCompile(`-(.*)-`), func(str string) string {
+					return "~$1~"
+				} },
+				GSub{ regexp.MustCompile(`{color:#......}(.*?){color}`), func(str string) string {
+					return "**$1**"
+				} },
 			}
-			foo := func(agg string, gsub GSub, i int)(string) { return gsub.re.ReplaceAllString(agg, gsub.sub) }
+
+			foo := func(agg string, gsub GSub, i int)(string) {
+				return gsub.re.ReplaceAllStringFunc(agg, gsub.sub)
+			}
 			return lo.Reduce(regexps, foo, str)
 		},
 		"termWidth": func() int {

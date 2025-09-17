@@ -23,9 +23,7 @@ type UserSearchOptions struct {
 func UserSearch(ua HttpClient, endpoint string, opts *UserSearchOptions) ([]*jiradata.User, error) {
 	uri := URLJoin(endpoint, "rest/api/2/user/search")
 	params := []string{}
-	if opts.Query != "" {
-		params = append(params, "query="+url.QueryEscape(opts.Query))
-	}
+	params = append(params, "query="+url.QueryEscape(opts.Query))
 	if opts.AccountID != "" {
 		params = append(params, "accountId="+url.QueryEscape(opts.AccountID))
 	}
