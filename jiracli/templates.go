@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"net/url"
 
 	yaml "gopkg.in/coryb/yaml.v2"
 
@@ -23,7 +24,12 @@ import (
 	wordwrap "github.com/mitchellh/go-wordwrap"
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
+	"github.com/samber/lo"
 )
+type GSub struct {
+	re *regexp.Regexp
+	sub string
+}
 
 func findTemplate(name string) ([]byte, error) {
 	if file, err := findClosestParentPath(filepath.Join(".jira.d", "templates", name)); err == nil {
@@ -98,6 +104,19 @@ func TemplateProcessor() *template.Template {
 				return "", err
 			}
 			return string(bytes), nil
+		},
+		"pathEscape": func(str string) string {
+			return url.PathEscape(str)
+		},
+		"toMd": func(str string) string {
+			var regexps = []GSub {
+				GSub{ regexp.MustCompile(`\[(.*?)\|(.*?)\|.*?\]`), `[$1]($2)` },
+				GSub{ regexp.MustCompile(`{{(.*?)}}`), "`$1`" },
+				GSub{ regexp.MustCompile(`-(.*)-`), "~$1~" },
+				GSub{ regexp.MustCompile(`{color:#......}(.*?){color}`), "**$1**" },
+			}
+			foo := func(agg string, gsub GSub, i int)(string) { return gsub.re.ReplaceAllString(agg, gsub.sub) }
+			return lo.Reduce(regexps, foo, str)
 		},
 		"termWidth": func() int {
 			w, _, err := terminal.GetSize(int(os.Stdout.Fd()))
