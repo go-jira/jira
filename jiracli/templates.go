@@ -28,7 +28,7 @@ import (
 )
 type GSub struct {
 	re *regexp.Regexp
-	sub func(string) string
+	sub string
 }
 
 func findTemplate(name string) ([]byte, error) {
@@ -87,6 +87,17 @@ func TemplateProcessor() *template.Template {
 		panic(err)
 	}
 
+	var regexps = []GSub {
+		GSub{ regexp.MustCompile(`\[(.*?)\|(.*?)\|.*?\]`), `[$1]($2)` },
+		GSub{ regexp.MustCompile(`{{(.*?)}}`), "`$1`" },
+		GSub{ regexp.MustCompile(`-(.*)-`), "~$1~" },
+		GSub{ regexp.MustCompile(`{color:#......}(.*?){color}`), "**$1**" },
+	}
+
+	for accountid, displayName := range userMap {
+		regexps = append(regexps, GSub{ regexp.MustCompile(fmt.Sprintf("\\[~accountid:%v\\]", accountid)), fmt.Sprintf("@%v",displayName) } )
+	}
+
 	funcs := map[string]interface{}{
 		"jira": func() string {
 			return os.Args[0]
@@ -123,29 +134,9 @@ func TemplateProcessor() *template.Template {
 			return url.PathEscape(str)
 		},
 		"toMd": func(str string) string {
-			var regexps = []GSub {
-				GSub{ regexp.MustCompile(`\[~accountid:(.*?)\]`), func(str string) string {
-					subre := regexp.MustCompile(`\[~accountid:(.*?)\]`)
-					accountId := subre.FindStringSubmatch(str)[1]
-					displayName := userMap[accountId]
-					return "@" + displayName
-				} },
-				GSub{ regexp.MustCompile(`\[(.*?)\|(.*?)\|.*?\]`), func(str string) string {
-					return `[$1]($2)`
-				} },
-				GSub{ regexp.MustCompile(`{{(.*?)}}`), func(str string) string {
-					return "`$1`"
-				} },
-				GSub{ regexp.MustCompile(`-(.*)-`), func(str string) string {
-					return "~$1~"
-				} },
-				GSub{ regexp.MustCompile(`{color:#......}(.*?){color}`), func(str string) string {
-					return "**$1**"
-				} },
-			}
 
 			foo := func(agg string, gsub GSub, i int)(string) {
-				return gsub.re.ReplaceAllStringFunc(agg, gsub.sub)
+				return gsub.re.ReplaceAllString(agg, gsub.sub)
 			}
 			return lo.Reduce(regexps, foo, str)
 		},
