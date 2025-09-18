@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"net/url"
 
 	yaml "gopkg.in/coryb/yaml.v2"
 
@@ -23,7 +24,12 @@ import (
 	wordwrap "github.com/mitchellh/go-wordwrap"
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/crypto/ssh/terminal"
+	"github.com/samber/lo"
 )
+type GSub struct {
+	re *regexp.Regexp
+	sub string
+}
 
 func findTemplate(name string) ([]byte, error) {
 	if file, err := findClosestParentPath(filepath.Join(".jira.d", "templates", name)); err == nil {
@@ -67,6 +73,31 @@ func tmpTemplate(templateName string, data interface{}) (string, error) {
 }
 
 func TemplateProcessor() *template.Template {
+	var userMap map[string]string
+  dir, err := os.UserHomeDir()
+	if err != nil { panic(err) }
+
+	doc, err := ioutil.ReadFile(dir + "/work/jirausersmap.json")
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal([]byte(doc), &userMap)
+	if err != nil {
+		panic(err)
+	}
+
+	var regexps = []GSub {
+		GSub{ regexp.MustCompile(`\[(.*?)\|(.*?)\|.*?\]`), `[$1]($2)` },
+		GSub{ regexp.MustCompile(`{{(.*?)}}`), "`$1`" },
+		GSub{ regexp.MustCompile(`-(.*)-`), "~$1~" },
+		GSub{ regexp.MustCompile(`{color:#......}(.*?){color}`), "**$1**" },
+	}
+
+	for accountid, displayName := range userMap {
+		regexps = append(regexps, GSub{ regexp.MustCompile(fmt.Sprintf("\\[~accountid:%v\\]", accountid)), fmt.Sprintf("@%v",displayName) } )
+	}
+
 	funcs := map[string]interface{}{
 		"jira": func() string {
 			return os.Args[0]
@@ -98,6 +129,16 @@ func TemplateProcessor() *template.Template {
 				return "", err
 			}
 			return string(bytes), nil
+		},
+		"pathEscape": func(str string) string {
+			return url.PathEscape(str)
+		},
+		"toMd": func(str string) string {
+
+			foo := func(agg string, gsub GSub, i int)(string) {
+				return gsub.re.ReplaceAllString(agg, gsub.sub)
+			}
+			return lo.Reduce(regexps, foo, str)
 		},
 		"termWidth": func() int {
 			w, _, err := terminal.GetSize(int(os.Stdout.Fd()))
@@ -258,28 +299,52 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 		return err
 	}
 
-	table := tablewriter.NewWriter(out)
-	table.SetAutoFormatHeaders(false)
-	headers := []string{}
-	cells := [][]string{}
+	footerTable := tablewriter.NewWriter(out)
+	footerTable.SetAutoFormatHeaders(false)
+	footerHeaders := []string{}
+	footerCells := [][]string{}
+
+	var table *tablewriter.Table
+	var table_str *strings.Builder
 	tmpl, err := TemplateProcessor().Funcs(map[string]interface{}{
+		"newTable": func(mw int) string {
+			table_str = new(strings.Builder)
+			table = tablewriter.NewWriter(table_str)
+			table.SetAutoFormatHeaders(false)
+			table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+			table.SetCenterSeparator("|")
+			table.SetColWidth(mw)
+			return ""
+		},
+		"tableHeaders": func(args ...string) string {
+			table.SetHeader(args)
+			return ""
+		},
+		"tableRow": func(args ...string) string {
+			table.Append(args)
+			return ""
+		},
+		"tableRender": func() string {
+			table.Render()
+			return table_str.String()
+		},
 		"defaultColWidth": func(cw int) string {
-			table.SetColWidth(cw)
+			footerTable.SetColWidth(cw)
 			return ""
 		},
 		"headers": func(titles ...string) string {
-			headers = append(headers, titles...)
+			footerHeaders = append(footerHeaders, titles...)
 			return ""
 		},
 		"row": func() string {
-			cells = append(cells, []string{})
+			footerCells = append(footerCells, []string{})
 			return ""
 		},
 		"cell": func(value interface{}) (string, error) {
-			if len(cells) == 0 {
+			if len(footerCells) == 0 {
 				return "", fmt.Errorf(`"cell" template function called before "row" template function`)
 			}
-			cells[len(cells)-1] = append(cells[len(cells)-1], fmt.Sprintf("%v", value))
+			footerCells[len(footerCells)-1] = append(footerCells[len(footerCells)-1], fmt.Sprintf("%v", value))
 			return "", nil
 		},
 	}).Parse(templateContent)
@@ -290,10 +355,12 @@ func RunTemplate(templateName string, data interface{}, out io.Writer) error {
 	if err := tmpl.Execute(out, rawData); err != nil {
 		return err
 	}
-	if len(headers) > 0 || len(cells) > 0 {
-		table.SetHeader(headers)
-		table.AppendBulk(cells)
-		table.Render()
+	if len(footerHeaders) > 0 || len(footerCells) > 0 {
+		footerTable.SetHeader(footerHeaders)
+		footerTable.AppendBulk(footerCells)
+		footerTable.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+		footerTable.SetCenterSeparator("|")
+		footerTable.Render()
 	}
 
 	return nil
@@ -333,7 +400,7 @@ const defaultListTemplate = "{{ range .issues }}{{ .key | append \":\" | printf 
 
 const defaultTableTemplate = `{{/* table template */ -}}
 {{- headers "Issue" "Summary" "Type" "Priority" "Status" "Age" "Reporter" "Assignee" -}}
-{{- range .issues -}} 
+{{- range .issues -}}
   {{- row -}}
   {{- cell .key -}}
   {{- cell .fields.summary -}}

@@ -108,7 +108,7 @@ func Search(ua HttpClient, endpoint string, sp SearchProvider, opts ...SearchOpt
 		if err != nil {
 			return nil, err
 		}
-		uri := URLJoin(endpoint, "rest/api/2/search")
+		uri := URLJoin(endpoint, "rest/api/3/search/jql")
 		resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 		if err != nil {
 			return nil, err

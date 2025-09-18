@@ -59,6 +59,18 @@ func CmdAttachList(o *oreo.Client, globals *jiracli.GlobalOptions, opts *AttachL
 	}
 	sort.Sort(&attachments)
 
+	for _, attachment := range attachments {
+		attachment.Local = "/tmp/attachment_" + attachment.Filename
+		getOpts := AttachGetOptions {
+			OutputFile: attachment.Local,
+			AttachmentID: string(attachment.ID),
+		}
+		err := CmdAttachGet(o, globals, &getOpts)
+		if err != nil {
+			return err
+		}
+	}
+
 	if err := opts.PrintTemplate(attachments); err != nil {
 		return err
 	}

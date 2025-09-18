@@ -4,6 +4,7 @@ import "github.com/go-jira/jira/jiracli"
 
 func RegisterAllCommands() {
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "acknowledge", Entry: CmdTransitionRegistry("acknowledge"), Aliases: []string{"ack"}})
+	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "users", Entry: CmdUsersRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "assign", Entry: CmdAssignRegistry(), Aliases: []string{"give"}})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "attach create", Entry: CmdAttachCreateRegistry()})
 	jiracli.RegisterCommand(jiracli.CommandRegistry{Command: "attach get", Entry: CmdAttachGetRegistry()})

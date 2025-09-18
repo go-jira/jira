@@ -39,6 +39,7 @@ func CmdAttachGetUsage(cmd *kingpin.CmdClause, opts *AttachGetOptions) error {
 }
 
 func CmdAttachGet(o *oreo.Client, globals *jiracli.GlobalOptions, opts *AttachGetOptions) error {
+	fmt.Println(opts)
 	attachment, err := jira.GetAttachment(o, globals.Endpoint.Value, opts.AttachmentID)
 	if err != nil {
 		return err
