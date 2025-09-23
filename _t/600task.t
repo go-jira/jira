@@ -256,7 +256,7 @@ OK $issue $ENDPOINT/browse/$issue
 EOF
 
 # FIXME we probably need a watchers command to wrap this?
-RUNS sh -c "$jira req /rest/api/2/issue/$issue/watchers | jq -r .watchers[].displayName | sort"
+RUNS sh -c "$jira req /rest/api/3/issue/$issue/watchers | jq -r .watchers[].displayName | sort"
 DIFF <<EOF
 GoJira
 Mothra

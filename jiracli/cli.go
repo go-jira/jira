@@ -110,7 +110,7 @@ type GlobalOptions struct {
 	User figtree.StringOption `yaml:"user,omitempty" json:"user,omitempty"`
 
 	// JiraDeploymentType can be `cloud` or `server`, if not set it will be inferred from
-	// the /rest/api/2/serverInfo REST API.
+	// the /rest/api/3/serverInfo REST API.
 	JiraDeploymentType figtree.StringOption `yaml:"jira-deployment-type,omitempty" json:"jira-deployment-type,omitempty"`
 }
 

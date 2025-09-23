@@ -6,13 +6,13 @@ import (
 	"github.com/go-jira/jira/jiradata"
 )
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/project-getProjectComponents
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/project-getProjectComponents
 func (j *Jira) GetProjectComponents(project string) (*jiradata.Components, error) {
 	return GetProjectComponents(j.UA, j.Endpoint, project)
 }
 
 func GetProjectComponents(ua HttpClient, endpoint string, project string) (*jiradata.Components, error) {
-	uri := URLJoin(endpoint, "rest/api/2/project", project, "components")
+	uri := URLJoin(endpoint, "rest/api/3/project", project, "components")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (j *Jira) GetProjectVersions(project string) (*jiradata.Versions, error) {
 }
 
 func GetProjectVersions(ua HttpClient, endpoint string, project string) (*jiradata.Versions, error) {
-	uri := URLJoin(endpoint, "rest/api/2/project", project, "versions")
+	uri := URLJoin(endpoint, "rest/api/3/project", project, "versions")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err

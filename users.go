@@ -21,7 +21,7 @@ type UserSearchOptions struct {
 // https://developer.atlassian.com/cloud/jira/platform/rest/v2/#api-rest-api-2-user-search-get
 
 func UserSearch(ua HttpClient, endpoint string, opts *UserSearchOptions) ([]*jiradata.User, error) {
-	uri := URLJoin(endpoint, "rest/api/2/user/search")
+	uri := URLJoin(endpoint, "rest/api/3/user/search")
 	params := []string{}
 	if opts.Query != "" {
 		params = append(params, "query="+url.QueryEscape(opts.Query))

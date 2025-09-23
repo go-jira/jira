@@ -26,7 +26,7 @@ func CmdFieldsRegistry() *jiracli.CommandRegistryEntry {
 	}
 }
 
-// Fields will send data from /rest/api/2/field API to "fields" template
+// Fields will send data from /rest/api/3/field API to "fields" template
 func CmdFields(o *oreo.Client, globals *jiracli.GlobalOptions, opts *jiracli.CommonOptions) error {
 	data, err := jira.GetFields(o, globals.Endpoint.Value)
 	if err != nil {

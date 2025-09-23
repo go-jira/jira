@@ -6,13 +6,13 @@ import (
 	"github.com/go-jira/jira/jiradata"
 )
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/attachment-getAttachment
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/attachment-getAttachment
 func (j *Jira) GetAttachment(id string) (*jiradata.Attachment, error) {
 	return GetAttachment(j.UA, j.Endpoint, id)
 }
 
 func GetAttachment(ua HttpClient, endpoint string, id string) (*jiradata.Attachment, error) {
-	uri := URLJoin(endpoint, "rest/api/2/attachment", id)
+	uri := URLJoin(endpoint, "rest/api/3/attachment", id)
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -26,13 +26,13 @@ func GetAttachment(ua HttpClient, endpoint string, id string) (*jiradata.Attachm
 	return nil, responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/attachment-removeAttachment
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/attachment-removeAttachment
 func (j *Jira) RemoveAttachment(id string) error {
 	return RemoveAttachment(j.UA, j.Endpoint, id)
 }
 
 func RemoveAttachment(ua HttpClient, endpoint string, id string) error {
-	uri := URLJoin(endpoint, "rest/api/2/attachment", id)
+	uri := URLJoin(endpoint, "rest/api/3/attachment", id)
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err

@@ -49,7 +49,7 @@ func (o *IssueOptions) ProvideIssueQueryString() string {
 	return ""
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getIssue
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-getIssue
 func (j *Jira) GetIssue(issue string, iqg IssueQueryProvider) (*jiradata.Issue, error) {
 	return GetIssue(j.UA, j.Endpoint, issue, iqg)
 }
@@ -59,7 +59,7 @@ func GetIssue(ua HttpClient, endpoint string, issue string, iqg IssueQueryProvid
 	if iqg != nil {
 		query = iqg.ProvideIssueQueryString()
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue)
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue)
 	uri += query
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
@@ -78,14 +78,14 @@ func (j *Jira) GetIssueWorklog(issue string) (*jiradata.Worklogs, error) {
 	return GetIssueWorklog(j.UA, j.Endpoint, issue)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue/{issueIdOrKey}/worklog-getIssueWorklog
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue/{issueIdOrKey}/worklog-getIssueWorklog
 func GetIssueWorklog(ua HttpClient, endpoint string, issue string) (*jiradata.Worklogs, error) {
 	startAt := 0
 	total := 1
 	maxResults := 100
 	worklogs := jiradata.Worklogs{}
 	for startAt < total {
-		uri := URLJoin(endpoint, "rest/api/2/issue", issue, "worklog")
+		uri := URLJoin(endpoint, "rest/api/3/issue", issue, "worklog")
 		uri += fmt.Sprintf("?startAt=%d&maxResults=%d", startAt, maxResults)
 		resp, err := ua.GetJSON(uri)
 		if err != nil {
@@ -113,14 +113,14 @@ func (j *Jira) GetIssueComment(issue string) (*jiradata.Comments, error) {
 	return GetIssueComment(j.UA, j.Endpoint, issue)
 }
 
-// https://docs.atlassian.com/software/jira/docs/api/REST/7.12.0/#api/2/issue-getComments
+// https://docs.atlassian.com/software/jira/docs/api/REST/7.12.0/#api/3/issue-getComments
 func GetIssueComment(ua HttpClient, endpoint string, issue string) (*jiradata.Comments, error) {
 	startAt := 0
 	total := 1
 	maxResults := 100
 	comments := jiradata.Comments{}
 	for startAt < total {
-		uri := URLJoin(endpoint, "rest/api/2/issue", issue, "comment")
+		uri := URLJoin(endpoint, "rest/api/3/issue", issue, "comment")
 		uri += fmt.Sprintf("?startAt=%d&maxResults=%d", startAt, maxResults)
 		resp, err := ua.GetJSON(uri)
 		if err != nil {
@@ -148,7 +148,7 @@ type WorklogProvider interface {
 	ProvideWorklog() *jiradata.Worklog
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue/{issueIdOrKey}/worklog-addWorklog
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue/{issueIdOrKey}/worklog-addWorklog
 func (j *Jira) AddIssueWorklog(issue string, wp WorklogProvider) (*jiradata.Worklog, error) {
 	return AddIssueWorklog(j.UA, j.Endpoint, issue, wp)
 }
@@ -159,7 +159,7 @@ func AddIssueWorklog(ua HttpClient, endpoint string, issue string, wp WorklogPro
 	if err != nil {
 		return nil, err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "worklog")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "worklog")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
@@ -173,13 +173,13 @@ func AddIssueWorklog(ua HttpClient, endpoint string, issue string, wp WorklogPro
 	return nil, responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getEditIssueMeta
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-getEditIssueMeta
 func (j *Jira) GetIssueEditMeta(issue string) (*jiradata.EditMeta, error) {
 	return GetIssueEditMeta(j.UA, j.Endpoint, issue)
 }
 
 func GetIssueEditMeta(ua HttpClient, endpoint string, issue string) (*jiradata.EditMeta, error) {
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "editmeta")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "editmeta")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -197,7 +197,7 @@ type IssueUpdateProvider interface {
 	ProvideIssueUpdate() *jiradata.IssueUpdate
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-editIssue
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-editIssue
 func (j *Jira) EditIssue(issue string, iup IssueUpdateProvider) error {
 	return EditIssue(j.UA, j.Endpoint, issue, iup)
 }
@@ -208,7 +208,7 @@ func EditIssue(ua HttpClient, endpoint string, issue string, iup IssueUpdateProv
 	if err != nil {
 		return err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue)
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue)
 	resp, err := ua.Put(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -221,7 +221,7 @@ func EditIssue(ua HttpClient, endpoint string, issue string, iup IssueUpdateProv
 	return responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-createIssue
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-createIssue
 func (j *Jira) CreateIssue(iup IssueUpdateProvider) (*jiradata.IssueCreateResponse, error) {
 	return CreateIssue(j.UA, j.Endpoint, iup)
 }
@@ -232,7 +232,7 @@ func CreateIssue(ua HttpClient, endpoint string, iup IssueUpdateProvider) (*jira
 	if err != nil {
 		return nil, err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue")
+	uri := URLJoin(endpoint, "rest/api/3/issue")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
@@ -246,13 +246,13 @@ func CreateIssue(ua HttpClient, endpoint string, iup IssueUpdateProvider) (*jira
 	return nil, responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getCreateIssueMeta
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-getCreateIssueMeta
 func (j *Jira) GetIssueCreateMetaProject(projectKey string) (*jiradata.CreateMetaProject, error) {
 	return GetIssueCreateMetaProject(j.UA, j.Endpoint, projectKey)
 }
 
 func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string) (*jiradata.CreateMetaProject, error) {
-	uri := URLJoin(endpoint, "rest/api/2/issue/createmeta")
+	uri := URLJoin(endpoint, "rest/api/3/issue/createmeta")
 	uri += fmt.Sprintf("?projectKeys=%s&expand=projects.issuetypes.fields", projectKey)
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
@@ -276,13 +276,13 @@ func GetIssueCreateMetaProject(ua HttpClient, endpoint string, projectKey string
 	return nil, responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getCreateIssueMeta
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-getCreateIssueMeta
 func (j *Jira) GetIssueCreateMetaIssueType(projectKey, issueTypeName string) (*jiradata.IssueType, error) {
 	return GetIssueCreateMetaIssueType(j.UA, j.Endpoint, projectKey, issueTypeName)
 }
 
 func GetIssueCreateMetaIssueType(ua HttpClient, endpoint string, projectKey, issueTypeName string) (*jiradata.IssueType, error) {
-	uri := URLJoin(endpoint, "rest/api/2/issue/createmeta")
+	uri := URLJoin(endpoint, "rest/api/3/issue/createmeta")
 	uri += fmt.Sprintf("?projectKeys=%s&issuetypeNames=%s&expand=projects.issuetypes.fields", projectKey, url.QueryEscape(issueTypeName))
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
@@ -314,7 +314,7 @@ type LinkIssueProvider interface {
 	ProvideLinkIssueRequest() *jiradata.LinkIssueRequest
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issueLink-linkIssues
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issueLink-linkIssues
 func (j *Jira) LinkIssues(lip LinkIssueProvider) error {
 	return LinkIssues(j.UA, j.Endpoint, lip)
 }
@@ -325,7 +325,7 @@ func LinkIssues(ua HttpClient, endpoint string, lip LinkIssueProvider) error {
 	if err != nil {
 		return err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issueLink")
+	uri := URLJoin(endpoint, "rest/api/3/issueLink")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -338,13 +338,13 @@ func LinkIssues(ua HttpClient, endpoint string, lip LinkIssueProvider) error {
 	return responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-getTransitions
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-getTransitions
 func (j *Jira) GetIssueTransitions(issue string) (*jiradata.TransitionsMeta, error) {
 	return GetIssueTransitions(j.UA, j.Endpoint, issue)
 }
 
 func GetIssueTransitions(ua HttpClient, endpoint string, issue string) (*jiradata.TransitionsMeta, error) {
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "transitions")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "transitions")
 	uri += "?expand=transitions.fields"
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
@@ -359,7 +359,7 @@ func GetIssueTransitions(ua HttpClient, endpoint string, issue string) (*jiradat
 	return nil, responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-doTransition
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-doTransition
 func (j *Jira) TransitionIssue(issue string, iup IssueUpdateProvider) error {
 	return TransitionIssue(j.UA, j.Endpoint, issue, iup)
 }
@@ -370,7 +370,7 @@ func TransitionIssue(ua HttpClient, endpoint string, issue string, iup IssueUpda
 	if err != nil {
 		return err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "transitions")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "transitions")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -383,13 +383,13 @@ func TransitionIssue(ua HttpClient, endpoint string, issue string, iup IssueUpda
 	return responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issueLinkType-getIssueLinkTypes
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issueLinkType-getIssueLinkTypes
 func (j *Jira) GetIssueLinkTypes() (*jiradata.IssueLinkTypes, error) {
 	return GetIssueLinkTypes(j.UA, j.Endpoint)
 }
 
 func GetIssueLinkTypes(ua HttpClient, endpoint string) (*jiradata.IssueLinkTypes, error) {
-	uri := URLJoin(endpoint, "rest/api/2/issueLinkType")
+	uri := URLJoin(endpoint, "rest/api/3/issueLinkType")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err
@@ -407,13 +407,13 @@ func GetIssueLinkTypes(ua HttpClient, endpoint string) (*jiradata.IssueLinkTypes
 	return nil, responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addVote
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-addVote
 func (j *Jira) IssueAddVote(issue string) error {
 	return IssueAddVote(j.UA, j.Endpoint, issue)
 }
 
 func IssueAddVote(ua HttpClient, endpoint string, issue string) error {
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "votes")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "votes")
 	resp, err := ua.Post(uri, "application/json", strings.NewReader("{}"))
 	if err != nil {
 		return err
@@ -426,13 +426,13 @@ func IssueAddVote(ua HttpClient, endpoint string, issue string) error {
 	return responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-removeVote
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-removeVote
 func (j *Jira) IssueRemoveVote(issue string) error {
 	return IssueRemoveVote(j.UA, j.Endpoint, issue)
 }
 
 func IssueRemoveVote(ua HttpClient, endpoint string, issue string) error {
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "votes")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "votes")
 	resp, err := ua.Delete(uri)
 	if err != nil {
 		return err
@@ -473,13 +473,13 @@ func RankIssues(ua HttpClient, endpoint string, rrp RankRequestProvider) error {
 	return responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addWatcher
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-addWatcher
 func (j *Jira) IssueAddWatcher(issue, user string) error {
 	return IssueAddWatcher(j.UA, j.Endpoint, issue, user)
 }
 
 func IssueAddWatcher(ua HttpClient, endpoint string, issue, user string) error {
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "watchers")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "watchers")
 	resp, err := ua.Post(uri, "application/json", strings.NewReader(fmt.Sprintf("%q", user)))
 	if err != nil {
 		return err
@@ -492,13 +492,13 @@ func IssueAddWatcher(ua HttpClient, endpoint string, issue, user string) error {
 	return responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-addWatcher
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-addWatcher
 func (j *Jira) IssueRemoveWatcher(issue, user string) error {
 	return IssueRemoveWatcher(j.UA, j.Endpoint, issue, user)
 }
 
 func IssueRemoveWatcher(ua HttpClient, endpoint string, issue, user string) error {
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "watchers")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "watchers")
 	uri += fmt.Sprintf("?accountId=%s", user)
 	resp, err := ua.Delete(uri)
 	if err != nil {
@@ -516,7 +516,7 @@ type CommentProvider interface {
 	ProvideComment() *jiradata.Comment
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue/{issueIdOrKey}/comment-addComment
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue/{issueIdOrKey}/comment-addComment
 func (j *Jira) IssueAddComment(issue string, cp CommentProvider) (*jiradata.Comment, error) {
 	return IssueAddComment(j.UA, j.Endpoint, issue, cp)
 }
@@ -527,7 +527,7 @@ func IssueAddComment(ua HttpClient, endpoint string, issue string, cp CommentPro
 	if err != nil {
 		return nil, err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "comment")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "comment")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err
@@ -545,7 +545,7 @@ type UserProvider interface {
 	ProvideUser() *jiradata.User
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue-assign
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue-assign
 func (j *Jira) IssueAssign(issue, name string) error {
 	return IssueAssign(j.UA, j.Endpoint, issue, name)
 }
@@ -565,7 +565,7 @@ func IssueAssign(ua HttpClient, endpoint string, issue, name string) error {
 	if err != nil {
 		return err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "assignee")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "assignee")
 	resp, err := ua.Put(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -593,7 +593,7 @@ func IssueAssignAccountID(ua HttpClient, endpoint string, issue, acctId string) 
 	if err != nil {
 		return err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/issue", issue, "assignee")
+	uri := URLJoin(endpoint, "rest/api/3/issue", issue, "assignee")
 	resp, err := ua.Put(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return err
@@ -606,7 +606,7 @@ func IssueAssignAccountID(ua HttpClient, endpoint string, issue, acctId string) 
 	return responseError(resp)
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/issue/{issueIdOrKey}/attachments-addAttachment
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/issue/{issueIdOrKey}/attachments-addAttachment
 func (j *Jira) IssueAttachFile(issue, filename string, contents io.Reader) (*jiradata.ListOfAttachment, error) {
 	return IssueAttachFile(j.UA, j.Endpoint, issue, filename, contents)
 }
@@ -623,7 +623,7 @@ func IssueAttachFile(ua HttpClient, endpoint string, issue, filename string, con
 		return nil, err
 	}
 
-	uri, err := url.Parse(URLJoin(endpoint, "rest/api/2/issue", issue, "attachments"))
+	uri, err := url.Parse(URLJoin(endpoint, "rest/api/3/issue", issue, "attachments"))
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 func ServerInfo(ua HttpClient, endpoint string) (*jiradata.ServerInfo, error) {
-	uri := URLJoin(endpoint, "rest/api/2/serverInfo")
+	uri := URLJoin(endpoint, "rest/api/3/serverInfo")
 	resp, err := ua.GetJSON(uri)
 	if err != nil {
 		return nil, err

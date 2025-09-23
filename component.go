@@ -11,7 +11,7 @@ type ComponentProvider interface {
 	ProvideComponent() *jiradata.Component
 }
 
-// https://docs.atlassian.com/jira/REST/cloud/#api/2/component-createComponent
+// https://docs.atlassian.com/jira/REST/cloud/#api/3/component-createComponent
 func (j *Jira) CreateComponent(cp ComponentProvider) (*jiradata.Component, error) {
 	return CreateComponent(j.UA, j.Endpoint, cp)
 }
@@ -22,7 +22,7 @@ func CreateComponent(ua HttpClient, endpoint string, cp ComponentProvider) (*jir
 	if err != nil {
 		return nil, err
 	}
-	uri := URLJoin(endpoint, "rest/api/2/component")
+	uri := URLJoin(endpoint, "rest/api/3/component")
 	resp, err := ua.Post(uri, "application/json", bytes.NewBuffer(encoded))
 	if err != nil {
 		return nil, err

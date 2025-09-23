@@ -25,34 +25,34 @@ echo "# Waiting for jira service to be listening on port 8080"
 docker exec -i go-jira-test tail -f screenlog.0 | grep -m 1 'jira started successfully' | sed 's/^/# /'
 
 # wait for healthchecks to pass, curl will retry 900 times over 15 min waiting
-RUNS curl -q -L --retry 900 --retry-delay 1 -f -s "http://localhost:8080/rest/api/2/serverInfo?doHealthCheck=1"
+RUNS curl -q -L --retry 900 --retry-delay 1 -f -s "http://localhost:8080/rest/api/3/serverInfo?doHealthCheck=1"
 
 # login to jira as admin user
 RUNS $jira login
 
 # create gojira user
-RUNS $jira req -M POST /rest/api/2/user '{"name":"gojira","password":"gojira123","emailAddress":"gojira@example.com","displayName":"GoJira"}'
+RUNS $jira req -M POST /rest/api/3/user '{"name":"gojira","password":"gojira123","emailAddress":"gojira@example.com","displayName":"GoJira"}'
 
 # create mothra user (need secondary user for voting)
-RUNS $jira req -M POST /rest/api/2/user '{"name":"mothra","password":"mothra123","emailAddress":"mothra@example.com","displayName":"Mothra"}'
+RUNS $jira req -M POST /rest/api/3/user '{"name":"mothra","password":"mothra123","emailAddress":"mothra@example.com","displayName":"Mothra"}'
 
 # create SCRUM softwareproject
-RUNS $jira req -M POST /rest/api/2/project '{"key":"SCRUM","name":"Scrum","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-scrum-template","lead":"gojira"}'
+RUNS $jira req -M POST /rest/api/3/project '{"key":"SCRUM","name":"Scrum","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-scrum-template","lead":"gojira"}'
 
 # create KANBAN software project
-RUNS $jira req -M POST /rest/api/2/project '{"key":"KANBAN","name":"Kanban","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-kanban-template","lead":"gojira"}'
+RUNS $jira req -M POST /rest/api/3/project '{"key":"KANBAN","name":"Kanban","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:gh-kanban-template","lead":"gojira"}'
 
 # create BAISC software project
-RUNS $jira req -M POST /rest/api/2/project '{"key":"BASIC","name":"Basic","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:basic-software-development-template","lead":"gojira"}'
+RUNS $jira req -M POST /rest/api/3/project '{"key":"BASIC","name":"Basic","projectTypeKey":"software","projectTemplateKey":"com.pyxis.greenhopper.jira:basic-software-development-template","lead":"gojira"}'
 
 # create PROJECT business project
-RUNS $jira req -M POST /rest/api/2/project '{"key":"PROJECT","name":"Project","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-project-management","lead":"gojira"}'
+RUNS $jira req -M POST /rest/api/3/project '{"key":"PROJECT","name":"Project","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-project-management","lead":"gojira"}'
 
 # create PROCESS business project
-RUNS $jira req -M POST /rest/api/2/project '{"key":"PROCESS","name":"Process","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-process-management","lead":"gojira"}'
+RUNS $jira req -M POST /rest/api/3/project '{"key":"PROCESS","name":"Process","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-process-management","lead":"gojira"}'
 
 # create TASK business project
-RUNS $jira req -M POST /rest/api/2/project '{"key":"TASK","name":"Task","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-task-management","lead":"gojira"}'
+RUNS $jira req -M POST /rest/api/3/project '{"key":"TASK","name":"Task","projectTypeKey":"business","projectTemplateKey":"com.atlassian.jira-core-project-templates:jira-core-task-management","lead":"gojira"}'
 
 RUNS $jira logout
 
