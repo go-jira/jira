@@ -1,8 +1,6 @@
-// +build !windows
-
 package jiracli
 
-import "github.com/tmc/keyring"
+import "github.com/zalando/go-keyring"
 
 func keyringGet(user string) (string, error) {
 	password, err := keyring.Get("go-jira", user)
